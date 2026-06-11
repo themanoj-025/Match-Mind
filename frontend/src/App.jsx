@@ -1,15 +1,26 @@
-import React, { lazy, Suspense, useEffect } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import React, { lazy, Suspense, useEffect, useState } from 'react'
+import { Routes, Route, useLocation } from 'react-router-dom'
+import { AnimatePresence, motion } from 'framer-motion'
 import Navbar from './components/Navbar'
 import BottomNav from './components/BottomNav'
 import LiveTicker from './components/LiveTicker'
 import ErrorBoundary from './components/ErrorBoundary'
+import CommandPalette from './components/CommandPalette'
+import PremiumLoadingScreen from './components/PremiumLoadingScreen'
+import GamificationStrip from './components/GamificationStrip'
+import QuickChatFeed from './components/QuickChatFeed'
 import useStore from './store/useStore'
 
 const LandingPage = lazy(() => import('./pages/LandingPage'))
 const LoginPage = lazy(() => import('./pages/LoginPage'))
 const SignupPage = lazy(() => import('./pages/SignupPage'))
+const ForgotPasswordPage = lazy(() => import('./pages/auth/ForgotPasswordPage'))
+const ResetPasswordPage = lazy(() => import('./pages/auth/ResetPasswordPage'))
+const VerifyEmailPage = lazy(() => import('./pages/auth/VerifyEmailPage'))
 const OnboardingPage = lazy(() => import('./pages/OnboardingPage'))
+const AboutPage = lazy(() => import('./pages/static/AboutPage'))
+const FAQPage = lazy(() => import('./pages/static/FAQPage'))
+const NotFoundPage = lazy(() => import('./pages/static/NotFoundPage'))
 const FeedPage = lazy(() => import('./pages/FeedPage'))
 const LiveHubPage = lazy(() => import('./pages/LiveHubPage'))
 const MatchRoomPage = lazy(() => import('./pages/MatchRoomPage'))
@@ -32,7 +43,26 @@ const StandingsPage = lazy(() => import('./pages/StandingsPage'))
 const TeamPage = lazy(() => import('./pages/TeamPage'))
 const PlayerPage = lazy(() => import('./pages/PlayerPage'))
 const SearchPage = lazy(() => import('./pages/SearchPage'))
+const AchievementsPage = lazy(() => import('./pages/AchievementsPage'))
+const ActivityPage = lazy(() => import('./pages/ActivityPage'))
+const MessagesPage = lazy(() => import('./pages/MessagesPage'))
+const PricingPage = lazy(() => import('./pages/PricingPage'))
 const AdminPage = lazy(() => import('./pages/AdminPage'))
+
+// ── Page transition wrapper ────────────────────────────
+const pageVariants = {
+  initial: { opacity: 0, y: 8 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.2, ease: 'easeOut' } },
+  exit: { opacity: 0, y: -8, transition: { duration: 0.15, ease: 'easeIn' } },
+}
+
+function AnimatedRoute({ children }) {
+  return (
+    <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+      {children}
+    </motion.div>
+  )
+}
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center min-h-[60vh]">
@@ -45,6 +75,10 @@ const LoadingFallback = () => (
 
 export default function App() {
   const setIsMobile = useStore((s) => s.setIsMobile)
+  const isAuthenticated = useStore((s) => s.isAuthenticated)
+  const [cmdOpen, setCmdOpen] = useState(false)
+  const [initialLoading, setInitialLoading] = useState(true)
+  const location = useLocation()
 
   // Listen for viewport resize to update isMobile state
   useEffect(() => {
@@ -54,45 +88,92 @@ export default function App() {
     return () => window.removeEventListener('resize', checkMobile)
   }, [setIsMobile])
 
+  // ⌘K / Ctrl+K toggle
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        setCmdOpen((prev) => !prev)
+      }
+      if (e.key === 'Escape' && cmdOpen) {
+        setCmdOpen(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [cmdOpen])
+
+  // Turn off initial loading after first route resolves
+  useEffect(() => {
+    const timer = setTimeout(() => setInitialLoading(false), 1200)
+    return () => clearTimeout(timer)
+  }, [])
+
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Initial loading screen (only on first visit) */}
+      <PremiumLoadingScreen isLoading={initialLoading} minDisplay={800} />
+
+      {/* Command Palette */}
+      <CommandPalette isOpen={cmdOpen} onClose={() => setCmdOpen(false)} />
+
       <Navbar />
       <LiveTicker />
+
+      {/* Gamification Strip — shows for logged-in users only */}
+      {isAuthenticated && <GamificationStrip />}
+
+      {/* Quick Chat Feed — global floating drawer */}
+      <QuickChatFeed />
+
       <main className="flex-1">
         <ErrorBoundary>
-          <Suspense fallback={<LoadingFallback />}>
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/signup" element={<SignupPage />} />
-              <Route path="/onboarding" element={<OnboardingPage />} />
-              <Route path="/feed" element={<FeedPage />} />
-              <Route path="/live" element={<LiveHubPage />} />
-              <Route path="/live/:matchId" element={<MatchRoomPage />} />
-              <Route path="/scores" element={<ScoresPage />} />
-              <Route path="/scores/:sport" element={<ScoresPage />} />
-              <Route path="/predictions" element={<PredictionsPage />} />
-              <Route path="/predictions/new/:matchId" element={<MakePredictionPage />} />
-              <Route path="/leaderboard" element={<LeaderboardPage />} />
-              <Route path="/leaderboard/:leagueId" element={<LeaderboardPage />} />
-              <Route path="/leagues" element={<LeaguesPage />} />
-              <Route path="/leagues/create" element={<CreateLeaguePage />} />
-              <Route path="/leagues/:leagueId" element={<LeagueRoomPage />} />
-              <Route path="/squads" element={<SquadsPage />} />
-              <Route path="/squads/:squadId" element={<SquadPage />} />
-              <Route path="/explore" element={<ExplorePage />} />
-              <Route path="/highlights" element={<HighlightsPage />} />
-              <Route path="/profile/:userId" element={<ProfilePage />} />
-              <Route path="/profile/me" element={<MyProfilePage />} />
-              <Route path="/profile/me/settings" element={<SettingsPage />} />
-              <Route path="/profile/me/notifications" element={<NotificationsPage />} />
-              <Route path="/standings/:sport" element={<StandingsPage />} />
-              <Route path="/teams/:teamId" element={<TeamPage />} />
-              <Route path="/players/:playerId" element={<PlayerPage />} />
-              <Route path="/search" element={<SearchPage />} />
-              <Route path="/admin" element={<AdminPage />} />
-            </Routes>
-          </Suspense>
+          <AnimatePresence mode="wait">
+            <Suspense fallback={<LoadingFallback />}>
+              <Routes location={location} key={location.pathname}>
+                <Route path="/" element={<AnimatedRoute><LandingPage /></AnimatedRoute>} />
+                <Route path="/login" element={<AnimatedRoute><LoginPage /></AnimatedRoute>} />
+                <Route path="/signup" element={<AnimatedRoute><SignupPage /></AnimatedRoute>} />
+                <Route path="/forgot-password" element={<AnimatedRoute><ForgotPasswordPage /></AnimatedRoute>} />
+                <Route path="/reset-password" element={<AnimatedRoute><ResetPasswordPage /></AnimatedRoute>} />
+                <Route path="/verify-email" element={<AnimatedRoute><VerifyEmailPage /></AnimatedRoute>} />
+                <Route path="/onboarding" element={<AnimatedRoute><OnboardingPage /></AnimatedRoute>} />
+                <Route path="/about" element={<AnimatedRoute><AboutPage /></AnimatedRoute>} />
+                <Route path="/faq" element={<AnimatedRoute><FAQPage /></AnimatedRoute>} />
+                <Route path="/404" element={<AnimatedRoute><NotFoundPage /></AnimatedRoute>} />
+                <Route path="*" element={<AnimatedRoute><NotFoundPage /></AnimatedRoute>} />
+                <Route path="/feed" element={<AnimatedRoute><FeedPage /></AnimatedRoute>} />
+                <Route path="/live" element={<AnimatedRoute><LiveHubPage /></AnimatedRoute>} />
+                <Route path="/live/:matchId" element={<AnimatedRoute><MatchRoomPage /></AnimatedRoute>} />
+                <Route path="/scores" element={<AnimatedRoute><ScoresPage /></AnimatedRoute>} />
+                <Route path="/scores/:sport" element={<AnimatedRoute><ScoresPage /></AnimatedRoute>} />
+                <Route path="/predictions" element={<AnimatedRoute><PredictionsPage /></AnimatedRoute>} />
+                <Route path="/predictions/new/:matchId" element={<AnimatedRoute><MakePredictionPage /></AnimatedRoute>} />
+                <Route path="/leaderboard" element={<AnimatedRoute><LeaderboardPage /></AnimatedRoute>} />
+                <Route path="/leaderboard/:leagueId" element={<AnimatedRoute><LeaderboardPage /></AnimatedRoute>} />
+                <Route path="/leagues" element={<AnimatedRoute><LeaguesPage /></AnimatedRoute>} />
+                <Route path="/leagues/create" element={<AnimatedRoute><CreateLeaguePage /></AnimatedRoute>} />
+                <Route path="/leagues/:leagueId" element={<AnimatedRoute><LeagueRoomPage /></AnimatedRoute>} />
+                <Route path="/squads" element={<AnimatedRoute><SquadsPage /></AnimatedRoute>} />
+                <Route path="/squads/:squadId" element={<AnimatedRoute><SquadPage /></AnimatedRoute>} />
+                <Route path="/explore" element={<AnimatedRoute><ExplorePage /></AnimatedRoute>} />
+                <Route path="/highlights" element={<AnimatedRoute><HighlightsPage /></AnimatedRoute>} />
+                <Route path="/profile/:userId" element={<AnimatedRoute><ProfilePage /></AnimatedRoute>} />
+                <Route path="/profile/me" element={<AnimatedRoute><MyProfilePage /></AnimatedRoute>} />
+                <Route path="/profile/me/settings" element={<AnimatedRoute><SettingsPage /></AnimatedRoute>} />
+                <Route path="/profile/me/notifications" element={<AnimatedRoute><NotificationsPage /></AnimatedRoute>} />
+                <Route path="/standings/:sport" element={<AnimatedRoute><StandingsPage /></AnimatedRoute>} />
+                <Route path="/teams/:teamId" element={<AnimatedRoute><TeamPage /></AnimatedRoute>} />
+                <Route path="/players/:playerId" element={<AnimatedRoute><PlayerPage /></AnimatedRoute>} />
+                <Route path="/achievements" element={<AnimatedRoute><AchievementsPage /></AnimatedRoute>} />
+                <Route path="/activity" element={<AnimatedRoute><ActivityPage /></AnimatedRoute>} />
+                <Route path="/messages" element={<AnimatedRoute><MessagesPage /></AnimatedRoute>} />
+                <Route path="/pricing" element={<AnimatedRoute><PricingPage /></AnimatedRoute>} />
+                <Route path="/search" element={<AnimatedRoute><SearchPage /></AnimatedRoute>} />
+                <Route path="/admin" element={<AnimatedRoute><AdminPage /></AnimatedRoute>} />
+              </Routes>
+            </Suspense>
+          </AnimatePresence>
         </ErrorBoundary>
       </main>
       <BottomNav />

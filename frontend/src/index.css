@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
   /* ── BACKGROUNDS ── */
@@ -13,11 +12,15 @@
   /* ── BRAND ACCENTS ── */
   --mm-accent-green: #00E676;      /* Primary CTA / Live indicator */
   --mm-accent-green-dim: #00A152;   /* Darker green (hover) */
+  --mm-accent-green-glow: rgba(0,230,118,0.15); /* Green ambient glow */
   --mm-accent-amber: #FFB300;       /* Predictions / Points */
   --mm-accent-amber-dim: #E65100;   /* Darker amber */
   --mm-accent-red: #FF3D57;         /* Alerts / Danger / Red card */
+  --mm-accent-red-dim: #C62828;    /* Red hover */
   --mm-accent-blue: #4FC3F7;        /* Info / Links */
+  --mm-accent-blue-dim: #0277BD;   /* Blue hover */
   --mm-accent-purple: #CE93D8;      /* Premium / Pro features */
+  --mm-accent-purple-dim: #7C4DFF; /* Purple hover */
 
   /* ── TEXT ── */
   --mm-text-primary: #F1F3F8;
@@ -25,6 +28,9 @@
   --mm-text-muted: #4A5168;
   --mm-text-inverse: #0A0B0F;
   --mm-text-link: #4FC3F7;
+  --mm-text-success: #00E676;
+  --mm-text-error: #FF3D57;
+  --mm-text-warning: #FFB300;
 
   /* ── SPORT COLOUR CODES ── */
   --sport-football: #2ECC40;
@@ -40,6 +46,9 @@
   --tier-gold: #FFD700;
   --tier-platinum: #E5E4E2;
   --tier-diamond: #B9F2FF;
+  --tier-legend-1: #FF6B6B;
+  --tier-legend-2: #FFE66D;
+  --tier-legend-3: #4ECDC4;
   --tier-legend: linear-gradient(135deg, #FF6B6B, #FFE66D, #4ECDC4);
 
   /* ── GRADIENTS ── */
@@ -48,19 +57,26 @@
   --gradient-pro: linear-gradient(135deg, #CE93D8 0%, #7C4DFF 100%);
   --gradient-hero: radial-gradient(ellipse at top, #1C2E1A 0%, #0A0B0F 60%);
   --gradient-card-hover: linear-gradient(135deg, rgba(0,230,118,0.04) 0%, transparent 100%);
+  --gradient-legend: linear-gradient(135deg, #FF6B6B 0%, #FFE66D 50%, #4ECDC4 100%);
+  --gradient-score: linear-gradient(180deg, #1C1F2A 0%, #13151C 100%);
+  --gradient-sidebar: linear-gradient(180deg, #13151C 0%, #0A0B0F 100%);
 
   /* ── BORDERS ── */
   --border-subtle: rgba(255, 255, 255, 0.06);
   --border-default: rgba(255, 255, 255, 0.10);
   --border-active: rgba(0, 230, 118, 0.35);
   --border-pro: rgba(206, 147, 216, 0.40);
+  --border-error: rgba(255, 61, 87, 0.50);
+  --border-focus: rgba(0, 230, 118, 0.60);
 
   /* ── SHADOWS ── */
   --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
   --shadow-elevated: 0 8px 40px rgba(0, 0, 0, 0.6);
+  --shadow-modal: 0 24px 80px rgba(0, 0, 0, 0.8);
   --shadow-glow-green: 0 0 20px rgba(0, 230, 118, 0.25);
   --shadow-glow-amber: 0 0 20px rgba(255, 179, 0, 0.25);
   --shadow-glow-purple: 0 0 20px rgba(206, 147, 216, 0.30);
+  --shadow-glow-red: 0 0 20px rgba(255, 61, 87, 0.25);
 
   /* ── SPACING (8px base) ── */
   --space-1: 4px;   --space-2: 8px;   --space-3: 12px;  --space-4: 16px;
@@ -81,7 +97,17 @@
   --z-base: 1;    --z-card: 10;
   --z-sticky: 100;  --z-drawer: 200;
   --z-modal: 300;  --z-toast: 400;
-  --z-tooltip: 500;
+  --z-tooltip: 500; --z-overlay: 600;
+
+  /* ── TRANSITIONS ── */
+  --transition-fast: 0.15s ease-out;
+  --transition-default: 0.25s ease-out;
+  --transition-slow: 0.4s ease-out;
+  --transition-spring: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── GLASS ── */
+  --mm-bg-glass: rgba(19,21,28,0.7);
+  --mm-bg-glass-border: rgba(255,255,255,0.08);
 }
 
 * {

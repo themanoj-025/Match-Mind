@@ -2,9 +2,5 @@ import { defineConfig } from '@prisma/config'
 
 export default defineConfig({
   earlyAccess: true,
-  schema: {
-    datasource: {
-      url: process.env.DATABASE_URL || 'postgresql://user:password@localhost:5432/matchmind',
-    },
-  },
+  datasourceUrl: process.env.DATABASE_URL || 'postgresql://matchmind:matchmind_pass@localhost:5432/matchmind',
 })

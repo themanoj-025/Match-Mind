@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // ─── ENUMS ──────────────────────────────────────────────
@@ -205,7 +204,6 @@ model Match {
   homeTeam       Team         @relation("homeTeam", fields: [homeTeamId], references: [id])
   awayTeam       Team         @relation("awayTeam", fields: [awayTeamId], references: [id])
   predictions    Prediction[]
-  chatMessages   ChatMessage[]
   events         MatchEvent[]
 }
 
@@ -295,7 +293,6 @@ model Squad {
   createdAt   DateTime @default(now())
 
   members      SquadMember[]
-  chatMessages ChatMessage[] @relation("squadChat")
 }
 
 model SquadMember {
@@ -325,9 +322,10 @@ model ChatMessage {
   reactions Json     @default("{}")
   isPinned  Boolean  @default(false)
   isDeleted Boolean  @default(false)
+  isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  user    User   @relation(fields: [userId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
   reports Report[]
 
   @@index([roomType, roomId])
@@ -464,4 +462,51 @@ model UserTeam {
   team Team @relation(fields: [teamId], references: [id])
 
   @@id([userId, teamId])
+}
+
+// ─── LEADERBOARD SNAPSHOTS ────────────────────────────────
+
+enum LeaderboardPeriod {
+  WEEKLY
+  MONTHLY
+}
+
+model LeaderboardSnapshot {
+  id          String           @id @default(cuid())
+  period      LeaderboardPeriod
+  periodStart DateTime
+  periodEnd   DateTime
+  snapshot    Json             // JSON array of { userId, username, displayName, avatar, points, rank, tier }
+  createdAt   DateTime         @default(now())
+
+  @@index([period, periodStart])
+}
+
+// ─── ADMIN ACTIVITY LOG ────────────────────────────────────
+
+model AdminLog {
+  id          String   @id @default(cuid())
+  adminId     String
+  action      String   // USER_DELETED | PRO_TOGGLED | REPORT_RESOLVED | REPORT_DISMISSED | MATCH_UPDATED
+  targetId    String?
+  targetType  String?  // user | match | report
+  detail      Json?
+  createdAt   DateTime @default(now())
+
+  @@index([adminId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// ─── SCORING LOG ───────────────────────────────────────────
+
+model ScoringLog {
+  id          String   @id @default(cuid())
+  matchId     String
+  type        String   // "match_finished" | "predictions_scored" | "leaderboard_reset"
+  detail      Json?
+  createdAt   DateTime @default(now())
+
+  @@index([matchId])
+  @@index([type])
 }

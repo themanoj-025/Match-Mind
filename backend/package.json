@@ -8,9 +8,13 @@
     "dev:watch": "nodemon src/index.js",
     "start": "node src/index.js",
     "prisma:generate": "prisma generate",
-    "prisma:push": "prisma db push",
+    "prisma:push": "node scripts/push-schema.js",
+    "prisma:seed": "node scripts/seed-db.js",
     "prisma:studio": "prisma studio",
-    "prisma:seed": "node prisma/seed.js"
+    "db:push": "node scripts/push-schema.js",
+    "db:seed": "node scripts/seed-db.js",
+    "db:setup": "node scripts/push-schema.js && node scripts/seed-db.js",
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
@@ -20,23 +24,29 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.104.1",
+    "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "bcryptjs": "^3.0.3",
     "bullmq": "^5.78.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
+    "crypto": "^1.0.1",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "google-auth-library": "^10.7.0",
     "helmet": "^8.2.0",
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.11.0",
+    "nodemailer": "^8.0.10",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",
+    "pg": "^8.21.0",
     "prisma": "^7.8.0",
     "redis": "^6.0.0",
     "socket.io": "^4.8.3",
+    "stripe": "^22.2.0",
     "uuid": "^14.0.0"
   },
   "devDependencies": {

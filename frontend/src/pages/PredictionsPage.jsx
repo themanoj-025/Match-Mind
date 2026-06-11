@@ -1,16 +1,25 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { TrendingUp, Zap, Trophy, Flame } from 'lucide-react'
+import { TrendingUp, Zap, Trophy, Flame, Loader } from 'lucide-react'
 import PredictionCard from '../components/PredictionCard'
+import { useMyPredictions } from '../hooks/useApi'
 
 export default function PredictionsPage() {
   const [activeTab, setActiveTab] = useState('open')
+  const { data: predictions = [], isLoading } = useMyPredictions()
 
   const tabs = [
     { id: 'open', label: 'Open Predictions' },
     { id: 'results', label: 'Results' },
     { id: 'all', label: 'All Time' },
   ]
+
+  // Compute stats from real data
+  const totalPoints = predictions.reduce((sum, p) => sum + (p.pointsEarned || 0), 0)
+  const totalPredictions = predictions.length
+  const correctPredictions = predictions.filter(p => p.status === 'CORRECT').length
+  const accuracy = totalPredictions > 0 ? Math.round((correctPredictions / totalPredictions) * 100) : 0
+  const streak = predictions.length > 0 ? (predictions[0]?.streakCurrent || 0) : 0
 
   return (
     <div className="min-h-screen pt-16 pb-20 md:pb-8">
@@ -21,29 +30,29 @@ export default function PredictionsPage() {
             <div className="flex items-center justify-center gap-1 mb-1">
               <TrendingUp size={18} className="text-[var(--mm-accent-green)]" />
             </div>
-            <span className="heading-2 text-[var(--mm-accent-green)]">0%</span>
+            <span className="heading-2 text-[var(--mm-accent-green)]">{isLoading ? '...' : `${accuracy}%`}</span>
             <span className="caption text-[var(--mm-text-muted)] block">Accuracy</span>
           </div>
           <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4 text-center">
             <div className="flex items-center justify-center gap-1 mb-1">
               <Zap size={18} className="text-[var(--mm-accent-amber)]" />
             </div>
-            <span className="heading-2 text-[var(--mm-accent-amber)]">0</span>
+            <span className="heading-2 text-[var(--mm-accent-amber)]">{isLoading ? '...' : totalPoints.toLocaleString()}</span>
             <span className="caption text-[var(--mm-text-muted)] block">Total Points</span>
           </div>
           <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4 text-center">
             <div className="flex items-center justify-center gap-1 mb-1">
               <Flame size={18} className="text-[var(--mm-accent-red)]" />
             </div>
-            <span className="heading-2 text-[var(--mm-accent-red)]">0</span>
+            <span className="heading-2 text-[var(--mm-accent-red)]">{isLoading ? '...' : streak}</span>
             <span className="caption text-[var(--mm-text-muted)] block">Streak</span>
           </div>
           <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4 text-center">
             <div className="flex items-center justify-center gap-1 mb-1">
               <Trophy size={18} className="text-[var(--mm-accent-purple)]" />
             </div>
-            <span className="heading-2 text-[var(--mm-accent-purple)]">—</span>
-            <span className="caption text-[var(--mm-text-muted)] block">Rank</span>
+            <span className="heading-2 text-[var(--mm-accent-purple)]">{isLoading ? '...' : totalPredictions}</span>
+            <span className="caption text-[var(--mm-text-muted)] block">Predictions</span>
           </div>
         </div>
 

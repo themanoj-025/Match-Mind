@@ -1,16 +1,20 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Mail, Lock, ArrowRight, Eye, EyeOff, AlertCircle } from 'lucide-react'
+import { motion } from 'framer-motion'
 import useStore from '../store/useStore'
-
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [searchParams] = useSearchParams()
   const { setUser } = useStore()
   const navigate = useNavigate()
+
+  // Check for redirect parameter
+  const redirectTo = searchParams.get('redirect') || '/feed'
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -27,9 +31,12 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.message || 'Login failed')
+      if (!res.ok) throw new Error(data.message || 'Invalid credentials')
+      
+      // Store token and user
+      localStorage.setItem('accessToken', data.accessToken)
       setUser(data.user)
-      navigate('/feed')
+      navigate(redirectTo)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -42,7 +49,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-20">
+    <motion.div
+      className="min-h-screen flex items-center justify-center px-4 py-20"
+    >
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
@@ -95,16 +104,23 @@ export default function LoginPage() {
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
+              <div className="text-right mt-1">
+                <Link to="/forgot-password" className="caption text-[var(--mm-accent-green)] hover:underline">
+                  Forgot password?
+                </Link>
+              </div>
             </div>
 
-            <button
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={loading}
               className="w-full flex items-center justify-center gap-2 bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] body font-semibold py-3 rounded-[var(--radius-md)] hover:shadow-[var(--shadow-glow-green)] transition-all duration-300 disabled:opacity-50"
             >
               {loading ? 'Signing in...' : 'Sign In'}
               <ArrowRight size={18} />
-            </button>
+            </motion.button>
           </form>
 
           <div className="relative my-6">
@@ -130,6 +146,6 @@ export default function LoginPage() {
           </p>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

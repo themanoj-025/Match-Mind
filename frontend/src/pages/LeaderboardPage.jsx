@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
 import { Trophy, TrendingUp, Users, Crown } from 'lucide-react'
 import LeaderboardRow from '../components/LeaderboardRow'
+import { useLeaderboard, useLeaderboardSport } from '../hooks/useApi'
 
 const tiers = {
   BRONZE: { label: 'Bronze', color: 'from-amber-700 to-amber-500', min: 0 },
@@ -23,18 +24,14 @@ export default function LeaderboardPage() {
     { id: 'sport', label: 'By Sport' },
   ]
 
-  const topUsers = [
-    { name: 'SportsKing', pts: 8420, acc: 78, streak: 12, rank: 1, tier: 'DIAMOND' },
-    { name: 'GoalPredictor', pts: 7910, acc: 74, streak: 9, rank: 2, tier: 'DIAMOND' },
-    { name: 'HoopsMaster', pts: 7650, acc: 71, streak: 7, rank: 3, tier: 'PLATINUM' },
-    { name: 'GridironGuru', pts: 7320, acc: 69, streak: 5, rank: 4, tier: 'PLATINUM' },
-    { name: 'AcePredictor', pts: 7040, acc: 72, streak: 8, rank: 5, tier: 'PLATINUM' },
-    { name: 'SportsFan42', pts: 6780, acc: 65, streak: 4, rank: 6, tier: 'GOLD' },
-    { name: 'GameDayPro', pts: 6540, acc: 68, streak: 6, rank: 7, tier: 'GOLD' },
-    { name: 'PredictMaster', pts: 6320, acc: 70, streak: 3, rank: 8, tier: 'GOLD' },
-    { name: 'Fanatico', pts: 6100, acc: 63, streak: 2, rank: 9, tier: 'GOLD' },
-    { name: 'SportyMind', pts: 5890, acc: 67, streak: 5, rank: 10, tier: 'GOLD' },
-  ]
+  const { data: topUsers = [] } = useLeaderboard(
+    period === 'week' ? 'week' : period === 'month' ? 'global' : 'global'
+  )
+  const { data: sportUsers = [] } = useLeaderboardSport(
+    period === 'sport' ? 'football' : null
+  )
+
+  const displayUsers = period === 'sport' ? sportUsers : topUsers
 
   return (
     <div className="min-h-screen pt-16 pb-20 md:pb-8">
@@ -126,19 +123,24 @@ export default function LeaderboardPage() {
           <div className="flex-1">
             <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-xl)] overflow-hidden">
               <div className="flex flex-col gap-0.5 p-2">
-                {topUsers.map((user, i) => (
+                {displayUsers.slice(0, 10).map((user, i) => (
                   <LeaderboardRow
-                    key={user.name}
-                    rank={i + 1}
-                    user={{ name: user.name, avatar: null }}
-                    points={user.pts}
-                    accuracy={user.acc}
-                    streak={user.streak}
+                    key={user.id || user.username || i}
+                    rank={user.rank || i + 1}
+                    user={{ name: user.displayName || user.name || user.username, avatar: user.avatar }}
+                    points={user.points || user.totalPoints || 0}
+                    accuracy={user.accuracy || user.predAccuracy || 0}
+                    streak={user.streak || user.streakCurrent || 0}
                     rankChange={i < 3 ? i + 1 : i === 4 ? -1 : i === 5 ? 2 : 0}
                     isCurrentUser={false}
-                    tier={user.tier}
+                    tier={user.tier || 'BRONZE'}
                   />
                 ))}
+                {displayUsers.length === 0 && (
+                  <div className="text-center py-8 text-[var(--mm-text-muted)]">
+                    <p className="body">No leaderboard data available yet</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

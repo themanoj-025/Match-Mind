@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Info, ChevronDown, ChevronUp, Sparkles } from 'lucide-react'
+import { ArrowLeft, Info, ChevronDown, ChevronUp, Sparkles, Loader } from 'lucide-react'
+import { useMatch, useCreatePrediction } from '../hooks/useApi'
 
 export default function MakePredictionPage() {
   const { matchId } = useParams()
@@ -11,8 +12,12 @@ export default function MakePredictionPage() {
   const [firstScorer, setFirstScorer] = useState('')
   const [totalGoalsOU, setTotalGoalsOU] = useState('')
   const [btts, setBtts] = useState(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const match = {
+  const { data: matchData, isLoading } = useMatch(matchId)
+  const createPrediction = useCreatePrediction()
+
+  const match = matchData || {
     homeTeam: 'Manchester City',
     awayTeam: 'Arsenal',
     competition: 'Premier League',
@@ -244,8 +249,34 @@ export default function MakePredictionPage() {
         </div>
 
         {/* Lock In */}
-        <button className="w-full bg-[var(--gradient-predict)] text-[var(--mm-text-inverse)] body font-bold py-4 rounded-[var(--radius-lg)] hover:shadow-[var(--shadow-glow-amber)] transition-all duration-300 text-lg">
-          Lock In Prediction
+        <button
+          onClick={async () => {
+            if (isSubmitting) return
+            setIsSubmitting(true)
+            try {
+              await createPrediction.mutateAsync({
+                matchId,
+                homeGoals,
+                awayGoals,
+                firstScorer: firstScorer || undefined,
+                totalGoalsOU: totalGoalsOU || undefined,
+                btts: btts !== null ? btts : undefined,
+              })
+              navigate(`/live/${matchId}`)
+            } catch (err) {
+              alert('Failed to submit prediction: ' + err.message)
+            } finally {
+              setIsSubmitting(false)
+            }
+          }}
+          disabled={isSubmitting}
+          className="w-full bg-[var(--gradient-predict)] text-[var(--mm-text-inverse)] body font-bold py-4 rounded-[var(--radius-lg)] hover:shadow-[var(--shadow-glow-amber)] transition-all duration-300 text-lg disabled:opacity-50"
+        >
+          {isSubmitting ? (
+            <span className="flex items-center justify-center gap-2"><Loader size={18} className="animate-spin" /> Submitting...</span>
+          ) : (
+            'Lock In Prediction'
+          )}
         </button>
       </div>
     </div>

@@ -1,15 +1,78 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useParams, Link } from 'react-router-dom'
-import { Send, Users, BarChart3, Timer, Activity, ChevronLeft, Sparkles, Lock, Trophy, MessageCircle } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Send, Users, BarChart3, Timer, Activity, ChevronLeft, Sparkles, Lock, Trophy, MessageCircle, Loader } from 'lucide-react'
 import ScoreDisplay from '../components/ScoreDisplay'
 import LiveBadge from '../components/LiveBadge'
 import ChatMessage from '../components/ChatMessage'
 import SportBadge from '../components/SportBadge'
 import StatBar from '../components/StatBar'
 import useStore from '../store/useStore'
+import { useMatch, useMatchStats, useMatchLineups, useMatchH2H, useMatchTimeline } from '../hooks/useApi'
 
 const reactions = ['🔥', '😱', '👏', '😤', '⚽', '🏀']
+
+// ── Animated xG Bar ───────────────────────────────────
+function AnimatedXGBar({ label, home, away, homeColor = 'var(--mm-accent-green)', awayColor = 'var(--mm-accent-amber)' }) {
+  const max = Math.max(home, away, 0.1)
+  const homePct = (home / max) * 100
+  const awayPct = (away / max) * 100
+
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="caption text-[var(--mm-text-muted)] text-center">{label}</span>
+      <div className="flex items-end gap-2 h-20">
+        <div className="flex-1 flex flex-col items-center gap-1">
+          <span className="caption font-bold" style={{ color: homeColor }}>{home.toFixed(1)}</span>
+          <div
+            className="w-full rounded-t-[var(--radius-sm)] transition-all duration-700"
+            style={{ height: `${homePct}%`, background: `linear-gradient(180deg, ${homeColor}, ${homeColor}88)` }}
+          />
+        </div>
+        <div className="flex-1 flex flex-col items-center gap-1">
+          <span className="caption font-bold" style={{ color: awayColor }}>{away.toFixed(1)}</span>
+          <div
+            className="w-full rounded-t-[var(--radius-sm)] transition-all duration-700"
+            style={{ height: `${awayPct}%`, background: `linear-gradient(180deg, ${awayColor}, ${awayColor}88)` }}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Spotlight Effect ──────────────────────────────────
+function StadiumSpotlight() {
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      {/* Top-left spotlight */}
+      <div
+        className="absolute -top-20 -left-20 w-64 h-64 rounded-full opacity-[0.04]"
+        style={{
+          background: 'radial-gradient(circle, var(--mm-accent-green) 0%, transparent 70%)',
+          animation: 'float 6s ease-in-out infinite',
+        }}
+      />
+      {/* Top-right spotlight */}
+      <div
+        className="absolute -top-32 -right-20 w-80 h-80 rounded-full opacity-[0.03]"
+        style={{
+          background: 'radial-gradient(circle, var(--mm-accent-blue) 0%, transparent 70%)',
+          animation: 'float 8s ease-in-out infinite 1s',
+        }}
+      />
+      {/* Center glow */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full opacity-[0.02]"
+        style={{
+          background: 'radial-gradient(circle, var(--mm-accent-amber) 0%, transparent 60%)',
+          animation: 'glow-pulse 4s ease-in-out infinite',
+        }}
+      />
+    </div>
+  )
+}
 
 export default function MatchRoomPage() {
   const { matchId } = useParams()
@@ -21,11 +84,27 @@ export default function MatchRoomPage() {
   const [predHome, setPredHome] = useState(0)
   const [predAway, setPredAway] = useState(0)
   const [showGoalOverlay, setShowGoalOverlay] = useState(false)
-  const chatEndRef = useRef(null)
+  const [goalSequence, setGoalSequence] = useState(0)
   const [showGifPicker, setShowGifPicker] = useState(false)
+  const chatEndRef = useRef(null)
 
-  // Mock match data with full stats
-  const match = {
+  const { data: matchData, isLoading: matchLoading } = useMatch(matchId)
+  const { data: statsData } = useMatchStats(matchId)
+  const { data: lineupsData } = useMatchLineups(matchId)
+  const { data: h2hData } = useMatchH2H(matchId)
+  const { data: timelineData } = useMatchTimeline(matchId)
+
+  const handleReact = (messageId, emoji) => {
+    setMessages(prev => prev.map(msg => {
+      if (msg.id !== messageId) return msg
+      const reactions = { ...(msg.reactions || {}) }
+      reactions[emoji] = (reactions[emoji] || 0) + 1
+      return { ...msg, reactions }
+    }))
+  }
+
+  // Build match from API data with graceful fallback
+  const match = matchData || {
     id: matchId,
     homeTeam: 'Manchester City',
     awayTeam: 'Arsenal',
@@ -40,7 +119,7 @@ export default function MatchRoomPage() {
     awayLogo: null,
   }
 
-  const stats = {
+  const stats = statsData || {
     possession: [55, 45],
     shots: [12, 8],
     shotsOnTarget: [5, 3],
@@ -50,8 +129,7 @@ export default function MatchRoomPage() {
     xg: [1.8, 1.2],
   }
 
-  // Mock timeline events
-  const timeline = [
+  const timeline = timelineData || [
     { minute: 67, type: 'goal', team: 'home', description: 'J. Alvarez — Assisted by K. De Bruyne', scorer: 'J. Alvarez' },
     { minute: 42, type: 'goal', team: 'away', description: 'M. Ødegaard — Penalty', scorer: 'M. Ødegaard' },
     { minute: 28, type: 'goal', team: 'home', description: 'E. Haaland — Header from corner', scorer: 'E. Haaland' },
@@ -59,12 +137,12 @@ export default function MatchRoomPage() {
     { minute: 15, type: 'yellow', team: 'home', description: 'R. Dias' },
   ]
 
-  const lineups = {
+  const lineups = lineupsData || {
     home: { formation: '4-3-3', players: ['Ederson', 'Walker', 'Dias', 'Aké', 'Gvardiol', 'Rodri', 'De Bruyne', 'Silva', 'Foden', 'Haaland', 'Alvarez'] },
     away: { formation: '4-3-3', players: ['Raya', 'White', 'Saliba', 'Gabriel', 'Zinchenko', 'Rice', 'Ødegaard', 'Havertz', 'Saka', 'Jesus', 'Martinelli'] },
   }
 
-  const h2h = { homeWins: 12, draws: 5, awayWins: 8, lastMeetings: [{ date: 'Sep 2025', score: '2-2' }, { date: 'Mar 2025', score: '1-0' }, { date: 'Oct 2024', score: '2-1' }, { date: 'Apr 2024', score: '0-0' }, { date: 'Jan 2024', score: '1-1' }] }
+  const h2h = h2hData || { homeWins: 12, draws: 5, awayWins: 8, lastMeetings: [{ date: 'Sep 2025', score: '2-2' }, { date: 'Mar 2025', score: '1-0' }, { date: 'Oct 2024', score: '2-1' }, { date: 'Apr 2024', score: '0-0' }, { date: 'Jan 2024', score: '1-1' }] }
 
   // Socket sim: initial chat + goal effect
   useEffect(() => {
@@ -77,6 +155,7 @@ export default function MatchRoomPage() {
     // Simulate goal event after 3s
     const goalTimer = setTimeout(() => {
       setShowGoalOverlay(true)
+      setGoalSequence(prev => prev + 1)
       setMessages(prev => [...prev, { id: Date.now(), user: { name: 'System', avatar: null }, text: '⚽ GOAL! Julian Alvarez (67\')', timestamp: "67'", isSystem: true }])
       setTimeout(() => setShowGoalOverlay(false), 1500)
     }, 3000)
@@ -161,15 +240,39 @@ export default function MatchRoomPage() {
       </Helmet>
 
       {/* Goal Overlay */}
-      {showGoalOverlay && (
-        <div className="fixed inset-0 z-[var(--z-modal)] flex items-center justify-center pointer-events-none animate-fade-in-up">
-          <div className="bg-[var(--mm-accent-green)]/90 text-[var(--mm-text-inverse)] px-8 py-6 rounded-[var(--radius-xl)] text-center shadow-[var(--shadow-elevated)]">
-            <div className="text-5xl mb-2">⚽</div>
-            <div className="display-l">GOAL!</div>
-            <div className="body-large font-semibold">J. Alvarez · 67'</div>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {showGoalOverlay && (
+          <motion.div
+            key={`goal-${goalSequence}`}
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.1 }}
+            transition={{ duration: 0.3, ease: 'backOut' }}
+            className="fixed inset-0 z-[var(--z-modal)] flex items-center justify-center pointer-events-none"
+          >
+            <div className="bg-[var(--mm-accent-green)]/95 text-[var(--mm-text-inverse)] px-10 py-8 rounded-[var(--radius-xl)] text-center shadow-[var(--shadow-elevated)] backdrop-blur-sm">
+              <motion.div
+                animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.2, 1.2, 1] }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+                className="text-6xl mb-3"
+              >
+                ⚽
+              </motion.div>
+              <motion.div
+                initial={{ y: 10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                <div className="display-l">GOAL!</div>
+                <div className="body-large font-semibold mt-1">Julian Alvarez · 67'</div>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Stadium Spotlights */}
+      <StadiumSpotlight />
 
       {/* Match Header */}
       <div className="bg-[var(--mm-bg-secondary)] border-b border-[var(--border-subtle)] sticky top-16 z-[var(--z-sticky)]">
@@ -259,49 +362,48 @@ export default function MatchRoomPage() {
             <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4 sm:p-6">
               {/* Stats Tab */}
               {activeTab === 'stats' && (
-                <div className="grid gap-4">
+                <motion.div
+                  key={`stats-${goalSequence}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="grid gap-4"
+                >
                   <h3 className="heading-3 mb-2">Match Statistics</h3>
                   <StatBar homeValue={stats.possession[0]} awayValue={stats.possession[1]} label="Possession" homeColor="var(--mm-accent-green)" awayColor="var(--mm-accent-amber)" />
-                  <div className="flex justify-between py-2 border-b border-[var(--border-subtle)]">
-                    <span className="body font-medium text-[var(--mm-accent-green)]">{stats.shots[0]}</span>
-                    <span className="caption text-[var(--mm-text-muted)]">Shots</span>
-                    <span className="body font-medium text-[var(--mm-accent-amber)]">{stats.shots[1]}</span>
-                  </div>
-                  <div className="flex justify-between py-2 border-b border-[var(--border-subtle)]">
-                    <span className="body font-medium text-[var(--mm-accent-green)]">{stats.shotsOnTarget[0]}</span>
-                    <span className="caption text-[var(--mm-text-muted)]">Shots on Target</span>
-                    <span className="body font-medium text-[var(--mm-accent-amber)]">{stats.shotsOnTarget[1]}</span>
-                  </div>
-                  <div className="flex justify-between py-2 border-b border-[var(--border-subtle)]">
-                    <span className="body font-medium text-[var(--mm-accent-green)]">{stats.corners[0]}</span>
-                    <span className="caption text-[var(--mm-text-muted)]">Corners</span>
-                    <span className="body font-medium text-[var(--mm-accent-amber)]">{stats.corners[1]}</span>
-                  </div>
-                  <div className="flex justify-between py-2 border-b border-[var(--border-subtle)]">
-                    <span className="body font-medium text-[var(--mm-accent-green)]">{stats.fouls[0]}</span>
-                    <span className="caption text-[var(--mm-text-muted)]">Fouls</span>
-                    <span className="body font-medium text-[var(--mm-accent-amber)]">{stats.fouls[1]}</span>
-                  </div>
-                  <div className="flex justify-between py-2 border-b border-[var(--border-subtle)]">
-                    <span className="body font-medium text-[var(--mm-accent-green)]">{stats.yellowCards[0]}</span>
-                    <span className="caption text-[var(--mm-text-muted)]">Yellow Cards</span>
-                    <span className="body font-medium text-[var(--mm-accent-amber)]">{stats.yellowCards[1]}</span>
-                  </div>
-                  {/* xG Bar */}
+                  
+                  {/* Stat rows with hover effect */}
+                  {[
+                    { key: 'shots', label: 'Shots', home: stats.shots, away: stats.shots },
+                    { key: 'shotsOT', label: 'Shots on Target', home: stats.shotsOnTarget, away: stats.shotsOnTarget },
+                    { key: 'corners', label: 'Corners', home: stats.corners, away: stats.corners },
+                    { key: 'fouls', label: 'Fouls', home: stats.fouls, away: stats.fouls },
+                    { key: 'yellow', label: 'Yellow Cards', home: stats.yellowCards, away: stats.yellowCards },
+                  ].map((stat, i) => (
+                    <motion.div
+                      key={stat.key}
+                      initial={{ opacity: 0, x: -5 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.04 }}
+                      className="flex justify-between py-2 border-b border-[var(--border-subtle)] hover:bg-[var(--mm-bg-hover)]/50 px-2 -mx-2 rounded-[var(--radius-sm)] transition-colors"
+                    >
+                      <span className="body font-medium text-[var(--mm-accent-green)]">{stat.home[0]}</span>
+                      <span className="caption text-[var(--mm-text-muted)]">{stat.label}</span>
+                      <span className="body font-medium text-[var(--mm-accent-amber)]">{stat.away[1]}</span>
+                    </motion.div>
+                  ))}
+
+                  {/* Animated xG Bars */}
                   <div className="pt-4 border-t border-[var(--border-subtle)]">
-                    <span className="caption text-[var(--mm-text-muted)] mb-2 block">Expected Goals (xG)</span>
-                    <div className="flex items-end gap-2 h-24">
-                      <div className="flex-1 flex flex-col items-center gap-1">
-                        <span className="caption font-bold text-[var(--mm-accent-green)]">{stats.xg[0]}</span>
-                        <div className="w-full rounded-t-[var(--radius-sm)]" style={{ height: `${stats.xg[0] / 2.5 * 100}%`, background: 'var(--gradient-live)' }} />
-                      </div>
-                      <div className="flex-1 flex flex-col items-center gap-1">
-                        <span className="caption font-bold text-[var(--mm-accent-amber)]">{stats.xg[1]}</span>
-                        <div className="w-full rounded-t-[var(--radius-sm)]" style={{ height: `${stats.xg[1] / 2.5 * 100}%`, background: 'var(--gradient-predict)' }} />
-                      </div>
-                    </div>
+                    <AnimatedXGBar
+                      label="Expected Goals (xG)"
+                      home={stats.xg[0]}
+                      away={stats.xg[1]}
+                      homeColor="var(--mm-accent-green)"
+                      awayColor="var(--mm-accent-amber)"
+                    />
                   </div>
-                </div>
+                </motion.div>
               )}
 
               {/* Timeline Tab */}
@@ -404,36 +506,10 @@ export default function MatchRoomPage() {
                 </div>
               </div>
 
-              {/* Messages */}
+              {/* Messages - using enhanced ChatMessage component */}
               <div className="flex-1 overflow-y-auto py-2">
                 {messages.map((msg) => (
-                  msg.isSystem ? (
-                    <div key={msg.id} className="flex items-center justify-center py-1.5 px-4">
-                      <span className="caption text-[var(--mm-text-muted)] italic">{msg.text}</span>
-                    </div>
-                  ) : (
-                    <div key={msg.id} className="flex gap-2.5 px-4 py-2 hover:bg-[var(--mm-bg-hover)]/30 transition-colors group">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--mm-accent-amber)] to-[var(--mm-accent-purple)] flex items-center justify-center shrink-0">
-                        <span className="text-xs font-bold text-[var(--mm-text-inverse)]">{msg.user.name.charAt(0)}</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="body font-semibold text-[var(--mm-text-primary)]">{msg.user.name}</span>
-                          <span className="caption text-[var(--mm-text-muted)]">{msg.timestamp}</span>
-                        </div>
-                        <p className="body text-[var(--mm-text-secondary)] mt-0.5 break-words">{msg.text}</p>
-                        {msg.reactions && Object.keys(msg.reactions).length > 0 && (
-                          <div className="flex items-center gap-1.5 mt-1">
-                            {Object.entries(msg.reactions).map(([emoji, count]) => (
-                              <button key={emoji} className="flex items-center gap-0.5 px-1.5 py-0.5 bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-sm)] caption text-[var(--mm-text-muted)] hover:bg-[var(--mm-bg-hover)]">
-                                {emoji} {count}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )
+                  <ChatMessage key={msg.id} message={msg} onReact={handleReact} onReport={() => {}} />
                 ))}
                 <div ref={chatEndRef} />
               </div>

@@ -1,0 +1,21 @@
+{
+  "name": "matchmind",
+  "version": "1.0.0",
+  "private": true,
+  "description": "🏟️ MatchMind — The Internet's Sports Bar",
+  "scripts": {
+    "dev": "concurrently -n api,web -c cyan,green \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:watch": "concurrently -n api,web -c cyan,green \"cd backend && npm run dev:watch\" \"cd frontend && npm run dev\"",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "build": "cd frontend && npm run build",
+    "prisma:generate": "cd backend && npx prisma generate",
+    "prisma:push": "cd backend && node scripts/push-schema.js",
+    "prisma:seed": "cd backend && npm run prisma:seed",
+    "setup": "npm run install:all && npm run prisma:generate && npm run prisma:push && npm run prisma:seed"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

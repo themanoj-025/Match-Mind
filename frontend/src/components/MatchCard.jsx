@@ -22,7 +22,7 @@ export default function MatchCard({ match, onEnterRoom, onPredict }) {
 
   return (
     <div
-      className={`bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] overflow-hidden transition-all duration-300 hover:border-[var(--border-active)] hover:shadow-[var(--shadow-card)] group ${
+      className={`bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] overflow-hidden transition-all duration-300 hover:border-[var(--border-active)] hover:shadow-[var(--shadow-card)] hover:-translate-y-0.5 group ${
         isFinished ? 'opacity-60' : ''
       }`}
     >
@@ -102,14 +102,14 @@ export default function MatchCard({ match, onEnterRoom, onPredict }) {
         {!isFinished && onPredict && (
           <button
             onClick={onPredict}
-            className="caption font-semibold text-[var(--mm-accent-amber)] hover:text-[var(--mm-accent-green)] transition-colors px-3 py-1.5 rounded-[var(--radius-sm)] hover:bg-[var(--mm-bg-hover)]"
+            className="caption font-semibold text-[var(--mm-accent-amber)] hover:text-[var(--mm-accent-green)] transition-colors px-3 py-1.5 rounded-[var(--radius-sm)] hover:bg-[var(--mm-bg-hover)] active:scale-95"
           >
             Predict
           </button>
         )}
         <button
           onClick={onEnterRoom}
-          className="caption font-semibold bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] px-4 py-1.5 rounded-[var(--radius-sm)] hover:shadow-[var(--shadow-glow-green)] transition-all duration-300"
+          className="caption font-semibold bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] px-4 py-1.5 rounded-[var(--radius-sm)] hover:shadow-[var(--shadow-glow-green)] active:scale-95 transition-all duration-300"
         >
           {isFinished ? 'Results' : isScheduled ? 'Set Reminder' : 'Enter Room'}
         </button>

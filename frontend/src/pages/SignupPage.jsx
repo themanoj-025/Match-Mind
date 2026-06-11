@@ -1,17 +1,50 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Mail, Lock, User, ArrowRight, Eye, EyeOff } from 'lucide-react'
+import { Mail, Lock, User, ArrowRight, Eye, EyeOff, Check, X } from 'lucide-react'
+import { motion } from 'framer-motion'
 import useStore from '../store/useStore'
-
 export default function SignupPage() {
   const [form, setForm] = useState({ username: '', email: '', password: '', confirmPassword: '' })
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [usernameAvailable, setUsernameAvailable] = useState(null) // null | true | false
   const { setUser } = useStore()
   const navigate = useNavigate()
 
+  const usernameTimerRef = useRef(null)
+
   const updateField = (field, value) => setForm((prev) => ({ ...prev, [field]: value }))
+
+  // Password strength
+  const getStrength = (pwd) => {
+    if (!pwd) return 0
+    let score = 0
+    if (pwd.length >= 8) score++
+    if (/[A-Z]/.test(pwd)) score++
+    if (/[0-9]/.test(pwd)) score++
+    if (/[^A-Za-z0-9]/.test(pwd)) score++
+    return score
+  }
+  const strength = getStrength(form.password)
+  const strengthLabels = ['', 'Weak', 'Fair', 'Good', 'Strong']
+  const strengthColors = ['', 'var(--mm-accent-red)', 'var(--mm-accent-amber)', 'var(--mm-accent-blue)', 'var(--mm-accent-green)']
+
+  // Username availability check (debounced)
+  const checkUsername = async (username) => {
+    if (username.length < 3) { setUsernameAvailable(null); return }
+    try {
+      const res = await fetch(`/api/users/check-username?username=${encodeURIComponent(username)}`)
+      const data = await res.json()
+      setUsernameAvailable(data.available)
+    } catch { setUsernameAvailable(null) }
+  }
+
+  const handleUsernameChange = (value) => {
+    updateField('username', value)
+    if (usernameTimerRef.current) clearTimeout(usernameTimerRef.current)
+    usernameTimerRef.current = setTimeout(() => checkUsername(value), 500)
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -37,8 +70,9 @@ export default function SignupPage() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.message || 'Signup failed')
+      localStorage.setItem('accessToken', data.accessToken)
       setUser(data.user)
-      navigate('/onboarding')
+      navigate('/verify-email')
     } catch (err) {
       setError(err.message)
     } finally {
@@ -47,7 +81,9 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-20">
+    <motion.div
+      className="min-h-screen flex items-center justify-center px-4 py-20"
+    >
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
@@ -74,10 +110,22 @@ export default function SignupPage() {
                 <input
                   type="text"
                   value={form.username}
-                  onChange={(e) => updateField('username', e.target.value)}
+                  onChange={(e) => handleUsernameChange(e.target.value)}
                   placeholder="yourname"
-                  className="w-full bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-primary)] body rounded-[var(--radius-md)] pl-10 pr-4 py-3 border border-[var(--border-subtle)] focus:border-[var(--border-active)] focus:outline-none transition-colors"
+                  autoComplete="username"
+                  className="w-full bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-primary)] body rounded-[var(--radius-md)] pl-10 pr-10 py-3 border border-[var(--border-subtle)] focus:border-[var(--border-active)] focus:outline-none transition-colors"
                 />
+                {form.username.length >= 3 && (
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2">
+                    {usernameAvailable === true ? (
+                      <Check size={16} className="text-[var(--mm-accent-green)]" />
+                    ) : usernameAvailable === false ? (
+                      <X size={16} className="text-[var(--mm-accent-red)]" />
+                    ) : (
+                      <span className="w-4 h-4 border-2 border-[var(--mm-text-muted)] border-t-transparent rounded-full animate-spin" />
+                    )}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -104,6 +152,7 @@ export default function SignupPage() {
                   value={form.password}
                   onChange={(e) => updateField('password', e.target.value)}
                   placeholder="••••••••"
+                  autoComplete="new-password"
                   className="w-full bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-primary)] body rounded-[var(--radius-md)] pl-10 pr-10 py-3 border border-[var(--border-subtle)] focus:border-[var(--border-active)] focus:outline-none transition-colors"
                 />
                 <button
@@ -114,6 +163,23 @@ export default function SignupPage() {
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
+              {/* Password Strength Meter */}
+              {form.password && (
+                <div className="mt-2">
+                  <div className="flex gap-1 mb-1">
+                    {[1, 2, 3, 4].map((level) => (
+                      <div
+                        key={level}
+                        className="h-1 flex-1 rounded-full transition-all duration-300"
+                        style={{ background: strength >= level ? strengthColors[strength] : 'var(--mm-bg-tertiary)' }}
+                      />
+                    ))}
+                  </div>
+                  <span className="caption" style={{ color: strengthColors[strength] || 'var(--mm-text-muted)' }}>
+                    {strengthLabels[strength]}
+                  </span>
+                </div>
+              )}
             </div>
 
             <div>
@@ -160,6 +226,6 @@ export default function SignupPage() {
           </p>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

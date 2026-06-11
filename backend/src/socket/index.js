@@ -80,6 +80,28 @@ const setupSocket = (io, prisma) => {
       io.to('global').emit('MATCH_STATUS', data)
     })
 
+    // ─── Direct Messages ─────────────────────────────────
+
+    // User is typing in a DM conversation
+    socket.on('DM_TYPING', ({ roomId }) => {
+      socket.to(roomId).emit('DM_TYPING', { roomId, userId: socket.userId })
+    })
+
+    // User stopped typing
+    socket.on('DM_STOP_TYPING', ({ roomId }) => {
+      socket.to(roomId).emit('DM_STOP_TYPING', { roomId, userId: socket.userId })
+    })
+
+    // Join a DM room (called when user opens a DM conversation)
+    socket.on('JOIN_DM', ({ roomId }) => {
+      socket.join(roomId)
+    })
+
+    // Leave a DM room
+    socket.on('LEAVE_DM', ({ roomId }) => {
+      socket.leave(roomId)
+    })
+
     // Handle disconnection
     socket.on('disconnect', () => {
       console.log(`Socket disconnected: ${socket.id}`)

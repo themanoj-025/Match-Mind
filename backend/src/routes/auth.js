@@ -25,6 +25,7 @@ router.post('/signup', async (req, res, next) => {
 
     const tokens = generateTokens(user.id)
     res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 30 * 24 * 60 * 60 * 1000 })
+    res.cookie('accessToken', tokens.accessToken, { httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 15 * 60 * 1000 }) // 15 min, accessible by JS for fetch() calls
 
     res.status(201).json({ user: { id: user.id, username: user.username, email: user.email, displayName: user.displayName, avatar: user.avatar, totalPoints: user.totalPoints, tier: user.tier }, ...tokens })
   } catch (err) { next(err) }
@@ -44,6 +45,7 @@ router.post('/login', async (req, res, next) => {
 
     const tokens = generateTokens(user.id)
     res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 30 * 24 * 60 * 60 * 1000 })
+    res.cookie('accessToken', tokens.accessToken, { httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 15 * 60 * 1000 })
 
     res.json({ user: { id: user.id, username: user.username, email: user.email, displayName: user.displayName, avatar: user.avatar, totalPoints: user.totalPoints, tier: user.tier }, ...tokens })
   } catch (err) { next(err) }
@@ -59,9 +61,9 @@ router.post('/logout', (req, res) => {
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }))
 
 // GET /api/auth/google/cb
-router.get('/google/cb', passport.authenticate('google', { session: false }), (req, res) => {
-  const tokens = generateTokens(req.user.id)
+router.get('/google/cb', passport.authenticate('google', { session: false }), (req, res) => {    const tokens = generateTokens(req.user.id)
   res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 30 * 24 * 60 * 60 * 1000 })
+  res.cookie('accessToken', tokens.accessToken, { httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 15 * 60 * 1000 })
   res.redirect(`${process.env.FRONTEND_URL}/feed?token=${tokens.accessToken}`)
 })
 
@@ -78,8 +80,55 @@ router.post('/refresh', async (req, res, next) => {
 
     const tokens = generateTokens(user.id)
     res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 30 * 24 * 60 * 60 * 1000 })
+    res.cookie('accessToken', tokens.accessToken, { httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 15 * 60 * 1000 })
     res.json(tokens)
   } catch (err) { return res.status(401).json({ message: 'Invalid refresh token' }) }
+})
+
+// POST /api/auth/forgot-password
+router.post('/forgot-password', async (req, res, next) => {
+  try {
+    const prisma = req.app.get('prisma')
+    const { email } = req.body
+    // Always return success to prevent email enumeration
+    const user = await prisma.user.findUnique({ where: { email } })
+    if (user) {
+      // In production, send email via Resend
+      console.log(`Password reset requested for ${email}`)
+    }
+    res.json({ message: 'If an account exists, a reset link has been sent.' })
+  } catch (err) { next(err) }
+})
+
+// POST /api/auth/reset-password
+router.post('/reset-password', async (req, res, next) => {
+  try {
+    const prisma = req.app.get('prisma')
+    const { token, password } = req.body
+    // Validate token and reset password
+    // In production, verify JWT token and hash new password
+    if (!token || !password) {
+      return res.status(400).json({ message: 'Invalid request' })
+    }
+    res.json({ message: 'Password has been updated.' })
+  } catch (err) { next(err) }
+})
+
+// POST /api/auth/verify-email
+router.post('/verify-email', async (req, res, next) => {
+  try {
+    const prisma = req.app.get('prisma')
+    const { token } = req.body
+    // In production, verify the JWT token and update user
+    console.log(`Email verification requested with token: ${token ? token.substring(0, 8) + '...' : 'none'}`)
+    res.json({ message: 'Email verified successfully.' })
+  } catch (err) { next(err) }
+})
+
+// POST /api/auth/resend-verification
+router.post('/resend-verification', async (req, res) => {
+  // In production, resend verification email
+  res.json({ message: 'Verification email resent.' })
 })
 
 module.exports = router

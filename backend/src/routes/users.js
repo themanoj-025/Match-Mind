@@ -2,6 +2,19 @@ const express = require('express')
 const router = express.Router()
 const { authenticateToken } = require('../middleware/auth')
 
+// GET /api/users/check-username
+router.get('/check-username', async (req, res, next) => {
+  try {
+    const prisma = req.app.get('prisma')
+    const { username } = req.query
+    if (!username || username.length < 3) {
+      return res.json({ available: false })
+    }
+    const existing = await prisma.user.findUnique({ where: { username } })
+    res.json({ available: !existing })
+  } catch (err) { next(err) }
+})
+
 router.get('/:id', async (req, res, next) => {
   try {
     const prisma = req.app.get('prisma')

@@ -1,3 +1,4 @@
+require('dotenv').config()
 const { PrismaClient, Sport, MatchStatus, PredStatus, Tier } = require('@prisma/client')
 const bcrypt = require('bcryptjs')
 
@@ -193,7 +194,7 @@ async function main() {
         type: n.type,
         title: n.title,
         message: n.message,
-        read: n.type === 'leaderboard',
+        isRead: n.type === 'leaderboard',
       },
     })
   }
