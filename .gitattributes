@@ -1,0 +1,69 @@
+# Auto-detect text files and normalize line endings
+* text=auto
+
+# JavaScript / TypeScript source
+*.js text
+*.jsx text
+*.ts text
+*.tsx text
+*.mjs text
+*.cjs text
+
+# CSS / Styles
+*.css text
+*.scss text
+*.less text
+
+# HTML
+*.html text diff=html
+
+# Markdown documentation
+*.md text
+*.rst text
+
+# Config files
+*.yml text
+*.yaml text
+*.toml text
+*.json text
+*.cfg text
+*.ini text
+*.env text
+
+# Shell / batch scripts
+*.sh text eol=lf
+*.bat text eol=crlf
+
+# Docker
+Dockerfile text
+Dockerfile.* text
+docker-compose.yml text
+
+# Package manager files (npm)
+package.json text
+package-lock.json text -diff
+yarn.lock text -diff
+pnpm-lock.yaml text -diff
+
+# Prisma schema
+*.prisma text
+
+# IDE / editor
+*.code-workspace text
+.editorconfig text
+
+# Vercel config
+vercel.json text
+
+# Binary files - don't modify
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.svg text  # SVGs are text-based
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.zip binary

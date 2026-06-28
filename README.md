@@ -1,5 +1,13 @@
 # 🏟️ MatchMind — The Internet's Sports Bar
 
+![Node.js](https://img.shields.io/badge/Node.js-20+-339933?logo=node.js&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?logo=postgresql&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-7-DC382D?logo=redis&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green)
+[![CI](https://img.shields.io/github/actions/workflow/status/themanoj-025/Match-Mind/ci.yml?branch=main&label=CI&logo=github)](https://github.com/themanoj-025/Match-Mind/actions/workflows/ci.yml)
+[![Dependabot](https://img.shields.io/badge/dependabot-enabled-025E8C?logo=dependabot)](https://github.com/themanoj-025/Match-Mind/security/dependabot)
+
 **Watch. Predict. Compete. Talk sport together. Unlock AI insights.**
 
 MatchMind is a real-time social sports prediction platform where fans watch live games, make score predictions, compete on leaderboards, chat in live match rooms, unlock AI-powered insights, earn achievements, and build a global fan community.
