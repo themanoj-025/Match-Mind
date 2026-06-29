@@ -63,3 +63,5 @@ backend/prisma/*.tsbuildinfo
 *.tmp
 *.temp
 .cache/
+
+CLAUDE.md
