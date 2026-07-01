@@ -58,7 +58,7 @@ export default function ScoresPage() {
   }, [allMatches])
 
   // Quick stats
-  const liveCount = allMatches.filter(m => m.status === 'LIVE').length
+  const liveCount = allMatches.filter(m => m.status === 'SIMULATING').length
   const finishedCount = allMatches.filter(m => m.status === 'FINISHED' || m.status === 'COMPLETED').length
   const upcomingCount = allMatches.filter(m => m.status === 'SCHEDULED').length
   const predictCount = upcomingCount
@@ -264,7 +264,7 @@ export default function ScoresPage() {
 
                         {/* Score / Time */}
                         <Link to={`/live/${match.id}`} className="flex items-center gap-2 min-w-[80px] justify-center hover:opacity-80">
-                          {match.status === 'LIVE' ? (
+                          {match.status === 'SIMULATING' ? (
                             <>
                               <span className="w-1.5 h-1.5 rounded-full bg-[var(--mm-accent-green)] animate-live-pulse" />
                               <span className="body font-bold text-[var(--mm-accent-green)]">{match.homeScore ?? '?'} - {match.awayScore ?? '?'}</span>

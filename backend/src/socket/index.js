@@ -1,9 +1,11 @@
 /**
- * Socket.IO event handlers
+ * Socket.IO event handlers — MatchMind
  *
  * Now enforces JWT authentication for ALL connections.
  * Chat messages are validated, sanitized, and persisted to the database before emitting.
  * Room joins are validated against allowed room types.
+ *
+ * Simulation events use SIM_* prefix for clarity.
  */
 const jwt = require('jsonwebtoken')
 
@@ -34,7 +36,6 @@ const setupSocket = (io, prisma) => {
 
     // ─── Room Management ─────────────────────────────────
 
-    // Handle joining match/chat rooms
     socket.on('JOIN_ROOM', ({ roomId }) => {
       if (!roomId || typeof roomId !== 'string') return
 
@@ -49,7 +50,6 @@ const setupSocket = (io, prisma) => {
       }
     })
 
-    // Handle leaving rooms
     socket.on('LEAVE_ROOM', ({ roomId }) => {
       if (!roomId || typeof roomId !== 'string') return
       socket.leave(roomId)
@@ -64,18 +64,15 @@ const setupSocket = (io, prisma) => {
 
     socket.on('SEND_MESSAGE', async ({ roomId, text, gifUrl }) => {
       try {
-        // Validate inputs
         if (!roomId || typeof roomId !== 'string') return
         const cleanText = typeof text === 'string' ? text.trim().slice(0, 1000) : ''
         const cleanGifUrl = typeof gifUrl === 'string' ? gifUrl.trim().slice(0, 500) : null
 
         if (!cleanText && !cleanGifUrl) return
 
-        // Determine and validate room type
         const roomType = roomId.split(':')[0]
         if (!ALLOWED_ROOM_TYPES.includes(roomType)) return
 
-        // Persist to database first
         const message = await prisma.chatMessage.create({
           data: {
             roomType,
@@ -92,7 +89,6 @@ const setupSocket = (io, prisma) => {
           },
         })
 
-        // Then broadcast the persisted message with a real DB id
         io.to(roomId).emit('CHAT_MESSAGE', message)
       } catch (err) {
         console.error('[Socket] SEND_MESSAGE error:', err.message)
@@ -108,23 +104,28 @@ const setupSocket = (io, prisma) => {
       io.to(roomId).emit('REACTION_UPDATE', { roomId, emoji, userId: socket.userId })
     })
 
-    // ─── Score & Match Events ─────────────────────────────
+    // ─── Simulation Events (SIM_* prefix) ─────────────────
 
-    socket.on('SCORE_UPDATE', (data) => {
+    socket.on('SIM_STATUS_UPDATE', (data) => {
       if (!data?.matchId) return
-      io.to(`match:${data.matchId}`).emit('SCORE_UPDATE', data)
-      io.to('global').emit('SCORE_UPDATE', data)
+      io.to(`match:${data.matchId}`).emit('SIM_STATUS_UPDATE', data)
+      io.to('global').emit('SIM_STATUS_UPDATE', data)
     })
 
-    socket.on('GOAL_EVENT', (data) => {
+    socket.on('SIM_GOAL_EVENT', (data) => {
       if (!data?.matchId) return
-      io.to(`match:${data.matchId}`).emit('GOAL_EVENT', data)
+      io.to(`match:${data.matchId}`).emit('SIM_GOAL_EVENT', data)
+      io.to('global').emit('SIM_GOAL_EVENT', data)
     })
 
-    socket.on('MATCH_STATUS', (data) => {
+    socket.on('SIM_CARD_EVENT', (data) => {
       if (!data?.matchId) return
-      io.to(`match:${data.matchId}`).emit('MATCH_STATUS', data)
-      io.to('global').emit('MATCH_STATUS', data)
+      io.to(`match:${data.matchId}`).emit('SIM_CARD_EVENT', data)
+    })
+
+    socket.on('SIM_SUB_EVENT', (data) => {
+      if (!data?.matchId) return
+      io.to(`match:${data.matchId}`).emit('SIM_SUB_EVENT', data)
     })
 
     // ─── Direct Messages ─────────────────────────────────
@@ -142,7 +143,6 @@ const setupSocket = (io, prisma) => {
     socket.on('JOIN_DM', ({ roomId }) => {
       if (!roomId || typeof roomId !== 'string') return
       if (!roomId.startsWith('dm:')) return
-      // Verify user is a participant in this DM
       const participants = roomId.replace('dm:', '').split(':')
       if (!participants.includes(socket.userId)) return
       socket.join(roomId)
@@ -153,7 +153,6 @@ const setupSocket = (io, prisma) => {
       socket.leave(roomId)
     })
 
-    // Handle disconnection
     socket.on('disconnect', () => {
       console.log(`Socket disconnected: ${socket.id} (user: ${socket.userId})`)
     })

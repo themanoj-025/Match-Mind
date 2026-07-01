@@ -24,7 +24,7 @@ const useStore = create((set, get) => ({
   updateMatchScore: (matchId, homeScore, awayScore, minute) =>
     set((state) => ({
       liveMatches: state.liveMatches.map((m) =>
-        m.id === matchId ? { ...m, homeScore, awayScore, minute, status: 'LIVE' } : m
+        m.id === matchId ? { ...m, homeScore, awayScore, minute, status: 'SIMULATING' } : m
       ),
     })),
   updateMatchStatus: (matchId, status, minute) =>

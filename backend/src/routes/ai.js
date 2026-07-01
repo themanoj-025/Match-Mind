@@ -1,77 +1,71 @@
 const express = require('express')
 const router = express.Router()
 const { authenticateToken, optionalAuth } = require('../middleware/auth')
+const asyncHandler = require('../middleware/asyncHandler')
 
 /**
  * POST /api/ai/predict/:matchId
  * Returns AI-powered prediction for a match
- * Uses Anthropic Claude when API key is configured, otherwise falls back to smart heuristics
  */
-router.post('/predict/:matchId', optionalAuth, async (req, res, next) => {
-  try {
-    const prisma = req.app.get('prisma')
-    const match = await prisma.match.findUnique({ where: { id: req.params.matchId } })
-    if (!match) return res.status(404).json({ message: 'Match not found' })
+router.post('/predict/:matchId', optionalAuth, asyncHandler(async (req, res) => {
+  const prisma = req.app.get('prisma')
+  const match = await prisma.match.findUnique({ where: { id: req.params.matchId } })
+  if (!match) return res.status(404).json({ error: { code: 'MATCH_NOT_FOUND', message: 'Match not found' } })
 
-    const isPro = req.userId ? await checkProStatus(prisma, req.userId) : false
+  const isPro = req.userId ? await checkProStatus(prisma, req.userId) : false
 
-    // If not pro, return blurred/unavailable
-    if (!isPro) {
-      return res.json({
-        isProFeature: true,
-        homeGoals: null,
-        awayGoals: null,
-        confidence: null,
-        reasoning: null,
-        message: 'AI predictions are a Pro feature. Upgrade to unlock.',
-      })
-    }
-
-    // Try Anthropic SDK if configured
-    let anthropicResult = null
-    if (process.env.ANTHROPIC_API_KEY) {
-      try {
-        anthropicResult = await getAnthropicPrediction(match)
-      } catch (err) {
-        console.error('Anthropic API error:', err.message)
-      }
-    }
-
-    // Use heuristic fallback or Anthropic result
-    if (anthropicResult) {
-      return res.json({
-        isProFeature: false,
-        ...anthropicResult,
-      })
-    }
-
-    // Smart heuristic prediction
-    const prediction = generatePrediction(match)
-    res.json({
-      isProFeature: false,
-      ...prediction,
+  if (!isPro) {
+    return res.json({
+      isProFeature: true,
+      homeGoals: null,
+      awayGoals: null,
+      confidence: null,
+      reasoning: null,
+      message: 'AI predictions are a Pro feature. Upgrade to unlock.',
     })
-  } catch (err) { next(err) }
-})
+  }
+
+  // Try Anthropic SDK if configured
+  let anthropicResult = null
+  if (process.env.ANTHROPIC_API_KEY) {
+    try {
+      anthropicResult = await getAnthropicPrediction(match)
+    } catch (err) {
+      console.error('Anthropic API error:', err.message)
+    }
+  }
+
+  if (anthropicResult) {
+    return res.json({
+      isProFeature: false,
+      ...anthropicResult,
+    })
+  }
+
+  // Smart heuristic prediction
+  const prediction = generatePrediction(match)
+  res.json({
+    isProFeature: false,
+    ...prediction,
+  })
+}))
 
 /**
  * POST /api/ai/summary/:matchId
  * Generates AI match summary after match completes
  */
-router.post('/summary/:matchId', authenticateToken, async (req, res, next) => {
-  try {
-    const prisma = req.app.get('prisma')
-    const match = await prisma.match.findUnique({
-      where: { id: req.params.matchId },
-      include: { events: { orderBy: { minute: 'asc' } } },
-    })
-    if (!match) return res.status(404).json({ message: 'Match not found' })
-    if (match.status !== 'FINISHED') return res.status(400).json({ message: 'Match not yet finished' })
+router.post('/summary/:matchId', authenticateToken, asyncHandler(async (req, res) => {
+  const prisma = req.app.get('prisma')
+  const match = await prisma.match.findUnique({
+    where: { id: req.params.matchId },
+    include: { events: { orderBy: { minute: 'asc' } } },
+  })
+  if (!match) return res.status(404).json({ error: { code: 'MATCH_NOT_FOUND', message: 'Match not found' } })
+  if (match.status !== 'FINISHED') return res.status(400).json({ error: { code: 'MATCH_NOT_FINISHED', message: 'Match not yet finished' } })
 
-    const summary = generateMatchSummary(match)
-    res.json({ summary })
-  } catch (err) { next(err) }
-})
+  const summary = generateMatchSummary(match)
+  res.json({ summary })
+}))
 
 async function checkProStatus(prisma, userId) {
   const user = await prisma.user.findUnique({
@@ -124,12 +118,11 @@ Only respond with valid JSON, no other text.`,
 }
 
 function generatePrediction(match) {
-  // Smart heuristic based on match data
-  const totalGoals = 1 + Math.floor(Math.random() * 3) // 1-3 total goals
-  const homeWinProb = 0.45 + Math.random() * 0.2 // 45-65% home bias
+  const totalGoals = 1 + Math.floor(Math.random() * 3)
+  const homeWinProb = 0.45 + Math.random() * 0.2
   const homeGoals = Math.round(totalGoals * homeWinProb)
   const awayGoals = Math.max(0, totalGoals - homeGoals)
-  const confidence = 55 + Math.floor(Math.random() * 25) // 55-79%
+  const confidence = 55 + Math.floor(Math.random() * 25)
 
   const reasons = [
     `${match.homeTeamName} have strong home form this season, averaging 2.1 goals per game at their stadium. ${match.awayTeamName} have conceded an average of 1.8 goals away from home.`,

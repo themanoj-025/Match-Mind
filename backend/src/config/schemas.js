@@ -65,7 +65,7 @@ const finishMatchSchema = z.object({
 const updateMatchSchema = z.object({
   homeScore: nonNegativeInt.optional(),
   awayScore: nonNegativeInt.optional(),
-  status: z.enum(['SCHEDULED', 'LIVE', 'HALFTIME', 'FINISHED', 'POSTPONED', 'CANCELLED']).optional(),
+  status: z.enum(['SCHEDULED', 'SIMULATING', 'HALFTIME', 'FINISHED', 'POSTPONED', 'CANCELLED']).optional(),
   minute: nonNegativeInt.optional(),
 }).strict()
 

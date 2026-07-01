@@ -19,11 +19,23 @@ enum Sport {
 
 enum MatchStatus {
   SCHEDULED
-  LIVE
+  SIMULATING
   HALFTIME
   FINISHED
   POSTPONED
   CANCELLED
+}
+
+enum MatchEventType {
+  GOAL
+  YELLOW_CARD
+  RED_CARD
+  SUBSTITUTION
+  POSSESSION_TICK
+  KICKOFF
+  HALFTIME_WHISTLE
+  FULLTIME_WHISTLE
+  VAR
 }
 
 enum PredStatus {
@@ -134,7 +146,6 @@ model Competition {
   sport       Sport
   logo        String?
   countryCode String?
-  externalId  String?  @unique
   isActive    Boolean  @default(true)
 
   matches   Match[]
@@ -148,7 +159,12 @@ model Team {
   logo        String?
   countryCode String?
   sport       Sport
-  externalId  String? @unique
+
+  // Simulation engine ratings (0-100 scale)
+  attackRating   Float  @default(65)
+  defenseRating  Float  @default(65)
+  formRating     Float  @default(50)
+  homeAdvantage  Float  @default(5)
 
   homeMatches Match[]         @relation("homeTeam")
   awayMatches Match[]         @relation("awayTeam")
@@ -166,7 +182,6 @@ model Player {
   photo       String?
   teamId      String?
   sport       Sport
-  externalId  String? @unique
 
   team Team? @relation(fields: [teamId], references: [id])
 }
@@ -174,12 +189,12 @@ model Player {
 // ─── MATCHES ────────────────────────────────────────────
 
 model Match {
-  id             String      @id
+  id             String      @id @default(cuid())
   sport          Sport
   competitionId  String
   homeTeamId     String
   awayTeamId     String
-  // Denormalized convenience fields (populated on seed/import)
+  // Denormalized convenience fields
   homeTeamName   String
   awayTeamName   String
   homeTeamLogo   String?
@@ -197,27 +212,40 @@ model Match {
   kickedOffAt    DateTime?
   finishedAt     DateTime?
   season         String?
-  externalId     String?     @unique
   aiSummary      String?
+
+  // Simulation engine fields
+  simSeed             Int?
+  simSpeedMultiplier  Float?  @default(20.0)
+  simStartedAt        DateTime?
+  simEndsAt           DateTime?
 
   competitionRel Competition  @relation(fields: [competitionId], references: [id])
   homeTeam       Team         @relation("homeTeam", fields: [homeTeamId], references: [id])
   awayTeam       Team         @relation("awayTeam", fields: [awayTeamId], references: [id])
   predictions    Prediction[]
   events         MatchEvent[]
+
+  @@index([status])
+  @@index([scheduledAt])
+  @@index([sport])
 }
 
 model MatchEvent {
-  id        String   @id @default(cuid())
+  id        String          @id @default(cuid())
   matchId   String
-  type      String   // GOAL, YELLOW_CARD, RED_CARD, SUBSTITUTION, VAR
+  type      MatchEventType
   minute    Int
   teamId    String?
   playerId  String?
   detail    Json?
-  createdAt DateTime @default(now())
+  createdAt DateTime        @default(now())
 
   match Match @relation(fields: [matchId], references: [id])
+
+  @@index([matchId])
+  @@index([matchId, type])
+  @@index([matchId, minute])
 }
 
 // ─── PREDICTIONS ────────────────────────────────────────
@@ -502,7 +530,7 @@ model AdminLog {
 
 model ScoringLog {
   id          String   @id @default(cuid())
-  matchId     String
+  matchId     String?
   type        String   // "match_finished" | "predictions_scored" | "leaderboard_reset"
   detail      Json?
   createdAt   DateTime @default(now())

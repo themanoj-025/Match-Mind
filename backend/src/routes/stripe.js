@@ -3,63 +3,60 @@ const router = express.Router()
 const { authenticateToken } = require('../middleware/auth')
 const { validate } = require('../middleware/validate')
 const { createCheckoutSchema } = require('../config/schemas')
+const asyncHandler = require('../middleware/asyncHandler')
 
 /**
  * POST /api/stripe/create-checkout
  * Creates a Stripe Checkout Session for Pro subscription
  */
-router.post('/create-checkout', authenticateToken, validate(createCheckoutSchema), async (req, res, next) => {
+router.post('/create-checkout', authenticateToken, validate(createCheckoutSchema), asyncHandler(async (req, res) => {
+  const prisma = req.app.get('prisma')
+  const { plan } = req.body // 'monthly' | 'annual'
+
+  const user = await prisma.user.findUnique({ where: { id: req.userId } })
+  if (!user) return res.status(404).json({ error: { code: 'USER_NOT_FOUND', message: 'User not found' } })
+
+  // If user already has a Stripe customer, reuse it
+  const existingSub = await prisma.subscription.findUnique({ where: { userId: user.id } })
+
+  let stripe
   try {
-    const prisma = req.app.get('prisma')
-    const { plan } = req.body // 'monthly' | 'annual'
-
-    const user = await prisma.user.findUnique({ where: { id: req.userId } })
-    if (!user) return res.status(404).json({ message: 'User not found' })
-
-    // If user already has a Stripe customer, reuse it
-    const existingSub = await prisma.subscription.findUnique({ where: { userId: user.id } })
-
-    let stripe
-    try {
-      stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
-    } catch {
-      // Stripe not configured — return direct link for testing
-      console.log('[Stripe] API key not configured, returning mock URL')
-      return res.json({
-        url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/profile/me/settings?pro=activated`,
-      })
-    }
-
-    const priceId = plan === 'annual'
-      ? process.env.STRIPE_PRICE_ANNUAL
-      : process.env.STRIPE_PRICE_MONTHLY
-
-    if (!priceId) {
-      return res.status(500).json({ error: { code: 'STRIPE_NOT_CONFIGURED', message: 'Stripe price ID not configured' } })
-    }
-
-    const session = await stripe.checkout.sessions.create({
-      customer: existingSub?.stripeCustomerId || undefined,
-      customer_email: existingSub ? undefined : user.email,
-      mode: 'subscription',
-      line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/profile/me/settings?pro=activated`,
-      cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/pricing?cancelled=true`,
-      metadata: { userId: user.id },
-      ...(existingSub?.stripeCustomerId ? {} : {
-        customer_creation: 'always',
-      }),
+    stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
+  } catch {
+    // Stripe not configured — return direct link for testing
+    console.log('[Stripe] API key not configured, returning mock URL')
+    return res.json({
+      url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/profile/me/settings?pro=activated`,
     })
+  }
 
-    res.json({ url: session.url })
-  } catch (err) { next(err) }
-})
+  const priceId = plan === 'annual'
+    ? process.env.STRIPE_PRICE_ANNUAL
+    : process.env.STRIPE_PRICE_MONTHLY
+
+  if (!priceId) {
+    return res.status(500).json({ error: { code: 'STRIPE_NOT_CONFIGURED', message: 'Stripe price ID not configured' } })
+  }
+
+  const session = await stripe.checkout.sessions.create({
+    customer: existingSub?.stripeCustomerId || undefined,
+    customer_email: existingSub ? undefined : user.email,
+    mode: 'subscription',
+    line_items: [{ price: priceId, quantity: 1 }],
+    success_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/profile/me/settings?pro=activated`,
+    cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/pricing?cancelled=true`,
+    metadata: { userId: user.id },
+    ...(existingSub?.stripeCustomerId ? {} : {
+      customer_creation: 'always',
+    }),
+  })
+
+  res.json({ url: session.url })
+}))
 
 /**
  * POST /api/stripe/webhook
  * Stripe webhook handler — listens for subscription lifecycle events
- * Note: raw body parsing is handled at the app level in index.js (before express.json())
- * to preserve the Buffer needed for signature verification.
  */
 router.post('/webhook', async (req, res) => {
   const sig = req.headers['stripe-signature']
@@ -67,7 +64,6 @@ router.post('/webhook', async (req, res) => {
 
   try {
     const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
-    // req.body is a Buffer because the raw middleware ran before express.json() in index.js
     const body = Buffer.isBuffer(req.body) ? req.body : JSON.stringify(req.body)
     event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET)
   } catch (err) {
@@ -83,7 +79,6 @@ router.post('/webhook', async (req, res) => {
       const userId = session.metadata?.userId
       if (!userId) break
 
-      // Create or update subscription
       const subscriptionId = session.subscription
       const customerId = session.customer
 
@@ -115,7 +110,6 @@ router.post('/webhook', async (req, res) => {
             },
           })
 
-          // Grant Pro benefits
           await prisma.user.update({
             where: { id: userId },
             data: {
@@ -202,63 +196,59 @@ router.post('/webhook', async (req, res) => {
  * POST /api/stripe/create-portal-session
  * Creates a Stripe Customer Portal session for managing billing
  */
-router.post('/create-portal-session', authenticateToken, async (req, res, next) => {
+router.post('/create-portal-session', authenticateToken, asyncHandler(async (req, res) => {
+  const prisma = req.app.get('prisma')
+  const sub = await prisma.subscription.findUnique({ where: { userId: req.userId } })
+
+  if (!sub?.stripeCustomerId) {
+    return res.status(400).json({ error: { code: 'NO_SUBSCRIPTION', message: 'No active subscription found' } })
+  }
+
+  let stripe
   try {
-    const prisma = req.app.get('prisma')
-    const sub = await prisma.subscription.findUnique({ where: { userId: req.userId } })
+    stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
+  } catch {
+    return res.json({ url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/pricing` })
+  }
 
-    if (!sub?.stripeCustomerId) {
-      return res.status(400).json({ error: { code: 'NO_SUBSCRIPTION', message: 'No active subscription found' } })
-    }
+  const portalSession = await stripe.billingPortal.sessions.create({
+    customer: sub.stripeCustomerId,
+    return_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/profile/me/settings`,
+  })
 
-    let stripe
-    try {
-      stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
-    } catch {
-      return res.json({ url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/pricing` })
-    }
-
-    const portalSession = await stripe.billingPortal.sessions.create({
-      customer: sub.stripeCustomerId,
-      return_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/profile/me/settings`,
-    })
-
-    res.json({ url: portalSession.url })
-  } catch (err) { next(err) }
-})
+  res.json({ url: portalSession.url })
+}))
 
 /**
  * GET /api/stripe/status
  * Returns the current user's subscription status
  */
-router.get('/status', authenticateToken, async (req, res, next) => {
-  try {
-    const prisma = req.app.get('prisma')
+router.get('/status', authenticateToken, asyncHandler(async (req, res) => {
+  const prisma = req.app.get('prisma')
 
-    const user = await prisma.user.findUnique({
-      where: { id: req.userId },
-      select: {
-        isPro: true,
-        proExpiresAt: true,
-        subscription: true,
-      },
-    })
+  const user = await prisma.user.findUnique({
+    where: { id: req.userId },
+    select: {
+      isPro: true,
+      proExpiresAt: true,
+      subscription: true,
+    },
+  })
 
-    if (!user) return res.status(404).json({ message: 'User not found' })
+  if (!user) return res.status(404).json({ error: { code: 'USER_NOT_FOUND', message: 'User not found' } })
 
-    res.json({
-      isPro: user.isPro,
-      proExpiresAt: user.proExpiresAt,
-      subscription: user.subscription
-        ? {
-            plan: user.subscription.plan,
-            status: user.subscription.status,
-            currentPeriodEnd: user.subscription.currentPeriodEnd,
-            cancelAtPeriodEnd: user.subscription.cancelAtPeriodEnd,
-          }
-        : null,
-    })
-  } catch (err) { next(err) }
-})
+  res.json({
+    isPro: user.isPro,
+    proExpiresAt: user.proExpiresAt,
+    subscription: user.subscription
+      ? {
+          plan: user.subscription.plan,
+          status: user.subscription.status,
+          currentPeriodEnd: user.subscription.currentPeriodEnd,
+          cancelAtPeriodEnd: user.subscription.cancelAtPeriodEnd,
+        }
+      : null,
+  })
+}))
 
 module.exports = router

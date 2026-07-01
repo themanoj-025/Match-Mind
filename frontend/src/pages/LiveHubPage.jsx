@@ -37,7 +37,7 @@ export default function LiveHubPage() {
     return today.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
   }
 
-  const liveMatchList = liveMatches.filter((m) => m.status === 'LIVE')
+  const liveMatchList = liveMatches.filter((m) => m.status === 'SIMULATING')
   const upcomingList = liveMatches.filter((m) => m.status === 'SCHEDULED')
   const finishedList = liveMatches.filter((m) => m.status === 'FINISHED' || m.status === 'COMPLETED')
 

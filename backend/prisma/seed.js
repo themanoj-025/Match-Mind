@@ -60,11 +60,11 @@ async function main() {
   const now = new Date()
 
   const matchesData = [
-    // LIVE matches
-    { id: 'live-1', sport: Sport.FOOTBALL, competition: 'Premier League', homeTeamId: 'team-mci', awayTeamId: 'team-ars', homeTeamName: 'Manchester City', awayTeamName: 'Arsenal', homeScore: 2, awayScore: 1, status: MatchStatus.LIVE, minute: 67, scheduledAt: new Date(now.getTime() - 7200000), kickedOffAt: new Date(now.getTime() - 5400000), stadium: 'Etihad Stadium', season: '2025/26' },
-    { id: 'live-2', sport: Sport.FOOTBALL, competition: 'La Liga', homeTeamId: 'team-rma', awayTeamId: 'team-fcb', homeTeamName: 'Real Madrid', awayTeamName: 'Barcelona', homeScore: 1, awayScore: 1, status: MatchStatus.LIVE, minute: 34, scheduledAt: new Date(now.getTime() - 3600000), kickedOffAt: new Date(now.getTime() - 2040000), stadium: 'Santiago Bernabéu', season: '2025/26' },
-    { id: 'live-3', sport: Sport.BASKETBALL, competition: 'NBA', homeTeamId: 'team-lal', awayTeamId: 'team-bos', homeTeamName: 'LA Lakers', awayTeamName: 'Boston Celtics', homeScore: 89, awayScore: 92, status: MatchStatus.LIVE, minute: 8, scheduledAt: new Date(now.getTime() - 2700000), kickedOffAt: new Date(now.getTime() - 1800000), stadium: 'Crypto.com Arena', season: '2025/26' },
-    { id: 'live-4', sport: Sport.TENNIS, competition: 'Wimbledon', homeTeamId: 'player-djokovic', awayTeamId: 'player-alcaraz', homeTeamName: 'N. Djokovic', awayTeamName: 'C. Alcaraz', homeScore: 2, awayScore: 1, status: MatchStatus.LIVE, minute: 3, scheduledAt: new Date(now.getTime() - 3600000), kickedOffAt: new Date(now.getTime() - 1800000), stadium: 'Centre Court', season: '2025' },
+    // SIMULATING matches (pre-seeded as FINISHED with events for demo)
+    { id: 'live-1', sport: Sport.FOOTBALL, competition: 'Premier League', homeTeamId: 'team-mci', awayTeamId: 'team-ars', homeTeamName: 'Manchester City', awayTeamName: 'Arsenal', homeScore: 2, awayScore: 1, status: MatchStatus.FINISHED, minute: 90, scheduledAt: new Date(now.getTime() - 7200000), kickedOffAt: new Date(now.getTime() - 7200000), finishedAt: new Date(now.getTime() - 3600000), simSeed: 42, simStartedAt: new Date(now.getTime() - 7200000), simEndsAt: new Date(now.getTime() - 3600000), stadium: 'Etihad Stadium', season: '2025/26' },
+    { id: 'live-2', sport: Sport.FOOTBALL, competition: 'La Liga', homeTeamId: 'team-rma', awayTeamId: 'team-fcb', homeTeamName: 'Real Madrid', awayTeamName: 'Barcelona', homeScore: 1, awayScore: 1, status: MatchStatus.FINISHED, minute: 90, scheduledAt: new Date(now.getTime() - 3600000), kickedOffAt: new Date(now.getTime() - 3600000), finishedAt: new Date(), simSeed: 99, simStartedAt: new Date(now.getTime() - 3600000), simEndsAt: new Date(), stadium: 'Santiago Bernabéu', season: '2025/26' },
+    { id: 'live-3', sport: Sport.BASKETBALL, competition: 'NBA', homeTeamId: 'team-lal', awayTeamId: 'team-bos', homeTeamName: 'LA Lakers', awayTeamName: 'Boston Celtics', homeScore: 105, awayScore: 98, status: MatchStatus.FINISHED, minute: 48, scheduledAt: new Date(now.getTime() - 2700000), kickedOffAt: new Date(now.getTime() - 2700000), finishedAt: new Date(), simSeed: 7, simStartedAt: new Date(now.getTime() - 2700000), simEndsAt: new Date(), stadium: 'Crypto.com Arena', season: '2025/26' },
+    { id: 'live-4', sport: Sport.TENNIS, competition: 'Wimbledon', homeTeamId: 'player-djokovic', awayTeamId: 'player-alcaraz', homeTeamName: 'N. Djokovic', awayTeamName: 'C. Alcaraz', homeScore: 2, awayScore: 1, status: MatchStatus.FINISHED, minute: 3, scheduledAt: new Date(now.getTime() - 3600000), kickedOffAt: new Date(now.getTime() - 3600000), finishedAt: new Date(), simSeed: 123, simStartedAt: new Date(now.getTime() - 3600000), simEndsAt: new Date(), stadium: 'Centre Court', season: '2025' },
 
     // UPCOMING matches
     { id: 'upcoming-1', sport: Sport.FOOTBALL, competition: 'Champions League', homeTeamId: 'team-liv', awayTeamId: 'team-mun', homeTeamName: 'Liverpool', awayTeamName: 'Bayern Munich', homeScore: null, awayScore: null, status: MatchStatus.SCHEDULED, minute: 0, scheduledAt: new Date(now.getTime() + 7200000), stadium: 'Anfield', season: '2025/26' },
@@ -87,23 +87,23 @@ async function main() {
   // ========== PREDICTIONS ==========
   const predictionsData = [
     // demouser predictions
-    { username: 'demouser', matchId: 'live-1', homeGoals: 2, awayGoals: 1, firstScorer: 'E. Haaland', totalGoalsOU: 'Over 2.5', btts: true, status: PredStatus.PENDING },
-    { username: 'demouser', matchId: 'live-2', homeGoals: 2, awayGoals: 1, firstScorer: 'K. Mbappé', status: PredStatus.PENDING },
+    { username: 'demouser', matchId: 'live-1', homeGoals: 2, awayGoals: 1, firstScorerId: 'E. Haaland', totalGoalsOU: 'Over 2.5', btts: true, status: PredStatus.PENDING },
+    { username: 'demouser', matchId: 'live-2', homeGoals: 2, awayGoals: 1, firstScorerId: 'K. Mbappé', status: PredStatus.PENDING },
     { username: 'demouser', matchId: 'upcoming-1', homeGoals: 2, awayGoals: 1, btts: true, status: PredStatus.PENDING },
     { username: 'demouser', matchId: 'upcoming-2', homeGoals: 1, awayGoals: 1, status: PredStatus.PENDING },
-    { username: 'demouser', matchId: 'finished-1', homeGoals: 1, awayGoals: 2, firstScorer: 'M. Ødegaard', btts: true, status: PredStatus.SCORED, pointsEarned: 15 },
+    { username: 'demouser', matchId: 'finished-1', homeGoals: 1, awayGoals: 2, firstScorerId: 'M. Ødegaard', btts: true, status: PredStatus.SCORED, pointsEarned: 15 },
     { username: 'demouser', matchId: 'finished-2', homeGoals: 110, awayGoals: 105, totalGoalsOU: 'Over 210.5', status: PredStatus.SCORED, pointsEarned: 0 },
 
     // sportsking predictions (top predictor)
-    { username: 'sportsking', matchId: 'live-1', homeGoals: 3, awayGoals: 1, firstScorer: 'E. Haaland', btts: true, status: PredStatus.PENDING },
-    { username: 'sportsking', matchId: 'live-2', homeGoals: 2, awayGoals: 1, firstScorer: 'Vini Jr.', status: PredStatus.PENDING },
-    { username: 'sportsking', matchId: 'finished-1', homeGoals: 1, awayGoals: 3, firstScorer: 'B. Saka', btts: true, status: PredStatus.SCORED, pointsEarned: 50 },
+    { username: 'sportsking', matchId: 'live-1', homeGoals: 3, awayGoals: 1, firstScorerId: 'E. Haaland', btts: true, status: PredStatus.PENDING },
+    { username: 'sportsking', matchId: 'live-2', homeGoals: 2, awayGoals: 1, firstScorerId: 'Vini Jr.', status: PredStatus.PENDING },
+    { username: 'sportsking', matchId: 'finished-1', homeGoals: 1, awayGoals: 3, firstScorerId: 'B. Saka', btts: true, status: PredStatus.SCORED, pointsEarned: 50 },
     { username: 'sportsking', matchId: 'finished-2', homeGoals: 115, awayGoals: 102, totalGoalsOU: 'Over 210.5', status: PredStatus.SCORED, pointsEarned: 10 },
 
     // goalpredictor predictions
     { username: 'goalpredictor', matchId: 'live-1', homeGoals: 2, awayGoals: 2, btts: true, status: PredStatus.PENDING },
     { username: 'goalpredictor', matchId: 'live-3', homeGoals: 95, awayGoals: 98, totalGoalsOU: 'Over 190.5', status: PredStatus.PENDING },
-    { username: 'goalpredictor', matchId: 'finished-1', homeGoals: 0, awayGoals: 2, firstScorer: 'M. Ødegaard', btts: false, status: PredStatus.SCORED, pointsEarned: 15 },
+    { username: 'goalpredictor', matchId: 'finished-1', homeGoals: 0, awayGoals: 2, firstScorerId: 'M. Ødegaard', btts: false, status: PredStatus.SCORED, pointsEarned: 15 },
     { username: 'goalpredictor', matchId: 'finished-3', homeGoals: 24, awayGoals: 20, status: PredStatus.SCORED, pointsEarned: 0 },
   ]
 
@@ -114,7 +114,7 @@ async function main() {
         matchId: p.matchId,
         homeGoals: p.homeGoals,
         awayGoals: p.awayGoals,
-        firstScorer: p.firstScorer || null,
+        firstScorerId: p.firstScorerId || null,
         totalGoalsOU: p.totalGoalsOU || null,
         btts: p.btts ?? null,
         status: p.status,
@@ -203,7 +203,7 @@ async function main() {
   console.log('\n🎉 Seeding complete!')
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
   console.log(`📊 Users:         ${Object.keys(users).length}`)
-  console.log(`📊 Matches:       ${matchesData.length} (${matchesData.filter(m => m.status === 'LIVE').length} live, ${matchesData.filter(m => m.status === 'SCHEDULED').length} upcoming, ${matchesData.filter(m => m.status === 'FINISHED').length} finished)`)
+  console.log(`📊 Matches:       ${matchesData.length} (${matchesData.filter(m => m.status === 'SIMULATING').length} simulating, ${matchesData.filter(m => m.status === 'SCHEDULED').length} upcoming, ${matchesData.filter(m => m.status === 'FINISHED').length} finished)`)
   console.log(`📊 Predictions:   ${predictionsData.length}`)
   console.log(`📊 Leagues:       ${leaguesData.length}`)
   console.log(`📊 Squads:        ${squadsData.length}`)

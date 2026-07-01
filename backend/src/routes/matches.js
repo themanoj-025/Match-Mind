@@ -1,188 +1,218 @@
 const express = require('express')
 const router = express.Router()
 const { authenticateToken } = require('../middleware/auth')
-const { queueScoreMatchPredictions, queueRecalculateRanks } = require('../workers/queue')
-const { scoreMatchPredictions, recalculateRanks } = require('../services/scoring')
+const { requireAdmin } = require('../middleware/requireAdmin')
+const { finalizeMatch } = require('../workflows/finalizeMatch')
 const { validate } = require('../middleware/validate')
 const { finishMatchSchema } = require('../config/schemas')
-
-/**
- * Middleware: require ADMIN or SUPERADMIN role
- */
-async function requireAdmin(req, res, next) {
-  try {
-    const prisma = req.app.get('prisma')
-    const user = await prisma.user.findUnique({ where: { id: req.userId }, select: { role: true } })
-    if (!user || (user.role !== 'ADMIN' && user.role !== 'SUPERADMIN')) {
-      return res.status(403).json({ message: 'Admin access required' })
-    }
-    next()
-  } catch (err) { next(err) }
-}
+const asyncHandler = require('../middleware/asyncHandler')
 
 // GET /api/matches
-router.get('/', async (req, res, next) => {
-  try {
-    const prisma = req.app.get('prisma')
-    const { sport, date, status } = req.query
-    const where = {}
-    if (sport && sport !== 'all') where.sport = sport.toUpperCase()
-    if (status) where.status = status.toUpperCase()
-    if (date) {
-      const d = new Date(date)
-      where.scheduledAt = { gte: d, lt: new Date(d.getTime() + 86400000) }
-    }
-    const matches = await prisma.match.findMany({ where, orderBy: { scheduledAt: 'asc' }, take: 50 })
-    res.json(matches)
-  } catch (err) { next(err) }
-})
+router.get('/', asyncHandler(async (req, res) => {
+  const prisma = req.app.get('prisma')
+  const { sport, date, status } = req.query
+  const where = {}
+  if (sport && sport !== 'all') where.sport = sport.toUpperCase()
+  if (status) where.status = status.toUpperCase()
+  if (date) {
+    const d = new Date(date)
+    where.scheduledAt = { gte: d, lt: new Date(d.getTime() + 86400000) }
+  }
+  const matches = await prisma.match.findMany({ where, orderBy: { scheduledAt: 'asc' }, take: 50 })
+  res.json(matches)
+}))
 
 // GET /api/matches/:id
-router.get('/:id', async (req, res, next) => {
-  try {
-    const prisma = req.app.get('prisma')
-    const match = await prisma.match.findUnique({ where: { id: req.params.id } })
-    if (!match) return res.status(404).json({ message: 'Match not found' })
-    res.json(match)
-  } catch (err) { next(err) }
-})
+router.get('/:id', asyncHandler(async (req, res) => {
+  const prisma = req.app.get('prisma')
+  const match = await prisma.match.findUnique({ where: { id: req.params.id } })
+  if (!match) return res.status(404).json({ error: { code: 'MATCH_NOT_FOUND', message: 'Match not found' } })
+  res.json(match)
+}))
 
-// GET /api/matches/:id/stats
-router.get('/:id/stats', async (req, res) => {
-  // TODO: Wire to a real match statistics data source
-  res.status(501).json({
-    error: { code: 'NOT_IMPLEMENTED', message: 'Match statistics are not yet available. Coming soon with SportRadar integration.' },
+// GET /api/matches/:id/stats — REAL data from MatchEvent rows
+router.get('/:id/stats', asyncHandler(async (req, res) => {
+  const prisma = req.app.get('prisma')
+  const match = await prisma.match.findUnique({ where: { id: req.params.id } })
+  if (!match) return res.status(404).json({ error: { code: 'MATCH_NOT_FOUND', message: 'Match not found' } })
+
+  // Aggregate real events from MatchEvent table
+  const events = await prisma.matchEvent.findMany({
+    where: { matchId: req.params.id },
+    orderBy: { minute: 'asc' },
   })
-})
 
-// GET /api/matches/:id/lineups
-router.get('/:id/lineups', async (req, res) => {
-  // TODO: Wire to a real lineups data source
-  res.status(501).json({
-    error: { code: 'NOT_IMPLEMENTED', message: 'Lineups data is not yet available. Coming soon with SportRadar integration.' },
+  const goalEvents = events.filter((e) => e.type === 'GOAL')
+  const yellowCards = events.filter((e) => e.type === 'YELLOW_CARD')
+  const redCards = events.filter((e) => e.type === 'RED_CARD')
+  const possessionTicks = events.filter((e) => e.type === 'POSSESSION_TICK')
+
+  // Compute average possession from ticks
+  const avgHomePossession = possessionTicks.length > 0
+    ? Math.round(possessionTicks.reduce((sum, e) => sum + (e.detail?.homePossession || 50), 0) / possessionTicks.length)
+    : 50
+
+  res.json({
+    matchId: req.params.id,
+    homeScore: match.homeScore,
+    awayScore: match.awayScore,
+    status: match.status,
+    events: events.length,
+    goals: goalEvents.map((e) => ({
+      minute: e.minute,
+      teamId: e.teamId,
+      detail: e.detail,
+    })),
+    cards: {
+      yellow: yellowCards.length,
+      red: redCards.length,
+    },
+    possession: {
+      home: avgHomePossession,
+      away: 100 - avgHomePossession,
+    },
+    totalEvents: events.length,
+    goalCount: goalEvents.length,
   })
-})
+}))
 
-// GET /api/matches/:id/h2h
-router.get('/:id/h2h', async (req, res) => {
-  // TODO: Wire to real head-to-head data from completed matches
-  res.status(501).json({
-    error: { code: 'NOT_IMPLEMENTED', message: 'Head-to-head data is not yet available. Coming soon.' },
+// GET /api/matches/:id/lineups — generate from Player pool or 501
+router.get('/:id/lineups', asyncHandler(async (req, res) => {
+  const prisma = req.app.get('prisma')
+  const match = await prisma.match.findUnique({ where: { id: req.params.id } })
+  if (!match) return res.status(404).json({ error: { code: 'MATCH_NOT_FOUND', message: 'Match not found' } })
+
+  // Try to generate lineups from Player pool
+  const homePlayers = await prisma.player.findMany({
+    where: { teamId: match.homeTeamId },
+    orderBy: { name: 'asc' },
+    take: 11,
   })
-})
+  const awayPlayers = await prisma.player.findMany({
+    where: { teamId: match.awayTeamId },
+    orderBy: { name: 'asc' },
+    take: 11,
+  })
 
-/**
- * POST /api/matches/:id/finish
- * Marks a match as FINISHED and triggers scoring for all predictions.
- * Optionally accepts a score to set if not already set.
- * Can use BullMQ (async) or direct (sync) scoring via `mode` query param.
- */
-router.post('/:id/finish', authenticateToken, requireAdmin, validate(finishMatchSchema), async (req, res, next) => {
-  try {
-    const prisma = req.app.get('prisma')
-    const { homeScore, awayScore } = req.body
-    const mode = req.query.mode || 'queue' // 'queue' | 'direct'
+  if (homePlayers.length === 0 && awayPlayers.length === 0) {
+    return res.status(501).json({
+      error: { code: 'NOT_IMPLEMENTED', message: 'No player data available for lineups. Add players to teams first.' },
+    })
+  }
 
-    const match = await prisma.match.findUnique({ where: { id: req.params.id } })
-    if (!match) {
-      return res.status(404).json({
-        error: { code: 'MATCH_NOT_FOUND', message: 'Match not found' },
-      })
-    }
-    if (match.status === 'FINISHED') {
-      return res.status(400).json({
-        error: { code: 'MATCH_ALREADY_FINISHED', message: 'Match already finished' },
-      })
-    }
+  res.json({
+    matchId: req.params.id,
+    home: { formation: '4-3-3', players: homePlayers },
+    away: { formation: '4-3-3', players: awayPlayers },
+  })
+}))
 
-    // Update match with final score and status
-    const data = {
+// GET /api/matches/:id/h2h — REAL head-to-head from past simulated matches
+router.get('/:id/h2h', asyncHandler(async (req, res) => {
+  const prisma = req.app.get('prisma')
+  const match = await prisma.match.findUnique({ where: { id: req.params.id } })
+  if (!match) return res.status(404).json({ error: { code: 'MATCH_NOT_FOUND', message: 'Match not found' } })
+
+  // Find past FINISHED matches between the same two teams
+  const pastMatches = await prisma.match.findMany({
+    where: {
+      id: { not: match.id },
       status: 'FINISHED',
-      finishedAt: new Date(),
-      minute: 90,
-    }
-    if (homeScore !== undefined) data.homeScore = homeScore
-    if (awayScore !== undefined) data.awayScore = awayScore
-
-    const updated = await prisma.match.update({
-      where: { id: req.params.id },
-      data,
-    })
-
-    // Lock all pending predictions
-    await prisma.prediction.updateMany({
-      where: { matchId: req.params.id, status: 'PENDING' },
-      data: { status: 'LOCKED', lockedAt: new Date() },
-    })
-
-    // Trigger scoring
-    let scoringResult = null
-    if (mode === 'direct') {
-      // Synchronous scoring (for smaller matches/testing)
-      try {
-        scoringResult = await scoreMatchPredictions(prisma, req.params.id)
-        await recalculateRanks(prisma)
-      } catch (err) {
-        console.error('[Scoring] Direct scoring error:', err.message)
-        scoringResult = { error: err.message }
-      }
-    } else {
-      // Async scoring via BullMQ (default)
-      try {
-        await queueScoreMatchPredictions(req.params.id)
-        await queueRecalculateRanks()
-      } catch (err) {
-        console.warn('[Scoring] BullMQ unavailable, falling back to direct scoring:', err.message)
-        // Fallback to direct scoring if queue is unavailable
-        scoringResult = await scoreMatchPredictions(prisma, req.params.id)
-        await recalculateRanks(prisma)
-      }
-    }
-
-    // Determine actual mode used (queue might fallback to direct)
-    const actualMode = scoringResult ? 'direct' : mode
-
-    // Log match finished
-    await prisma.scoringLog.create({
-      data: {
-        matchId: req.params.id,
-        type: 'match_finished',
-        detail: { homeScore: updated.homeScore, awayScore: updated.awayScore, mode: actualMode },
-      },
-    })
-
-    // Emit socket event
-    const io = req.app.get('io')
-    if (io) {
-      io.to(`match:${req.params.id}`).emit('MATCH_FINISHED', {
-        matchId: req.params.id,
-        homeScore: updated.homeScore,
-        awayScore: updated.awayScore,
-      })
-      io.to('global').emit('MATCH_FINISHED', {
-        matchId: req.params.id,
-        homeTeamName: updated.homeTeamName,
-        awayTeamName: updated.awayTeamName,
-        homeScore: updated.homeScore,
-        awayScore: updated.awayScore,
-      })
-    }
-
-    res.json({
-      match: updated,
-      scoring: actualMode === 'direct' ? (scoringResult?.error ? 'failed' : 'completed') : 'queued',
-      ...(scoringResult?.error && { scoringError: scoringResult.error }),
-      ...(scoringResult?.scored !== undefined && { scored: scoringResult.scored, usersAffected: scoringResult.usersAffected }),
-    })
-  } catch (err) { next(err) }
-})
-
-// GET /api/matches/:id/timeline
-router.get('/:id/timeline', (req, res) => {
-  // TODO: Wire to real match event data from MatchEvent table
-  res.status(501).json({
-    error: { code: 'NOT_IMPLEMENTED', message: 'Match timeline data is not yet available. Coming soon.' },
+      OR: [
+        { homeTeamId: match.homeTeamId, awayTeamId: match.awayTeamId },
+        { homeTeamId: match.awayTeamId, awayTeamId: match.homeTeamId },
+      ],
+    },
+    orderBy: { finishedAt: 'desc' },
+    take: 10,
   })
-})
+
+  let homeWins = 0
+  let awayWins = 0
+  let draws = 0
+  let totalHomeGoals = 0
+  let totalAwayGoals = 0
+
+  for (const m of pastMatches) {
+    if (m.homeScore !== null && m.awayScore !== null) {
+      // Normalize to current home team's perspective
+      const isHome = m.homeTeamId === match.homeTeamId
+      const teamGoals = isHome ? m.homeScore : m.awayScore
+      const oppGoals = isHome ? m.awayScore : m.homeScore
+
+      totalHomeGoals += teamGoals
+      totalAwayGoals += oppGoals
+
+      if (teamGoals > oppGoals) homeWins++
+      else if (teamGoals < oppGoals) awayWins++
+      else draws++
+    }
+  }
+
+  res.json({
+    matchId: req.params.id,
+    homeTeamName: match.homeTeamName,
+    awayTeamName: match.awayTeamName,
+    totalMatches: pastMatches.length,
+    homeWins,
+    awayWins,
+    draws,
+    avgHomeGoals: pastMatches.length > 0 ? (totalHomeGoals / pastMatches.length).toFixed(1) : 0,
+    avgAwayGoals: pastMatches.length > 0 ? (totalAwayGoals / pastMatches.length).toFixed(1) : 0,
+    recentResults: pastMatches.slice(0, 5).map((m) => ({
+      id: m.id,
+      date: m.finishedAt,
+      homeTeam: m.homeTeamName,
+      awayTeam: m.awayTeamName,
+      homeScore: m.homeScore,
+      awayScore: m.awayScore,
+    })),
+  })
+}))
+
+// POST /api/matches/:id/finish — manual finish (legacy, for admin override)
+router.post('/:id/finish', authenticateToken, requireAdmin, validate(finishMatchSchema), asyncHandler(async (req, res) => {
+  const prisma = req.app.get('prisma')
+  const { homeScore, awayScore } = req.body
+
+  const match = await prisma.match.findUnique({ where: { id: req.params.id } })
+  if (!match) {
+    return res.status(404).json({ error: { code: 'MATCH_NOT_FOUND', message: 'Match not found' } })
+  }
+  if (match.status === 'FINISHED') {
+    return res.status(400).json({ error: { code: 'MATCH_ALREADY_FINISHED', message: 'Match already finished' } })
+  }
+
+  const data = { status: 'FINISHED', finishedAt: new Date(), minute: 90 }
+  if (homeScore !== undefined) data.homeScore = homeScore
+  if (awayScore !== undefined) data.awayScore = awayScore
+
+  const updated = await prisma.match.update({ where: { id: req.params.id }, data })
+
+  const scoring = await finalizeMatch(prisma, req.params.id, { mode: 'auto', io: req.app.get('io') })
+
+  const io = req.app.get('io')
+  if (io) {
+    io.to(`match:${req.params.id}`).emit('SIM_FULLTIME', { matchId: req.params.id, homeScore: updated.homeScore, awayScore: updated.awayScore })
+    io.to('global').emit('SIM_FULLTIME', { matchId: req.params.id, homeTeamName: updated.homeTeamName, awayTeamName: updated.awayTeamName, homeScore: updated.homeScore, awayScore: updated.awayScore })
+  }
+
+  res.json({ match: updated, scoring })
+}))
+
+// GET /api/matches/:id/timeline — real events from MatchEvent table
+router.get('/:id/timeline', asyncHandler(async (req, res) => {
+  const prisma = req.app.get('prisma')
+  const events = await prisma.matchEvent.findMany({
+    where: { matchId: req.params.id },
+    orderBy: { minute: 'asc' },
+  })
+
+  if (events.length === 0) {
+    return res.status(404).json({ error: { code: 'NO_EVENTS', message: 'No events found for this match. The simulation may not have run yet.' } })
+  }
+
+  res.json({ matchId: req.params.id, events })
+}))
 
 module.exports = router

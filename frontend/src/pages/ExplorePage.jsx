@@ -34,7 +34,7 @@ export default function ExplorePage() {
   const { data: allMatches = [] } = useMatches()
   const { data: topUsers = [] } = useLeaderboard('global')
 
-  const liveMatches = allMatches.filter(m => m.status === 'LIVE').slice(0, 4)
+  const liveMatches = allMatches.filter(m => m.status === 'SIMULATING').slice(0, 4)
   const topPredictors = topUsers.slice(0, 5)
 
   const handleSearch = (e) => {
@@ -111,7 +111,7 @@ export default function ExplorePage() {
                   <span className="caption text-[var(--mm-text-muted)] block">{match.competition || 'Live event'}</span>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  {match.status === 'LIVE' && (
+                  {match.status === 'SIMULATING' && (
                     <span className="w-1.5 h-1.5 rounded-full bg-[var(--mm-accent-green)] animate-live-pulse" />
                   )}
                   <ChevronRight size={16} className="text-[var(--mm-text-muted)] group-hover:translate-x-1 transition-transform" />

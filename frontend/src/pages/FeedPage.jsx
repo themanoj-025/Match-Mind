@@ -15,7 +15,7 @@ export default function FeedPage() {
 
   const pendingPredictions = myPredictions?.filter(p => p.status === 'PENDING')?.length || 0
 
-  const liveMatches = allMatches.filter(m => m.status === 'LIVE')
+  const liveMatches = allMatches.filter(m => m.status === 'SIMULATING')
   const upcomingMatches = allMatches.filter(m => m.status === 'SCHEDULED')
 
   const topPredictors = topUsers.slice(0, 3).map((u, i) => ({

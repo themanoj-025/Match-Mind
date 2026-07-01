@@ -384,7 +384,7 @@ export default function LandingPage() {
               <h2 className="display-l">HAPPENING RIGHT NOW</h2>
             </motion.div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {liveMatches.filter(m => m.status === 'LIVE').slice(0, 3).map((match) => (
+              {liveMatches.filter(m => m.status === 'SIMULATING').slice(0, 3).map((match) => (
                 <MatchCard
                   key={match.id}
                   match={match}

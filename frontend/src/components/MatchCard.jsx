@@ -11,7 +11,7 @@ export default function MatchCard({ match, onEnterRoom, onPredict }) {
     viewersCount, sport, scheduledAt
   } = match
 
-  const isLive = status === 'LIVE' || status === 'HALFTIME'
+  const isLive = status === 'SIMULATING' || status === 'HALFTIME'
   const isFinished = status === 'FINISHED' || status === 'FT'
   const isScheduled = status === 'SCHEDULED' || status === 'scheduled'
 
