@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const { authenticateToken } = require('../middleware/auth')
+const { validate } = require('../middleware/validate')
+const { sendMessageSchema } = require('../config/schemas')
 
 /**
  * Helper: build a deterministic DM room ID from two user IDs.
@@ -106,7 +108,7 @@ router.get('/:userId', authenticateToken, async (req, res, next) => {
       select: { id: true, username: true, displayName: true, avatar: true, tier: true, isPro: true, isOnline: true },
     })
     if (!otherUser) {
-      return res.status(404).json({ message: 'User not found' })
+      return res.status(404).json({ error: { code: 'USER_NOT_FOUND', message: 'User not found' } })
     }
 
     const messages = await prisma.chatMessage.findMany({
@@ -134,24 +136,15 @@ router.get('/:userId', authenticateToken, async (req, res, next) => {
  * POST /api/messages/:userId
  * Send a direct message to another user.
  */
-router.post('/:userId', authenticateToken, async (req, res, next) => {
+router.post('/:userId', authenticateToken, validate(sendMessageSchema), async (req, res, next) => {
   try {
     const prisma = req.app.get('prisma')
     const { text, gifUrl } = req.body
     const roomId = getDMRoomId(req.userId, req.params.userId)
 
-    if (!text?.trim() && !gifUrl) {
-      return res.status(400).json({ message: 'Message text or GIF required' })
-    }
-
-    // Validate message length
-    if (text && text.length > 1000) {
-      return res.status(400).json({ message: 'Message must be under 1000 characters' })
-    }
-
     // Validate recipient is not self
     if (req.userId === req.params.userId) {
-      return res.status(400).json({ message: 'Cannot message yourself' })
+      return res.status(400).json({ error: { code: 'SELF_MESSAGE', message: 'Cannot message yourself' } })
     }
 
     // Verify the recipient exists
@@ -160,7 +153,7 @@ router.post('/:userId', authenticateToken, async (req, res, next) => {
       select: { id: true },
     })
     if (!recipient) {
-      return res.status(404).json({ message: 'Recipient not found' })
+      return res.status(404).json({ error: { code: 'USER_NOT_FOUND', message: 'Recipient not found' } })
     }
 
     const message = await prisma.chatMessage.create({

@@ -51,16 +51,22 @@ function calculatePredictionPoints(prediction, match) {
   const breakdown = {}
   let points = 0
 
-  // Base participation
-  if (prediction.status !== 'VOID') {
-    points += 5
-    breakdown.base = 5
+  // VOID predictions get no points at all
+  if (prediction.status === 'VOID') {
+    return { points: 0, breakdown: {} }
   }
+
+  // Base participation
+  points += 5
+  breakdown.base = 5
 
   // Exact score (both goals match)
   if (predHome === homeScore && predAway === awayScore) {
     points += 50
     breakdown.exactScore = 50
+    applyBonuses(prediction, match, homeScore, awayScore, breakdown)
+    points += (breakdown.btts || 0) + (breakdown.overUnder || 0)
+
     return { points, breakdown }
   }
 
@@ -68,6 +74,8 @@ function calculatePredictionPoints(prediction, match) {
   if (predResult === actualResult && predGD === actualGD) {
     points += 35
     breakdown.resultAndGD = 35
+    applyBonuses(prediction, match, homeScore, awayScore, breakdown)
+    points += (breakdown.btts || 0) + (breakdown.overUnder || 0)
     return { points, breakdown }
   }
 
@@ -77,11 +85,22 @@ function calculatePredictionPoints(prediction, match) {
     breakdown.result = 25
   }
 
+  // Bonuses for incorrect result predictions
+  applyBonuses(prediction, match, homeScore, awayScore, breakdown)
+  points += (breakdown.btts || 0) + (breakdown.overUnder || 0)
+
+  return { points, breakdown }
+}
+
+/**
+ * Calculate bonus points for BTTS and Over/Under.
+ * Mutates the breakdown object in place.
+ */
+function applyBonuses(prediction, match, homeScore, awayScore, breakdown) {
   // BTTS bonus
   if (prediction.btts !== null && prediction.btts !== undefined) {
     const bothScored = homeScore > 0 && awayScore > 0
     if (prediction.btts === bothScored) {
-      points += 10
       breakdown.btts = 10
     }
   }
@@ -91,12 +110,9 @@ function calculatePredictionPoints(prediction, match) {
     const totalActual = homeScore + awayScore
     const actualOU = totalActual > prediction.totalGoalsLine ? 'over' : 'under'
     if (prediction.totalGoalsOU === actualOU) {
-      points += 10
       breakdown.overUnder = 10
     }
   }
-
-  return { points, breakdown }
 }
 
 /**

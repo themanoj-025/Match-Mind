@@ -1,12 +1,14 @@
 const express = require('express')
 const router = express.Router()
 const { authenticateToken } = require('../middleware/auth')
+const { validate } = require('../middleware/validate')
+const { createCheckoutSchema } = require('../config/schemas')
 
 /**
  * POST /api/stripe/create-checkout
  * Creates a Stripe Checkout Session for Pro subscription
  */
-router.post('/create-checkout', authenticateToken, async (req, res, next) => {
+router.post('/create-checkout', authenticateToken, validate(createCheckoutSchema), async (req, res, next) => {
   try {
     const prisma = req.app.get('prisma')
     const { plan } = req.body // 'monthly' | 'annual'
@@ -33,7 +35,7 @@ router.post('/create-checkout', authenticateToken, async (req, res, next) => {
       : process.env.STRIPE_PRICE_MONTHLY
 
     if (!priceId) {
-      return res.status(500).json({ message: 'Stripe price ID not configured' })
+      return res.status(500).json({ error: { code: 'STRIPE_NOT_CONFIGURED', message: 'Stripe price ID not configured' } })
     }
 
     const session = await stripe.checkout.sessions.create({
@@ -206,7 +208,7 @@ router.post('/create-portal-session', authenticateToken, async (req, res, next) 
     const sub = await prisma.subscription.findUnique({ where: { userId: req.userId } })
 
     if (!sub?.stripeCustomerId) {
-      return res.status(400).json({ message: 'No active subscription found' })
+      return res.status(400).json({ error: { code: 'NO_SUBSCRIPTION', message: 'No active subscription found' } })
     }
 
     let stripe

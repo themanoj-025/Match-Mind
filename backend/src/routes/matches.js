@@ -3,6 +3,8 @@ const router = express.Router()
 const { authenticateToken } = require('../middleware/auth')
 const { queueScoreMatchPredictions, queueRecalculateRanks } = require('../workers/queue')
 const { scoreMatchPredictions, recalculateRanks } = require('../services/scoring')
+const { validate } = require('../middleware/validate')
+const { finishMatchSchema } = require('../config/schemas')
 
 /**
  * Middleware: require ADMIN or SUPERADMIN role
@@ -46,18 +48,27 @@ router.get('/:id', async (req, res, next) => {
 })
 
 // GET /api/matches/:id/stats
-router.get('/:id/stats', (req, res) => {
-  res.json({ home: { possession: 55, shots: 12, shotsOnTarget: 5, corners: 7, fouls: 10, yellowCards: 2, xg: 1.8 }, away: { possession: 45, shots: 8, shotsOnTarget: 3, corners: 4, fouls: 8, yellowCards: 1, xg: 1.2 } })
+router.get('/:id/stats', async (req, res) => {
+  // TODO: Wire to a real match statistics data source
+  res.status(501).json({
+    error: { code: 'NOT_IMPLEMENTED', message: 'Match statistics are not yet available. Coming soon with SportRadar integration.' },
+  })
 })
 
 // GET /api/matches/:id/lineups
-router.get('/:id/lineups', (req, res) => {
-  res.json({ home: { formation: '4-3-3', players: ['Ederson', 'Walker', 'Dias', 'Aké', 'Gvardiol', 'Rodri', 'De Bruyne', 'Silva', 'Foden', 'Haaland', 'Alvarez'] }, away: { formation: '4-3-3', players: ['Raya', 'White', 'Saliba', 'Gabriel', 'Zinchenko', 'Rice', 'Ødegaard', 'Havertz', 'Saka', 'Jesus', 'Martinelli'] } })
+router.get('/:id/lineups', async (req, res) => {
+  // TODO: Wire to a real lineups data source
+  res.status(501).json({
+    error: { code: 'NOT_IMPLEMENTED', message: 'Lineups data is not yet available. Coming soon with SportRadar integration.' },
+  })
 })
 
 // GET /api/matches/:id/h2h
-router.get('/:id/h2h', (req, res) => {
-  res.json({ homeWins: 12, draws: 5, awayWins: 8, lastMeetings: [{ date: 'Sep 2025', score: '2-2' }, { date: 'Mar 2025', score: '1-0' }, { date: 'Oct 2024', score: '2-1' }] })
+router.get('/:id/h2h', async (req, res) => {
+  // TODO: Wire to real head-to-head data from completed matches
+  res.status(501).json({
+    error: { code: 'NOT_IMPLEMENTED', message: 'Head-to-head data is not yet available. Coming soon.' },
+  })
 })
 
 /**
@@ -66,15 +77,23 @@ router.get('/:id/h2h', (req, res) => {
  * Optionally accepts a score to set if not already set.
  * Can use BullMQ (async) or direct (sync) scoring via `mode` query param.
  */
-router.post('/:id/finish', authenticateToken, requireAdmin, async (req, res, next) => {
+router.post('/:id/finish', authenticateToken, requireAdmin, validate(finishMatchSchema), async (req, res, next) => {
   try {
     const prisma = req.app.get('prisma')
     const { homeScore, awayScore } = req.body
     const mode = req.query.mode || 'queue' // 'queue' | 'direct'
 
     const match = await prisma.match.findUnique({ where: { id: req.params.id } })
-    if (!match) return res.status(404).json({ message: 'Match not found' })
-    if (match.status === 'FINISHED') return res.status(400).json({ message: 'Match already finished' })
+    if (!match) {
+      return res.status(404).json({
+        error: { code: 'MATCH_NOT_FOUND', message: 'Match not found' },
+      })
+    }
+    if (match.status === 'FINISHED') {
+      return res.status(400).json({
+        error: { code: 'MATCH_ALREADY_FINISHED', message: 'Match already finished' },
+      })
+    }
 
     // Update match with final score and status
     const data = {
@@ -160,7 +179,10 @@ router.post('/:id/finish', authenticateToken, requireAdmin, async (req, res, nex
 
 // GET /api/matches/:id/timeline
 router.get('/:id/timeline', (req, res) => {
-  res.json({ events: [{ minute: 67, type: 'goal', team: 'home', scorer: 'J. Alvarez' }, { minute: 42, type: 'goal', team: 'away', scorer: 'M. Ødegaard' }] })
+  // TODO: Wire to real match event data from MatchEvent table
+  res.status(501).json({
+    error: { code: 'NOT_IMPLEMENTED', message: 'Match timeline data is not yet available. Coming soon.' },
+  })
 })
 
 module.exports = router

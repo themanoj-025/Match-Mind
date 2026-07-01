@@ -65,3 +65,4 @@ backend/prisma/*.tsbuildinfo
 .cache/
 
 CLAUDE.md
+start.bat

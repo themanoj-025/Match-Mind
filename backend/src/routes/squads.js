@@ -1,8 +1,10 @@
 const express = require('express')
 const router = express.Router()
 const { authenticateToken } = require('../middleware/auth')
+const { validate } = require('../middleware/validate')
+const { createSquadSchema, inviteSquadMemberSchema } = require('../config/schemas')
 
-router.post('/', authenticateToken, async (req, res, next) => {
+router.post('/', authenticateToken, validate(createSquadSchema), async (req, res, next) => {
   try {
     const prisma = req.app.get('prisma')
     const { name } = req.body
@@ -30,12 +32,12 @@ router.get('/:id', async (req, res, next) => {
       where: { id: req.params.id },
       include: { members: { include: { user: { select: { id: true, username: true, displayName: true, avatar: true, totalPoints: true } } } } },
     })
-    if (!squad) return res.status(404).json({ message: 'Squad not found' })
+    if (!squad) return res.status(404).json({ error: { code: 'SQUAD_NOT_FOUND', message: 'Squad not found' } })
     res.json(squad)
   } catch (err) { next(err) }
 })
 
-router.post('/:id/members/invite', authenticateToken, async (req, res, next) => {
+router.post('/:id/members/invite', authenticateToken, validate(inviteSquadMemberSchema), async (req, res, next) => {
   try {
     const prisma = req.app.get('prisma')
     const { userId: inviteUserId } = req.body

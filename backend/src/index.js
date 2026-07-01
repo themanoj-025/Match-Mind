@@ -11,6 +11,16 @@ const { PrismaClient } = require('@prisma/client')
 const { PrismaPg } = require('@prisma/adapter-pg')
 const pg = require('pg')
 
+// ─── Validate required environment variables ──────────────────────────
+const REQUIRED_ENV_VARS = ['JWT_SECRET', 'DATABASE_URL']
+for (const envVar of REQUIRED_ENV_VARS) {
+  if (!process.env[envVar]) {
+    console.error(`[FATAL] Required environment variable ${envVar} is not set.`)
+    console.error(`Please set ${envVar} in your .env file or environment.`)
+    process.exit(1)
+  }
+}
+
 // Initialize Prisma with PostgreSQL driver adapter (Prisma 7)
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL || 'postgresql://matchmind:matchmind_pass@localhost:5433/matchmind',
@@ -43,8 +53,12 @@ const messageRoutes = require('./routes/messages')
 const { setupSocket } = require('./socket')
 const { createWorkers } = require('./workers/scoringWorker')
 const { queueWeeklyReset, queueMonthlyReset } = require('./workers/queue')
+const { globalLimiter, authLimiter, passwordResetLimiter, predictionLimiter } = require('./middleware/rateLimiter')
 
 const app = express()
+
+// ─── Global rate limiter (applied before everything) ──────────────────
+app.use(globalLimiter)
 const httpServer = createServer(app)
 const io = new Server(httpServer, {
   cors: {
@@ -69,7 +83,11 @@ app.use(passport.initialize())
 app.set('prisma', prisma)
 app.set('io', io)
 
-// Routes
+// Routes with rate limiting
+// Note: Mount specific limiters BEFORE route groups to avoid stacking
+app.use('/api/auth/login', authLimiter)
+app.use('/api/auth/signup', authLimiter)
+app.use('/api/auth/forgot-password', passwordResetLimiter)
 app.use('/api/auth', authRoutes)
 app.use('/api/matches', matchRoutes)
 app.use('/api/predictions', predictionRoutes)
@@ -86,19 +104,14 @@ app.use('/api/stripe', stripeRoutes)
 app.use('/api/messages', messageRoutes)
 app.use('/api/admin', adminRoutes)
 
-// Health check
+// Health check (before error handler)
 app.get('/api/health', (req, res) => {
   res.json({ status: 'healthy', timestamp: new Date().toISOString() })
 })
 
-// Error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack)
-  res.status(err.status || 500).json({
-    message: err.message || 'Internal server error',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
-  })
-})
+// Error handler — must be last
+const { errorHandler } = require('./middleware/errorHandler')
+app.use(errorHandler)
 
 // Setup Socket.io
 setupSocket(io, prisma)

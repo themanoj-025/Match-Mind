@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const { authenticateToken } = require('../middleware/auth')
+const { validate } = require('../middleware/validate')
+const { updateProfileSchema } = require('../config/schemas')
 
 // GET /api/users/check-username
 router.get('/check-username', async (req, res, next) => {
@@ -22,12 +24,12 @@ router.get('/:id', async (req, res, next) => {
       where: { id: req.params.id },
       select: { id: true, username: true, displayName: true, avatar: true, bio: true, countryCode: true, totalPoints: true, globalRank: true, predAccuracy: true, streakCurrent: true, tier: true, createdAt: true },
     })
-    if (!user) return res.status(404).json({ message: 'User not found' })
+    if (!user) return res.status(404).json({ error: { code: 'USER_NOT_FOUND', message: 'User not found' } })
     res.json(user)
   } catch (err) { next(err) }
 })
 
-router.patch('/me', authenticateToken, async (req, res, next) => {
+router.patch('/me', authenticateToken, validate(updateProfileSchema), async (req, res, next) => {
   try {
     const prisma = req.app.get('prisma')
     const { displayName, avatar, bio, favouriteSports, favouriteTeams } = req.body
@@ -67,7 +69,7 @@ router.get('/me/notifications', authenticateToken, async (req, res, next) => {
 router.patch('/me/notifications/read', authenticateToken, async (req, res, next) => {
   try {
     const prisma = req.app.get('prisma')
-    await prisma.notification.updateMany({ where: { userId: req.userId, read: false }, data: { read: true } })
+    await prisma.notification.updateMany({ where: { userId: req.userId, isRead: false }, data: { isRead: true } })
     res.json({ message: 'All notifications marked as read' })
   } catch (err) { next(err) }
 })
