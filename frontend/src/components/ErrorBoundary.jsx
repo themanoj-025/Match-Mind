@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import * as Sentry from '@sentry/react'
 
 export default class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -12,7 +13,10 @@ export default class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('ErrorBoundary caught:', error, errorInfo)
+    // Report to Sentry if DSN is configured
+    if (import.meta.env.VITE_SENTRY_DSN) {
+      Sentry.captureException(error, { extra: errorInfo })
+    }
   }
 
   render() {

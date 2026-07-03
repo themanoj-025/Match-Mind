@@ -4,6 +4,7 @@ const { authenticateToken } = require('../middleware/auth')
 const { validate } = require('../middleware/validate')
 const { createCheckoutSchema } = require('../config/schemas')
 const asyncHandler = require('../middleware/asyncHandler')
+const logger = require('../utils/logger')
 
 /**
  * POST /api/stripe/create-checkout
@@ -24,7 +25,7 @@ router.post('/create-checkout', authenticateToken, validate(createCheckoutSchema
     stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
   } catch {
     // Stripe not configured — return direct link for testing
-    console.log('[Stripe] API key not configured, returning mock URL')
+    logger.info({ event: 'stripe.not_configured', userId: req.userId }, 'Stripe API key not configured, returning mock URL')
     return res.json({
       url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/profile/me/settings?pro=activated`,
     })
@@ -67,7 +68,7 @@ router.post('/webhook', async (req, res) => {
     const body = Buffer.isBuffer(req.body) ? req.body : JSON.stringify(req.body)
     event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET)
   } catch (err) {
-    console.error('Stripe webhook signature verification failed:', err.message)
+    logger.error({ event: 'stripe.webhook_verification_failed', err: err.message }, 'Stripe webhook signature verification failed')
     return res.status(400).send(`Webhook Error: ${err.message}`)
   }
 
@@ -118,7 +119,7 @@ router.post('/webhook', async (req, res) => {
             },
           })
         } catch (err) {
-          console.error('Stripe webhook: failed to process subscription:', err.message)
+          logger.error({ event: 'stripe.subscription_creation_failed', err: err.message }, 'Failed to process subscription')
         }
       }
       break
@@ -157,7 +158,7 @@ router.post('/webhook', async (req, res) => {
           })
         }
       } catch (err) {
-        console.error('Stripe webhook: subscription update failed:', err.message)
+        logger.error({ event: 'stripe.subscription_update_failed', err: err.message }, 'Subscription update failed')
       }
       break
     }
@@ -180,13 +181,13 @@ router.post('/webhook', async (req, res) => {
           data: { isPro: false, proExpiresAt: null },
         })
       } catch (err) {
-        console.error('Stripe webhook: subscription deletion failed:', err.message)
+        logger.error({ event: 'stripe.subscription_deletion_failed', err: err.message }, 'Subscription deletion failed')
       }
       break
     }
 
     default:
-      console.log(`Stripe webhook: unhandled event type ${event.type}`)
+      logger.warn({ event: 'stripe.unhandled_event', eventType: event.type }, `Unhandled event type ${event.type}`)
   }
 
   res.json({ received: true })

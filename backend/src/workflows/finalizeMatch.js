@@ -6,6 +6,7 @@
  * score route. Single place to call when a match needs to be scored.
  */
 
+const logger = require('../utils/logger')
 const { scoreMatchPredictions, recalculateRanks } = require('../services/scoring')
 const { queueScoreMatchPredictions, queueRecalculateRanks } = require('../workers/queue')
 
@@ -36,7 +37,7 @@ async function finalizeMatch(prisma, matchId, opts = {}) {
       scoringResult = await scoreMatchPredictions(prisma, matchId)
       await recalculateRanks(prisma)
     } catch (err) {
-      console.error('[Scoring] Direct scoring error:', err.message)
+      logger.error({ event: 'scoring.direct_error', matchId, err: err.message }, 'Direct scoring error')
       scoringResult = { error: err.message }
     }
   } else if (mode === 'queue') {
@@ -45,7 +46,7 @@ async function finalizeMatch(prisma, matchId, opts = {}) {
       await queueScoreMatchPredictions(matchId)
       await queueRecalculateRanks()
     } catch (err) {
-      console.warn('[Scoring] BullMQ unavailable, falling back to direct scoring:', err.message)
+      logger.warn({ event: 'scoring.bullmq_unavailable', matchId, err: err.message }, 'BullMQ unavailable, falling back to direct scoring')
       scoringResult = await scoreMatchPredictions(prisma, matchId)
       await recalculateRanks(prisma)
     }
@@ -55,12 +56,12 @@ async function finalizeMatch(prisma, matchId, opts = {}) {
       await queueScoreMatchPredictions(matchId)
       await queueRecalculateRanks()
     } catch (err) {
-      console.warn('[Scoring] Queue unavailable, falling back to direct:', err.message)
+      logger.warn({ event: 'scoring.queue_unavailable', matchId, err: err.message }, 'Queue unavailable, falling back to direct')
       try {
         scoringResult = await scoreMatchPredictions(prisma, matchId)
         await recalculateRanks(prisma)
       } catch (innerErr) {
-        console.error('[Scoring] Direct scoring fallback failed:', innerErr.message)
+        logger.error({ event: 'scoring.direct_fallback_failed', matchId, err: innerErr.message }, 'Direct scoring fallback failed')
         scoringResult = { error: innerErr.message }
       }
     }

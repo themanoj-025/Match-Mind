@@ -5,6 +5,7 @@
  * so only one pg pool is created across the entire app.
  */
 const passport = require('passport')
+const logger = require('../utils/logger')
 const { Strategy: GoogleStrategy } = require('passport-google-oauth20')
 const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt')
 
@@ -53,7 +54,7 @@ function configurePassport(prisma) {
       }
     }))
   } else {
-    console.warn('⚠️  Google OAuth not configured — set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET env vars')
+    logger.warn({ event: 'auth.google_oauth_not_configured' }, 'Google OAuth not configured — set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET env vars')
   }
 
   // Serialization (not used with JWT, but required for sessions if ever needed)

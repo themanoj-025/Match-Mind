@@ -14,13 +14,25 @@ router.get('/', asyncHandler(async (req, res) => {
     take: parseInt(limit),
   })
 
+  // Batch-fetch all goal events for all matches in a single query (fix N+1)
+  const matchIds = recentMatches.map((m) => m.id)
+  const allGoals = await prisma.matchEvent.findMany({
+    where: { matchId: { in: matchIds }, type: 'GOAL' },
+    orderBy: { minute: 'asc' },
+  })
+
+  // Group goals by matchId in memory
+  const goalsByMatchId = new Map()
+  for (const goal of allGoals) {
+    if (!goalsByMatchId.has(goal.matchId)) {
+      goalsByMatchId.set(goal.matchId, [])
+    }
+    goalsByMatchId.get(goal.matchId).push(goal)
+  }
+
   const highlights = []
   for (const match of recentMatches) {
-    const goals = await prisma.matchEvent.findMany({
-      where: { matchId: match.id, type: 'GOAL' },
-      orderBy: { minute: 'asc' },
-    })
-
+    const goals = goalsByMatchId.get(match.id) || []
     if (goals.length > 0) {
       highlights.push({
         matchId: match.id,

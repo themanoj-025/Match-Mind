@@ -34,6 +34,27 @@ router.patch('/me', authenticateToken, validate(updateProfileSchema), asyncHandl
     data: { displayName, avatar, bio },
     select: { id: true, username: true, displayName: true, avatar: true, bio: true, totalPoints: true, tier: true },
   })
+
+  // Persist favouriteSports to UserSport join table
+  if (favouriteSports !== undefined) {
+    await prisma.userSport.deleteMany({ where: { userId: req.userId } })
+    if (favouriteSports.length > 0) {
+      await prisma.userSport.createMany({
+        data: favouriteSports.map((sport) => ({ userId: req.userId, sport })),
+      })
+    }
+  }
+
+  // Persist favouriteTeams to UserTeam join table
+  if (favouriteTeams !== undefined) {
+    await prisma.userTeam.deleteMany({ where: { userId: req.userId } })
+    if (favouriteTeams.length > 0) {
+      await prisma.userTeam.createMany({
+        data: favouriteTeams.map((teamId) => ({ userId: req.userId, teamId })),
+      })
+    }
+  }
+
   res.json(user)
 }))
 

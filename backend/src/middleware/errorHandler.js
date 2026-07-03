@@ -9,6 +9,7 @@
  */
 
 const { Prisma } = require('@prisma/client')
+const logger = require('../utils/logger')
 
 /**
  * Centralized Express error handler.
@@ -16,11 +17,15 @@ const { Prisma } = require('@prisma/client')
  */
 // eslint-disable-next-line no-unused-vars
 function errorHandler(err, req, res, _next) {
-  // Log the error server-side (structured logging will replace this later)
-  console.error(`[Error] ${err.message}`)
-  if (process.env.NODE_ENV === 'development') {
-    console.error(err.stack)
-  }
+  // Structured error logging with request context
+  logger.error({
+    event: 'error.unhandled',
+    err: { message: err.message, stack: process.env.NODE_ENV === 'development' ? err.stack : undefined },
+    requestId: req.id,
+    method: req.method,
+    url: req.originalUrl || req.url,
+    userId: req.userId,
+  }, err.message)
 
   // ─── Prisma known-request errors (e.g. unique constraint, not found) ──
   if (err instanceof Prisma.PrismaClientKnownRequestError) {

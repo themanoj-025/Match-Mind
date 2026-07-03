@@ -8,6 +8,7 @@
  * Simulation events use SIM_* prefix for clarity.
  */
 const jwt = require('jsonwebtoken')
+const logger = require('../utils/logger')
 
 // Allowed room types for authorization checks
 const ALLOWED_ROOM_TYPES = ['match', 'squad', 'sport']
@@ -29,7 +30,7 @@ const setupSocket = (io, prisma) => {
   })
 
   io.on('connection', (socket) => {
-    console.log(`Socket connected: ${socket.id} (user: ${socket.userId})`)
+    logger.info({ event: 'socket.connected', socketId: socket.id, userId: socket.userId }, `Socket connected: ${socket.id}`)
 
     // Join user-specific room for targeted events
     socket.join(`user:${socket.userId}`)
@@ -91,7 +92,7 @@ const setupSocket = (io, prisma) => {
 
         io.to(roomId).emit('CHAT_MESSAGE', message)
       } catch (err) {
-        console.error('[Socket] SEND_MESSAGE error:', err.message)
+        logger.error({ event: 'socket.send_message_error', userId: socket.userId, err: err.message }, 'SEND_MESSAGE error')
         socket.emit('CHAT_ERROR', { message: 'Failed to send message' })
       }
     })
@@ -154,7 +155,7 @@ const setupSocket = (io, prisma) => {
     })
 
     socket.on('disconnect', () => {
-      console.log(`Socket disconnected: ${socket.id} (user: ${socket.userId})`)
+      logger.info({ event: 'socket.disconnected', socketId: socket.id, userId: socket.userId }, `Socket disconnected: ${socket.id}`)
     })
   })
 }

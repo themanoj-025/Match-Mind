@@ -5,6 +5,7 @@ const { requireAdmin } = require('../middleware/requireAdmin')
 const { validate } = require('../middleware/validate')
 const { runSimulation } = require('../services/simulation/simulationRunner')
 const asyncHandler = require('../middleware/asyncHandler')
+const logger = require('../utils/logger')
 
 /**
  * POST /api/matches/:id/start-simulation
@@ -28,7 +29,7 @@ router.post('/:id/start-simulation', authenticateToken, requireAdmin, asyncHandl
   // Run simulation asynchronously (don't block the response)
   const io = req.app.get('io')
   runSimulation(prisma, io, req.params.id, { skipDelay: false }).catch((err) => {
-    console.error(`[Simulation] Failed for match ${req.params.id}:`, err.message)
+    logger.error({ event: 'simulation.start_failed', matchId: req.params.id, err: err.message }, `Simulation failed for match ${req.params.id}`)
   })
 
   res.json({ message: 'Simulation started', matchId: req.params.id })

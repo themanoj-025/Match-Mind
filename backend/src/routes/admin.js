@@ -3,79 +3,41 @@ const router = express.Router()
 const bcrypt = require('bcryptjs')
 const { authenticateToken } = require('../middleware/auth')
 const { requireAdmin } = require('../middleware/requireAdmin')
+const { AdminService } = require('../services/adminService')
+const { createRepositories } = require('../repositories/index')
 const asyncHandler = require('../middleware/asyncHandler')
+const logger = require('../utils/logger')
 
 // All admin routes require auth + admin role
 router.use(authenticateToken, requireAdmin)
 
-// ─── HELPER: Log admin action ─────────────────────────────
-
-async function logAdminAction(req, action, targetId, targetType, detail = {}) {
-  try {
-    const prisma = req.app.get('prisma')
-    await prisma.adminLog.create({
-      data: {
-        adminId: req.userId,
-        action,
-        targetId,
-        targetType,
-        detail,
-      },
-    })
-  } catch (err) {
-    console.error('[AdminLog] Failed to log action:', err.message)
-  }
+/** Create an AdminService instance from the Express app's prisma client */
+function getAdminService(req) {
+  const prisma = req.app.get('prisma')
+  const { userRepository, matchRepository, reportRepository, adminLogRepository } = createRepositories(prisma)
+  return new AdminService({
+    userRepository,
+    matchRepository,
+    reportRepository,
+    adminLogRepository,
+    prisma: {
+      prediction: { count: (opts) => prisma.prediction.count(opts) },
+      user: { count: (opts) => prisma.user.count(opts) },
+    },
+  })
 }
 
 // ─── DASHBOARD STATS ─────────────────────────────────────
 
 /**
  * GET /api/admin/stats
- * Returns aggregated dashboard metrics
+ * Returns aggregated dashboard metrics via AdminService
  */
 router.get('/stats', asyncHandler(async (req, res) => {
-  const prisma = req.app.get('prisma')
-
-  const [totalUsers, activeUsers, predictionsToday, proUsers, reports, matches] = await Promise.all([
-    prisma.user.count(),
-    prisma.user.count({ where: { lastActiveAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } } }),
-    prisma.prediction.count({ where: { createdAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } } }),
-    prisma.user.count({ where: { isPro: true } }),
-    prisma.report.count({ where: { status: 'pending' } }),
-    prisma.match.count({ where: { status: 'SCHEDULED' } }),
-  ])
-
-  // Signup trend (last 7 days)
-  const signupTrend = []
-  for (let i = 6; i >= 0; i--) {
-    const day = new Date()
-    day.setDate(day.getDate() - i)
-    const startOfDay = new Date(day.setHours(0, 0, 0, 0))
-    const endOfDay = new Date(day.setHours(23, 59, 59, 999))
-    const count = await prisma.user.count({
-      where: { createdAt: { gte: startOfDay, lte: endOfDay } },
-    })
-    signupTrend.push({
-      day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][startOfDay.getDay()],
-      signups: count,
-    })
-  }
-
-  // Sport distribution
-  const sportDistribution = await prisma.prediction.groupBy({
-    by: ['matchId'],
-    _count: { id: true },
-  })
+  const stats = await getAdminService(req).getDashboardStats()
 
   res.json({
-    totalUsers,
-    activeUsers,
-    predictionsToday,
-    proUsers,
-    pendingReports: reports,
-    scheduledMatches: matches,
-    signupTrend,
-    // Sport distribution is complex via Prisma groupBy with joins, return simplified
+    ...stats,
     sportDistribution: [
       { name: 'Football', value: 45 },
       { name: 'Basketball', value: 25 },
@@ -194,7 +156,7 @@ router.delete('/users/:id', asyncHandler(async (req, res) => {
   const prisma = req.app.get('prisma')
   // Cascade delete user data
   await prisma.user.delete({ where: { id: req.params.id } })
-  logAdminAction(req, 'USER_DELETED', req.params.id, 'user', {})
+  getAdminService(req).logAction(req.userId, 'USER_DELETED', req.params.id, 'user', {})
   res.json({ message: 'User deleted' })
 }))
 
@@ -216,7 +178,7 @@ router.post('/users/:id/toggle-pro', asyncHandler(async (req, res) => {
     select: { id: true, isPro: true, proExpiresAt: true },
   })
 
-  logAdminAction(req, 'PRO_TOGGLED', req.params.id, 'user', {
+  getAdminService(req).logAction(req.userId, 'PRO_TOGGLED', req.params.id, 'user', {
     wasPro: user.isPro,
     nowPro: !user.isPro,
   })
@@ -282,7 +244,7 @@ router.patch('/matches/:id', asyncHandler(async (req, res) => {
     select: { id: true, homeTeamName: true, awayTeamName: true, homeScore: true, awayScore: true, status: true },
   })
 
-  logAdminAction(req, 'MATCH_UPDATED', req.params.id, 'match', { ...data })
+  getAdminService(req).logAction(req.userId, 'MATCH_UPDATED', req.params.id, 'match', { ...data })
   res.json({ match })
 }))
 
@@ -336,7 +298,7 @@ router.patch('/reports/:id', asyncHandler(async (req, res) => {
     })
   }
 
-  logAdminAction(req, status === 'resolved' ? 'REPORT_RESOLVED' : 'REPORT_DISMISSED', req.params.id, 'report', {
+  getAdminService(req).logAction(req.userId, status === 'resolved' ? 'REPORT_RESOLVED' : 'REPORT_DISMISSED', req.params.id, 'report', {
     reportStatus: status,
   })
   res.json({ report })

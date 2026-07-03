@@ -1,13 +1,15 @@
 const express = require('express')
 const router = express.Router()
-const { authenticateToken, optionalAuth } = require('../middleware/auth')
+const { authenticateToken } = require('../middleware/auth')
+const { aiPredictionLimiter } = require('../middleware/rateLimiter')
+const logger = require('../utils/logger')
 const asyncHandler = require('../middleware/asyncHandler')
 
 /**
  * POST /api/ai/predict/:matchId
  * Returns AI-powered prediction for a match
  */
-router.post('/predict/:matchId', optionalAuth, asyncHandler(async (req, res) => {
+router.post('/predict/:matchId', authenticateToken, aiPredictionLimiter, asyncHandler(async (req, res) => {
   const prisma = req.app.get('prisma')
   const match = await prisma.match.findUnique({ where: { id: req.params.matchId } })
   if (!match) return res.status(404).json({ error: { code: 'MATCH_NOT_FOUND', message: 'Match not found' } })
@@ -31,7 +33,7 @@ router.post('/predict/:matchId', optionalAuth, asyncHandler(async (req, res) => 
     try {
       anthropicResult = await getAnthropicPrediction(match)
     } catch (err) {
-      console.error('Anthropic API error:', err.message)
+      logger.error({ event: 'ai.anthropic_error', matchId: match.id, err: err.message }, 'Anthropic API error')
     }
   }
 
@@ -54,7 +56,7 @@ router.post('/predict/:matchId', optionalAuth, asyncHandler(async (req, res) => 
  * POST /api/ai/summary/:matchId
  * Generates AI match summary after match completes
  */
-router.post('/summary/:matchId', authenticateToken, asyncHandler(async (req, res) => {
+router.post('/summary/:matchId', authenticateToken, aiPredictionLimiter, asyncHandler(async (req, res) => {
   const prisma = req.app.get('prisma')
   const match = await prisma.match.findUnique({
     where: { id: req.params.matchId },

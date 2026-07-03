@@ -13,6 +13,8 @@
  * - resetMonthlyLeaderboard: Reset monthly tracking
  */
 
+const logger = require('../utils/logger')
+
 const TIER_THRESHOLDS = {
   BRONZE: 0,
   SILVER: 500,
@@ -129,7 +131,7 @@ async function scoreMatchPredictions(prisma, matchId) {
   })
 
   if (predictions.length === 0) {
-    console.log(`[Scoring] No predictions to score for match ${matchId}`)
+    logger.info({ event: 'scoring.no_predictions', matchId }, `No predictions to score for match ${matchId}`)
     await prisma.scoringLog.create({
       data: { matchId, type: 'predictions_scored', detail: { count: 0 } },
     })
@@ -223,7 +225,7 @@ async function scoreMatchPredictions(prisma, matchId) {
     },
   })
 
-  console.log(`[Scoring] Scored ${scored} predictions for match ${matchId}, ${userUpdates.size} users affected`)
+  logger.info({ event: 'scoring.completed', matchId, scored, usersAffected: userUpdates.size }, `Scored ${scored} predictions for match ${matchId}, ${userUpdates.size} users affected`)
   return { scored, usersAffected: userUpdates.size }
 }
 
@@ -277,7 +279,7 @@ async function checkTierProgression(prisma, userId, totalPoints, currentTier) {
       io.to(`user:${userId}`).emit('TIER_UPGRADE', { tier: newTier, points: totalPoints })
     }
 
-    console.log(`[Tier] ${userId} upgraded to ${newTier} (${totalPoints} pts)`)
+    logger.info({ event: 'tier.upgrade', userId, tier: newTier, totalPoints }, `${userId} upgraded to ${newTier} (${totalPoints} pts)`)
   }
 }
 
@@ -319,7 +321,7 @@ async function recalculateRanks(prisma) {
   })
 
   await prisma.$transaction(updates)
-  console.log(`[Scoring] Recalculated ranks for ${users.length} users`)
+  logger.info({ event: 'scoring.ranks_recalculated', count: users.length }, `Recalculated ranks for ${users.length} users`)
   return { users: users.length }
 }
 
@@ -372,7 +374,7 @@ async function snapshotLeaderboard(prisma, period) {
     },
   })
 
-  console.log(`[Scoring] Snapshot created: ${period} leaderboard (${snapshotData.length} users)`)
+  logger.info({ event: 'scoring.snapshot_created', period, count: snapshotData.length }, `Snapshot created: ${period} leaderboard (${snapshotData.length} users)`)
   return { period, users: snapshotData.length }
 }
 
@@ -393,7 +395,7 @@ async function resetWeeklyLeaderboard(prisma) {
     data: { matchId: 'system', type: 'leaderboard_reset', detail: { period: 'WEEKLY' } },
   })
 
-  console.log('[Scoring] Weekly leaderboard reset complete')
+  logger.info({ event: 'scoring.weekly_reset_complete' }, 'Weekly leaderboard reset complete')
   return { period: 'WEEKLY', reset: true }
 }
 
@@ -407,7 +409,7 @@ async function resetMonthlyLeaderboard(prisma) {
     data: { matchId: 'system', type: 'leaderboard_reset', detail: { period: 'MONTHLY' } },
   })
 
-  console.log('[Scoring] Monthly leaderboard snapshot complete')
+  logger.info({ event: 'scoring.monthly_snapshot_complete' }, 'Monthly leaderboard snapshot complete')
   return { period: 'MONTHLY', reset: true }
 }
 

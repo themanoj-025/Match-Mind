@@ -56,27 +56,73 @@ async function main() {
   }
   console.log(`✅ Created ${follows.length} follows`)
 
+  // ========== TEAMS ==========
+  const teamsData = [
+    { id: 'team-mci', name: 'Manchester City', shortName: 'MCI', sport: Sport.FOOTBALL, attackRating: 88, defenseRating: 82, formRating: 80, homeAdvantage: 8 },
+    { id: 'team-ars', name: 'Arsenal', shortName: 'ARS', sport: Sport.FOOTBALL, attackRating: 82, defenseRating: 78, formRating: 75, homeAdvantage: 7 },
+    { id: 'team-rma', name: 'Real Madrid', shortName: 'RMA', sport: Sport.FOOTBALL, attackRating: 90, defenseRating: 80, formRating: 85, homeAdvantage: 9 },
+    { id: 'team-fcb', name: 'Barcelona', shortName: 'FCB', sport: Sport.FOOTBALL, attackRating: 85, defenseRating: 75, formRating: 78, homeAdvantage: 7 },
+    { id: 'team-liv', name: 'Liverpool', shortName: 'LIV', sport: Sport.FOOTBALL, attackRating: 84, defenseRating: 76, formRating: 77, homeAdvantage: 9 },
+    { id: 'team-mun', name: 'Bayern Munich', shortName: 'MUN', sport: Sport.FOOTBALL, attackRating: 88, defenseRating: 79, formRating: 82, homeAdvantage: 8 },
+    { id: 'team-che', name: 'Chelsea', shortName: 'CHE', sport: Sport.FOOTBALL, attackRating: 76, defenseRating: 72, formRating: 70, homeAdvantage: 7 },
+    { id: 'team-tot', name: 'Tottenham', shortName: 'TOT', sport: Sport.FOOTBALL, attackRating: 78, defenseRating: 70, formRating: 72, homeAdvantage: 6 },
+    { id: 'team-lal', name: 'LA Lakers', shortName: 'LAL', sport: Sport.BASKETBALL, attackRating: 85, defenseRating: 78, formRating: 80, homeAdvantage: 6 },
+    { id: 'team-bos', name: 'Boston Celtics', shortName: 'BOS', sport: Sport.BASKETBALL, attackRating: 88, defenseRating: 82, formRating: 84, homeAdvantage: 7 },
+    { id: 'team-gsw', name: 'Golden State Warriors', shortName: 'GSW', sport: Sport.BASKETBALL, attackRating: 82, defenseRating: 74, formRating: 76, homeAdvantage: 6 },
+    { id: 'team-mil', name: 'Milwaukee Bucks', shortName: 'MIL', sport: Sport.BASKETBALL, attackRating: 80, defenseRating: 76, formRating: 78, homeAdvantage: 5 },
+    { id: 'team-kcc', name: 'Kansas City Chiefs', shortName: 'KC', sport: Sport.AMERICAN_FOOTBALL, attackRating: 85, defenseRating: 80, formRating: 82, homeAdvantage: 7 },
+    { id: 'team-sf49', name: 'San Francisco 49ers', shortName: 'SF', sport: Sport.AMERICAN_FOOTBALL, attackRating: 82, defenseRating: 78, formRating: 80, homeAdvantage: 6 },
+    { id: 'team-buf', name: 'Buffalo Bills', shortName: 'BUF', sport: Sport.AMERICAN_FOOTBALL, attackRating: 80, defenseRating: 76, formRating: 78, homeAdvantage: 6 },
+    { id: 'team-csk', name: 'Chennai Super Kings', shortName: 'CSK', sport: Sport.CRICKET, attackRating: 82, defenseRating: 78, formRating: 80, homeAdvantage: 6 },
+    { id: 'team-mi', name: 'Mumbai Indians', shortName: 'MI', sport: Sport.CRICKET, attackRating: 84, defenseRating: 76, formRating: 82, homeAdvantage: 5 },
+    { id: 'player-djokovic', name: 'Novak Djokovic', shortName: 'DJOK', sport: Sport.TENNIS },
+    { id: 'player-alcaraz', name: 'Carlos Alcaraz', shortName: 'ALCA', sport: Sport.TENNIS },
+  ]
+
+  const teams = {}
+  for (const data of teamsData) {
+    teams[data.id] = await prisma.team.create({ data })
+  }
+
+  // ========== COMPETITIONS ==========
+  const competitionsData = [
+    { name: 'Premier League', shortName: 'PL', sport: Sport.FOOTBALL, countryCode: 'GB' },
+    { name: 'La Liga', shortName: 'LL', sport: Sport.FOOTBALL, countryCode: 'ES' },
+    { name: 'Champions League', shortName: 'UCL', sport: Sport.FOOTBALL },
+    { name: 'NBA', shortName: 'NBA', sport: Sport.BASKETBALL, countryCode: 'US' },
+    { name: 'NFL', shortName: 'NFL', sport: Sport.AMERICAN_FOOTBALL, countryCode: 'US' },
+    { name: 'Wimbledon', shortName: 'WIM', sport: Sport.TENNIS, countryCode: 'GB' },
+    { name: 'IPL', shortName: 'IPL', sport: Sport.CRICKET, countryCode: 'IN' },
+  ]
+
+  const competitions = {}
+  for (const data of competitionsData) {
+    competitions[data.shortName] = await prisma.competition.create({ data })
+  }
+
+  console.log(`✅ Created ${Object.keys(teams).length} teams and ${Object.keys(competitions).length} competitions`)
+
   // ========== MATCHES ==========
   const now = new Date()
 
   const matchesData = [
     // SIMULATING matches (pre-seeded as FINISHED with events for demo)
-    { id: 'live-1', sport: Sport.FOOTBALL, competition: 'Premier League', homeTeamId: 'team-mci', awayTeamId: 'team-ars', homeTeamName: 'Manchester City', awayTeamName: 'Arsenal', homeScore: 2, awayScore: 1, status: MatchStatus.FINISHED, minute: 90, scheduledAt: new Date(now.getTime() - 7200000), kickedOffAt: new Date(now.getTime() - 7200000), finishedAt: new Date(now.getTime() - 3600000), simSeed: 42, simStartedAt: new Date(now.getTime() - 7200000), simEndsAt: new Date(now.getTime() - 3600000), stadium: 'Etihad Stadium', season: '2025/26' },
-    { id: 'live-2', sport: Sport.FOOTBALL, competition: 'La Liga', homeTeamId: 'team-rma', awayTeamId: 'team-fcb', homeTeamName: 'Real Madrid', awayTeamName: 'Barcelona', homeScore: 1, awayScore: 1, status: MatchStatus.FINISHED, minute: 90, scheduledAt: new Date(now.getTime() - 3600000), kickedOffAt: new Date(now.getTime() - 3600000), finishedAt: new Date(), simSeed: 99, simStartedAt: new Date(now.getTime() - 3600000), simEndsAt: new Date(), stadium: 'Santiago Bernabéu', season: '2025/26' },
-    { id: 'live-3', sport: Sport.BASKETBALL, competition: 'NBA', homeTeamId: 'team-lal', awayTeamId: 'team-bos', homeTeamName: 'LA Lakers', awayTeamName: 'Boston Celtics', homeScore: 105, awayScore: 98, status: MatchStatus.FINISHED, minute: 48, scheduledAt: new Date(now.getTime() - 2700000), kickedOffAt: new Date(now.getTime() - 2700000), finishedAt: new Date(), simSeed: 7, simStartedAt: new Date(now.getTime() - 2700000), simEndsAt: new Date(), stadium: 'Crypto.com Arena', season: '2025/26' },
-    { id: 'live-4', sport: Sport.TENNIS, competition: 'Wimbledon', homeTeamId: 'player-djokovic', awayTeamId: 'player-alcaraz', homeTeamName: 'N. Djokovic', awayTeamName: 'C. Alcaraz', homeScore: 2, awayScore: 1, status: MatchStatus.FINISHED, minute: 3, scheduledAt: new Date(now.getTime() - 3600000), kickedOffAt: new Date(now.getTime() - 3600000), finishedAt: new Date(), simSeed: 123, simStartedAt: new Date(now.getTime() - 3600000), simEndsAt: new Date(), stadium: 'Centre Court', season: '2025' },
+    { id: 'live-1', sport: Sport.FOOTBALL, competition: 'Premier League', competitionId: competitions['PL'].id, homeTeamId: 'team-mci', awayTeamId: 'team-ars', homeTeamName: 'Manchester City', awayTeamName: 'Arsenal', homeScore: 2, awayScore: 1, status: MatchStatus.FINISHED, minute: 90, scheduledAt: new Date(now.getTime() - 7200000), kickedOffAt: new Date(now.getTime() - 7200000), finishedAt: new Date(now.getTime() - 3600000), simSeed: 42, simStartedAt: new Date(now.getTime() - 7200000), simEndsAt: new Date(now.getTime() - 3600000), stadium: 'Etihad Stadium', season: '2025/26' },
+    { id: 'live-2', sport: Sport.FOOTBALL, competition: 'La Liga', competitionId: competitions['LL'].id, homeTeamId: 'team-rma', awayTeamId: 'team-fcb', homeTeamName: 'Real Madrid', awayTeamName: 'Barcelona', homeScore: 1, awayScore: 1, status: MatchStatus.FINISHED, minute: 90, scheduledAt: new Date(now.getTime() - 3600000), kickedOffAt: new Date(now.getTime() - 3600000), finishedAt: new Date(), simSeed: 99, simStartedAt: new Date(now.getTime() - 3600000), simEndsAt: new Date(), stadium: 'Santiago Bernabéu', season: '2025/26' },
+    { id: 'live-3', sport: Sport.BASKETBALL, competition: 'NBA', competitionId: competitions['NBA'].id, homeTeamId: 'team-lal', awayTeamId: 'team-bos', homeTeamName: 'LA Lakers', awayTeamName: 'Boston Celtics', homeScore: 105, awayScore: 98, status: MatchStatus.FINISHED, minute: 48, scheduledAt: new Date(now.getTime() - 2700000), kickedOffAt: new Date(now.getTime() - 2700000), finishedAt: new Date(), simSeed: 7, simStartedAt: new Date(now.getTime() - 2700000), simEndsAt: new Date(), stadium: 'Crypto.com Arena', season: '2025/26' },
+    { id: 'live-4', sport: Sport.TENNIS, competition: 'Wimbledon', competitionId: competitions['WIM'].id, homeTeamId: 'player-djokovic', awayTeamId: 'player-alcaraz', homeTeamName: 'N. Djokovic', awayTeamName: 'C. Alcaraz', homeScore: 2, awayScore: 1, status: MatchStatus.FINISHED, minute: 3, scheduledAt: new Date(now.getTime() - 3600000), kickedOffAt: new Date(now.getTime() - 3600000), finishedAt: new Date(), simSeed: 123, simStartedAt: new Date(now.getTime() - 3600000), simEndsAt: new Date(), stadium: 'Centre Court', season: '2025' },
 
     // UPCOMING matches
-    { id: 'upcoming-1', sport: Sport.FOOTBALL, competition: 'Champions League', homeTeamId: 'team-liv', awayTeamId: 'team-mun', homeTeamName: 'Liverpool', awayTeamName: 'Bayern Munich', homeScore: null, awayScore: null, status: MatchStatus.SCHEDULED, minute: 0, scheduledAt: new Date(now.getTime() + 7200000), stadium: 'Anfield', season: '2025/26' },
-    { id: 'upcoming-2', sport: Sport.FOOTBALL, competition: 'Premier League', homeTeamId: 'team-che', awayTeamId: 'team-tot', homeTeamName: 'Chelsea', awayTeamName: 'Tottenham', homeScore: null, awayScore: null, status: MatchStatus.SCHEDULED, minute: 0, scheduledAt: new Date(now.getTime() + 10800000), stadium: 'Stamford Bridge', season: '2025/26' },
-    { id: 'upcoming-3', sport: Sport.BASKETBALL, competition: 'NBA', homeTeamId: 'team-gsw', awayTeamId: 'team-mil', homeTeamName: 'Golden State Warriors', awayTeamName: 'Milwaukee Bucks', homeScore: null, awayScore: null, status: MatchStatus.SCHEDULED, minute: 0, scheduledAt: new Date(now.getTime() + 14400000), stadium: 'Chase Center', season: '2025/26' },
-    { id: 'upcoming-4', sport: Sport.AMERICAN_FOOTBALL, competition: 'NFL', homeTeamId: 'team-kcc', awayTeamId: 'team-sf49', homeTeamName: 'Kansas City Chiefs', awayTeamName: 'San Francisco 49ers', homeScore: null, awayScore: null, status: MatchStatus.SCHEDULED, minute: 0, scheduledAt: new Date(now.getTime() + 18000000), stadium: 'Arrowhead Stadium', season: '2025' },
-    { id: 'upcoming-5', sport: Sport.CRICKET, competition: 'IPL', homeTeamId: 'team-csk', awayTeamId: 'team-mi', homeTeamName: 'Chennai Super Kings', awayTeamName: 'Mumbai Indians', homeScore: null, awayScore: null, status: MatchStatus.SCHEDULED, minute: 0, scheduledAt: new Date(now.getTime() + 21600000), stadium: 'M. A. Chidambaram Stadium', season: '2025' },
+    { id: 'upcoming-1', sport: Sport.FOOTBALL, competition: 'Champions League', competitionId: competitions['UCL'].id, homeTeamId: 'team-liv', awayTeamId: 'team-mun', homeTeamName: 'Liverpool', awayTeamName: 'Bayern Munich', homeScore: null, awayScore: null, status: MatchStatus.SCHEDULED, minute: 0, scheduledAt: new Date(now.getTime() + 7200000), stadium: 'Anfield', season: '2025/26' },
+    { id: 'upcoming-2', sport: Sport.FOOTBALL, competition: 'Premier League', competitionId: competitions['PL'].id, homeTeamId: 'team-che', awayTeamId: 'team-tot', homeTeamName: 'Chelsea', awayTeamName: 'Tottenham', homeScore: null, awayScore: null, status: MatchStatus.SCHEDULED, minute: 0, scheduledAt: new Date(now.getTime() + 10800000), stadium: 'Stamford Bridge', season: '2025/26' },
+    { id: 'upcoming-3', sport: Sport.BASKETBALL, competition: 'NBA', competitionId: competitions['NBA'].id, homeTeamId: 'team-gsw', awayTeamId: 'team-mil', homeTeamName: 'Golden State Warriors', awayTeamName: 'Milwaukee Bucks', homeScore: null, awayScore: null, status: MatchStatus.SCHEDULED, minute: 0, scheduledAt: new Date(now.getTime() + 14400000), stadium: 'Chase Center', season: '2025/26' },
+    { id: 'upcoming-4', sport: Sport.AMERICAN_FOOTBALL, competition: 'NFL', competitionId: competitions['NFL'].id, homeTeamId: 'team-kcc', awayTeamId: 'team-sf49', homeTeamName: 'Kansas City Chiefs', awayTeamName: 'San Francisco 49ers', homeScore: null, awayScore: null, status: MatchStatus.SCHEDULED, minute: 0, scheduledAt: new Date(now.getTime() + 18000000), stadium: 'Arrowhead Stadium', season: '2025' },
+    { id: 'upcoming-5', sport: Sport.CRICKET, competition: 'IPL', competitionId: competitions['IPL'].id, homeTeamId: 'team-csk', awayTeamId: 'team-mi', homeTeamName: 'Chennai Super Kings', awayTeamName: 'Mumbai Indians', homeScore: null, awayScore: null, status: MatchStatus.SCHEDULED, minute: 0, scheduledAt: new Date(now.getTime() + 21600000), stadium: 'M. A. Chidambaram Stadium', season: '2025' },
 
     // FINISHED matches
-    { id: 'finished-1', sport: Sport.FOOTBALL, competition: 'Premier League', homeTeamId: 'team-mun', awayTeamId: 'team-ars', homeTeamName: 'Manchester United', awayTeamName: 'Arsenal', homeScore: 1, awayScore: 3, status: MatchStatus.FINISHED, minute: 90, scheduledAt: new Date(now.getTime() - 86400000), kickedOffAt: new Date(now.getTime() - 84600000), finishedAt: new Date(now.getTime() - 83700000), stadium: 'Old Trafford', season: '2025/26' },
-    { id: 'finished-2', sport: Sport.BASKETBALL, competition: 'NBA', homeTeamId: 'team-lal', awayTeamId: 'team-gsw', homeTeamName: 'LA Lakers', awayTeamName: 'Golden State Warriors', homeScore: 112, awayScore: 108, status: MatchStatus.FINISHED, minute: 48, scheduledAt: new Date(now.getTime() - 86400000), kickedOffAt: new Date(now.getTime() - 84600000), finishedAt: new Date(now.getTime() - 83700000), stadium: 'Crypto.com Arena', season: '2025/26' },
-    { id: 'finished-3', sport: Sport.AMERICAN_FOOTBALL, competition: 'NFL', homeTeamId: 'team-kcc', awayTeamId: 'team-buf', homeTeamName: 'Kansas City Chiefs', awayTeamName: 'Buffalo Bills', homeScore: 27, awayScore: 24, status: MatchStatus.FINISHED, minute: 60, scheduledAt: new Date(now.getTime() - 172800000), kickedOffAt: new Date(now.getTime() - 171000000), finishedAt: new Date(now.getTime() - 170100000), stadium: 'Arrowhead Stadium', season: '2025' },
+    { id: 'finished-1', sport: Sport.FOOTBALL, competition: 'Premier League', competitionId: competitions['PL'].id, homeTeamId: 'team-mun', awayTeamId: 'team-ars', homeTeamName: 'Manchester United', awayTeamName: 'Arsenal', homeScore: 1, awayScore: 3, status: MatchStatus.FINISHED, minute: 90, scheduledAt: new Date(now.getTime() - 86400000), kickedOffAt: new Date(now.getTime() - 84600000), finishedAt: new Date(now.getTime() - 83700000), stadium: 'Old Trafford', season: '2025/26' },
+    { id: 'finished-2', sport: Sport.BASKETBALL, competition: 'NBA', competitionId: competitions['NBA'].id, homeTeamId: 'team-lal', awayTeamId: 'team-gsw', homeTeamName: 'LA Lakers', awayTeamName: 'Golden State Warriors', homeScore: 112, awayScore: 108, status: MatchStatus.FINISHED, minute: 48, scheduledAt: new Date(now.getTime() - 86400000), kickedOffAt: new Date(now.getTime() - 84600000), finishedAt: new Date(now.getTime() - 83700000), stadium: 'Crypto.com Arena', season: '2025/26' },
+    { id: 'finished-3', sport: Sport.AMERICAN_FOOTBALL, competition: 'NFL', competitionId: competitions['NFL'].id, homeTeamId: 'team-kcc', awayTeamId: 'team-buf', homeTeamName: 'Kansas City Chiefs', awayTeamName: 'Buffalo Bills', homeScore: 27, awayScore: 24, status: MatchStatus.FINISHED, minute: 60, scheduledAt: new Date(now.getTime() - 172800000), kickedOffAt: new Date(now.getTime() - 171000000), finishedAt: new Date(now.getTime() - 170100000), stadium: 'Arrowhead Stadium', season: '2025' },
   ]
 
   for (const match of matchesData) {
@@ -203,6 +249,8 @@ async function main() {
   console.log('\n🎉 Seeding complete!')
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
   console.log(`📊 Users:         ${Object.keys(users).length}`)
+  console.log(`📊 Teams:         ${Object.keys(teams).length}`)
+  console.log(`📊 Competitions:  ${Object.keys(competitions).length}`)
   console.log(`📊 Matches:       ${matchesData.length} (${matchesData.filter(m => m.status === 'SIMULATING').length} simulating, ${matchesData.filter(m => m.status === 'SCHEDULED').length} upcoming, ${matchesData.filter(m => m.status === 'FINISHED').length} finished)`)
   console.log(`📊 Predictions:   ${predictionsData.length}`)
   console.log(`📊 Leagues:       ${leaguesData.length}`)

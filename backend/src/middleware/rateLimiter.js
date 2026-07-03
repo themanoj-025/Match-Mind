@@ -101,9 +101,23 @@ const globalLimiter = createLimiter({
   prefix: 'rl:global:',
 })
 
+// AI prediction: 10 requests per hour per user (paid external API — Anthropic)
+const aiPredictionLimiter = createLimiter({
+  windowMs: 60 * 60 * 1000,
+  max: 10,
+  message: 'Too many AI prediction requests, please try again after an hour',
+  prefix: 'rl:ai:',
+  keyGenerator: (req) => req.userId || req.ip,
+})
+
 module.exports = {
   authLimiter,
   passwordResetLimiter,
   predictionLimiter,
   globalLimiter,
+  aiPredictionLimiter,
+  // Export sharedRedisClient for health checks — avoids creating new connections per request
+  sharedRedisClient: sharedRedisClient,
+  // Also export a helper that returns whether Redis is connected
+  isRedisConnected: () => sharedRedisClient !== null && sharedRedisClient.isOpen,
 }

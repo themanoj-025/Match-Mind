@@ -8,6 +8,7 @@
  */
 
 const { Worker } = require('bullmq')
+const logger = require('../utils/logger')
 const { scoreMatchPredictions, resetWeeklyLeaderboard, resetMonthlyLeaderboard, recalculateRanks } = require('../services/scoring')
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379'
@@ -28,7 +29,7 @@ function createWorkers(prisma) {
     'score-predictions',
     async (job) => {
       const { matchId } = job.data
-      console.log(`[Worker] Scoring predictions for match ${matchId}`)
+      logger.info({ event: 'worker.scoring_started', matchId }, `Scoring predictions for match ${matchId}`)
 
       const result = await scoreMatchPredictions(prisma, matchId)
       return result
@@ -40,7 +41,7 @@ function createWorkers(prisma) {
     'reset-leaderboards',
     async (job) => {
       const { period } = job.data
-      console.log(`[Worker] Resetting ${period} leaderboard`)
+      logger.info({ event: 'worker.leaderboard_reset', period }, `Resetting ${period} leaderboard`)
 
       if (period === 'WEEKLY') {
         return await resetWeeklyLeaderboard(prisma)
@@ -55,7 +56,7 @@ function createWorkers(prisma) {
   const recalculateRanksWorker = new Worker(
     'recalculate-ranks',
     async (job) => {
-      console.log(`[Worker] Recalculating all ranks`)
+      logger.info({ event: 'worker.ranks_recalculating' }, 'Recalculating all ranks')
       return await recalculateRanks(prisma)
     },
     { connection, concurrency: 1 }
@@ -63,27 +64,27 @@ function createWorkers(prisma) {
 
   // Error handlers
   scorePredictionsWorker.on('failed', (job, err) => {
-    console.error(`[Worker] score-predictions failed: ${job?.id}`, err.message)
+    logger.error({ event: 'worker.scoring_failed', jobId: job?.id, err: err.message }, 'score-predictions failed')
   })
 
   resetLeaderboardsWorker.on('failed', (job, err) => {
-    console.error(`[Worker] reset-leaderboards failed: ${job?.id}`, err.message)
+    logger.error({ event: 'worker.reset_failed', jobId: job?.id, err: err.message }, 'reset-leaderboards failed')
   })
 
   recalculateRanksWorker.on('failed', (job, err) => {
-    console.error(`[Worker] recalculate-ranks failed: ${job?.id}`, err.message)
+    logger.error({ event: 'worker.ranks_failed', jobId: job?.id, err: err.message }, 'recalculate-ranks failed')
   })
 
   scorePredictionsWorker.on('completed', (job) => {
-    console.log(`[Worker] score-predictions completed: ${job?.id}`, JSON.stringify(job.returnvalue))
+    logger.info({ event: 'worker.scoring_completed', jobId: job?.id, result: job?.returnvalue }, 'score-predictions completed')
   })
 
   resetLeaderboardsWorker.on('completed', (job) => {
-    console.log(`[Worker] reset-leaderboards completed: ${job?.id}`)
+    logger.info({ event: 'worker.reset_completed', jobId: job?.id }, 'reset-leaderboards completed')
   })
 
   recalculateRanksWorker.on('completed', (job) => {
-    console.log(`[Worker] recalculate-ranks completed: ${job?.id}`)
+    logger.info({ event: 'worker.ranks_completed', jobId: job?.id }, 'recalculate-ranks completed')
   })
 
   return { scorePredictionsWorker, resetLeaderboardsWorker, recalculateRanksWorker }

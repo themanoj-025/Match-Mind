@@ -18,5 +18,15 @@ export default defineConfig({
     },
     testTimeout: 10000,
     hookTimeout: 10000,
+    // Use tsx to handle TypeScript files loaded via CommonJS require()
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        execArgv: ['--import', 'tsx'],
+      },
+      threads: {
+        execArgv: ['--import', 'tsx'],
+      },
+    },
   },
 })

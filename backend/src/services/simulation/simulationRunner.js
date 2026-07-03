@@ -11,6 +11,7 @@
 
 const { simulateMatch } = require('./simulationEngine')
 const { finalizeMatch } = require('../workflows/finalizeMatch')
+const logger = require('../../utils/logger')
 
 /**
  * Run a simulation for a given match.
@@ -235,7 +236,7 @@ async function runSimulation(prisma, io, matchId, opts = {}) {
   try {
     await finalizeMatch(prisma, matchId, { mode: 'auto', io })
   } catch (err) {
-    console.error(`[Simulation] Scoring failed for ${matchId}:`, err.message)
+    logger.error({ event: 'simulation.scoring_failed', matchId, err: err.message }, `Scoring failed for ${matchId}`)
   }
 
   // Log simulation
@@ -247,7 +248,7 @@ async function runSimulation(prisma, io, matchId, opts = {}) {
     },
   })
 
-  console.log(`[Simulation] Match ${matchId} completed: ${result.homeGoals}-${result.awayGoals} (${persistedEvents.length} events, seed: ${seed})`)
+  logger.info({ event: 'simulation.completed', matchId, homeGoals: result.homeGoals, awayGoals: result.awayGoals, events: persistedEvents.length, seed }, `Match ${matchId} completed: ${result.homeGoals}-${result.awayGoals}`)
 
   return { events: persistedEvents.length, stats, result, seed }
 }
