@@ -1,0 +1,36 @@
+[
+  {
+    "name": "The Undefeatables",
+    "ownerId": "user_mr4s28nu_320jkb",
+    "members": [
+      "hoopsmaster",
+      "demouser",
+      "sportsking"
+    ],
+    "id": "squad_mr4s28pe_swznof",
+    "createdAt": "2026-06-18T10:15:31.672Z"
+  },
+  {
+    "name": "Weekend Warriors",
+    "ownerId": "user_mr4s28ny_0a3kwi",
+    "members": [
+      "gamedaypro",
+      "gridironguru",
+      "acepredictor"
+    ],
+    "id": "squad_mr4s28pf_975afz",
+    "createdAt": "2026-06-17T10:15:31.672Z"
+  },
+  {
+    "name": "Fantasy Kings",
+    "ownerId": "user_mr4s28o1_6mlp8u",
+    "members": [
+      "sportymind",
+      "fanatico",
+      "predictmaster",
+      "footyfanatic"
+    ],
+    "id": "squad_mr4s28pg_fic38i",
+    "createdAt": "2026-06-10T10:15:31.672Z"
+  }
+]

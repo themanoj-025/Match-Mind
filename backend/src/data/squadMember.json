@@ -1,0 +1,82 @@
+[
+  {
+    "id": "sm_mr4s28ph_gx077b",
+    "squadId": "squad_mr4s28pe_swznof",
+    "userId": "user_mr4s28nu_320jkb",
+    "role": "owner",
+    "points": 79,
+    "joinedAt": "2026-06-19T10:15:31.672Z"
+  },
+  {
+    "id": "sm_mr4s28pi_o7oll9",
+    "squadId": "squad_mr4s28pe_swznof",
+    "userId": "user_mr4s28o2_0e71nr",
+    "role": "member",
+    "points": 307,
+    "joinedAt": "2026-06-20T10:15:31.672Z"
+  },
+  {
+    "id": "sm_mr4s28pj_ewwq99",
+    "squadId": "squad_mr4s28pe_swznof",
+    "userId": "user_mr4s28ns_2tqull",
+    "role": "member",
+    "points": 279,
+    "joinedAt": "2026-06-21T10:15:31.672Z"
+  },
+  {
+    "id": "sm_mr4s28pk_44g0kt",
+    "squadId": "squad_mr4s28pf_975afz",
+    "userId": "user_mr4s28ny_0a3kwi",
+    "role": "owner",
+    "points": 435,
+    "joinedAt": "2026-06-19T10:15:31.672Z"
+  },
+  {
+    "id": "sm_mr4s28pl_ypj5u7",
+    "squadId": "squad_mr4s28pf_975afz",
+    "userId": "user_mr4s28nv_1q6h2c",
+    "role": "member",
+    "points": 307,
+    "joinedAt": "2026-06-23T10:15:31.672Z"
+  },
+  {
+    "id": "sm_mr4s28pm_k4k3b8",
+    "squadId": "squad_mr4s28pf_975afz",
+    "userId": "user_mr4s28nw_o5lf4t",
+    "role": "member",
+    "points": 298,
+    "joinedAt": "2026-06-22T10:15:31.672Z"
+  },
+  {
+    "id": "sm_mr4s28pn_nijxt0",
+    "squadId": "squad_mr4s28pg_fic38i",
+    "userId": "user_mr4s28o1_6mlp8u",
+    "role": "owner",
+    "points": 381,
+    "joinedAt": "2026-06-23T10:15:31.672Z"
+  },
+  {
+    "id": "sm_mr4s28po_hdlx30",
+    "squadId": "squad_mr4s28pg_fic38i",
+    "userId": "user_mr4s28o0_ietiw4",
+    "role": "member",
+    "points": 246,
+    "joinedAt": "2026-06-19T10:15:31.672Z"
+  },
+  {
+    "id": "sm_mr4s28pp_qs6pw8",
+    "squadId": "squad_mr4s28pg_fic38i",
+    "userId": "user_mr4s28nz_bd6jim",
+    "role": "member",
+    "points": 15,
+    "joinedAt": "2026-06-22T10:15:31.672Z"
+  },
+  {
+    "id": "sm_mr4s28pq_3w1wi9",
+    "squadId": "squad_mr4s28pg_fic38i",
+    "userId": "user_mr4s28nx_5mjzql",
+    "role": "member",
+    "points": 374,
+    "joinedAt": "2026-06-19T10:15:31.672Z"
+  }
+]

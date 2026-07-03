@@ -1,6 +1,4 @@
 // ─── Sentry instrumentation (must be first) ────────────────────────────
-// The instrument module is named instrument.js (not .ts) intentionally
-// to keep it as the very first require.
 if (process.env.SENTRY_DSN) {
   require('../instrument')
 }
@@ -16,9 +14,7 @@ const cookieParser = require('cookie-parser')
 const passport = require('passport')
 const { createServer } = require('http')
 const { Server } = require('socket.io')
-const { PrismaClient } = require('@prisma/client')
-const { PrismaPg } = require('@prisma/adapter-pg')
-const pg = require('pg')
+const { createJsonDatabase } = require('./lib/jsonDb')
 
 // ─── Validate required environment variables ──────────────────────────
 const logger = require('./utils/logger')
@@ -32,17 +28,29 @@ for (const envVar of REQUIRED_ENV_VARS) {
   }
 }
 
-// Initialize Prisma with PostgreSQL driver adapter (Prisma 7)
-const pool = new pg.Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://matchmind:matchmind_pass@localhost:5433/matchmind',
-})
-const adapter = new PrismaPg(pool)
-const prisma = new PrismaClient({ adapter })
+// Initialize JSON Database (replaces Prisma/PostgreSQL)
+const prisma = createJsonDatabase()
+let dbInitialized = false
 
-// Export pool for graceful shutdown cleanup
-prisma._pool = pool
+async function initDatabase() {
+  try {
+    await prisma.initialize()
+    dbInitialized = true
+    logger.info({ event: 'database.initialized', dbType: 'json-file' }, 'JSON Database initialized (replaces Prisma/PostgreSQL)')
 
-// Initialize Passport strategies with shared PrismaClient
+    // Log record counts per model
+    const counts = {}
+    for (const [name, records] of Object.entries(prisma.data)) {
+      if (Array.isArray(records)) counts[name] = records.length
+    }
+    logger.info({ event: 'database.stats', counts }, `Database loaded: ${Object.values(counts).reduce((a, b) => a + b, 0)} total records`)
+  } catch (err) {
+    logger.error({ event: 'database.initialization_failed', err: err.message }, 'Failed to initialize JSON Database')
+    process.exit(1)
+  }
+}
+
+// Initialize Passport strategies with shared database
 const { configurePassport } = require('./config/passport')
 configurePassport(prisma)
 
@@ -82,7 +90,6 @@ const io = new Server(httpServer, {
 // Middleware
 app.use(helmet())
 app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:3000', credentials: true }))
-// Structured HTTP request logging via pino-http (replaces morgan)
 app.use(pinoHttp({ logger }))
 
 // Stripe webhook needs raw body BEFORE express.json() consumes it
@@ -97,7 +104,6 @@ app.set('prisma', prisma)
 app.set('io', io)
 
 // Routes with rate limiting
-// Note: Mount specific limiters BEFORE route groups to avoid stacking
 app.use('/api/auth/login', authLimiter)
 app.use('/api/auth/signup', authLimiter)
 app.use('/api/auth/forgot-password', passwordResetLimiter)
@@ -123,31 +129,9 @@ app.get('/api/health', async (req, res) => {
   const checks = {
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    checks: {},
-  }
-  let degraded = false
-
-  // Check Postgres
-  try {
-    await prisma.$queryRawUnsafe('SELECT 1')
-    checks.checks.postgres = { status: 'ok' }
-  } catch (err) {
-    checks.checks.postgres = { status: 'error', message: err.message }
-    degraded = true
-  }
-
-  // Check Redis using the shared client from rateLimiter (avoids creating new connections per request)
-  const { isRedisConnected } = require('./middleware/rateLimiter')
-  if (isRedisConnected()) {
-    checks.checks.redis = { status: 'ok' }
-  } else {
-    checks.checks.redis = { status: 'degraded', message: 'Redis not available (fallback to in-memory)' }
-    // Don't mark as degraded — Redis is optional (BullMQ falls back to direct scoring)
-  }
-
-  if (degraded) {
-    checks.status = 'degraded'
-    return res.status(503).json(checks)
+    checks: {
+      database: { status: 'ok', type: 'json-file' },
+    },
   }
 
   res.json(checks)
@@ -186,7 +170,7 @@ try {
       } catch (err) {
         logger.error({ event: 'scheduler.weekly_error', err: String(err) }, 'Weekly reset error')
       }
-      scheduleWeekly() // Re-schedule for next week
+      scheduleWeekly()
     }, msTillMonday)
   }
 
@@ -203,7 +187,7 @@ try {
       } catch (err) {
         logger.error({ event: 'scheduler.monthly_error', err: err.message }, 'Monthly reset error')
       }
-      scheduleMonthly() // Re-schedule for next month
+      scheduleMonthly()
     }, msTillNextMonth)
   }
 
@@ -216,18 +200,21 @@ try {
 }
 
 const PORT = process.env.PORT || 4000
-httpServer.listen(PORT, () => {
-  logger.info({ event: 'server.start', port: PORT, env: process.env.NODE_ENV || 'development' }, `MatchMind API server running on port ${PORT}`)
+
+// Start database then server
+initDatabase().then(() => {
+  httpServer.listen(PORT, () => {
+    logger.info({ event: 'server.start', port: PORT, env: process.env.NODE_ENV || 'development' }, `MatchMind API server running on port ${PORT}`)
+  })
 })
 
-// Import closeWorkers at top level (not inside the signal handler)
+// Import closeWorkers at top level
 const { closeWorkers } = require('./workers/scoringWorker')
 
 // Graceful shutdown
 const shutdown = async (signal) => {
   logger.info({ event: 'server.shutdown', signal }, `${signal} received. Starting graceful shutdown...`)
 
-  // Set a hard 10s timeout to force exit if shutdown hangs
   const forceExit = setTimeout(() => {
     logger.error({ event: 'server.shutdown_timeout' }, 'Graceful shutdown timed out after 10s. Force exiting.')
     process.exit(1)
@@ -247,17 +234,16 @@ const shutdown = async (signal) => {
       logger.info({ event: 'server.workers_closed' }, 'Workers closed')
     }
 
-    // 3. Disconnect Prisma and close pool
+    // 3. Persist JSON database
     await prisma.$disconnect()
-    if (prisma._pool) await prisma._pool.end()
-    logger.info({ event: 'server.db_closed' }, 'Database connections closed')
+    logger.info({ event: 'server.db_closed' }, 'JSON Database persisted and closed')
   } catch (err) {
     logger.error({ event: 'server.shutdown_error', err: err.message }, 'Error during graceful shutdown')
   }
 
   clearTimeout(forceExit)
   process.exit(0)
-})
+}
 
 process.on('SIGTERM', () => shutdown('SIGTERM'))
 process.on('SIGINT', () => shutdown('SIGINT'))

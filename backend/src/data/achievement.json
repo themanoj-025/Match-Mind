@@ -1,0 +1,110 @@
+[
+  {
+    "key": "first_prediction",
+    "name": "First Prediction",
+    "description": "Make your first prediction",
+    "icon": "🎯",
+    "rarity": "common",
+    "pointBonus": 10,
+    "id": "ach_mr4s28py_i5hhy0"
+  },
+  {
+    "key": "perfect_week",
+    "name": "Perfect Week",
+    "description": "Get all predictions correct in a week",
+    "icon": "🌟",
+    "rarity": "rare",
+    "pointBonus": 50,
+    "id": "ach_mr4s28pz_h110qw"
+  },
+  {
+    "key": "streak_5",
+    "name": "Hot Streak",
+    "description": "Achieve a 5-prediction correct streak",
+    "icon": "🔥",
+    "rarity": "rare",
+    "pointBonus": 25,
+    "id": "ach_mr4s28q0_aovsx8"
+  },
+  {
+    "key": "streak_10",
+    "name": "On Fire",
+    "description": "Achieve a 10-prediction correct streak",
+    "icon": "⚡",
+    "rarity": "epic",
+    "pointBonus": 100,
+    "id": "ach_mr4s28q1_e6mn3s"
+  },
+  {
+    "key": "tier_silver",
+    "name": "Silver Tier",
+    "description": "Reach Silver tier",
+    "icon": "🥈",
+    "rarity": "common",
+    "pointBonus": 20,
+    "id": "ach_mr4s28q2_x1ws3a"
+  },
+  {
+    "key": "tier_gold",
+    "name": "Gold Tier",
+    "description": "Reach Gold tier",
+    "icon": "🥇",
+    "rarity": "rare",
+    "pointBonus": 50,
+    "id": "ach_mr4s28q3_r0bglh"
+  },
+  {
+    "key": "tier_platinum",
+    "name": "Platinum Tier",
+    "description": "Reach Platinum tier",
+    "icon": "💎",
+    "rarity": "epic",
+    "pointBonus": 100,
+    "id": "ach_mr4s28q4_fb1p5u"
+  },
+  {
+    "key": "tier_diamond",
+    "name": "Diamond Tier",
+    "description": "Reach Diamond tier",
+    "icon": "💠",
+    "rarity": "legendary",
+    "pointBonus": 250,
+    "id": "ach_mr4s28q5_lv1k7f"
+  },
+  {
+    "key": "tier_legend",
+    "name": "Legend Tier",
+    "description": "Reach Legend tier",
+    "icon": "👑",
+    "rarity": "legendary",
+    "pointBonus": 500,
+    "id": "ach_mr4s28q6_0ntfmv"
+  },
+  {
+    "key": "top_10",
+    "name": "Top 10",
+    "description": "Reach top 10 on global leaderboard",
+    "icon": "🏆",
+    "rarity": "epic",
+    "pointBonus": 150,
+    "id": "ach_mr4s28q7_ttp0dr"
+  },
+  {
+    "key": "social_butterfly",
+    "name": "Social Butterfly",
+    "description": "Follow 10 users",
+    "icon": "🦋",
+    "rarity": "rare",
+    "pointBonus": 30,
+    "id": "ach_mr4s28q8_ob5glz"
+  },
+  {
+    "key": "league_champion",
+    "name": "League Champion",
+    "description": "Win a league",
+    "icon": "🏅",
+    "rarity": "rare",
+    "pointBonus": 75,
+    "id": "ach_mr4s28q9_xeh3g7"
+  }
+]

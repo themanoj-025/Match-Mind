@@ -1,0 +1,52 @@
+[
+  {
+    "name": "Premier League Fans 2025",
+    "inviteCode": "PL2025X",
+    "isPublic": true,
+    "sport": "FOOTBALL",
+    "ownerId": "user_mr4s28ns_2tqull",
+    "id": "league_mr4s28ov_v6n0sb",
+    "maxMembers": 50,
+    "createdAt": "2026-06-09T10:15:31.672Z"
+  },
+  {
+    "name": "The Undefeatables",
+    "inviteCode": "UNDEF1",
+    "isPublic": false,
+    "sport": "BASKETBALL",
+    "ownerId": "user_mr4s28nu_320jkb",
+    "id": "league_mr4s28ow_kvdmil",
+    "maxMembers": 50,
+    "createdAt": "2026-06-07T10:15:31.672Z"
+  },
+  {
+    "name": "NFL Pick'em Crew",
+    "inviteCode": "NFLPICK",
+    "isPublic": true,
+    "sport": "AMERICAN_FOOTBALL",
+    "ownerId": "user_mr4s28nv_1q6h2c",
+    "id": "league_mr4s28ox_rwtsmg",
+    "maxMembers": 50,
+    "createdAt": "2026-06-12T10:15:31.672Z"
+  },
+  {
+    "name": "Champions League Special",
+    "inviteCode": "UCL25X",
+    "isPublic": true,
+    "sport": "FOOTBALL",
+    "ownerId": "user_mr4s28nt_56260q",
+    "id": "league_mr4s28oy_xb43wp",
+    "maxMembers": 50,
+    "createdAt": "2026-06-12T10:15:31.672Z"
+  },
+  {
+    "name": "All Sports Showdown",
+    "inviteCode": "ALLSPT",
+    "isPublic": true,
+    "sport": null,
+    "ownerId": "user_mr4s28o1_6mlp8u",
+    "id": "league_mr4s28oz_bm8k85",
+    "maxMembers": 50,
+    "createdAt": "2026-06-05T10:15:31.672Z"
+  }
+]
