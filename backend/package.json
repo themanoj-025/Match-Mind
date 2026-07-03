@@ -7,21 +7,9 @@
     "dev": "tsx src/index.js",
     "dev:watch": "nodemon --exec tsx src/index.js",
     "start": "node src/index.js",
-    "prisma:generate": "prisma generate",
-    "prisma:push": "node scripts/push-schema.js",
-    "prisma:seed": "node scripts/seed-db.js",
-    "prisma:studio": "prisma studio",
-    "db:push": "node scripts/push-schema.js",
-    "db:seed": "node scripts/seed-db.js",
-    "db:setup": "node scripts/push-schema.js && node scripts/seed-db.js",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc --noEmit",
-    "postinstall": "prisma generate"
-  },
-  "prisma": {
-    "seed": "node prisma/seed.js"
+    "test:coverage": "vitest run --coverage"
   },
   "keywords": [],
   "author": "",
@@ -29,8 +17,6 @@
   "type": "commonjs",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",
-    "@prisma/adapter-pg": "^7.8.0",
-    "@prisma/client": "^7.8.0",
     "@sentry/node": "^10.63.0",
     "bcryptjs": "^3.0.3",
     "bullmq": "^5.78.0",
@@ -45,10 +31,8 @@
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",
-    "pg": "^8.21.0",
     "pino": "^10.3.1",
     "pino-http": "^11.0.0",
-    "prisma": "^7.8.0",
     "rate-limit-redis": "^5.0.0",
     "redis": "^6.0.0",
     "socket.io": "^4.8.3",
@@ -57,6 +41,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@prisma/client": "^7.8.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.1.0",
     "@vitest/coverage-v8": "^4.1.9",

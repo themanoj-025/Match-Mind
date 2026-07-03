@@ -10,7 +10,7 @@
  */
 
 const { simulateMatch } = require('./simulationEngine')
-const { finalizeMatch } = require('../workflows/finalizeMatch')
+const { finalizeMatch } = require('../../workflows/finalizeMatch')
 const logger = require('../../utils/logger')
 
 /**

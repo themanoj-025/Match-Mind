@@ -471,7 +471,7 @@ function createModelHandler(modelName, getData, persist) {
 
       const updated = {
         ...records[index],
-        ...resolveUpdates(data),
+        ...resolveUpdates(data, records[index]),
         updatedAt: now(),
       }
       records[index] = updated
@@ -486,7 +486,7 @@ function createModelHandler(modelName, getData, persist) {
         if (matchesWhere(records[i], where)) {
           records[i] = {
             ...records[i],
-            ...resolveUpdates(data),
+            ...resolveUpdates(data, records[i]),
             updatedAt: now(),
           }
           count++
@@ -541,14 +541,14 @@ function createModelHandler(modelName, getData, persist) {
   }
 }
 
-function resolveUpdates(data) {
-  const result = { ...data }
+function resolveUpdates(data, existingRecord) {
+  const result = {}
   for (const [key, value] of Object.entries(data)) {
     if (value && typeof value === 'object' && 'increment' in value) {
-      result[key] = value.increment
-      // This is wrong; we need to handle increment differently
-      delete result[key]
-      result[key + '__INCREMENT'] = value.increment
+      // Handle Prisma-style { increment: x } operator
+      result[key] = (existingRecord?.[key] || 0) + value.increment
+    } else {
+      result[key] = value
     }
   }
   return result

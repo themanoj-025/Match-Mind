@@ -155,6 +155,16 @@ try {
   workersCreated = true
   logger.info({ event: 'workers.initialized' }, 'BullMQ workers initialized (score-predictions, reset-leaderboards, recalculate-ranks)')
 
+  // Safe setTimeout wrapper that avoids 32-bit signed integer overflow
+  const safeSetTimeout = (fn, delay) => {
+    const MAX_DELAY = 2147483647 // 2^31 - 1 (max safe for setTimeout)
+    if (delay > MAX_DELAY) {
+      // Split into chunks: poll every 24 hours until time is right
+      return setTimeout(() => safeSetTimeout(fn, delay - 86400000), 86400000)
+    }
+    return setTimeout(fn, delay)
+  }
+
   // Schedule weekly reset (every Monday at 00:00 UTC)
   const scheduleWeekly = () => {
     const now = new Date()
@@ -163,7 +173,7 @@ try {
     nextMonday.setHours(0, 0, 0, 0)
     const msTillMonday = nextMonday.getTime() - now.getTime()
 
-    setTimeout(async () => {
+    safeSetTimeout(async () => {
       try {
         await queueWeeklyReset()
         logger.info({ event: 'scheduler.weekly_queued' }, 'Weekly leaderboard reset queued')
@@ -180,7 +190,7 @@ try {
     const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1)
     const msTillNextMonth = nextMonth.getTime() - now.getTime()
 
-    setTimeout(async () => {
+    safeSetTimeout(async () => {
       try {
         await queueMonthlyReset()
         logger.info({ event: 'scheduler.monthly_queued' }, 'Monthly leaderboard snapshot queued')

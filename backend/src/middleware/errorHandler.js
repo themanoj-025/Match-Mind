@@ -8,7 +8,6 @@
  *   app.use(errorHandler)
  */
 
-const { Prisma } = require('@prisma/client')
 const logger = require('../utils/logger')
 
 /**
@@ -27,54 +26,20 @@ function errorHandler(err, req, res, _next) {
     userId: req.userId,
   }, err.message)
 
-  // ─── Prisma known-request errors (e.g. unique constraint, not found) ──
-  if (err instanceof Prisma.PrismaClientKnownRequestError) {
-    switch (err.code) {
-      case 'P2002': // Unique constraint violation
-        return res.status(409).json({
-          error: {
-            code: 'CONFLICT',
-            message: 'A record with that value already exists',
-            fields: err.meta?.target,
-          },
-        })
-      case 'P2025': // Record not found
-        return res.status(404).json({
-          error: {
-            code: 'NOT_FOUND',
-            message: 'The requested record was not found',
-          },
-        })
-      case 'P2003': // Foreign key constraint
-        return res.status(400).json({
-          error: {
-            code: 'INVALID_REFERENCE',
-            message: 'Referenced record does not exist',
-          },
-        })
-      case 'P2014': // Required relation violation
-        return res.status(400).json({
-          error: {
-            code: 'INVALID_RELATION',
-            message: 'A required relation is missing',
-          },
-        })
-      default:
-        return res.status(400).json({
-          error: {
-            code: 'DATABASE_ERROR',
-            message: 'A database error occurred',
-          },
-        })
-    }
-  }
-
-  // ─── Prisma validation errors ──────────────────────────────────────
-  if (err instanceof Prisma.PrismaClientValidationError) {
-    return res.status(400).json({
+  // ─── JSON DB errors (unique constraint, not found) ───────────────────
+  if (err.code === 'CONFLICT') {
+    return res.status(409).json({
       error: {
-        code: 'VALIDATION_ERROR',
-        message: 'Invalid data provided to database',
+        code: 'CONFLICT',
+        message: err.message || 'A record with that value already exists',
+      },
+    })
+  }
+  if (err.code === 'NOT_FOUND') {
+    return res.status(404).json({
+      error: {
+        code: 'NOT_FOUND',
+        message: err.message || 'The requested record was not found',
       },
     })
   }

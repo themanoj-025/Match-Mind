@@ -5,7 +5,6 @@
  * Route/service code depends on the interface, making it testable without a live DB.
  */
 
-import { PrismaClient } from '@prisma/client'
 import type {
   IUserRepository,
   IMatchRepository,
@@ -19,10 +18,31 @@ import type {
   LeaderboardEntry,
 } from './types'
 
+/** Minimal type compatible with both PrismaClient and JsonDatabase */
+type DatabaseClient = {
+  [model: string]: {
+    findUnique: (args: any) => Promise<any>
+    findFirst: (args: any) => Promise<any>
+    findMany: (args: any) => Promise<any[]>
+    create: (args: any) => Promise<any>
+    update: (args: any) => Promise<any>
+    updateMany: (args: any) => Promise<{ count: number }>
+    delete: (args: any) => Promise<any>
+    deleteMany: (args: any) => Promise<{ count: number }>
+    count: (args?: any) => Promise<number>
+    upsert: (args: any) => Promise<any>
+    createMany: (args: any) => Promise<{ count: number }>
+  }
+  $transaction: (ops: any[]) => Promise<any[]>
+  $connect: () => Promise<void>
+  $disconnect: () => Promise<void>
+  $queryRawUnsafe: (query: string) => Promise<any[]>
+}
+
 // ─── User Repository ─────────────────────────────────────
 
 export class PrismaUserRepository implements IUserRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(private prisma: DatabaseClient) {}
 
   async findById(id: string): Promise<UserData | null> {
     return this.prisma.user.findUnique({ where: { id } }) as unknown as UserData | null
