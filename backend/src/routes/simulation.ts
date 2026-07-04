@@ -29,7 +29,7 @@ router.post('/:id/start-simulation', authenticateToken, requireAdmin, asyncHandl
 
   // Run simulation asynchronously (don't block the response)
   const io = req.app.get('io')
-  runSimulation(prisma, io, req.params.id, { skipDelay: false }).catch((err: any) => {
+  runSimulation(prisma, io, String(req.params.id), { skipDelay: false }).catch((err: any) => {
     logger.error({ event: 'simulation.start_failed', matchId: req.params.id, err: err.message }, `Simulation failed for match ${req.params.id}`)
   })
 
@@ -55,9 +55,9 @@ router.post('/:id/start-simulation-sync', authenticateToken, requireAdmin, async
   }
 
   const io = req.app.get('io')
-  const result = await runSimulation(prisma, io, req.params.id, { skipDelay: true })
+  await runSimulation(prisma, io, String(req.params.id), { skipDelay: true })
 
-  res.json({ matchId: req.params.id, ...result })
+  res.json({ message: 'Simulation completed', matchId: req.params.id })
 }))
 
 /**

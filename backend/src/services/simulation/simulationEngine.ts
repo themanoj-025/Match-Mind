@@ -122,7 +122,8 @@ function generateGoalTimings(numGoals: number, rng: () => number, matchMinuteMax
 // ─── Team-specific defaults ──────────────────────────────
 
 function getTeamRating(team: TeamRating, key: keyof TeamRating, defaultValue: number): number {
-  return team[key] ?? defaultValue
+  const val = team[key]
+  return typeof val === 'number' ? val : defaultValue
 }
 
 // ─── Simulate Match ──────────────────────────────────────
@@ -216,8 +217,8 @@ export function simulateMatch(
   events.sort((a, b) => a.minute - b.minute || (a.type === 'GOAL' ? -1 : 1))
 
   // Cards (average ~1.1 per team per match via Bernoulli)
-  const homeCards = rng() < 0.8 ? 1 + Math.floor(rng() * 3) : 0
-  const awayCards = rng() < 0.75 ? 1 + Math.floor(rng() * 3) : 0
+  const homeCards: number = rng() < 0.8 ? 1 + Math.floor(rng() * 3) : 0
+  const awayCards: number = rng() < 0.75 ? 1 + Math.floor(rng() * 3) : 0
 
   for (let i = 0; i < homeCards; i++) {
     events.push({

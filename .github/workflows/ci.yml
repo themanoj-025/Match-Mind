@@ -6,24 +6,14 @@ on:
   pull_request:
     branches: [main, master]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  # ─── Backend: test + lint + coverage ─────────────────
+  # ─── Backend: install → typecheck → lint → test ──────
   backend:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: matchmind
-          POSTGRES_PASSWORD: matchmind_pass
-          POSTGRES_DB: matchmind_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
     steps:
       - uses: actions/checkout@v4
 
@@ -37,45 +27,25 @@ jobs:
         working-directory: ./backend
         run: npm ci
 
-      - name: Generate Prisma client
+      - name: TypeScript type check
         working-directory: ./backend
-        run: npx prisma generate
-        env:
-          DATABASE_URL: postgresql://matchmind:matchmind_pass@localhost:5432/matchmind_test
+        run: npx tsc --noEmit
 
-      - name: Push schema to test database
+      - name: Lint backend
         working-directory: ./backend
-        run: npx prisma db push --force-reset
-        env:
-          DATABASE_URL: postgresql://matchmind:matchmind_pass@localhost:5432/matchmind_test
+        run: npx eslint .
 
-      - name: Run tests with coverage
+      - name: Run tests
         working-directory: ./backend
-        run: npx vitest run --coverage
+        run: npx vitest run
         env:
-          DATABASE_URL: postgresql://matchmind:matchmind_pass@localhost:5432/matchmind_test
           JWT_SECRET: ci-test-jwt-secret-64-chars-minimum-for-testing-purposes
           JWT_REFRESH_SECRET: ci-test-refresh-secret-64-chars-minimum-for-ci-tests
           JWT_RESET_SECRET: ci-test-reset-secret-64-chars-minimum-for-ci-purposes
           LOG_LEVEL: silent
           NODE_ENV: test
 
-      - name: Syntax check — require all modules
-        working-directory: ./backend
-        run: |
-          errors=0
-          for file in $(find src -name '*.js' -not -path '*/node_modules/*' | sort); do
-            if node -c "$file" 2>/dev/null; then
-              echo "  ✓ $file"
-            else
-              echo "  ✗ FAILED: $file"
-              errors=$((errors + 1))
-            fi
-          done
-          echo "=== $errors file(s) failed ==="
-          [ "$errors" -eq 0 ] || exit 1
-
-  # ─── Frontend: lint + typecheck + build ─────────────
+  # ─── Frontend: install → lint → typecheck → test → build ──
   frontend:
     runs-on: ubuntu-latest
     steps:
@@ -98,6 +68,10 @@ jobs:
       - name: TypeScript type check
         working-directory: ./frontend
         run: npm run typecheck
+
+      - name: Run frontend tests
+        working-directory: ./frontend
+        run: npx vitest run
 
       - name: Build frontend
         working-directory: ./frontend

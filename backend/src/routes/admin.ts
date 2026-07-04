@@ -163,7 +163,7 @@ router.delete('/users/:id', asyncHandler(async (req: AuthenticatedRequest, res) 
   const prisma = req.app.get('prisma')
   // Cascade delete user data
   await prisma.user.delete({ where: { id: req.params.id } })
-  getAdminService(req).logAction(req.userId!, 'USER_DELETED', req.params.id, 'user', {})
+  getAdminService(req).logAction(req.userId!, 'USER_DELETED', String(req.params.id), 'user', {})
   res.json({ message: 'User deleted' })
 }))
 
@@ -185,7 +185,7 @@ router.post('/users/:id/toggle-pro', asyncHandler(async (req: AuthenticatedReque
     select: { id: true, isPro: true, proExpiresAt: true },
   })
 
-  getAdminService(req).logAction(req.userId!, 'PRO_TOGGLED', req.params.id, 'user', {
+  getAdminService(req).logAction(req.userId!, 'PRO_TOGGLED', String(req.params.id), 'user', {
     wasPro: user.isPro,
     nowPro: !user.isPro,
   })
@@ -256,7 +256,7 @@ router.patch('/matches/:id', asyncHandler(async (req: AuthenticatedRequest, res)
     select: { id: true, homeTeamName: true, awayTeamName: true, homeScore: true, awayScore: true, status: true },
   })
 
-  getAdminService(req).logAction(req.userId!, 'MATCH_UPDATED', req.params.id, 'match', { ...data })
+  getAdminService(req).logAction(req.userId!, 'MATCH_UPDATED', String(req.params.id), 'match', { ...data })
   res.json({ match })
 }))
 
@@ -310,7 +310,7 @@ router.patch('/reports/:id', asyncHandler(async (req: AuthenticatedRequest, res)
     })
   }
 
-  getAdminService(req).logAction(req.userId!, status === 'resolved' ? 'REPORT_RESOLVED' : 'REPORT_DISMISSED', req.params.id, 'report', {
+  getAdminService(req).logAction(req.userId!, status === 'resolved' ? 'REPORT_RESOLVED' : 'REPORT_DISMISSED', String(req.params.id), 'report', {
     reportStatus: status,
   })
   res.json({ report })

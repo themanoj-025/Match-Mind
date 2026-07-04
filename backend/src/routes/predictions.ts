@@ -85,7 +85,7 @@ router.post('/score/:matchId', authenticateToken, asyncHandler(async (req: Authe
     return res.status(400).json({ error: { code: 'MATCH_NOT_FINISHED', message: 'Match must be FINISHED to score predictions' } })
   }
 
-  const result = await finalizeMatch(prisma, req.params.matchId, { mode })
+  const result = await finalizeMatch(prisma, String(req.params.matchId), { mode: mode as 'queue' | 'direct' | 'auto' | undefined })
   res.json(result)
 }))
 

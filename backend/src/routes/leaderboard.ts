@@ -41,7 +41,7 @@ router.get('/weekly', asyncHandler(async (req, res) => {
 // GET /api/leaderboard/history/:period
 router.get('/history/:period', asyncHandler(async (req, res) => {
   const prisma = req.app.get('prisma')
-  const period = req.params.period.toUpperCase()
+  const period = String(req.params.period).toUpperCase()
   if (period !== 'WEEKLY' && period !== 'MONTHLY') {
     return res.status(400).json({ error: { code: 'INVALID_PERIOD', message: 'Invalid period. Use WEEKLY or MONTHLY' } })
   }

@@ -97,7 +97,7 @@ router.get('/conversations', authenticateToken, asyncHandler(async (req: Authent
 router.get('/:userId', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const { userId: targetUserId } = req.params
-  const roomId = getDMRoomId(req.userId!, targetUserId)
+  const roomId = getDMRoomId(req.userId!, String(targetUserId))
 
   // Verify the other user exists
   const otherUser = await prisma.user.findUnique({
@@ -134,7 +134,7 @@ router.post('/:userId', authenticateToken, validate(sendMessageSchema), asyncHan
   const prisma = req.app.get('prisma')
   const { text, gifUrl } = req.body as { text?: string; gifUrl?: string }
   const { userId: targetUserId } = req.params
-  const roomId = getDMRoomId(req.userId!, targetUserId)
+  const roomId = getDMRoomId(req.userId!, String(targetUserId))
 
   // Validate recipient is not self
   if (req.userId === targetUserId) {
@@ -186,7 +186,7 @@ router.post('/:userId', authenticateToken, validate(sendMessageSchema), asyncHan
 router.patch('/read/:userId', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const { userId: targetUserId } = req.params
-  const roomId = getDMRoomId(req.userId!, targetUserId)
+  const roomId = getDMRoomId(req.userId!, String(targetUserId))
 
   await prisma.chatMessage.updateMany({
     where: {

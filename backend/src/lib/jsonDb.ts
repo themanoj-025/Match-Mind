@@ -442,7 +442,7 @@ function resolveUpdates(data: Record<string, any>, existingRecord: Record<string
 
 // ─── Model Handler Factory ───────────────────────────────
 
-function createModelHandler(modelName: string, getData: () => any[], persist: () => void): ModelHandler {
+function createModelHandler(modelName: string, getData: () => any[], getAllData: () => Record<string, any[]>, persist: () => void): ModelHandler {
   function whereFilter(where?: WhereClause): any[] {
     const data = getData()
     if (!where) return data
@@ -485,12 +485,12 @@ function createModelHandler(modelName: string, getData: () => any[], persist: ()
       if (skip) filtered = filtered.slice(skip)
       if (take) filtered = filtered.slice(0, take)
 
-      const data = getData()
+      const allData = getAllData()
 
       return filtered.map((item) => {
         let result: any = item
         if (include) {
-          result = applyInclude(result, include, data, modelName)
+          result = applyInclude(result, include, allData, modelName)
         }
         if (select) {
           result = selectFields(result, select)
@@ -498,7 +498,7 @@ function createModelHandler(modelName: string, getData: () => any[], persist: ()
           // Apply includes for select with include
           if (select._count && result._count) {
             for (const countField of Object.keys(select._count.select)) {
-              result._count[countField] = resolveCount(item, countField, data)
+              result._count[countField] = resolveCount(item, countField, allData)
             }
           }
         }
@@ -653,6 +653,7 @@ export class JsonDatabase {
       this.models[name] = createModelHandler(
         name,
         () => this.data[name],
+        () => this.data,
         () => this._saveModel(name)
       )
     }

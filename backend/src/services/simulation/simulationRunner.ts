@@ -36,7 +36,7 @@ interface MatchData {
   simEndsAt?: Date | null
 }
 
-interface DatabaseClient {
+type DatabaseClient = {
   [model: string]: {
     findUnique: (args: any) => Promise<any>
     findMany: (args: any) => Promise<any[]>
@@ -44,6 +44,7 @@ interface DatabaseClient {
     create: (args: any) => Promise<any>
     createMany?: (args: any) => Promise<{ count: number }>
   }
+} & {
   $transaction?: (ops: any[]) => Promise<any[]>
   _app?: { get?: (key: string) => any }
 }

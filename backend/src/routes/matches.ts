@@ -161,7 +161,7 @@ router.get('/:id/h2h', asyncHandler(async (req, res) => {
     draws,
     avgHomeGoals: pastMatches.length > 0 ? (totalHomeGoals / pastMatches.length).toFixed(1) : '0',
     avgAwayGoals: pastMatches.length > 0 ? (totalAwayGoals / pastMatches.length).toFixed(1) : '0',
-    recentResults: pastMatches.slice(0, 5).map((m) => ({
+    recentResults: pastMatches.slice(0, 5).map((m: any) => ({
       id: m.id,
       date: m.finishedAt,
       homeTeam: m.homeTeamName,
@@ -191,7 +191,7 @@ router.post('/:id/finish', authenticateToken, requireAdmin, validate(finishMatch
 
   const updated = await prisma.match.update({ where: { id: req.params.id }, data })
 
-  const scoring = await finalizeMatch(prisma, req.params.id, { mode: 'auto', io: req.app.get('io') })
+  const scoring = await finalizeMatch(prisma, String(req.params.id), { mode: 'auto', io: req.app.get('io') })
 
   const io = req.app.get('io')
   if (io) {

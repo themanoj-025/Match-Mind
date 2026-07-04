@@ -71,6 +71,7 @@ type DatabaseClient = {
     delete: (args: any) => Promise<any>
     count: (args?: any) => Promise<number>
   }
+} & {
   $transaction: (ops: any[]) => Promise<any[]>
   _app?: { get?: (key: string) => any }
 }

@@ -33,6 +33,7 @@ export type DatabaseClient = {
     upsert: (args: any) => Promise<any>
     createMany: (args: any) => Promise<{ count: number }>
   }
+} & {
   $transaction: (ops: any[]) => Promise<any[]>
   $connect: () => Promise<void>
   $disconnect: () => Promise<void>
@@ -314,20 +315,14 @@ export class PrismaAdminLogRepository implements IAdminLogRepository {
     this.prisma = prisma
   }
 
-  async create(data: {
-    adminId: string
-    action: string
-    targetId?: string | null
-    targetType?: string | null
-    detail?: Record<string, unknown>
-  }): Promise<unknown> {
+  async create(data: Record<string, unknown>): Promise<unknown> {
     return (this.prisma as any).adminLog.create({
       data: {
-        adminId: data.adminId,
-        action: data.action,
-        targetId: data.targetId ?? null,
-        targetType: data.targetType ?? null,
-        detail: data.detail ?? {},
+        adminId: data.adminId as string,
+        action: data.action as string,
+        targetId: (data.targetId as string | null) ?? null,
+        targetType: (data.targetType as string | null) ?? null,
+        detail: (data.detail as Record<string, unknown>) ?? {},
       },
     })
   }
