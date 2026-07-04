@@ -42,7 +42,10 @@ type DatabaseClient = {
 // ─── User Repository ─────────────────────────────────────
 
 export class PrismaUserRepository implements IUserRepository {
-  constructor(private prisma: DatabaseClient) {}
+  private prisma: DatabaseClient
+  constructor(prisma: DatabaseClient) {
+    this.prisma = prisma
+  }
 
   async findById(id: string): Promise<UserData | null> {
     return this.prisma.user.findUnique({ where: { id } }) as unknown as UserData | null
@@ -113,7 +116,10 @@ export class PrismaUserRepository implements IUserRepository {
 // ─── Match Repository ─────────────────────────────────────
 
 export class PrismaMatchRepository implements IMatchRepository {
-  constructor(private prisma: PrismaClient) {}
+  private prisma: DatabaseClient
+  constructor(prisma: DatabaseClient) {
+    this.prisma = prisma
+  }
 
   async findById(id: string): Promise<MatchData | null> {
     return this.prisma.match.findUnique({ where: { id } }) as unknown as MatchData | null
@@ -141,7 +147,10 @@ export class PrismaMatchRepository implements IMatchRepository {
 // ─── Prediction Repository ────────────────────────────────
 
 export class PrismaPredictionRepository implements IPredictionRepository {
-  constructor(private prisma: PrismaClient) {}
+  private prisma: DatabaseClient
+  constructor(prisma: DatabaseClient) {
+    this.prisma = prisma
+  }
 
   async findById(id: string): Promise<PredictionData | null> {
     return this.prisma.prediction.findUnique({ where: { id } }) as unknown as PredictionData | null
@@ -203,7 +212,10 @@ export class PrismaPredictionRepository implements IPredictionRepository {
 // ─── Leaderboard Repository ───────────────────────────────
 
 export class PrismaLeaderboardRepository implements ILeaderboardRepository {
-  constructor(private prisma: PrismaClient) {}
+  private prisma: DatabaseClient
+  constructor(prisma: DatabaseClient) {
+    this.prisma = prisma
+  }
 
   async getGlobalLeaderboard(take = 100): Promise<LeaderboardEntry[]> {
     const users = await this.prisma.user.findMany({
@@ -271,7 +283,10 @@ export class PrismaLeaderboardRepository implements ILeaderboardRepository {
 // ─── Report Repository ─────────────────────────────────
 
 export class PrismaReportRepository implements IReportRepository {
-  constructor(private prisma: PrismaClient) {}
+  private prisma: DatabaseClient
+  constructor(prisma: DatabaseClient) {
+    this.prisma = prisma
+  }
 
   async count(where?: Record<string, unknown>): Promise<number> {
     return this.prisma.report.count({ where: where as any })
@@ -294,7 +309,10 @@ export class PrismaReportRepository implements IReportRepository {
 // ─── Admin Log Repository ────────────────────────────
 
 export class PrismaAdminLogRepository implements IAdminLogRepository {
-  constructor(private prisma: PrismaClient) {}
+  private prisma: DatabaseClient
+  constructor(prisma: DatabaseClient) {
+    this.prisma = prisma
+  }
 
   async create(data: {
     adminId: string
@@ -329,7 +347,7 @@ export class PrismaAdminLogRepository implements IAdminLogRepository {
 
 // ─── Factory ──────────────────────────────────────────────
 
-export function createRepositories(prisma: PrismaClient) {
+export function createRepositories(prisma: DatabaseClient) {
   return {
     userRepository: new PrismaUserRepository(prisma),
     matchRepository: new PrismaMatchRepository(prisma),

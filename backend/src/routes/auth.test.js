@@ -9,7 +9,6 @@
 const request = require('supertest')
 const express = require('express')
 const cookieParser = require('cookie-parser')
-const { PrismaClient } = require('@prisma/client')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 
@@ -149,8 +148,6 @@ vi.mock('../services/authService', () => {
 
 // ─── Also mock repositories/index.ts ───────────────────
 vi.mock('../repositories/index', () => {
-  const { PrismaClient } = require('@prisma/client')
-
   class MockUserRepository {
     constructor(prisma) {
       this.prisma = prisma
@@ -243,8 +240,9 @@ function createTestApp(prismaMock) {
   const authRoutes = require('./auth')
   app.use('/api/auth', authRoutes)
 
-  // Error handler that mimics the real one (handles JWT errors → 401)
+  // Error handler that mimics the real one
   app.use((err, req, res, _next) => {
+    console.error('TEST ERROR HANDLER CAUGHT:', err)
     if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
       return res.status(401).json({ error: { code: 'INVALID_TOKEN', message: 'Invalid or expired token' } })
     }
