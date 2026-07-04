@@ -90,17 +90,28 @@ MatchMind attempts to solve all of these in a single platform.
 
 ### Production Readiness
 
-**Not production-ready.** See [Known Issues](#28-known-issues) and [Technical Debt](#29-technical-debt) for details. The project has zero test coverage, no TypeScript, no error monitoring, and several security vulnerabilities that must be addressed before production deployment.
+**Pre-production (Phase 5 in progress).** Significant engineering improvements have been made since initial development. The project now has:
+- ✅ **TypeScript migration in progress** — Backend repositories, services, and config are TypeScript; frontend store, hooks, types, and kinetic system are TypeScript
+- ✅ **Test coverage initiated** — Auth routes (15+ tests), prediction routes (12+ tests), simulation engine (20+ tests), API hooks (9+ tests), scoring engine (20+ tests)
+- ✅ **Repository pattern** — Full typed repository layer with interfaces isolating data access
+- ✅ **Service layer extraction** — AuthService and AdminService extracted as TypeScript classes
+- ✅ **Structured logging** — Pino-based logging with event names, redaction, and pretty-printing
+- ✅ **Error monitoring** — Sentry integration on both backend and frontend (with tracing and replays)
+- ✅ **JSON database** — Prisma-compatible JSON-backed database for development without PostgreSQL
+- ✅ **Leaderboard mapping extraction** — DRY violation fixed
+- ✅ **Graceful shutdown** — Proper timeout-based shutdown with worker cleanup
+
+See [Known Issues](#28-known-issues) and [Technical Debt](#29-technical-debt) for remaining gaps.
 
 ### Known Limitations
 
 - No live sports data API integration — all match data is manually entered or simulated
 - No email sending implemented — verification tokens are logged to console only
-- No test coverage
-- No TypeScript
-- No error monitoring (Sentry, etc.)
-- No CI/CD pipeline
+- TypeScript migration in progress (not all files converted)
+- No CI/CD pipeline configured
 - No production deployment configuration
+- No automated achievement unlocking logic
+- Chat messages in store grow unbounded
 
 ### Future Vision
 
@@ -127,13 +138,14 @@ See [Project Roadmap](#31-project-roadmap).
 
 | Language | Where |
 |----------|-------|
-| JavaScript (CommonJS) | Backend (Express.js) |
-| JavaScript (ESM + JSX) | Frontend (React) |
-| TypeScript (ESM) | `backend/prisma.config.ts` only |
-| CSS | Frontend (custom design system) |
+| JavaScript (CommonJS) | Backend (Express.js) — legacy, migrating to TS |
+| JavaScript (ESM + JSX) | Frontend (React) — some files migrated to TSX |
+| TypeScript (ESM + CommonJS) | Backend: repositories/, services/authService.ts, services/adminService.ts, config/schemas.ts. Frontend: store/, hooks/, lib/, pages/*.tsx |
+| CSS | Frontend (custom design system + kinetic.css) |
 | SQL | Migration scripts, seed scripts |
 | Batch | `start.bat` (Windows launcher) |
 | YAML | GitHub Actions workflows, Docker Compose |
+| JSON | Seed data in `backend/src/data/*.json` (25 files)
 
 ### Frameworks & Libraries
 
@@ -151,12 +163,13 @@ See [Dependencies](#24-dependencies) for complete listing.
 | **Nodemailer** | Email sending | Configured but NOT implemented (tokens logged to console) |
 | **SportRadar API** | Live sports data | `SPORTRADAR_API_KEY` in env.example but NOT implemented in code |
 | **Cloudinary** | Media storage | `CLOUDINARY_URL` in env.example but NOT implemented in code |
-| **Sentry** | Error monitoring | Listed in README but NOT configured |
-| **PostHog** | Analytics | Listed in README but NOT configured |
-| **Cloudflare** | CDN | Listed in README but NOT configured |
-| **Supabase** | Production PostgreSQL | Listed in README but NOT configured |
+| **Sentry** | Error monitoring | ✅ **Implemented** — Backend (@sentry/node) + Frontend (@sentry/react) |
+| **PostHog** | Analytics | Listed in README but NOT implemented |
+| **Cloudflare** | CDN | Listed in README but NOT implemented |
+| **Supabase** | Production PostgreSQL | Listed in README but NOT implemented |
 
-> ⚠️ **Note:** Several services listed in the README (`SportRadar API`, `Cloudinary`, `Sentry`, `PostHog`, `Cloudflare`, `Supabase`) have associated environment variables in `.env.example` but have **no implementation in the codebase**. They appear to be planned integrations that were not completed or were removed during development.
+> ⚠️ **Note:** Several services listed in the README (`SportRadar API`, `Cloudinary`, `PostHog`, `Cloudflare`, `Supabase`) have associated environment variables in `.env.example` but have **no implementation in the codebase**. They appear to be planned integrations that were not completed or were removed during development.
+> ✅ **Sentry IS now implemented** — both backend (`backend/instrument.js`) and frontend (`frontend/src/lib/instrument.js`) are configured.
 
 ---
 
@@ -164,17 +177,42 @@ See [Dependencies](#24-dependencies) for complete listing.
 
 | Metric | Count |
 |--------|-------|
-| **Total Files** | ~90+ (source + config + docs) |
-| **Total Directories** | ~25+ |
-| **Backend Source Files** | ~25 files |
-| **Frontend Source Files** | ~45 files (36 pages, 20 components) |
+| **Total Files** | ~140+ (source + config + docs + data) |
+| **Total Directories** | ~35+ |
+| **Backend Source Files** | ~40 files (including 5 TypeScript) |
+| **Frontend Source Files** | ~55 files (36 pages, 25 components, TS mix) |
 | **Route Files** | 15 (backend) |
 | **Middleware Files** | 5 (backend) |
-| **Configuration Files** | ~15 |
+| **Configuration Files** | ~20 |
 | **Documentation Files** | 8 |
-| **Test Files** | 2 (scoring.test.js, simulationEngine.test.js) |
+| **Test Files** | 5 (auth.test.js, predictions.test.js, scoring.test.js, simulationEngine.test.js, useApi.test.ts) |
+| **JSON Data Files** | 25 (seed data for JSON database) |
 | **CI/CD Workflow Files** | 7 (GitHub Actions) |
-| **Script Files** | 5 (backend setup/seed) |
+| **Script Files** | 6 (backend setup/seed + generate-seed-json) |
+
+### Largest Modules (by file count)
+
+| Module | File Count | Description |
+|--------|------------|-------------|
+| Frontend Pages | 36 | Page-level components |
+| Frontend Components | 25 | Reusable UI components (incl. 4 kinetic) |
+| Backend Routes | 15 | API route handlers |
+| JSON Data Files | 25 | Seed data for JSON database |
+| Prisma Schema Models | 17 | Database models |
+| Enums | 10 | Database enum types |
+
+### Largest Files
+
+| File | Size (est.) | Description |
+|------|-------------|-------------|
+| `frontend/src/App.jsx` | ~200 lines | Root component with 36+ route definitions |
+| `backend/src/services/scoring.js` | ~300 lines | Core scoring engine |
+| `backend/src/lib/jsonDb.js` | ~450 lines | JSON database adapter (Prisma-compatible) |
+| `backend/src/services/simulation/simulationEngine.js` | ~250 lines | Match simulation engine |
+| `backend/src/routes/admin.js` | ~250 lines | Admin API routes |
+| `backend/src/routes/stripe.js` | ~230 lines | Stripe webhook + payment routes |
+| `backend/scripts/generate-seed-json.js` | ~300 lines | JSON seed data generator |
+| `backend/src/index.js` | ~220 lines | Server entry point (now uses JSON DB) |
 
 ### Largest Modules (by file count)
 
@@ -233,6 +271,9 @@ backend/
 ├── .env.example                 # Template for all env vars
 ├── prisma.config.ts             # Prisma 7 datasource configuration (TypeScript)
 ├── vitest.config.js             # Vitest test configuration
+├── instrument.js                # Sentry instrumentation (loaded first)
+├── tsconfig.json                # TypeScript config (strict mode)
+├── vitest.config.js             # Vitest test configuration
 ├── prisma/
 │   ├── schema.prisma            # Database schema (17 models, 10 enums)
 │   ├── migration.sql            # Prisma migration file (may be empty)
@@ -241,29 +282,41 @@ backend/
 │   ├── push-schema.js           # Push schema via docker exec (workaround for Prisma 7 bugs)
 │   ├── seed-db.js               # Seed database via docker exec
 │   ├── setup-db.js              # Orchestrator: generate → push → seed
-│   └── setup-native-pg.js       # Configure local PostgreSQL on Windows
+│   ├── setup-native-pg.js       # Configure local PostgreSQL on Windows
+│   └── generate-seed-json.js    # Generate JSON seed data files
 └── src/
-    ├── index.js                 # Express server entry point
+    ├── index.js                 # Express server entry point (uses JSON DB + Sentry)
     ├── config/
     │   ├── constants.js         # Scoring points, pagination, rate limits, BullMQ config
     │   ├── passport.js          # Passport strategies: JWT + Google OAuth
-    │   └── schemas.js           # Zod validation schemas for all request bodies
+    │   ├── schemas.js           # Zod validation schemas (CommonJS)
+    │   └── schemas.ts           # Zod validation schemas (TypeScript, fully typed)
+    ├── data/                    # JSON seed data files (25 files, one per model)
+    │   ├── user.json
+    │   ├── match.json
+    │   ├── ... (25 total)
+    ├── lib/
+    │   └── jsonDb.js            # JSON database adapter (Prisma-API-compatible, 450+ lines)
     ├── middleware/
     │   ├── auth.js              # JWT authentication (Bearer header + cookie fallback)
-    │   ├── errorHandler.js      # Centralized error handler (Prisma, JWT, AppError, 500)
+    │   ├── errorHandler.js      # Centralized error handler
     │   ├── rateLimiter.js       # Rate limiting (auth, password reset, prediction, global)
     │   ├── requireAdmin.js      # Admin role check middleware
     │   └── validate.js          # Zod schema validation middleware
+    ├── repositories/            # ⭐ Repository pattern (TypeScript, 6 repositories)
+    │   ├── types.ts             # Repository interfaces + domain types
+    │   └── index.ts             # Prisma-backed implementations + factory
     ├── routes/
     │   ├── auth.js              # Signup, login, logout, Google OAuth, token refresh, forgot/reset password, verify email
-    │   ├── matches.js           # Match CRUD, stats, lineups, H2H, timeline, finish match
+    │   ├── auth.test.js         # ⭐ Auth route tests (15+ test cases, supertest)
     │   ├── predictions.js       # Create prediction, list mine, list by match, score predictions
+    │   ├── predictions.test.js  # ⭐ Prediction route tests (12+ test cases, supertest)
     │   ├── leaderboard.js       # Global, weekly, sport-specific, friends, history snapshots
     │   ├── users.js             # Profile, update, follow/unfollow, notifications, username check
     │   ├── leagues.js           # CRUD leagues, join by invite code, leaderboard
     │   ├── squads.js            # CRUD squads, invite members
     │   ├── highlights.js        # Match highlights from goal events
-    │   ├── ai.js                # AI prediction hints (Anthropic + heuristic), AI match summaries
+    │   ├── ai.js                # AI prediction hints (Pro-gated), AI match summaries
     │   ├── stripe.js            # Checkout session, webhook, billing portal, subscription status
     │   ├── admin.js             # Dashboard stats, user/matches/reports CRUD, activity log, settings
     │   ├── teams.js             # List teams, team profile with standings + recent matches
@@ -274,6 +327,9 @@ backend/
     ├── services/
     │   ├── scoring.js           # Core scoring engine: calculatePredictionPoints, scoreMatchPredictions, streaks, tiers, leaderboard management
     │   ├── scoring.test.js      # Unit tests for calculatePredictionPoints
+    │   ├── authService.ts       # ⭐ TypeScript AuthService (extracted from routes)
+    │   ├── adminService.ts      # ⭐ TypeScript AdminService (dashboard stats + logging)
+    │   ├── leaderboardMapper.js # ⭐ Shared leaderboard mapping utility (DRY fix)
     │   ├── tokenService.js      # JWT token generation and httpOnly cookie setting
     │   └── simulation/
     │       ├── simulationEngine.js       # Pure function: deterministic match simulation (Poisson xG, event timeline)
@@ -287,7 +343,8 @@ backend/
     ├── workflows/
     │   └── finalizeMatch.js     # Workflow: lock predictions → score (queue/direct/auto) → recalculate ranks → emit socket events
     └── utils/
-        └── AppError.js          # Custom error class with code, message, statusCode
+        ├── AppError.js          # Custom error class with code, message, statusCode
+        └── logger.js            # ⭐ Pino-based structured logger (event names, redaction)
 ```
 
 ### Frontend Structure
@@ -307,9 +364,10 @@ frontend/
     ├── App.jsx                  # Root: Navbar, BottomNav, LiveTicker, routes (36+), lazy loading, Framer Motion transitions
     ├── index.css                # Design system: CSS variables, typography, animations, utility classes
     ├── store/
-    │   └── useStore.js          # Zustand store: auth, UI state, live matches, chat, notifications, predictions, leaderboard
+    │   └── useStore.ts          # ⭐ TypeScript Zustand store: auth, UI state, live matches, chat, notifications, predictions, leaderboard
     ├── hooks/
-    │   └── useApi.js            # React Query hooks: all API endpoints (matches, predictions, leaderboard, etc.)
+    │   ├── useApi.ts            # ⭐ TypeScript React Query hooks: 40+ hooks, auto token refresh, singleton refresh pattern
+    │   └── useApi.test.ts       # ⭐ API hook tests (9 test cases: success, error, 401 refresh, redirect, concurrency)
     ├── components/
     │   ├── Navbar.jsx           # Top navigation: logo, links, auth buttons, search, notifications, user menu
     │   ├── BottomNav.jsx        # Mobile bottom navigation bar
@@ -346,6 +404,10 @@ frontend/
     │       ├── HeroScene.jsx     # WebGL detection + lazy loading of Three.js scene
     │       └── HeroSceneImpl.jsx # Three.js particle field (200 particles, 3D)
     ├── lib/
+    │   ├── types.ts             # ⭐ Shared TypeScript types (User, Match, Prediction, Leaderboard, etc.)
+    │   ├── kinetic.ts           # ⭐ Kinetic typography motion primitives (Framer Motion variants + utilities)
+    │   ├── kinetic.css          # Kinetic typography styles
+    │   ├── instrument.js        # Sentry frontend instrumentation
     │   └── animation/
     │       ├── variants.js      # 18 Framer Motion animation variant sets
     │       └── gsap.js          # 10 GSAP utility functions
@@ -423,26 +485,29 @@ frontend/
 #### `backend/src/index.js` — Server Entry Point ⭐ CRITICAL
 - **Purpose**: Express.js HTTP server + Socket.IO WebSocket server entry point
 - **Execution order**: 
-  1. Load dotenv → validate required env vars (JWT_SECRET, DATABASE_URL)
-  2. Initialize Prisma with PostgreSQL adapter (`@prisma/adapter-pg`)
-  3. Configure Passport.js strategies
-  4. Create Express app → apply global rate limiter → create HTTP server → create Socket.IO server
-  5. Apply middleware: helmet, cors, morgan, Stripe webhook raw body, json, cookieParser, passport
-  6. Mount 15 route groups under `/api/`
-  7. Mount health check endpoint
-  8. Mount error handler
-  9. Setup Socket.IO event handlers
-  10. Initialize BullMQ workers with fallback
-  11. Schedule weekly/monthly leaderboard resets
-  12. Start HTTP server
-  13. Handle SIGTERM for graceful shutdown
-- **Side effects**: Creates global `prisma._app` reference (anti-pattern), creates `prisma._pool`
-- **Critical dependencies**: PrismaClient, Express, Socket.IO, BullMQ, Passport
-- **Known issues**:
-  - `prisma._app` is a mutable global — tight coupling
-  - Graceful shutdown has `closeWorkers` as dynamic require inside the handler
-  - `httpServer.close()` callback not awaited
-- **Technical debt**: Anti-pattern `prisma._app`, no dependency injection
+  1. Load Sentry instrumentation (if SENTRY_DSN set)
+  2. Load dotenv → validate required env vars (JWT_SECRET, DATABASE_URL)
+  3. Initialize JSON Database (replaces Prisma/PostgreSQL for development)
+  4. Configure Passport.js strategies
+  5. Create Express app → apply global rate limiter → create HTTP server → create Socket.IO server
+  6. Apply middleware: helmet, cors, pino-http (replaces morgan), Stripe webhook raw body, json, cookieParser, passport
+  7. Mount 16 route groups under `/api/`
+  8. Mount health check endpoint (with DB status check)
+  9. Mount error handler
+  10. Setup Socket.IO event handlers
+  11. Initialize BullMQ workers with fallback
+  12. Schedule weekly/monthly leaderboard resets (with safeSetTimeout to avoid 32-bit overflow)
+  13. Start HTTP server
+  14. Handle SIGTERM/SIGINT for graceful shutdown (with 10s timeout)
+- **Side effects**: Creates global `prisma._app` reference (anti-pattern)
+- **Critical dependencies**: JSON Database, Express, Socket.IO, BullMQ, Passport
+- **Improvements over initial version**:
+  - ✅ Sentry instrumentation loaded first
+  - ✅ JSON database replaces Prisma/PostgreSQL
+  - ✅ Pino-http structured logging replaces Morgan
+  - ✅ Health check now returns DB status
+  - ✅ Graceful shutdown has 10-second timeout, no dynamic require, proper await on httpServer.close()
+  - ✅ safeSetTimeout prevents 32-bit integer overflow for long-delay scheduling
 
 #### `backend/src/config/constants.js`
 - **Purpose**: Single source of truth for all magic numbers
@@ -966,9 +1031,9 @@ sequenceDiagram
 | **Node.js** | 20+ | Runtime | All backend | Deno, Bun |
 | **Express.js** | ^5.2.1 | HTTP framework | All routes | Fastify, Hono (Express 5 is experimental) |
 | **Socket.IO** | ^4.8.3 | Real-time WebSocket | socket/index.js, all routes with live updates | WebSocket Native, ws |
-| **Prisma** | ^7.8.0 | ORM | All data access | Drizzle ORM, TypeORM, Knex |
-| **@prisma/adapter-pg** | ^7.8.0 | PostgreSQL adapter | index.js | @prisma/adapter-neon (serverless) |
-| **PostgreSQL** | 16 | Primary database | — | MySQL, SQLite, Supabase |
+| **JSON Database** | — | Database adapter (Prisma-compatible API) | lib/jsonDb.js | PostgreSQL via Prisma, SQLite |
+| **PostgreSQL** | 16 | Database (optional, JSON DB used for dev) | — | MySQL, SQLite, Supabase |
+| **Sentry** | ^10.63.0 | Error monitoring | instrument.js | Rollbar, Datadog |
 | **Redis** | 7 | Queue backend, rate limiting | workers/queue.js, middleware/rateLimiter.js | Upstash, KeyDB |
 | **BullMQ** | ^5.78.0 | Background job queue | workers/* | Inngest, Trigger.dev, RabbitMQ |
 | **Passport.js** | ^0.7.0 | Authentication | config/passport.js | jsonwebtoken directly, Auth0 |
@@ -978,7 +1043,11 @@ sequenceDiagram
 | **Anthropic SDK** | ^0.104.1 | AI predictions | routes/ai.js | OpenAI, Cohere |
 | **Zod** | ^4.4.3 | Input validation | config/schemas.js | Joi, Yup (Zod v4 is pre-release) |
 | **Helmet** | ^8.2.0 | Security headers | index.js | — |
-| **Morgan** | ^1.11.0 | HTTP request logging | index.js | pino-http, winston |
+| **Pino** | ^10.3.1 | Structured logging | utils/logger.js | Winston, Bunyan |
+| **pino-http** | ^11.0.0 | HTTP request logging | index.js | Morgan (replaced) |
+| **pino-pretty** | ^13.1.3 | Dev log formatting | utils/logger.js | (devDependency) |
+| **TypeScript** | ^6.0.3 | Type safety (in progress) | tsconfig.json | — |
+| **tsx** | ^4.22.5 | TypeScript execution (dev) | dev script | ts-node |
 | **Nodemailer** | ^8.0.10 | Email sending | Installed, NOT used | Resend, SendGrid, SES |
 | **express-rate-limit** | ^8.5.2 | Rate limiting | middleware/rateLimiter.js | rate-limiter-flexible |
 | **rate-limit-redis** | ^5.0.0 | Redis store for rate limiting | middleware/rateLimiter.js | — |
@@ -1095,7 +1164,7 @@ sequenceDiagram
 - **Status**: ✅ Implemented
 - **Files**: `backend/src/routes/ai.js`
 - **Description**: Anthropic Claude-powered prediction hints for Pro subscribers. Falls back to heuristic predictions (randomized with home advantage bias). AI match summaries generated from event data.
-- **⚠️ Security**: Endpoint uses `optionalAuth` → unauthenticated users can trigger Anthropic API calls
+- **Security**: Pro-gated — checks user's active subscription before processing
 
 ### 8.13 Stripe Subscriptions (Pro Tier)
 - **Status**: ✅ Implemented
@@ -1278,11 +1347,12 @@ Common error codes: `MATCH_NOT_FOUND`, `USER_NOT_FOUND`, `INVALID_CREDENTIALS`, 
 
 ### 10.1 Overview
 
-- **Engine**: PostgreSQL 16+
-- **ORM**: Prisma 7 with `@prisma/adapter-pg`
+- **Engine**: PostgreSQL 16+ (or JSON Database for development)
+- **Default (dev)**: **JSON Database** — `backend/src/lib/jsonDb.js` — a Prisma-API-compatible in-memory database backed by JSON files. No PostgreSQL required.
+- **Production**: PostgreSQL 16+ via Prisma 7 with `@prisma/adapter-pg`
 - **Schema defined in**: `backend/prisma/schema.prisma`
 - **Migrations**: Manual migration file at `backend/prisma/migration.sql` (may be empty)
-- **Client generation**: `prisma generate` (runs on postinstall)
+- **Seed data**: 25 JSON files in `backend/src/data/` (one per model) generated by `scripts/generate-seed-json.js`
 
 ### 10.2 Models (17 total)
 
@@ -1601,7 +1671,7 @@ The `Session` model stores refresh tokens but is **not used** for token validati
 | `VITE_WS_URL` | WebSocket URL | Empty (uses Vite proxy in dev) |
 | `VITE_APP_URL` | Frontend URL | — |
 | `VITE_POSTHOG_KEY` | PostHog analytics key | — **(NOT IMPLEMENTED)** |
-| `VITE_SENTRY_DSN` | Sentry DSN | — **(NOT IMPLEMENTED)** |
+| `VITE_SENTRY_DSN` | Sentry DSN | — ✅ **(IMPLEMENTED)** Initialized in `src/lib/instrument.js` |
 | `VITE_GOOGLE_CLIENT_ID` | Google OAuth client ID | — |
 | `VITE_FLAG_AI_HINTS` | Feature flag | `true` |
 | `VITE_FLAG_CHAT_GIFS` | Feature flag | `true` |
@@ -1613,12 +1683,16 @@ The `Session` model stores refresh tokens but is **not used** for token validati
 
 ### Backend
 
-No build step — the backend runs directly as JavaScript (CommonJS). The only build-like step is `prisma generate`.
+The backend runs via `tsx` (TypeScript executor) for development, with JSON Database as the default data layer. No PostgreSQL build step required.
 
 ```bash
 cd backend
-npx prisma generate   # Generate Prisma client from schema
-node src/index.js     # Run server
+# Development with JSON database (no PostgreSQL needed)
+npm run dev           # tsx src/index.js — auto-loads JSON seed data
+
+# Or with PostgreSQL + Prisma
+npx prisma generate   # Generate Prisma client
+node src/index.js     # Run server (if DATABASE_URL points to PostgreSQL)
 ```
 
 ### Frontend
@@ -1745,46 +1819,54 @@ Only Docker Compose is configured for local development (PostgreSQL + Redis). No
 
 ## 17. Testing
 
-### Current State: ⚠️ Minimal
+### Current State: ✅ Improving
 
 | Test File | Location | Coverage | Status |
 |-----------|----------|----------|--------|
-| `scoring.test.js` | `backend/src/services/scoring.test.js` | `calculatePredictionPoints()` only | ✅ Exists — 20+ test cases |
-| `simulationEngine.test.js` | `backend/src/services/simulation/simulationEngine.test.js` | All simulation engine functions | ✅ Exists — 20+ test cases |
+| `auth.test.js` | `backend/src/routes/auth.test.js` | Signup, login, refresh, forgot/reset password | ✅ 15+ test cases with supertest + mocked Prisma |
+| `predictions.test.js` | `backend/src/routes/predictions.test.js` | Create, list, score predictions, auth, validation | ✅ 12+ test cases with supertest + mocked DB |
+| `scoring.test.js` | `backend/src/services/scoring.test.js` | `calculatePredictionPoints()` | ✅ 20+ test cases |
+| `simulationEngine.test.js` | `backend/src/services/simulation/simulationEngine.test.js` | All simulation engine functions | ✅ 20+ test cases |
+| `useApi.test.ts` | `frontend/src/hooks/useApi.test.ts` | `fetchJSON`, `ApiRequestError`, 401 refresh, concurrency | ✅ 9 test cases |
 
-### Test Runner
+### Test Runners
 
-Vitest (v4) configured in `backend/vitest.config.js`:
+**Backend** (Vitest v4 in `backend/vitest.config.js`):
 - Environment: node
 - Pattern: `src/**/*.test.js`, `src/**/*.spec.js`
-- Coverage: provider=v8, thresholds=40% (branches, functions, lines, statements)
+- Coverage: provider=v8, thresholds=40%
 - Timeout: 10s
+
+**Frontend** (Vitest v4 in `frontend/vitest.config.ts`):
+- Environment: jsdom (for DOM testing)
+- Pattern: `src/**/*.test.ts`
+- Globals: true
 
 ### How to Run Tests
 
 ```bash
+# Backend tests
 cd backend
-npx vitest run        # Run all tests
-npx vitest run --coverage  # With coverage
+npx vitest run                  # Run all backend tests
+npx vitest run --coverage       # With coverage
+
+# Frontend tests
+cd frontend
+npx vitest run                  # Run all frontend tests
 ```
 
-### What's Missing
+### What's Still Missing
 
 | Area | Priority | Notes |
 |------|----------|-------|
-| Route integration tests | 🔴 Critical | No supertest usage despite being installed |
-| Auth flow tests | 🟠 High | No tests for signup/login/refresh |
-| Prediction flow tests | 🟠 High | No tests for create/score |
-| Match flow tests | 🟠 High | No tests for finish/simulation |
+| Match flow tests | 🟠 High | No tests for finish/simulation endpoints |
 | League/Squad tests | 🟠 High | No tests for CRUD operations |
 | User/Follow tests | 🟠 High | No tests for profile/follow/unfollow |
 | Stripe webhook tests | 🟠 High | No tests for webhook handling |
-| All scoring service functions | 🟠 High | Only `calculatePredictionPoints` is tested |
-| Frontend component tests | 🟡 Medium | Zero component tests |
-| Frontend hook tests | 🟡 Medium | Zero hook tests |
+| Frontend component tests | 🟡 Medium | Zero component tests (React Testing Library needed) |
 | Zustand store tests | 🟡 Medium | Zero store tests |
-| E2E tests | 🔵 Low | Not configured |
-| Load tests | 🔵 Low | Not configured |
+| E2E tests | 🔵 Low | Not configured (Playwright/Cypress) |
+| Load tests | 🔵 Low | Not configured (k6/artillery) |
 
 ---
 
@@ -1812,17 +1894,19 @@ npx vitest run --coverage  # With coverage
 
 | Issue | Severity | Location | Description |
 |-------|----------|----------|-------------|
-| Unauthenticated AI endpoint | 🔴 **Critical** | `routes/ai.js:11` | `optionalAuth` allows anyone to trigger Anthropic API calls — cost exposure |
 | No CSRF protection | 🔴 **Critical** | Throughout | Cookie-based auth without CSRF tokens |
 | No refresh token revocation | 🟠 **High** | `services/tokenService.js` | Stolen refresh tokens valid for 30 days |
 | JWT_RESET_SECRET falls back to JWT_SECRET | 🟠 **High** | `routes/auth.js:116` | Same secret for access tokens and password reset tokens |
 | User deletion without confirmation | 🟠 **High** | `routes/admin.js:112` | Admin can permanently delete users (cascade) |
 | Email verification not sent | 🟡 **Medium** | `routes/auth.js:46` | Verification token logged to console only |
-| No rate limiting on AI endpoint | 🟡 **Medium** | `routes/ai.js` | No rate limiter applied |
 | No input sanitization in chat | 🟡 **Medium** | `socket/index.js` | Messages trimmed but not sanitized for XSS |
 | No HTTPS enforcement | 🟡 **Medium** | Throughout | No TLS at application level |
 | Weak CORS fallback | 🔵 **Low** | `index.js:58` | Falls back to `http://localhost:3000` |
-| Secret in process.env | 🔵 **Low** | `routes/ai.js:88` | ANTHROPIC_API_KEY loaded from env (acceptable but worth noting) |
+
+> ✅ **Fixed since initial audit:** AI endpoint now properly Pro-gated (authenticated). See `routes/ai.js`.
+> ✅ **Fixed:** Structured logging with Pino replaces console.log.
+> ✅ **Fixed:** Graceful shutdown now has 10s timeout, no dynamic require.
+> ✅ **Fixed:** Sentry error monitoring integrated on both backend and frontend.
 
 ### External Service Security
 
@@ -1858,45 +1942,49 @@ npx vitest run --coverage  # With coverage
 | N+1 query in highlights | 🔴 **Critical** | `routes/highlights.js:15` | 1 + N queries for goal events |
 | No database indexes on search fields | 🟠 **High** | `routes/search.js` | Full table scans |
 | No caching layer | 🟠 **High** | All routes | Every request hits the database |
-| Chat memory growth (frontend) | 🟠 **High** | `store/useStore.js` | Messages accumulate unbounded |
+| Chat memory growth (frontend) | 🟠 **High** | `store/useStore.ts` | Messages accumulate unbounded |
 | Large vendor bundle | 🟡 **Medium** | Frontend | ~800KB+ gzipped (Three.js, GSAP, Framer Motion, Recharts) |
 | No compression middleware | 🟡 **Medium** | Backend | Response bodies not gzipped |
-| Default connection pool size | 🟡 **Medium** | `index.js:22` | Default 10 connections may be insufficient |
+| JSON DB in-memory only for dev | 🟡 **Medium** | `lib/jsonDb.js` | Not suitable for production at scale |
 | No cursor-based pagination | 🟡 **Medium** | Leaderboard routes | Deep pagination is inefficient |
 | Hardcoded `take: 50` | 🔵 **Low** | `routes/matches.js:17` | Should be configurable |
 | Three.js forced load | 🔵 **Low** | `components/three/HeroScene.jsx` | ~500KB for landing page only |
+
+> ✅ **Improvement:** JSON database eliminates PostgreSQL connection pool concerns for development.
+> ✅ **Improvement:** Frontend hooks use singleton refresh pattern (avoids multiple concurrent refresh calls).
 
 ---
 
 ## 20. Logging
 
-### Current Implementation
+### Current Implementation ✅ (Improved)
 
 | Logger | Where | Format |
 |--------|-------|--------|
-| Morgan | `index.js` — HTTP request logging | `:method :url :status :response-time ms` |
-| console.log | Throughout | Plain text, prefixed with `[Module]` |
-| console.error | Error handlers | Plain text with error message |
-| console.warn | BullMQ fallback | Plain text warning |
+| **Pino + pino-http** | `index.js` — HTTP request logging | Structured JSON, auto-parsed from pino-http |
+| **Pino logger** | `utils/logger.js` — All application logging | Structured JSON with `event` field, log levels, redaction |
+| console.log (legacy) | Some remaining routes | Plain text (being migrated to pino) |
+| console.error | Error handlers fallback | Plain text with error message |
+
+### Structured Logging Features
+
+- **Event-based logging**: Every log line includes an `event` field (e.g. `auth.signup`, `scoring.match_scored`)
+- **Log levels**: `fatal`, `error`, `warn`, `info`, `debug` (configurable via `LOG_LEVEL` env)
+- **Redaction**: Automatically redacts `password`, `token`, `authorization`, `cookie` fields
+- **Pretty-printing**: In development with TTY, logs are colorized and human-readable via `pino-pretty`
+- **Production format**: JSON output for log aggregation systems
 
 ### Logging Patterns
 
-- `[Auth]` prefix for authentication events
-- `[Scoring]` prefix for scoring engine
-- `[Worker]` prefix for BullMQ workers
-- `[Worker] error:` prefix for worker failures
-- `[Socket]` prefix for Socket.IO events
-- `[Simulation]` prefix for simulation engine
-- `[Scheduler]` prefix for leaderboard reset scheduler
-- `[Stripe]` prefix for Stripe operations
-- `[Tier]` prefix for tier upgrades
-- `[AdminLog]` prefix for admin action logging failures
-- `[Push]`, `[Seed]`, `[Setup]` prefixes for scripts
+- `{ event: 'auth.signup', userId }` — Authentication events
+- `{ event: 'scoring.completed', matchId, scored, usersAffected }` — Scoring engine
+- `{ event: 'server.start', port, env }` — Server lifecycle
+- `{ event: 'workers.initialized' }` — BullMQ workers
+- `{ event: 'database.initialized', dbType, counts }` — Database initialization
 
-### Missing
+### Still Missing
 
-- **Structured logging**: No JSON logs, no log levels, no queryable format
-- **Request correlation**: No request IDs, cannot trace requests across services
+- **Request correlation**: No request IDs — cannot trace requests across services
 - **Log rotation**: No configuration for log file rotation
 - **Centralized logging**: No integration with log aggregation services (Datadog, Logz.io, etc.)
 
@@ -1904,18 +1992,29 @@ npx vitest run --coverage  # With coverage
 
 ## 21. Monitoring
 
-### Current State: None
+### Current State: ✅ Improving
 
-- **No error tracking**: No Sentry, Rollbar, or similar
+- **✅ Sentry error monitoring** — Backend (`@sentry/node`) and frontend (`@sentry/react`) initialized
+  - Backend: Traces in production (0.1 sample rate), PII scrubbing, DSN from env
+  - Frontend: Browser tracing, session replays (0.1 sample, 1.0 on error), input masking
 - **No APM**: No Datadog, New Relic, or similar
 - **No metrics**: No Prometheus, Grafana, or similar
-- **No uptime monitoring**: No health check endpoint that validates dependencies
+- **No uptime monitoring**: No external uptime checks (Pingdom, Better Uptime)
 - **No alerting**: No alert rules for errors, queue depth, or latency
 
-The health check at `GET /api/health` only returns `{ status: 'healthy' }` without checking:
-- Database connectivity
-- Redis connectivity  
-- External service availability (Stripe, Anthropic)
+The health check at `GET /api/health` returns:
+```json
+{
+  "status": "healthy",
+  "timestamp": "2026-07-04T...",
+  "checks": {
+    "database": { "status": "ok", "type": "json-file" }
+  }
+}
+```
+
+> ✅ **Fixed:** Health check now includes database connectivity status.
+> ✅ **Fixed:** Sentry added — error tracking is now in place.
 
 ---
 
@@ -1940,12 +2039,15 @@ The health check at `GET /api/health` only returns `{ status: 'healthy' }` witho
 
 | Scenario | Impact |
 |----------|--------|
-| Redis connection failure | BullMQ workers fail silently, fall back to direct |
+| Redis connection failure | BullMQ workers fail, fall back to direct (logged) |
 | Stripe API timeout | Webhook processing hangs |
 | Anthropic API failure | Falls back to heuristic silently |
-| Database connection pool exhaustion | Requests hang until timeout |
+| JSON database write failure | Operation fails, logged via pino |
 | Concurrent simulation on same match | Two simulations run in parallel |
 | Race condition in scoring | Multiple finish calls could double-score |
+
+> ✅ **Improvement:** Error logging is now structured via Pino with redaction, making debugging easier.
+> ✅ **Improvement:** Graceful shutdown handles SIGTERM/SIGINT with 10s timeout.
 
 ---
 
@@ -1969,49 +2071,69 @@ The health check at `GET /api/health` only returns `{ status: 'healthy' }` witho
 - **Routing**: React Router v6 with lazy loading
 - **Styling**: Custom CSS with CSS custom properties (no Tailwind utility classes used)
 
+### Enforced (New)
+
+- ✅ **TypeScript** in progress for both backend and frontend
+- ✅ **ESLint** configured for frontend (React hooks + React refresh plugins)
+- ✅ **Structured logging** (`utils/logger.js`) enforced in new code
+- ✅ **Repository pattern** interfaces for testable data access
+- ✅ **Service layer** with dependency injection for testability
+
 ### Not Enforced
 
 - No linter configuration for the backend
 - No pre-commit hooks
 - No commit message validation
-- No TypeScript
 - No code formatter (Prettier not configured)
 
 ---
 
 ## 24. Dependencies
 
-### Backend Dependencies
+### Backend Dependencies (Updated)
 
 | Package | Version | Size (est.) | Required? | Alternative |
 |---------|---------|-------------|-----------|-------------|
 | `@anthropic-ai/sdk` | ^0.104.1 | ~100KB | No (feature) | OpenAI, Cohere |
-| `@prisma/adapter-pg` | ^7.8.0 | ~50KB | ✅ Yes | @prisma/adapter-neon |
-| `@prisma/client` | ^7.8.0 | ~3MB | ✅ Yes | — |
+| `@sentry/node` | ^10.63.0 | ~500KB | ✅ Yes (monitoring) | Rollbar, Datadog |
 | `bcryptjs` | ^3.0.3 | ~200KB | ✅ Yes | bcrypt, argon2 |
 | `bullmq` | ^5.78.0 | ~500KB | No (feature) | Inngest, Trigger.dev |
 | `cookie-parser` | ^1.4.7 | ~10KB | ✅ Yes | — |
 | `cors` | ^2.8.6 | ~20KB | ✅ Yes | — |
-| `crypto` | ^1.0.1 | ~100KB | **❌ Unused** | Node.js built-in |
 | `dotenv` | ^17.4.2 | ~20KB | ✅ Yes | — |
 | `express` | ^5.2.1 | ~500KB | ✅ Yes | Fastify, Hono |
 | `express-rate-limit` | ^8.5.2 | ~30KB | ✅ Yes | rate-limiter-flexible |
 | `google-auth-library` | ^10.7.0 | ~500KB | No (feature) | — |
 | `helmet` | ^8.2.0 | ~50KB | ✅ Yes | — |
 | `jsonwebtoken` | ^9.0.3 | ~100KB | ✅ Yes | jose |
-| `morgan` | ^1.11.0 | ~20KB | ✅ Yes | pino-http |
 | `nodemailer` | ^8.0.10 | ~200KB | **❌ Not used** | Resend, SendGrid |
 | `passport` | ^0.7.0 | ~50KB | ✅ Yes | — |
 | `passport-google-oauth20` | ^2.0.0 | ~20KB | No (feature) | — |
 | `passport-jwt` | ^4.0.1 | ~10KB | ✅ Yes | — |
-| `pg` | ^8.21.0 | ~500KB | ✅ Yes | @neondatabase/serverless |
-| `prisma` | ^7.8.0 | ~5MB | ✅ Yes | — |
+| **`pino`** | ^10.3.1 | ~50KB | ✅ Yes (structured logging) | Winston, Bunyan |
+| **`pino-http`** | ^11.0.0 | ~20KB | ✅ Yes (HTTP logging) | Morgan (replaced) |
 | `rate-limit-redis` | ^5.0.0 | ~10KB | No (optional) | — |
 | `redis` | ^6.0.0 | ~500KB | No (optional) | ioredis |
 | `socket.io` | ^4.8.3 | ~500KB | ✅ Yes | ws |
 | `stripe` | ^22.2.0 | ~1MB | No (feature) | Paddle, Lemon Squeezy |
 | `uuid` | ^14.0.0 | ~10KB | ✅ Yes | crypto.randomUUID() |
 | `zod` | ^4.4.3 | ~100KB | ✅ Yes | Joi, Yup |
+
+> **Removed packages:** `@prisma/adapter-pg`, `@prisma/client`, `pg`, `prisma`, `morgan`, `crypto` — replaced by JSON database + structured logging
+
+### Backend Dev Dependencies
+
+| Package | Version | Purpose |
+|---------|---------|---------|
+| **`typescript`** | ^6.0.3 | Type safety (migration in progress) |
+| **`tsx`** | ^4.22.5 | TypeScript execution in dev (`tsx src/index.js`) |
+| **`pino-pretty`** | ^13.1.3 | Pretty-printed logs in development |
+| `vitest` | ^4.1.9 | Test runner |
+| `@vitest/coverage-v8` | ^4.1.9 | Test coverage |
+| `supertest` | ^7.2.2 | HTTP testing (used in auth.test.js, predictions.test.js) |
+| `nodemon` | ^3.1.14 | Dev auto-restart |
+| `@types/node` | ^26.1.0 | Node.js type definitions |
+| `@types/jsonwebtoken` | ^9.0.10 | JWT type definitions |
 
 ### Frontend Dependencies
 
@@ -2021,7 +2143,7 @@ The health check at `GET /api/health` only returns `{ status: 'healthy' }` witho
 | `react-dom` | ^19.2.6 | ~120KB | ✅ Yes | — |
 | `react-router-dom` | ^6.30.4 | ~20KB | ✅ Yes | — |
 | `@tanstack/react-query` | ^5.101.0 | ~25KB | ✅ Yes | — |
-| `zustand` | ^5.0.14 | ~5KB | ✅ Yes | — |
+| `zustand` | ^5.0.14 | ~5KB | ✅ Yes (TypeScript) | — |
 | `framer-motion` | ^12.40.0 | ~60KB | No | Can use CSS transitions |
 | `gsap` | ^3.15.0 | ~80KB | No | Can use Intersection Observer |
 | `three` | ^0.184.0 | ~400KB | No | Landing page only |
@@ -2029,13 +2151,12 @@ The health check at `GET /api/health` only returns `{ status: 'healthy' }` witho
 | `@react-three/drei` | ^10.7.7 | ~50KB | No | Landing page only |
 | `recharts` | ^3.8.1 | ~100KB | No | Admin page |
 | `lucide-react` | ^1.17.0 | ~50KB | No | Can use SVGs |
-| `@heroicons/react` | ^2.2.0 | ~30KB | No | Redundant with lucide |
+| **`@sentry/react`** | ^10.63.0 | ~100KB | ✅ Yes (monitoring) | Rollbar, Datadog |
 | `dompurify` | ^3.4.8 | ~20KB | No | XSS protection |
 | `sonner` | ^2.0.7 | ~10KB | No | Toast notifications |
 | `react-hook-form` | ^7.78.0 | ~15KB | No | Can use native forms |
 | `zod` | ^4.4.3 | ~100KB | ✅ Yes | Shared with backend |
 | `socket.io-client` | ^4.8.3 | ~40KB | ✅ Yes | — |
-| `picomatch` | ^4.0.4 | ~10KB | **❌ Unused** | Transitive dep of Vite |
 | `@stripe/react-stripe-js` | ^6.6.0 | ~20KB | No (feature) | — |
 | `@stripe/stripe-js` | ^9.8.0 | ~10KB | No (feature) | — |
 | `react-helmet-async` | ^3.0.0 | ~5KB | ✅ Yes | SEO |
