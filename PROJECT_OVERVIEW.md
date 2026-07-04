@@ -97,7 +97,7 @@ MatchMind attempts to solve all of these in a single platform.
 | Category | Status | Details |
 |----------|--------|---------|
 | **TypeScript Migration** | ✅ **Complete** | All 40+ backend source files converted to `.ts` — routes, middleware, services, workers, socket, workflows, JSON DB, Sentry instrumentation |
-| **Test Coverage** | ✅ **71+ Passing Tests** | 4 test files: auth (14 tests), predictions (11 tests), scoring (47 tests), API hooks (9 tests) |
+| **Test Coverage** | ✅ **81 Tests Passing** | 4 test files: scoring (47 tests), auth (14 tests), predictions (11 tests), API hooks (9 tests) |
 | **Repository Pattern** | ✅ **Implemented** | 6 typed repository interfaces with factory pattern, fully adopted |
 | **Service Layer** | ✅ **Extracted** | AuthService, AdminService, TokenService, scoring engine all in TypeScript |
 | **Structured Logging** | ✅ **Pino** | Event-based logging with redaction, levels, pretty-printing, pino-http replaces Morgan |
@@ -853,9 +853,9 @@ graph TB
     end
 
     subgraph "Data Layer"
-        P["Prisma ORM v7"]
-        Q["PostgreSQL 16"]
-        R["Redis 7"]
+        P["JSON Database (dev)"]
+        Q["Prisma + PostgreSQL (prod)"]
+        R["Redis 7 (optional)"]
     end
 
     subgraph "External"
@@ -894,21 +894,18 @@ sequenceDiagram
     participant Passport as Passport/JWT
     participant Route as Route Handler
     participant Service as Service Layer
-    participant Prisma as Prisma ORM
-    participant DB as PostgreSQL
+    participant DB as JSON DB / Prisma
 
     Browser->>ViteProxy: HTTP Request
     ViteProxy->>Express: Proxy to :4000
-    Express->>Express: Helmet, CORS, Morgan
+    Express->>Express: Helmet, CORS, pino-http
     Express->>Express: Rate Limiter Check
     Express->>Passport: JWT Auth (if required)
     Passport-->>Express: user object or 401
     Express->>Route: Route Handler
     Route->>Service: Business Logic
-    Service->>Prisma: Database Query
-    Prisma->>DB: SQL (via adapter-pg)
-    DB-->>Prisma: Results
-    Prisma-->>Service: Typed Results
+    Route->>DB: JSON DB query (default) / Prisma+PostgreSQL (prod)
+    DB-->>Service: Results
     Service-->>Route: Processed Data
     Route-->>Express: JSON Response
     Express-->>ViteProxy: HTTP Response
@@ -1308,23 +1305,159 @@ sequenceDiagram
 | GET | `/api/admin/activity-log` | Admin action log (page, limit) |
 | GET | `/api/admin/settings` | Feature flags |
 
-### 9.11 Other
+### 9.11 Direct Messages
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/teams` | List teams (filter: sport) |
-| GET | `/api/teams/:id` | Team profile with players, standings, form |
-| GET | `/api/players` | List players (filter: sport) |
-| GET | `/api/players/:id` | Player details |
-| GET | `/api/highlights` | Match highlights from goal events |
-| GET | `/api/search?q=` | Global search (users, teams, players, matches) |
-| GET | `/api/messages/conversations` | DM conversations |
-| GET | `/api/messages/:userId` | Messages with user |
-| POST | `/api/messages/:userId` | Send message |
-| PATCH | `/api/messages/read/:userId` | Mark messages as read |
-| GET | `/api/health` | Health check |
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/messages/conversations` | ✓ | List DM conversations with latest message preview and unread counts |
+| GET | `/api/messages/:userId` | ✓ | Get message history with a specific user (last 100, chronological) |
+| POST | `/api/messages/:userId` | ✓ | Send a direct message (text and/or GIF) |
+| PATCH | `/api/messages/read/:userId` | ✓ | Mark all messages from a user as read |
 
-### 9.12 Common Error Format
+**Important implementation details:**
+- DM room IDs are deterministic: `dm:{sortedUserId1}:{sortedUserId2}` — both users share the same room
+- Socket.IO event `DM_MESSAGE` emitted to both participants for real-time delivery
+- Self-messaging is rejected with `400 SELF_MESSAGE`
+- Messages are soft-deleted via `isDeleted` flag (not physically removed)
+- Pagination: last 100 messages returned, ordered chronologically
+
+**Validation (`POST /api/messages/:userId`):**
+- `text`: string, trimmed, max 1000 chars (optional if `gifUrl` is provided)
+- `gifUrl`: string, URL format, nullable (optional if `text` is provided)
+- At least one of `text` or `gifUrl` must be provided (validated by `sendMessageSchema`)
+
+**Error codes:** `USER_NOT_FOUND` (404), `SELF_MESSAGE` (400), `VALIDATION_ERROR` (400)
+
+### 9.12 Teams
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/teams` | — | List teams (optional `sport` query filter) |
+| GET | `/api/teams/:id` | — | Full team profile with players, standings, recent matches, form |
+
+**Query parameters (`GET /api/teams`):**
+- `sport`: string — filter by sport (e.g. `FOOTBALL`, `BASKETBALL`). Omit or set to `all` for all sports.
+- Results limited to 50, ordered alphabetically by name.
+
+**Response (`GET /api/teams/:id`):**
+```json
+{
+  "id": "team-mci",
+  "name": "Manchester City",
+  "sport": "FOOTBALL",
+  "logo": "https://...",
+  "players": [{ "id": "...", "name": "..." }],
+  "standings": [{ "competition": { "name": "Premier League" }, "position": 1, "points": 89 }],
+  "recentMatches": [{ "id": "...", "homeTeamName": "...", "awayTeamName": "...", "homeScore": 2, "awayScore": 1, "status": "FINISHED" }],
+  "form": "WWDLW",
+  "squadSize": 25
+}
+```
+- `form`: computed from last 5 matches as a string of `W`/`L`/`D` characters
+- `standings`: latest season only (sorted by season descending, limited to 1)
+
+**Error codes:** `TEAM_NOT_FOUND` (404)
+
+### 9.13 Players
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/players` | — | List players with team info (optional `sport` filter) |
+| GET | `/api/players/:id` | — | Player details with team info |
+
+**Query parameters (`GET /api/players`):**
+- `sport`: string — filter by sport (e.g. `FOOTBALL`). Omit or set to `all` for all sports.
+- Results limited to 50, ordered alphabetically by name.
+- Each player includes their team (`id`, `name`, `logo`, `sport`).
+
+**Error codes:** `PLAYER_NOT_FOUND` (404)
+
+### 9.14 Global Search
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/search?q=` | — | Full-text search across users, teams, players, and matches |
+
+**Query parameters:**
+- `q` (required): string, minimum 2 characters. Queries with fewer than 2 chars return empty results.
+
+**Response:**
+```json
+{
+  "users": [
+    {
+      "id": "user-1",
+      "username": "sportfan",
+      "displayName": "Sport Fan",
+      "avatar": "https://...",
+      "tier": "GOLD",
+      "totalPoints": 2500,
+      "predAccuracy": 0.68
+    }
+  ],
+  "teams": [{ "id": "team-mci", "name": "Manchester City", "logo": "...", "sport": "FOOTBALL" }],
+  "players": [{ "id": "...", "name": "...", "team": { "id": "...", "name": "..." } }],
+  "matches": [{ "id": "...", "homeTeamName": "...", "awayTeamName": "...", "status": "SCHEDULED", "scheduledAt": "..." }]
+}
+```
+
+**Search targets (case-insensitive `contains`):**
+- **Users**: `username`, `displayName` (max 10 results)
+- **Teams**: `name` (max 10 results)
+- **Players**: `name` (max 10 results, includes team)
+- **Matches**: `homeTeamName`, `awayTeamName`, `competition` (max 10 results, ordered by date descending)
+
+All 4 searches run in parallel via `Promise.all`.
+
+### 9.15 Match Simulation
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/matches/:id/start-simulation` | Admin | Start async simulation (non-blocking, runs server-side) |
+| POST | `/api/matches/:id/start-simulation-sync` | Admin | Start sync simulation (blocks until match finishes) |
+| GET | `/api/matches/:id/simulation-status` | — | Get current simulation state and seed info |
+
+**Request (`POST /api/matches/:id/start-simulation`):**
+- No body required. Match must have status `SCHEDULED`.
+- Simulation runs asynchronously — response returns immediately with `{ message: "Simulation started", matchId }`
+- Errors during simulation are logged via Pino with event `simulation.start_failed`
+
+**Sync mode (`POST /api/matches/:id/start-simulation-sync`):**
+- Blocks until the entire simulation completes (events generated, match marked FINISHED, scoring triggered)
+- Useful for testing or small batches
+- Uses `skipDelay: true` (no compressed clock delay between events)
+
+**Simulation-status response (`GET /api/matches/:id/simulation-status`):**
+```json
+{
+  "id": "match-1",
+  "status": "SIMULATING",
+  "minute": 67,
+  "homeScore": 2,
+  "awayScore": 1,
+  "simSeed": 12345,
+  "simSpeedMultiplier": 1.0,
+  "simStartedAt": "2026-07-04T12:00:00Z",
+  "simEndsAt": "2026-07-04T12:02:30Z"
+}
+```
+
+**Known issues:**
+- No locking mechanism — parallel simulations can run on the same match
+- Match must be `SCHEDULED` — cannot re-simulate finished matches
+
+**Error codes:** `MATCH_NOT_FOUND` (404), `MATCH_NOT_SCHEDULED` (400)
+
+### 9.16 Other
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/highlights` | — | Match highlights from goal events |
+| GET | `/api/health` | — | Health check (returns DB status + timestamp) |
+
+### 9.17 Common Error Format
+
+All API endpoints follow a consistent error response format:
 
 ```json
 {
@@ -1335,7 +1468,7 @@ sequenceDiagram
 }
 ```
 
-Common error codes: `MATCH_NOT_FOUND`, `USER_NOT_FOUND`, `INVALID_CREDENTIALS`, `DUPLICATE_USER`, `RATE_LIMIT_EXCEEDED`, `VALIDATION_ERROR`, `FORBIDDEN`, `INTERNAL_ERROR`.
+**Common error codes:** `MATCH_NOT_FOUND`, `USER_NOT_FOUND`, `INVALID_CREDENTIALS`, `DUPLICATE_USER`, `RATE_LIMIT_EXCEEDED`, `VALIDATION_ERROR`, `FORBIDDEN`, `INTERNAL_ERROR`, `TEAM_NOT_FOUND`, `PLAYER_NOT_FOUND`, `SELF_MESSAGE`, `MATCH_NOT_SCHEDULED`.
 
 ---
 
@@ -1681,16 +1814,13 @@ The `Session` model stores refresh tokens but is **not used** for token validati
 
 ### Backend
 
-The backend runs via `tsx` (TypeScript executor) for development, with JSON Database as the default data layer. No PostgreSQL build step required.
+The backend runs via `tsx` (TypeScript executor). The JSON Database is the default data layer, loading seed data automatically at startup. No PostgreSQL or build step required.
 
 ```bash
 cd backend
 # Development with JSON database (no PostgreSQL needed)
-npm run dev           # tsx src/index.js — auto-loads JSON seed data
-
-# Or with PostgreSQL + Prisma
-npx prisma generate   # Generate Prisma client
-node src/index.js     # Run server (if DATABASE_URL points to PostgreSQL)
+npm run dev           # tsx watch src/index.ts — auto-loads JSON seed data
+npm start             # tsx src/index.ts — production start
 ```
 
 ### Frontend
@@ -1728,15 +1858,12 @@ npm run build   # cd frontend && npm run build
 ### Quick Start (Windows)
 
 Double-click `start.bat` — it handles everything:
-1. Checks Node.js + Docker
+1. Checks Node.js
 2. Creates `.env` from template (if missing)
-3. Starts Docker containers (PostgreSQL on :5433, Redis on :6379)
-4. Installs npm dependencies
-5. Generates Prisma client
-6. Pushes database schema
-7. Seeds demo data (if DB is empty)
-8. Starts both servers in separate windows
-9. Opens browser at `http://localhost:3000`
+3. Installs npm dependencies
+4. Starts both servers in separate windows
+5. Opens browser at `http://localhost:3000`
+*(No PostgreSQL or Docker needed — JSON Database loads automatically)*
 
 ### Manual Setup
 
@@ -1746,30 +1873,26 @@ cd backend && npm install
 cd ../frontend && npm install
 cd ..
 
-# 2. Start infrastructure
-docker compose up -d
-
-# 3. Generate Prisma client
-cd backend && npx prisma generate
-
-# 4. Push schema
-node scripts/push-schema.js
-
-# 5. Seed database
-node scripts/seed-db.js
-
-# 6. Start servers
+# 2. Start servers (JSON DB auto-loads seed data)
 cd backend && npm run dev    # :4000
 cd frontend && npm run dev   # :3000
+
+# Both servers start with TypeScript hot-reload (tsx watch)
 ```
 
 ### One-Command Setup (from root)
 
 ```bash
-npm run setup
-# Runs: install:all → prisma:generate → prisma:push → prisma:seed
+cd backend && npm install && cd ../frontend && npm install && cd ..
 npm run dev
-# Runs: concurrently backend + frontend
+# Runs: concurrently "cd backend && npm run dev" + "cd frontend && npm run dev"
+```
+
+### Docker Infrastructure (Optional)
+
+Redis is optional — BullMQ falls back to direct synchronous scoring. Start only if using BullMQ:
+```bash
+docker compose up -d redis
 ```
 
 ### Demo Account

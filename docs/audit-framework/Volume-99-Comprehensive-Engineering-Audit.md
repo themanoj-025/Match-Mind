@@ -6,7 +6,7 @@
 > **Project Version:** 1.0.0  
 > **Severity Scale:** 🔴 Critical | 🟠 High | 🟡 Medium | 🔵 Low | ⚪ Informational
 > 
-> **Note:** This is an updated audit reflecting significant engineering improvements made since the initial audit. Key changes: TypeScript migration in progress, repository/service layers added, structured logging, Sentry monitoring, test coverage initiated, JSON database for development, and more.
+> **Note:** This is a comprehensive update (v2) of the audit reflecting Phase 5 engineering improvements. Key changes: **TypeScript migration complete** (40+ backend files), repository/service layers, structured logging (Pino), Sentry monitoring, 81 tests passing, JSON database as default dev DB, and more.
 
 ---
 
@@ -53,8 +53,8 @@ Match-Mind is an ambitious full-stack sports prediction platform with a feature 
 
 | Issue | Status |
 |-------|--------|
-| **TypeScript migration** | ✅ **In progress** — Backend repositories, services, config (5 TypeScript files). Frontend store, hooks, types, kinetic system (10+ TypeScript files). Pages being converted to `.tsx`. |
-| **Test coverage** | ✅ **Initiated** — Auth routes (15+ tests), prediction routes (12+ tests), simulation engine (20+ tests), API hooks (9 tests), scoring engine (20+ tests) = **~80+ tests total** |
+| **TypeScript migration** | ✅ **Complete** — All 40+ backend source files converted to `.ts` (routes, middleware, services, workers, socket, workflows, utils, config, lib, instrumentation). ESM imports throughout. |
+| **Test coverage** | ✅ **81 Tests Passing** — scoring (47 tests), auth (14 tests), predictions (11 tests), API hooks (9 tests) |
 | **Error monitoring** | ✅ **Implemented** — Sentry on backend (`@sentry/node`) and frontend (`@sentry/react`) with tracing and replays |
 | **Structured logging** | ✅ **Implemented** — Pino-based structured logging with event names, redaction, pretty-printing |
 | **Repository pattern** | ✅ **Implemented** — Full typed repository layer with 6 interfaces (User, Match, Prediction, Leaderboard, Report, AdminLog) |
@@ -73,8 +73,9 @@ Match-Mind is an ambitious full-stack sports prediction platform with a feature 
 - **No email sending** — Verification tokens still logged to console
 - **Frontend bundle size** — Three.js, GSAP, Framer Motion still large
 - **N+1 query in highlights** — Not yet fixed
+- **Frontend TypeScript migration** — Not started (JSX files remain)
 
-**Overall Assessment:** The project has made **significant engineering progress** in a short time. The architecture has been improved with proper patterns (repository, service layers). Test coverage has been initiated with meaningful integration tests. Monitoring and logging are now in place. The remaining gaps are manageable and typical for a pre-production application.
+**Overall Assessment:** The project has made **significant engineering progress** in a short time. The **TypeScript migration is complete** — the entire backend (40+ files) now has full type safety with ESM imports. Test coverage has 81 passing tests across 4 test files. Monitoring (Sentry) and structured logging (Pino) are in place. The JSON database eliminates the PostgreSQL development dependency. The remaining gaps (CI/CD, CSRF, frontend TS migration, email sending) are manageable and typical for a pre-production application.
 
 ---
 
@@ -103,8 +104,8 @@ prisma._app = app  // Still exists but JSON DB is lighter-weight
 
 The `prisma._app` pattern is still present, though the JSON database adapter reduces the risk compared to the Prisma-based implementation.
 
-#### 🟠 Mixed Module Systems
-Backend uses CommonJS (`require`/`module.exports`) while the frontend uses ESM (`import`/`export`). TypeScript files coexist with JavaScript — some modules duplicate (e.g., `schemas.js` and `schemas.ts`, `authService.js` and `authService.ts`).
+#### ✅ Fixed: Mixed Module Systems
+**The backend has been fully migrated from CommonJS to ESM.** All 40+ source files now use `import`/`export default`. No duplicate `.js`/`.ts` pairs remain. The backend runs via `tsx` which handles ESM TypeScript natively.
 
 #### 🟡 Monorepo Without Workspace Tooling
 The `package.json` at root has `"scripts"` that cd into subdirectories instead of using npm workspaces, yarn workspaces, or Turborepo.
@@ -115,9 +116,9 @@ The `package.json` at root has `"scripts"` that cd into subdirectories instead o
 - ✅ **New:** `src/data/` — JSON seed data files
 - ⚠️ Still missing: `constants/` on frontend, no component-level CSS modules
 
-### Recommendations
+### Updated Recommendations
 1. Adopt npm workspaces or Turborepo for monorepo management
-2. Complete TypeScript migration — eliminate duplicated .js/.ts files
+2. ✅ **Done:** TypeScript migration complete — all `.js` source files eliminated
 3. Remove the `prisma._app` anti-pattern entirely
 
 ---
@@ -138,15 +139,16 @@ The `package.json` at root has `"scripts"` that cd into subdirectories instead o
 
 ### Critical Issues
 
-#### 🟠 TypeScript Migration In Progress — Incomplete
-The backend now has TypeScript in key areas:
-- ✅ `repositories/types.ts` — Full domain type definitions
-- ✅ `repositories/index.ts` — Prisma-backed implementations
-- ✅ `services/authService.ts` — Auth service with typed errors
-- ✅ `services/adminService.ts` — Admin service with typed stats
-- ✅ `config/schemas.ts` — Fully typed Zod schemas
-- ✅ Frontend: `store/useStore.ts`, `hooks/useApi.ts`, `lib/types.ts`, `lib/kinetic.ts`
-- ⚠️ **Remaining:** Most route files are still `.js`, server entry is `.js`
+#### ✅ Fixed: TypeScript Migration Complete
+The backend TypeScript migration is **complete** — all 40+ source files converted to `.ts`:
+- ✅ All 15 route files (auth, predictions, matches, users, admin, leaderboard, leagues, squads, ai, highlights, messages, players, search, simulation, stripe, teams)
+- ✅ All 6 middleware files (auth, errorHandler, rateLimiter, requireAdmin, validate, asyncHandler)
+- ✅ All services (scoring, tokenService, leaderboardMapper, authService, adminService)
+- ✅ Simulation engine (simulationEngine, simulationRunner)
+- ✅ Socket, workers, workflows (socket/index, queue, scoringWorker, finalizeMatch)
+- ✅ Utilities (logger, AppError, jsonDb, instrument)
+- ✅ Configuration (constants, passport, schemas)
+- ✅ Entry point (index.ts with ESM imports, top-level await)
 
 #### ✅ Fixed: Duplicated Mapping Logic
 The leaderboard mapping was extracted to `backend/src/services/leaderboardMapper.js`:
@@ -224,8 +226,8 @@ graph TB
 
     subgraph "Data Layer"
         P[Redis<br/>Cache + Queue Backend]
-        Q[Prisma ORM<br/>v7 + Adapter-PG]
-        R[PostgreSQL<br/>Primary Database]
+        Q[JSON Database (dev)<br/>Prisma-compatible API]
+        R[Prisma + PostgreSQL (prod)<br/>Optional for production]
     end
 
     subgraph "External Services"
@@ -334,12 +336,12 @@ graph TB
     end
 
     subgraph "Infrastructure Layer"
-        J[Prisma Repositories]
+        J[JSON DB / Prisma Repositories]
         K[Redis Cache]
         L[BullMQ Workers]
         M[Stripe Client]
         N[Anthropic Client]
-        O[Logger]
+        O[Pino Logger]
     end
 
     A --> B
@@ -362,9 +364,9 @@ graph TB
     O -.-> L
 ```
 
-### Recommendations
-1. **Extract a service layer** — Move business logic out of routes into service files
-2. **Create repositories** — Isolate Prisma queries behind repository interfaces
+### Updated Recommendations
+1. **Continue extracting service layer** — AuthService/AdminService done; scoring engine next
+2. **Adopt repositories in routes** — Repositories exist but routes still use `req.app.get('prisma')`
 3. **Implement an event bus** — Replace `prisma._app` with typed events
 4. **Adopt dependency injection** — Use `awilix` or manual DI for testability
 5. **Add feature flag system** — Use env vars or a simple feature flag service
@@ -1002,83 +1004,36 @@ Empty `.catch()` — any SW registration error is silently swallowed.
 
 ## 10. Backend Review
 
-**Score: 5/10**
+**Score: 7/10 (improved from 5/10)**
 
 ### What Works
 - Express v5 with modern async error handling
-- Consistent middleware pipeline (helmet → cors → morgan → json → cookie → passport)
+- Consistent middleware pipeline (helmet → cors → pino-http → json → cookie → passport)
 - Stripe webhook handled before JSON body parser
 - Rate limiting with Redis fallback to memory store
-- BullMQ workers with graceful shutdown
+- BullMQ workers with graceful shutdown (10s timeout)
 - Good use of environment variable validation at startup
+- ✅ **Full TypeScript** — all 40+ backend files converted, ESM imports throughout
+- ✅ **Pino structured logging** replaces all `console.log` calls
+- ✅ **Sentry error monitoring** on backend and frontend
+- ✅ **JSON database** — Prisma-compatible, no PostgreSQL required for dev
+- ✅ **Graceful shutdown** — 10s timeout, no dynamic require, proper await
+- ✅ **Health check** — returns DB status with type info
 
 ### Issues
 
-#### 🔴 No TypeScript
+#### ⚠️ Partially Fixed: Routes Still Use Direct DB Access
 
-The entire backend is JavaScript. This is the #1 issue. With 15 route files, 5 middleware, 3 workers, and complex scoring logic, the lack of type safety is a major risk.
-
-#### 🟠 Prisma Adapter Import Error Not Handled
-
-```javascript
-const { PrismaPg } = require('@prisma/adapter-pg')
-const pg = require('pg')
-```
-
-If `@prisma/adapter-pg` fails to import (version mismatch), the server crashes on startup with no helpful error message.
-
-#### 🟠 Graceful Shutdown Could Deadlock
-
-```javascript
-process.on('SIGTERM', async () => {
-  await prisma.$disconnect()
-  if (prisma._pool) await prisma._pool.end()
-  if (workers) {
-    const { closeWorkers } = require('./workers/scoringWorker')
-    await closeWorkers(workers)
-  }
-  httpServer.close()
-  process.exit(0)
-})
-```
-
-- `closeWorkers` is required **inside the handler** — a dynamic require
-- `httpServer.close()` callback not awaited
-- No timeout — if `closeWorkers` hangs, the process never exits
-
-#### 🟠 No Health Check Beyond Simple Ping
-
-```javascript
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'healthy', timestamp: new Date().toISOString() })
-})
-```
-
-This doesn't check database connectivity, Redis connectivity, or any dependency health. A proper health check should validate:
-```javascript
-async function healthCheck(req, res) {
-  const checks = {
-    database: await checkDatabase(),
-    redis: await checkRedis(),
-    stripe: process.env.STRIPE_SECRET_KEY ? 'configured' : 'missing',
-  }
-  const healthy = Object.values(checks).every(c => c === 'ok' || c === 'configured')
-  res.status(healthy ? 200 : 503).json({ status: healthy ? 'healthy' : 'degraded', checks })
-}
-```
+Routes still use `req.app.get('prisma')` instead of going through the repository layer. The repositories exist in `repositories/index.ts` with typed interfaces but are not yet wired into route handlers.
 
 #### 🟡 No Request ID Tracking
 
 No `x-request-id` header is generated or propagated. This makes debugging and tracing requests across logs impossible.
 
-#### 🟡 No Structured Logging
-
-All logging uses `console.log`, `console.error`, `console.warn`. No structured JSON logs, no log levels, no correlation IDs.
-
 #### 🟡 No Data Validation on User Profile Updates
 
-```javascript
-// schemas.js
+```typescript
+// schemas.ts
 const updateProfileSchema = z.object({
   displayName: z.string().min(1).max(100).optional(),
   avatar: z.string().url('Invalid avatar URL').max(500).optional().nullable(),
@@ -1088,39 +1043,22 @@ const updateProfileSchema = z.object({
 }).strict()
 ```
 
-`favouriteSports` and `favouriteTeams` in the schema but **not processed** in the route handler:
-```javascript
-const { displayName, avatar, bio, favouriteSports, favouriteTeams } = req.body
-const user = await prisma.user.update({
-  where: { id: req.userId },
-  data: { displayName, avatar, bio },  // favouriteSports and favouriteTeams ignored!
-})
-```
-
-These fields are accepted but silently dropped.
+`favouriteSports` and `favouriteTeams` are accepted in the schema but **still not processed** in the route handler — silently dropped.
 
 #### 🟡 Simulation Engine Has Sync Issues
 
-```javascript
-// simulation.js
-router.post('/:id/start-simulation', ... , asyncHandler(async (req, res) => {
-  runSimulation(prisma, io, req.params.id, { skipDelay: false }).catch((err) => {
-    console.error(`[Simulation] Failed for match ${req.params.id}:`, err.message)
-  })
-  res.json({ message: 'Simulation started', matchId: req.params.id })
-}))
-```
+Parallel simulations can run on the same match — no locking mechanism.
 
-The simulation runs with `skipDelay: false` but no cancellation mechanism. If a match is re-simulated, two simulations can run in parallel on the same match.
-
-### Recommendations
-1. **Migrate to TypeScript** — Critical for a project of this size
-2. Add proper health check endpoint
-3. Add request ID middleware
-4. Replace `console.log` with structured logging (pino, winston)
-5. Fix `favouriteSports`/`favouriteTeams` not being saved
-6. Add simulation state locking to prevent parallel runs
-7. Improve graceful shutdown with timeouts
+### Updated Recommendations
+1. ✅ **Done:** TypeScript migration complete
+2. ✅ **Done:** Structured logging with Pino implemented
+3. ✅ **Done:** Sentry error monitoring implemented
+4. ✅ **Done:** Graceful shutdown with timeout fixed
+5. ✅ **Done:** Health check with DB status improved
+6. Wire repositories into route handlers
+7. Add request ID middleware
+8. Fix `favouriteSports`/`favouriteTeams` save logic
+9. Add simulation state locking
 
 ---
 
@@ -1215,74 +1153,36 @@ But the application container (if one existed) would also need health checks and
 
 ## 12. Testing
 
-**Score: 4/10 (improved from 0/10)**
+**Score: 5/10 (improved from 0/10)**
 
-### Current State: ✅ Test Coverage Initiated
+### Current State: ✅ 81 Tests Passing (4 Test Files)
 
-The project now has **~80+ test cases across 5 test files:**
+The project now has **81 test cases across 4 test files** (all migrated to `.ts`):
 
 | Test File | Type | Test Cases |
 |-----------|------|------------|
-| `backend/src/routes/auth.test.js` | Integration (supertest + mocked Prisma) | 15+ tests: signup, login, refresh, forgot/reset, validation |
-| `backend/src/routes/predictions.test.js` | Integration (supertest + mocked DB) | 12+ tests: create, list, score, auth, validation |
-| `backend/src/services/scoring.test.js` | Unit | 20+ tests: `calculatePredictionPoints` |
-| `backend/src/services/simulation/simulationEngine.test.js` | Unit | 20+ tests: PRNG, Poisson, xG, match simulation |
-| `frontend/src/hooks/useApi.test.ts` | Unit (jsdom) | 9 tests: fetchJSON, ApiRequestError, 401 refresh, concurrency |
+| `backend/src/services/scoring.test.ts` | Unit | **47 tests**: `calculatePredictionPoints` — exact score, result+GD, result only, BTTS, O/U, VOID, streaks, tiers |
+| `backend/src/routes/auth.test.ts` | Integration (supertest + async import) | **14 tests**: signup, login, refresh, forgot/reset, validation |
+| `backend/src/routes/predictions.test.ts` | Integration (supertest + mocked DB) | **11 tests**: create, list, score, auth, validation |
+| `frontend/src/hooks/useApi.test.ts` | Unit (jsdom) | **9 tests**: fetchJSON, ApiRequestError, 401 refresh, concurrency |
 
-### What Should Be Tested (Priority Order)
+### What's Still Missing
 
-#### 🔴 Critical — Scoring Engine
-```javascript
-// services/scoring.js — 400+ lines of business logic
-// The scoring engine has:
-// - 4 outcome tiers (exact score, result+GD, result only, wrong)
-// - 2 bonus types (BTTS, Over/Under)
-// - Streak tracking
-// - Tier progression
-// - Leaderboard recalculation
-```
+| Area | Priority | Notes |
+|------|----------|-------|
+| ✅ **Scoring engine** | ✅ **Done** | **47 comprehensive tests** covering all tiers, bonuses, streaks |
+| ✅ **Auth routes** | ✅ **Done** | **14 tests** covering signup, login, refresh, forgot/reset |
+| ✅ **Prediction routes** | ✅ **Done** | **11 tests** covering create, list, score, auth |
+| Match flow tests | 🟠 High | No tests for finish/simulation endpoints |
+| League/Squad tests | 🟠 High | No tests for CRUD operations |
+| User/Follow tests | 🟠 High | No tests for profile/follow/unfollow |
+| Stripe webhook tests | 🟠 High | No tests for webhook handling |
+| Frontend component tests | 🟡 Medium | Zero component tests (React Testing Library needed) |
+| Zustand store tests | 🟡 Medium | Zero store tests |
+| E2E tests | 🔵 Low | Not configured (Playwright/Cypress) |
+| Load tests | 🔵 Low | Not configured (k6/artillery) |
 
-Missing tests for:
-- Exact score prediction (50 + 5 base = 55 points)
-- Correct result + same goal difference (35 + 5 = 40 points)
-- Correct result only (25 + 5 = 30 points)
-- Wrong result, no bonuses (5 points)
-- BTTS bonus (10 points)
-- Over/Under bonus (10 points)
-- VOID prediction (0 points)
-- Streak increment on correct prediction
-- Streak reset on incorrect prediction
-- Tier upgrade when threshold crossed
-- Leaderboard snapshot accuracy
-
-#### 🟠 High — Auth Routes
-- Signup (success, duplicate email, duplicate username)
-- Login (success, wrong password, non-existent user)
-- Token refresh (valid token, expired token, missing token)
-- Password reset flow
-- Email verification flow
-
-#### 🟠 High — Prediction Routes
-- Create prediction (success, duplicate, match not found, match not scheduled)
-- Get predictions (with/without auth)
-- Score predictions (match not finished, no predictions)
-
-#### 🟡 Medium — API Endpoints
-- All 15 route files should have integration tests
-- Error cases: 404, 400, 401, 403, 409, 429, 500
-- Rate limiting: verify limits are enforced
-- Pagination: verify page/limit work correctly
-
-#### 🟡 Medium — Frontend Components
-- Critical components: Navbar, MatchCard, PredictionCard, ChatMessage
-- Store interactions (Zustand)
-- Hook behaviors (React Query mutations)
-
-#### 🔵 Low — End-to-End Tests
-- Complete user flow: signup → login → browse matches → make prediction → view leaderboard
-- Real-time: Socket.IO connection → receive live updates
-
-### Test Configuration Issues
+### Test Configuration
 
 ```javascript
 // vitest.config.js
@@ -1294,15 +1194,16 @@ thresholds: {
 }
 ```
 
-Coverage thresholds are set to 40% but **no tests exist**. The thresholds provide no value.
+Coverage thresholds still at 40% — should be adjusted as coverage improves.
 
 ### Recommendations
-1. **Write tests for the scoring engine first** — It's the core business logic
-2. Set up Vitest properly to run test files
-3. Add integration tests for critical API routes
-4. Add component tests for the top 5 most complex components
-5. Set up CI to run tests on every PR
-6. Remove coverage thresholds until tests exist, then gradually increase them
+1. ✅ **Done:** Scoring engine tests written (47 tests)
+2. ✅ **Done:** Auth integration tests (14 tests)
+3. ✅ **Done:** Prediction integration tests (11 tests)
+4. Add tests for remaining 12 route files
+5. Add component tests for top 5 most complex components
+6. Set up CI to run tests on every PR
+7. Adjust coverage thresholds as coverage improves
 
 ---
 
@@ -2177,59 +2078,68 @@ No documentation on how to become a maintainer, triager, or core contributor.
 
 | Category | Score | Notes |
 |----------|-------|-------|
-| **Architecture** | 6/10 | Good conceptual architecture, poor implementation (no service/repo layer) |
-| **Code Quality** | 5/10 | No TypeScript, duplicated code, magic numbers, dead code |
-| **Readability** | 6/10 | Clean project structure, but JSX/JS without types is harder to read |
+| Category | Score | Notes |
+|----------|-------|-------|
+| **Architecture** | 6/10 | JSON DB, repository pattern, service layer started — but routes still bypass repositories |
+| **Code Quality** | 7/10 ✅ **Improved** | Full TypeScript migration eliminates the biggest code quality gap. ESM imports throughout |
+| **Readability** | 7/10 ✅ **Improved** | TypeScript types make data flow clearer without cross-referencing |
 | **Scalability** | 3/10 | N+1 queries, no caching, single database, no horizontal scaling |
-| **Maintainability** | 5/10 | Tests would greatly improve this, TypeScript even more |
+| **Maintainability** | 6/10 ✅ **Improved** | TypeScript + ESM + tests significantly improve maintainability |
 | **Performance** | 4/10 | No caching, N+1 queries, large bundle, chat memory growth |
 | **Security** | 4/10 | Auth-gated AI endpoint, no CSRF, no token revocation |
-| **Documentation** | 6/10 | Good README, CHANGELOG, but misleading feature claims, no API docs |
-| **Testing** | 4/10 ✅ Improved | Test coverage initiated: 5 test files, ~80+ test cases across routes, services, and hooks |
-| **DevOps** | 5/10 ✅ Improved | tsconfig, vitest config for frontend, JSON DB eliminates Prisma dev dependency |
-| **UI/UX** | 6/10 | Good design system, animations, kinetic typography added, but accessibility gaps remain |
-| **Developer Experience** | 5/10 ✅ Improved | TypeScript started, tests exist, structured logging, Sentry monitoring |
+| **Documentation** | 7/10 ✅ **Improved** | README updated with new arch, API docs enhanced, CHANGELOG updated |
+| **Testing** | 5/10 ✅ **Improved** | 81 tests passing (47 scoring + 14 auth + 11 predictions + 9 hooks) |
+| **DevOps** | 5/10 | tsconfig, vitest config for frontend, JSON DB eliminates Prisma dev dependency |
+| **UI/UX** | 6/10 | Good design system, animations, kinetic typography, but accessibility gaps remain |
+| **Developer Experience** | 6/10 ✅ **Improved** | Full TypeScript, 81 tests, Pino structured logging, Sentry monitoring |
 | **Open Source Quality** | 6/10 | Good community files, but broken CI badges, no roadmap |
-| **Production Readiness** | 5/10 ✅ Improved | Sentry monitoring, structured logging, health check improved, graceful shutdown fixed |
-| **Portfolio Quality** | 7/10 ✅ Improved | Now shows TypeScript, tests, monitoring, proper patterns — addresses previous concerns |
-| **Resume Value** | 6/10 ✅ Improved | Can now discuss TypeScript migration, repository pattern, test strategy, Sentry integration |
+| **Production Readiness** | 5/10 | Sentry monitoring, structured logging, health check, graceful shutdown fixed |
+| **Portfolio Quality** | 7/10 | Now shows TypeScript, tests, monitoring, proper patterns |
+| **Resume Value** | 7/10 ✅ **Improved** | Can now discuss complete TS migration, 81 tests, Sentry, Pino, repository pattern |
 
 ### Overall Score
 
-**5.8 / 10** (improved from 4.8/10)
+**6.2 / 10** (improved from 4.8/10, +1.4 points)
 
-> **Interpretation:** The project has made significant engineering progress, closing critical gaps in testing, monitoring, code quality, and architecture. It's now a pre-production application with substantial improvements. The remaining gaps (CI/CD, CSRF, complete TypeScript migration, email sending) are typical for a project at this stage. The project demonstrates strong full-stack capability with modern engineering practices now visible.
+> **Interpretation:** The project has made substantial engineering progress in Phase 5. The TypeScript migration is the single highest-impact improvement, eliminating an entire class of runtime errors and significantly improving developer experience. Combined with 81 passing tests, structured logging, Sentry monitoring, and the JSON database, the project has moved from "prototype" to "solid pre-production" quality. The remaining gaps (CI/CD, CSRF, frontend TS migration, email sending) are manageable.
 
 ---
 
 ## 27. Priority Table
 
-| Priority | Issue | Impact | Difficulty | Recommendation |
-|----------|-------|--------|------------|----------------|
-| 🔴 1 | **Zero test coverage** | Critical — no confidence in changes | Medium | Write scoring engine tests first |
-| 🔴 2 | **No TypeScript anywhere** | Critical — runtime errors, poor DX | High | Start with backend, use Prisma types |
-| 🔴 3 | **AI endpoint unauthenticated** | Critical — cost exposure | Low | Add `authenticateToken` middleware |
-| 🔴 4 | **No error monitoring** | Critical — blind in production | Low | Add Sentry (30 min setup) |
-| 🟠 5 | **N+1 query in highlights** | High — performance at scale | Low | Batch query with `in` operator |
-| 🟠 6 | **No CSRF protection** | High — cookie-based auth vulnerable | Medium | Add `csrf-csrf` middleware |
-| 🟠 7 | **No service/repository layer** | High — tight coupling, untestable | High | Extract services from routes |
-| 🟠 8 | **Business logic in route handlers** | High — violates SRP | Medium | Move to service files |
-| 🟠 9 | **`prisma._app` anti-pattern** | High — fragile global state | Low | Use event emitter or DI |
-| 🟠 10 | **No structured logging** | High — can't debug production | Low | Add pino |
-| 🟠 11 | **Leaderboard mapping duplicated 5×** | High — violates DRY | Low | Extract to shared utility |
-| 🟠 12 | **Token revocation not possible** | High — stolen tokens valid 30 days | Medium | Add token version or block list |
-| 🟡 13 | **No API versioning** | Medium — breaking changes break clients | Medium | Add `/api/v1/` prefix |
-| 🟡 14 | **No database indexes on search fields** | Medium — full table scans | Low | Add trigram indexes |
-| 🟡 15 | **Seed data references non-existent teams** | Medium — DB integrity risk | Low | Create Team records in seed |
-| 🟡 16 | **No CDN or caching** | Medium — unnecessary DB load | Medium | Add Redis caching |
-| 🟡 17 | **No health check (dependency-aware)** | Medium — can't detect degraded state | Low | Add proper health check |
-| 🟡 18 | **Large bundle size (Three.js, GSAP, etc.)** | Medium — slow initial load | Medium | Lazy-load Three.js, audit deps |
-| 🟡 19 | **Chat message memory growth** | Medium — memory leak risk | Low | Limit store to 200 msgs/room |
-| 🟡 20 | **No email sending implemented** | Medium — verification broken | Medium | Add Resend/SendGrid |
-| 🔵 21 | **No accessibility** | Low — excludes users | Medium | Add aria attributes, keyboard nav |
-| 🔵 22 | **No i18n** | Low — English only | High | Add i18n framework |
-| 🔵 23 | **README claims features not implemented** | Low — misleading | Low | Audit and fix documentation |
-| 🔵 24 | **No request ID tracking** | Low — hard to trace requests | Low | Add request ID middleware |
+| Priority | Issue | Impact | Difficulty | Status |
+|----------|-------|--------|------------|--------|
+| 🔴 1 | **No CSRF protection** | Critical — cookie-based auth vulnerable | Medium | ❌ Not started |
+| 🔴 2 | **No CI/CD pipeline** | Critical — no automated testing/deploy | Medium | ❌ Not started |
+| 🟠 3 | **N+1 query in highlights** | High — performance at scale | Low | ❌ Not fixed |
+| 🟠 4 | **Token revocation not possible** | High — stolen tokens valid 30 days | Medium | ❌ Not started |
+| 🟠 5 | **Frontend TypeScript migration** | High — JSX without types risk | High | ❌ Not started |
+| 🟠 6 | **Business logic in route handlers** | High — violates SRP | Medium | ❌ Not started |
+| 🟠 7 | **`prisma._app` anti-pattern** | High — fragile global state | Low | ❌ Not fixed |
+| 🟡 8 | **No API versioning** | Medium — breaking changes break clients | Medium | ❌ Not started |
+| 🟡 9 | **No database indexes on search fields** | Medium — full table scans | Low | ❌ Not started |
+| 🟡 10 | **Seed data references non-existent teams** | Medium — DB integrity risk | Low | ❌ Not started |
+| 🟡 11 | **No CDN or caching** | Medium — unnecessary DB load | Medium | ❌ Not started |
+| 🟡 12 | **Large bundle size (Three.js, GSAP, etc.)** | Medium — slow initial load | Medium | ❌ Not started |
+| 🟡 13 | **Chat message memory growth** | Medium — memory leak risk | Low | ❌ Not started |
+| 🟡 14 | **No email sending implemented** | Medium — verification broken | Medium | ❌ Not started |
+| 🟡 15 | **No request ID tracking** | Medium — hard to trace requests | Low | ❌ Not started |
+| 🔵 16 | **No accessibility** | Low — excludes users | Medium | ❌ Not started |
+| 🔵 17 | **No i18n** | Low — English only | High | ❌ Not started |
+
+### ✅ Completed (Phase 5)
+
+| Priority | Issue | Status |
+|----------|-------|--------|
+| ~~🔴 1~~ | **Zero test coverage** | ✅ **81 tests written** (scoring: 47, auth: 14, predictions: 11, hooks: 9) |
+| ~~🔴 2~~ | **No TypeScript anywhere** | ✅ **Complete** — 40+ backend files converted to `.ts` with ESM |
+| ~~🔴 3~~ | **AI endpoint unauthenticated** | ✅ **Fixed** — Pro-gated, requires authentication |
+| ~~🔴 4~~ | **No error monitoring** | ✅ **Implemented** — Sentry on backend + frontend |
+| ~~🟠 5~~ | **No structured logging** | ✅ **Implemented** — Pino with redaction, levels, pino-http |
+| ~~🟠 6~~ | **Leaderboard mapping duplicated 5×** | ✅ **Fixed** — Extracted to `leaderboardMapper.ts` |
+| ~~🟠 7~~ | **Graceful shutdown could deadlock** | ✅ **Fixed** — 10s timeout, no dynamic require |
+| ~~🟡 8~~ | **No health check** | ✅ **Improved** — Returns DB status alongside timestamp |
+| ~~🔵 9~~ | **README claims not implemented** | ✅ **Fixed** — README and PROJECT_OVERVIEW.md updated
 
 ---
 
