@@ -6,7 +6,8 @@
  * - HOST_ACTION: host controls
  * - Auction server → client events: ROOM_STATE_SYNC, NEW_BID, PLAYER_SOLD, etc.
  *
- * JWT authentication enforced on all connections.
+ * JWT authentication enforced on all connections with tokenVersion revocation check.
+ * Connection rate limiting (10/sec/IP) and per-socket bid rate limiting (5/sec).
  */
 import jwt from 'jsonwebtoken'
 import type { Server, Socket } from 'socket.io'
@@ -21,6 +22,59 @@ import type { AuctionState, BidRequest } from '../services/auctionEngine'
 import logger from '../utils/logger'
 
 const ALLOWED_ROOM_TYPES = ['match', 'squad', 'sport', 'room', 'dm']
+
+// ─── Connection rate limiter: per-IP, max 10 new connections/sec ─────
+const connectionRateMap = new Map<string, number[]>()
+const CONNECTION_RATE_LIMIT = 10       // max connections
+const CONNECTION_RATE_WINDOW = 1000     // per 1 second
+
+function checkConnectionRate(ip: string): boolean {
+  const now = Date.now()
+  let timestamps = connectionRateMap.get(ip) || []
+  timestamps = timestamps.filter((t) => now - t < CONNECTION_RATE_WINDOW)
+  if (timestamps.length >= CONNECTION_RATE_LIMIT) {
+    return false
+  }
+  timestamps.push(now)
+  connectionRateMap.set(ip, timestamps)
+
+  // Cleanup stale entries periodically
+  if (connectionRateMap.size > 10000) {
+    for (const [key, vals] of connectionRateMap.entries()) {
+      const valid = vals.filter((t) => now - t < CONNECTION_RATE_WINDOW)
+      if (valid.length === 0) connectionRateMap.delete(key)
+      else connectionRateMap.set(key, valid)
+    }
+  }
+  return true
+}
+
+// ─── Per-socket bid rate limiter (5/sec per socket) ─────────────────
+/**
+ * Creates a rate-limited wrapper for the PLACE_BID handler.
+ * Uses a Map keyed by socket ID to track timestamps.
+ * This is more robust than the old prependListener approach.
+ */
+const bidRateTrackers = new Map<string, number[]>()
+const BID_RATE_LIMIT = 5
+const BID_RATE_WINDOW = 1000
+
+function checkBidRate(socketId: string): boolean {
+  const now = Date.now()
+  let timestamps = bidRateTrackers.get(socketId) || []
+  timestamps = timestamps.filter((t) => now - t < BID_RATE_WINDOW)
+  if (timestamps.length >= BID_RATE_LIMIT) {
+    return false
+  }
+  timestamps.push(now)
+  bidRateTrackers.set(socketId, timestamps)
+
+  // Cleanup on disconnect
+  if (timestamps.length > 20) {
+    timestamps.splice(0, timestamps.length - 20)
+  }
+  return true
+}
 
 interface AuthenticatedSocket extends Socket {
   userId?: string
@@ -50,15 +104,35 @@ function makeAuctionHelpers(prisma: any) {
 }
 
 export const setupSocket = (io: Server, prisma: any): void => {
-  // Auth middleware for socket connections
-  io.use((socket: AuthenticatedSocket, next) => {
+  // ─── Auth middleware for socket connections ───────────────
+  // Verifies JWT, checks tokenVersion for revocation, and rate-limits per IP
+  io.use(async (socket: AuthenticatedSocket, next) => {
+    // Connection rate limiting (per IP)
+    const ip = socket.handshake.address || 'unknown'
+    if (!checkConnectionRate(ip)) {
+      logger.warn({ event: 'socket.rate_limited', ip }, 'Socket connection rate limited')
+      return next(new Error('Too many connections. Please slow down.'))
+    }
+
     const token = socket.handshake.auth?.token
     if (!token) {
       return next(new Error('Authentication required'))
     }
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string }
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string; tokenVersion?: number }
       socket.userId = decoded.userId
+
+      // Verify token hasn't been revoked
+      if (decoded.tokenVersion !== undefined) {
+        const user = await prisma.user.findUnique({
+          where: { id: decoded.userId },
+          select: { tokenVersion: true },
+        })
+        if (!user || user.tokenVersion !== decoded.tokenVersion) {
+          return next(new Error('Token has been revoked'))
+        }
+      }
+
       next()
     } catch (err) {
       return next(new Error('Invalid or expired token'))
@@ -70,6 +144,12 @@ export const setupSocket = (io: Server, prisma: any): void => {
 
     // Join user-specific room for targeted events
     socket.join(`user:${socket.userId}`)
+
+    // Clean up bid rate tracker on disconnect
+    socket.on('disconnect', () => {
+      bidRateTrackers.delete(socket.id)
+      logger.info({ event: 'socket.disconnected', socketId: socket.id, userId: socket.userId }, `Socket disconnected: ${socket.id}`)
+    })
 
     // ─── Room Management ─────────────────────────────────
 
@@ -122,6 +202,12 @@ export const setupSocket = (io: Server, prisma: any): void => {
           return
         }
 
+        // Per-socket bid rate limiting (5/sec)
+        if (!checkBidRate(socket.id)) {
+          socket.emit('BID_REJECTED', { code: 'RATE_LIMITED', message: 'Too many bids. Slow down.' })
+          return
+        }
+
         // Verify room membership
         const member = await prisma.roomMember.findUnique({
           where: { roomId_userId: { roomId: data.roomId, userId: socket.userId } },
@@ -170,22 +256,6 @@ export const setupSocket = (io: Server, prisma: any): void => {
         logger.error({ event: 'socket.bid_error', userId: socket.userId, err: err.message }, 'PLACE_BID error')
         socket.emit('BID_REJECTED', { code: 'INTERNAL_ERROR', message: 'Failed to process bid' })
       }
-    })
-
-    // Rate limit PLACE_BID to max 5/second per socket connection
-    const bidTimestamps: number[] = []
-    const originalPlaceBid = socket.listeners('PLACE_BID')[0]
-    // Note: Socket.IO doesn't support per-event rate limiting natively.
-    // This is tracked via the bidTimestamps array as a simple guard.
-    socket.prependListener('PLACE_BID', () => {
-      const now = Date.now()
-      const recent = bidTimestamps.filter((t) => now - t < 1000)
-      if (recent.length >= 5) {
-        socket.emit('BID_REJECTED', { code: 'RATE_LIMITED', message: 'Too many bids. Slow down.' })
-        return
-      }
-      bidTimestamps.push(now)
-      if (bidTimestamps.length > 10) bidTimestamps.shift()
     })
 
     socket.on('HOST_ACTION', async (data: {
@@ -361,8 +431,6 @@ export const setupSocket = (io: Server, prisma: any): void => {
       socket.leave(roomId)
     })
 
-    socket.on('disconnect', () => {
-      logger.info({ event: 'socket.disconnected', socketId: socket.id, userId: socket.userId }, `Socket disconnected: ${socket.id}`)
-    })
+    // (disconnect handler moved earlier to clean up bid rate tracker)
   })
 }

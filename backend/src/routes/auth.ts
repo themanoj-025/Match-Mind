@@ -4,9 +4,10 @@ import jwt from 'jsonwebtoken'
 import passport from 'passport'
 import { validate } from '../middleware/validate'
 import { authenticateToken } from '../middleware/auth'
+import { csrfTokenHandler, generateCsrfToken } from '../middleware/csrf'
 import { signupSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema, verifyEmailSchema } from '../config/schemas'
-import { generateTokens, setAuthCookies } from '../services/tokenService'
-import { AuthService } from '../services/authService'
+import { generateTokens, setAuthCookies, clearAuthCookies } from '../services/tokenService'
+import { AuthService, revokeTokens } from '../services/authService'
 import { createRepositories } from '../repositories/index'
 import asyncHandler from '../middleware/asyncHandler'
 import logger from '../utils/logger'
@@ -20,6 +21,9 @@ function getAuthService(req: AuthenticatedRequest) {
   const { userRepository } = createRepositories(prisma)
   return new AuthService({ userRepository })
 }
+
+// GET /api/auth/csrf-token — retrieve CSRF token (no auth required)
+router.get('/csrf-token', csrfTokenHandler)
 
 // POST /api/auth/signup
 router.post('/signup', validate(signupSchema), asyncHandler(async (req, res) => {
@@ -43,19 +47,35 @@ router.post('/login', validate(loginSchema), asyncHandler(async (req, res) => {
   res.json({ user: result.user, ...tokens })
 }))
 
-// POST /api/auth/logout
-router.post('/logout', (_req, res) => {
-  res.clearCookie('refreshToken')
-  res.json({ message: 'Logged out' })
-})
+// POST /api/auth/logout — revoke tokens (invalidates all sessions)
+router.post('/logout', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
+  const prisma = req.app.get('prisma')
+  await revokeTokens(req.userId!, prisma)
+  clearAuthCookies(res)
+  logger.info({ event: 'auth.logout', userId: req.userId })
+  res.json({ message: 'Logged out successfully. All sessions invalidated.' })
+}))
+
+// POST /api/auth/logout-all — revoke all tokens for this user
+router.post('/logout-all', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
+  const prisma = req.app.get('prisma')
+  await revokeTokens(req.userId!, prisma)
+  clearAuthCookies(res)
+  logger.info({ event: 'auth.logout_all', userId: req.userId })
+  res.json({ message: 'All sessions logged out successfully.' })
+}))
 
 // GET /api/auth/google - OAuth redirect
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }) as any)
 
 // GET /api/auth/google/cb
 router.get('/google/cb', passport.authenticate('google', { session: false }), (req, res) => {
-  const tokens = generateTokens((req as any).user.id)
+  const prisma = req.app ? req.app.get('prisma') : null
+  const googleUser = (req as any).user
+  // Async token generation — use sync version since passport already resolved user
+  const tokens = generateTokens(googleUser.id, googleUser.tokenVersion)
   setAuthCookies(res, tokens)
+  // Also set a CSRF token cookie for the client
   res.redirect(`${process.env.FRONTEND_URL}/feed`)
 })
 
@@ -113,9 +133,8 @@ router.post('/reset-password', validate(resetPasswordSchema), asyncHandler(async
     data: { passwordHash },
   })
 
-  await prisma.session.deleteMany({
-    where: { userId: user.id },
-  })
+  // Revoke all tokens after password reset
+  await revokeTokens(user.id, prisma)
 
   logger.info({ event: 'auth.password_reset_completed', userId: user.id }, 'Password reset completed')
   res.json({ message: 'Password has been updated. Please log in with your new password.' })

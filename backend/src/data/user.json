@@ -20,6 +20,7 @@
     "weeklyPoints": 444,
     "isPro": true,
     "proExpiresAt": null,
+    "tokenVersion": 0,
     "createdAt": "2026-05-27T10:15:31.672Z",
     "updatedAt": "2026-07-03T00:15:31.672Z",
     "lastActiveAt": "2026-07-03T01:15:31.672Z"
@@ -45,6 +46,7 @@
     "weeklyPoints": 43,
     "isPro": false,
     "proExpiresAt": null,
+    "tokenVersion": 0,
     "createdAt": "2026-04-28T10:15:31.672Z",
     "updatedAt": "2026-07-03T07:15:31.672Z",
     "lastActiveAt": "2026-07-02T23:15:31.672Z"
@@ -70,6 +72,7 @@
     "weeklyPoints": 384,
     "isPro": false,
     "proExpiresAt": null,
+    "tokenVersion": 0,
     "createdAt": "2026-04-15T10:15:31.672Z",
     "updatedAt": "2026-07-02T12:15:31.672Z",
     "lastActiveAt": "2026-07-03T00:15:31.672Z"
@@ -95,6 +98,7 @@
     "weeklyPoints": 289,
     "isPro": false,
     "proExpiresAt": null,
+    "tokenVersion": 0,
     "createdAt": "2026-04-11T10:15:31.672Z",
     "updatedAt": "2026-07-02T21:15:31.672Z",
     "lastActiveAt": "2026-07-03T10:15:31.672Z"
@@ -120,6 +124,7 @@
     "weeklyPoints": 299,
     "isPro": false,
     "proExpiresAt": null,
+    "tokenVersion": 0,
     "createdAt": "2026-05-31T10:15:31.672Z",
     "updatedAt": "2026-07-02T14:15:31.672Z",
     "lastActiveAt": "2026-07-03T02:15:31.672Z"
@@ -145,6 +150,7 @@
     "weeklyPoints": 139,
     "isPro": false,
     "proExpiresAt": null,
+    "tokenVersion": 0,
     "createdAt": "2026-06-03T10:15:31.672Z",
     "updatedAt": "2026-07-03T05:15:31.672Z",
     "lastActiveAt": "2026-07-03T04:15:31.672Z"
@@ -170,6 +176,7 @@
     "weeklyPoints": 442,
     "isPro": false,
     "proExpiresAt": null,
+    "tokenVersion": 0,
     "createdAt": "2026-04-09T10:15:31.672Z",
     "updatedAt": "2026-07-02T14:15:31.672Z",
     "lastActiveAt": "2026-07-03T08:15:31.672Z"
@@ -195,6 +202,7 @@
     "weeklyPoints": 114,
     "isPro": false,
     "proExpiresAt": null,
+    "tokenVersion": 0,
     "createdAt": "2026-04-28T10:15:31.672Z",
     "updatedAt": "2026-07-03T01:15:31.672Z",
     "lastActiveAt": "2026-07-03T07:15:31.672Z"
@@ -220,6 +228,7 @@
     "weeklyPoints": 74,
     "isPro": false,
     "proExpiresAt": null,
+    "tokenVersion": 0,
     "createdAt": "2026-05-04T10:15:31.672Z",
     "updatedAt": "2026-07-03T04:15:31.672Z",
     "lastActiveAt": "2026-07-03T10:15:31.672Z"
@@ -245,6 +254,7 @@
     "weeklyPoints": 50,
     "isPro": false,
     "proExpiresAt": null,
+    "tokenVersion": 0,
     "createdAt": "2026-05-15T10:15:31.672Z",
     "updatedAt": "2026-07-03T00:15:31.672Z",
     "lastActiveAt": "2026-07-02T23:15:31.672Z"
@@ -270,6 +280,7 @@
     "weeklyPoints": 286,
     "isPro": true,
     "proExpiresAt": null,
+    "tokenVersion": 0,
     "createdAt": "2026-05-20T10:15:31.672Z",
     "updatedAt": "2026-07-03T03:15:31.672Z",
     "lastActiveAt": "2026-07-02T23:15:31.672Z"

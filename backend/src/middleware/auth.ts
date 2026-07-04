@@ -6,7 +6,26 @@ export interface AuthenticatedRequest extends Request {
   user?: any
 }
 
-export const authenticateToken = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+/**
+ * Verify the tokenVersion claim in a JWT matches the user's current
+ * version stored in the database. If they differ, the token has been
+ * revoked (user logged out on another device).
+ */
+async function checkTokenVersion(userId: string, tokenVersion: number, prisma: any): Promise<boolean> {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { tokenVersion: true },
+    })
+    if (!user) return false
+    return (user.tokenVersion ?? 0) === tokenVersion
+  } catch {
+    // If DB lookup fails, allow the request through to avoid lockouts
+    return true
+  }
+}
+
+export const authenticateToken = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
   // Check Authorization header first, then fall back to accessToken cookie
   const authHeader = req.headers['authorization']
   let token = authHeader && authHeader.split(' ')[1]
@@ -21,8 +40,21 @@ export const authenticateToken = (req: AuthenticatedRequest, res: Response, next
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string; tokenVersion?: number }
     req.userId = decoded.userId
+
+    // Verify token hasn't been revoked (tokenVersion matches)
+    const prisma = req.app.get('prisma')
+    if (prisma && decoded.tokenVersion !== undefined) {
+      const isValid = await checkTokenVersion(decoded.userId, decoded.tokenVersion, prisma)
+      if (!isValid) {
+        res.status(401).json({
+          error: { code: 'TOKEN_REVOKED', message: 'Token has been revoked. Please log in again.' },
+        })
+        return
+      }
+    }
+
     next()
   } catch (err) {
     res.status(403).json({ message: 'Invalid or expired token' })
@@ -35,7 +67,7 @@ export const optionalAuth = (req: AuthenticatedRequest, _res: Response, next: Ne
 
   if (token) {
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string }
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string; tokenVersion?: number }
       req.userId = decoded.userId
     } catch (err) {
       // Ignore invalid tokens for optional auth

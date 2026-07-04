@@ -20,7 +20,12 @@ export interface TokenPair {
   refreshToken: string
 }
 
-export function generateTokens(userId: string): TokenPair {
+/**
+ * Generate JWT token pair (access + refresh).
+ * Includes tokenVersion in the payload for revocation support.
+ * The version is looked up from the user record on each verify call.
+ */
+export function generateTokens(userId: string, tokenVersion?: number): TokenPair {
   const jwtSecret = process.env.JWT_SECRET
   const refreshSecret = process.env.JWT_REFRESH_SECRET
 
@@ -29,9 +34,49 @@ export function generateTokens(userId: string): TokenPair {
   }
 
   return {
-    accessToken: jwt.sign({ userId }, jwtSecret, { expiresIn: ACCESS_TOKEN_EXPIRY }),
-    refreshToken: jwt.sign({ userId }, refreshSecret, { expiresIn: REFRESH_TOKEN_EXPIRY }),
+    accessToken: jwt.sign(
+      { userId, tokenVersion: tokenVersion ?? 0 },
+      jwtSecret,
+      { expiresIn: ACCESS_TOKEN_EXPIRY },
+    ),
+    refreshToken: jwt.sign(
+      { userId, tokenVersion: tokenVersion ?? 0 },
+      refreshSecret,
+      { expiresIn: REFRESH_TOKEN_EXPIRY },
+    ),
   }
+}
+
+/**
+ * Get the current tokenVersion for a user.
+ */
+export async function getTokenVersion(userId: string, prisma: any): Promise<number> {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { tokenVersion: true },
+    })
+    return user?.tokenVersion ?? 0
+  } catch {
+    return 0
+  }
+}
+
+/**
+ * Invalidate all tokens for a user by incrementing tokenVersion.
+ * Returns the new version number.
+ */
+export async function revokeTokens(userId: string, prisma: any): Promise<number> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { tokenVersion: true },
+  })
+  const newVersion = (user?.tokenVersion ?? 0) + 1
+  await prisma.user.update({
+    where: { id: userId },
+    data: { tokenVersion: newVersion },
+  })
+  return newVersion
 }
 
 // ─── Auth Service ─────────────────────────────────────
@@ -106,7 +151,8 @@ export class AuthService {
     )
     logger.info({ event: 'auth.signup', userId: user.id }, `Signup: verification token generated for ${email}`)
 
-    const tokens = generateTokens(user.id)
+    const tokenVersion = await getTokenVersion(user.id, this.deps.userRepository)
+    const tokens = generateTokens(user.id, tokenVersion)
 
     return {
       user: {
@@ -139,7 +185,8 @@ export class AuthService {
       throw new AuthError('Invalid email or password', 'INVALID_CREDENTIALS', 401)
     }
 
-    const tokens = generateTokens(user.id)
+    const tokenVersion = await getTokenVersion(user.id, this.deps.userRepository)
+    const tokens = generateTokens(user.id, tokenVersion)
 
     return {
       user: {
@@ -176,7 +223,8 @@ export class AuthService {
       throw new AuthError('User not found', 'USER_NOT_FOUND', 401)
     }
 
-    return generateTokens(user.id)
+    const tokenVersion = await getTokenVersion(user.id, this.deps.userRepository)
+    return generateTokens(user.id, tokenVersion)
   }
 
   /**

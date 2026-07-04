@@ -83,6 +83,7 @@ export class PrismaUserRepository implements IUserRepository {
         email: data.email,
         passwordHash: data.passwordHash ?? null,
         displayName: data.displayName ?? data.username,
+        tokenVersion: 0,
       },
     }) as unknown as UserData
   }

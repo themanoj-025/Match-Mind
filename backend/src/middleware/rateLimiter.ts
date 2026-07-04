@@ -120,4 +120,41 @@ export const aiPredictionLimiter = createLimiter({
   keyGenerator: (req) => (req as any).userId || req.ip,
 })
 
+// ─── Phase 5: Hardened Limiters ───────────────────────────────
+
+// Auction host actions (start, force-sold, next-player, etc.): 30 per minute per user
+export const auctionActionLimiter = createLimiter({
+  windowMs: 60 * 1000,
+  max: 30,
+  message: 'Too many auction actions, please slow down',
+  prefix: 'rl:auction:',
+  keyGenerator: (req) => (req as any).userId || req.ip,
+})
+
+// Room creation: 5 per hour per user (prevents spam)
+export const createRoomLimiter = createLimiter({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  message: 'Too many rooms created, please try again after an hour',
+  prefix: 'rl:create-room:',
+  keyGenerator: (req) => (req as any).userId || req.ip,
+})
+
+// Room join: 10 per minute per user
+export const joinRoomLimiter = createLimiter({
+  windowMs: 60 * 1000,
+  max: 10,
+  message: 'Too many room join attempts, please slow down',
+  prefix: 'rl:join-room:',
+  keyGenerator: (req) => (req as any).userId || req.ip,
+})
+
+// Static assets / public endpoints: higher limit (200/min/IP) so crawlers & real users aren't blocked
+export const publicLimiter = createLimiter({
+  windowMs: 60 * 1000,
+  max: 200,
+  message: 'Too many requests, please slow down',
+  prefix: 'rl:public:',
+})
+
 export const isRedisConnected = () => sharedRedisClient !== null && sharedRedisClient.isOpen

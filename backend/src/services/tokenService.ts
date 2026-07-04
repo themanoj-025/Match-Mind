@@ -1,43 +1,41 @@
 /**
- * Token Service
+ * Token Service — Cookie and token helpers
  *
- * Extracts token generation and cookie-setting logic that was duplicated
- * across signup, login, Google OAuth callback, and refresh routes.
+ * Re-exports generateTokens and provides setAuthCookies for setting
+ * HTTP-only cookies with access + refresh tokens.
+ *
+ * This file is imported by auth routes as a bridge between the
+ * AuthService layer and Express response objects.
  */
-import jwt from 'jsonwebtoken'
 import type { Response } from 'express'
+import { generateTokens, revokeTokens, getTokenVersion } from './authService'
 
-const ACCESS_TOKEN_EXPIRY = '15m'
-const REFRESH_TOKEN_EXPIRY = '30d'
-const ACCESS_TOKEN_MAX_AGE = 15 * 60 * 1000
-const REFRESH_TOKEN_MAX_AGE = 30 * 24 * 60 * 60 * 1000
+export { generateTokens, revokeTokens, getTokenVersion }
 
-export interface TokenPair {
-  accessToken: string
-  refreshToken: string
-}
-
-export function generateTokens(userId: string): TokenPair {
-  return {
-    accessToken: jwt.sign({ userId }, process.env.JWT_SECRET!, { expiresIn: ACCESS_TOKEN_EXPIRY }),
-    refreshToken: jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET!, { expiresIn: REFRESH_TOKEN_EXPIRY }),
-  }
-}
-
-export function setAuthCookies(res: Response, tokens: TokenPair): void {
-  const isProd = process.env.NODE_ENV === 'production'
-
+/**
+ * Set auth cookies (refresh + access) on the Express response.
+ */
+export function setAuthCookies(res: Response, tokens: { accessToken: string; refreshToken: string }): void {
   res.cookie('refreshToken', tokens.refreshToken, {
     httpOnly: true,
-    secure: isProd,
     sameSite: 'strict',
-    maxAge: REFRESH_TOKEN_MAX_AGE,
+    secure: process.env.NODE_ENV === 'production',
+    path: '/api/auth',
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
   })
-
   res.cookie('accessToken', tokens.accessToken, {
     httpOnly: true,
-    secure: isProd,
-    sameSite: 'lax',
-    maxAge: ACCESS_TOKEN_MAX_AGE,
+    sameSite: 'strict',
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
+    maxAge: 15 * 60 * 1000, // 15 minutes
   })
+}
+
+/**
+ * Clear auth cookies.
+ */
+export function clearAuthCookies(res: Response): void {
+  res.clearCookie('refreshToken', { path: '/api/auth' })
+  res.clearCookie('accessToken', { path: '/' })
 }

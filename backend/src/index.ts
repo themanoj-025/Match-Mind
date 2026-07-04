@@ -78,12 +78,18 @@ import adminRoutes from './routes/admin'
 import stripeRoutes from './routes/stripe'
 import aiRoutes from './routes/ai'
 import { setupSocket } from './socket'
-import { globalLimiter, authLimiter, passwordResetLimiter } from './middleware/rateLimiter'
+import { globalLimiter, authLimiter, passwordResetLimiter, publicLimiter } from './middleware/rateLimiter'
 
 const app = express()
 
-// ─── Global rate limiter (applied before everything) ──────────────────
+// ─── Rate limiters applied before routes ────────────────────────────
 app.use(globalLimiter)
+
+// ─── CSRF protection (double-submit cookie pattern) ────────────────
+import { csrfProtection } from './middleware/csrf'
+// Apply CSRF protection globally — it skips Bearer token requests and read-only methods
+app.use(csrfProtection)
+
 const httpServer = createServer(app)
 const io = new Server(httpServer, {
   cors: {
@@ -127,8 +133,8 @@ app.use('/api/admin', adminRoutes)
 app.use('/api/stripe', stripeRoutes)
 app.use('/api/ai', aiRoutes)
 
-// Health check (before error handler)
-app.get('/api/health', (_req, res) => {
+// Health check (before error handler, with public rate limiter)
+app.get('/api/health', publicLimiter, (_req, res) => {
   const checks = {
     status: 'healthy',
     timestamp: new Date().toISOString(),

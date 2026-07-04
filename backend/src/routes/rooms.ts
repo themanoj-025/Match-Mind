@@ -7,6 +7,7 @@ import { isValidTournamentId, DEFAULT_ROSTER_RULES, MAX_FREE_ROOMS_PER_USER } fr
 import type { AuthenticatedRequest } from '../middleware/auth'
 import logger from '../utils/logger'
 import { computeRoomLeaderboard } from '../services/leaderboardService'
+import { createRoomLimiter, joinRoomLimiter } from '../middleware/rateLimiter'
 
 const router = express.Router()
 
@@ -42,8 +43,8 @@ function generateInviteCode(): string {
 
 // ─── Routes ─────────────────────────────────────────────
 
-// POST /api/rooms — create room (host)
-router.post('/', authenticateToken, validate(createRoomSchema), asyncHandler(async (req: AuthenticatedRequest, res) => {
+// POST /api/rooms — create room (host, rate-limited)
+router.post('/', createRoomLimiter, authenticateToken, validate(createRoomSchema), asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const { name, tournamentId, totalBudget, rosterRules } = req.body as z.infer<typeof createRoomSchema>
 
@@ -165,7 +166,7 @@ router.get('/:id/members', asyncHandler(async (req, res) => {
 }))
 
 // POST /api/rooms/:id/join — join room via invite code
-router.post('/:id/join', authenticateToken, validate(joinRoomSchema), asyncHandler(async (req: AuthenticatedRequest, res) => {
+router.post('/:id/join', joinRoomLimiter, authenticateToken, validate(joinRoomSchema), asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const roomId = req.params.id as string
   const { inviteCode } = req.body as z.infer<typeof joinRoomSchema>
