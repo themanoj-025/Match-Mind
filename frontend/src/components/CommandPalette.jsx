@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, ArrowRight, Trophy, Users, User, Globe, Zap, TrendingUp, Star, X, Command, Hash, Sparkles } from 'lucide-react'
+import { Search, ArrowRight, Trophy, Users, User, Zap, Star, X, Command, Sparkles } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 // ── Search Data ───────────────────────────────────────
@@ -10,44 +10,10 @@ const SECTIONS = [
     id: 'quick',
     label: 'Quick Actions',
     items: [
-      { id: 'go-live', label: 'Go to Live Matches', icon: Trophy, path: '/live', shortcut: 'G then L' },
-      { id: 'go-feed', label: 'Go to Feed', icon: TrendingUp, path: '/feed', shortcut: 'G then F' },
-      { id: 'go-predictions', label: 'Go to Predictions', icon: Zap, path: '/predictions', shortcut: 'G then P' },
+      { id: 'go-dashboard', label: 'Go to Dashboard', icon: Trophy, path: '/dashboard', shortcut: 'G then D' },
+      { id: 'go-new-room', label: 'Create Auction Room', icon: Zap, path: '/rooms/new', shortcut: 'G then N' },
       { id: 'go-leaderboard', label: 'Go to Leaderboard', icon: Star, path: '/leaderboard', shortcut: 'G then B' },
-      { id: 'go-leagues', label: 'Go to Leagues', icon: Trophy, path: '/leagues', shortcut: 'G then L' },
-      { id: 'go-squads', label: 'Go to Squads', icon: Users, path: '/squads', shortcut: 'G then S' },
-      { id: 'go-search', label: 'Go to Search', icon: Search, path: '/explore', shortcut: 'G then E' },
       { id: 'go-pricing', label: 'Go to Pricing', icon: Sparkles, path: '/pricing', shortcut: 'G then P' },
-    ],
-  },
-  {
-    id: 'sports',
-    label: 'Sports',
-    items: [
-      { id: 'sport-football', label: 'Football', icon: '⚽', path: '/live' },
-      { id: 'sport-basketball', label: 'Basketball', icon: '🏀', path: '/live' },
-      { id: 'sport-nfl', label: 'American Football', icon: '🏈', path: '/live' },
-      { id: 'sport-tennis', label: 'Tennis', icon: '🎾', path: '/live' },
-      { id: 'sport-cricket', label: 'Cricket', icon: '🏏', path: '/live' },
-      { id: 'sport-hockey', label: 'Ice Hockey', icon: '🏒', path: '/live' },
-    ],
-  },
-  {
-    id: 'matches',
-    label: 'Live Matches',
-    items: [
-      { id: 'match-mci-ars', label: 'Man City vs Arsenal', icon: '⚽', path: '/live/mci-ars', meta: '2-1 · 67\'' },
-      { id: 'match-rma-bar', label: 'Real Madrid vs Barcelona', icon: '⚽', path: '/live/rma-bar', meta: '1-0 · 58\'' },
-      { id: 'match-lal-gsw', label: 'Lakers vs Warriors', icon: '🏀', path: '/live/lal-gsw', meta: '108-102 · Q3' },
-    ],
-  },
-  {
-    id: 'top-users',
-    label: 'Top Predictors',
-    items: [
-      { id: 'user-sportsking', label: 'SportsKing', icon: User, path: '/profile/sportsking', meta: '8,420 pts · 78%' },
-      { id: 'user-goalpredictor', label: 'GoalPredictor', icon: User, path: '/profile/goalpredictor', meta: '7,910 pts · 74%' },
-      { id: 'user-hoopsmaster', label: 'HoopsMaster', icon: User, path: '/profile/hoopsmaster', meta: '7,650 pts · 71%' },
     ],
   },
 ]
@@ -72,7 +38,6 @@ export default function CommandPalette({ isOpen, onClose }) {
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [selectedIdx, setSelectedIdx] = useState(0)
-  const [activeSection, setActiveSection] = useState(null)
   const inputRef = useRef(null)
   const listRef = useRef(null)
 
@@ -181,7 +146,7 @@ export default function CommandPalette({ isOpen, onClose }) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Search matches, teams, players, pages..."
+            placeholder="Search rooms, players, pages..."
             className="flex-1 bg-transparent text-[var(--mm-text-primary)] body outline-none placeholder:text-[var(--mm-text-muted)]"
             autoComplete="off"
           />
@@ -197,10 +162,9 @@ export default function CommandPalette({ isOpen, onClose }) {
         {!query.trim() && (
           <div className="px-5 py-3 border-b border-[var(--border-subtle)]">
             <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-              <SuggestionChip text="Live Matches" icon="⚽" onClick={() => { navigate('/live'); onClose() }} />
+              <SuggestionChip text="Dashboard" icon="🏠" onClick={() => { navigate('/dashboard'); onClose() }} />
+              <SuggestionChip text="New Room" icon="⚽" onClick={() => { navigate('/rooms/new'); onClose() }} />
               <SuggestionChip text="Leaderboard" icon="🏆" onClick={() => { navigate('/leaderboard'); onClose() }} />
-              <SuggestionChip text="Predictions" icon="🎯" onClick={() => { navigate('/predictions'); onClose() }} />
-              <SuggestionChip text="Leagues" icon="👥" onClick={() => { navigate('/leagues'); onClose() }} />
               <SuggestionChip text="Pricing" icon="✨" onClick={() => { navigate('/pricing'); onClose() }} />
             </div>
           </div>
@@ -210,7 +174,6 @@ export default function CommandPalette({ isOpen, onClose }) {
         <div ref={listRef} className="max-h-[50vh] overflow-y-auto py-2">
           {filteredSections.length > 0 ? (
             filteredSections.map((section) => {
-              const sectionStartIdx = flatIdx
               return (
                 <div key={section.id}>
                   <div className="px-5 py-1.5 caption text-[var(--mm-text-muted)] font-medium flex items-center gap-2">
@@ -241,11 +204,6 @@ export default function CommandPalette({ isOpen, onClose }) {
 
                         {/* Label */}
                         <span className="body flex-1 truncate">{item.label}</span>
-
-                        {/* Meta */}
-                        {item.meta && (
-                          <span className="caption text-[var(--mm-text-muted)] hidden sm:inline">{item.meta}</span>
-                        )}
 
                         {/* Path hint */}
                         <span className="caption text-[var(--mm-text-muted)] opacity-50">

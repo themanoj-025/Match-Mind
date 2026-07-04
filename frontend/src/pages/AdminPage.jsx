@@ -18,7 +18,7 @@ const adminTabs = [
 const kpiData = [
   { label: 'Total Users', value: '12,847', icon: Users, change: '+12%', changeType: 'up', color: 'var(--mm-accent-green)' },
   { label: 'Monthly Active', value: '8,234', icon: Activity, change: '+8%', changeType: 'up', color: 'var(--mm-accent-blue)' },
-  { label: 'Predictions Today', value: '84,291', icon: Trophy, change: '+18%', changeType: 'up', color: 'var(--mm-accent-amber)' },
+  { label: 'Active Auctions', value: '24', icon: Trophy, change: '+18%', changeType: 'up', color: 'var(--mm-accent-amber)' },
   { label: 'Pro Subscribers', value: '1,247', icon: TrendingUp, change: '+15%', changeType: 'up', color: 'var(--mm-accent-purple)' },
   { label: 'Revenue MTD', value: '$12,400', icon: DollarSign, change: '+8%', changeType: 'up', color: 'var(--mm-accent-green)' },
   { label: 'Error Rate', value: '0.12%', icon: AlertCircle, change: '-0.02%', changeType: 'down', color: 'var(--mm-accent-green)' },
@@ -35,12 +35,7 @@ const signupData = [
 ]
 
 const sportData = [
-  { name: 'Football', value: 45, color: '#2ECC40' },
-  { name: 'Basketball', value: 25, color: '#FF851B' },
-  { name: 'NFL', value: 15, color: '#B10DC9' },
-  { name: 'Tennis', value: 8, color: '#FFDC00' },
-  { name: 'Cricket', value: 5, color: '#7FDBFF' },
-  { name: 'Hockey', value: 2, color: '#01FF70' },
+  { name: 'Football', value: 100, color: '#2ECC40' },
 ]
 
 

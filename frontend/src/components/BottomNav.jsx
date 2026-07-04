@@ -1,13 +1,12 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Home, Trophy, Swords, Newspaper, User } from 'lucide-react'
+import { Home, Trophy, Swords, User } from 'lucide-react'
 import useStore from '../store/useStore'
 
 const navItems = [
-  { path: '/feed', label: 'Home', icon: Home },
-  { path: '/live', label: 'Live', icon: Trophy },
-  { path: '/predictions', label: 'Predict', icon: Swords },
-  { path: '/leaderboard', label: 'Rank', icon: Newspaper },
+  { path: '/dashboard', label: 'Home', icon: Home },
+  { path: '/rooms/new', label: 'Auction', icon: Swords },
+  { path: '/leaderboard', label: 'Rank', icon: Trophy },
   { path: '/profile/me', label: 'Profile', icon: User },
 ]
 

@@ -1,19 +1,25 @@
 /**
- * JSON Database Adapter — MatchMind
+ * JSON Database Adapter — AuctionXI (Production)
  *
- * In-memory database backed by JSON files. Replaces Prisma/PostgreSQL.
- * API-compatible with PrismaClient for findMany, findUnique, create, update,
- * delete, count, upsert, createMany, updateMany, deleteMany, $transaction.
+ * In-memory database backed by JSON files. Permanent production database.
+ * API-compatible with a subset of PrismaClient (findMany, findUnique, create,
+ * update, delete, count, upsert, createMany, updateMany, deleteMany, $transaction).
  *
- * All writes are persisted to JSON files in src/data/ after each operation.
+ * Production safeguards:
+ * 1. Atomic writes via temp-file + fs.rename (prevents partial-write corruption)
+ * 2. In-process AsyncMutex per collection (serializes concurrent writes)
+ * 3. Backup snapshots on $disconnect
+ * 4. All writes go through write(collection, mutatorFn) pattern
  */
 
 import fs from 'fs'
 import path from 'path'
 import crypto from 'crypto'
+import { Mutex } from 'async-mutex'
 import logger from '../utils/logger'
 
 const DATA_DIR = path.join(__dirname, '..', 'data')
+const BACKUP_DIR = path.join(DATA_DIR, '.backups')
 
 // ─── Types ─────────────────────────────────────────────
 
@@ -33,50 +39,14 @@ interface QueryOpts {
   include?: Record<string, any>
 }
 
-interface CreateOpts {
-  data: Record<string, any>
-}
-
-interface UpdateOpts {
-  where: Record<string, any>
-  data: Record<string, any>
-}
-
-interface UpsertOpts {
-  where: Record<string, any>
-  create: Record<string, any>
-  update: Record<string, any>
-}
-
-interface DeleteOpts {
-  where: Record<string, any>
-}
-
-interface CreateManyOpts {
-  data: Record<string, any>[]
-}
-
-interface UpdateManyOpts {
-  where?: WhereClause
-  data: Record<string, any>
-}
-
-interface DeleteManyOpts {
-  where?: WhereClause
-}
-
-interface CountOpts {
-  where?: WhereClause
-}
-
-interface ModelRelations {
-  [relationName: string]: {
-    type: 'hasMany' | 'belongsTo'
-    model: string
-    localKey: string
-    foreignKey: string
-  }
-}
+interface CreateOpts { data: Record<string, any> }
+interface UpdateOpts { where: Record<string, any>; data: Record<string, any> }
+interface UpsertOpts { where: Record<string, any>; create: Record<string, any>; update: Record<string, any> }
+interface DeleteOpts { where: Record<string, any> }
+interface CreateManyOpts { data: Record<string, any>[] }
+interface UpdateManyOpts { where?: WhereClause; data: Record<string, any> }
+interface DeleteManyOpts { where?: WhereClause }
+interface CountOpts { where?: WhereClause }
 
 interface ModelHandler {
   findUnique: (opts: { where: Record<string, any> }) => any
@@ -90,6 +60,39 @@ interface ModelHandler {
   delete: (opts: DeleteOpts) => any
   deleteMany: (opts: DeleteManyOpts) => { count: number }
   count: (opts?: CountOpts) => number
+}
+
+interface ModelRelations {
+  [relationName: string]: {
+    type: 'hasMany' | 'belongsTo'
+    model: string
+    localKey: string
+    foreignKey: string
+  }
+}
+
+// ─── Per-collection mutexes ──────────────────────────────
+
+const collectionMutexes = new Map<string, Mutex>()
+
+function getMutex(collection: string): Mutex {
+  if (!collectionMutexes.has(collection)) {
+    collectionMutexes.set(collection, new Mutex())
+  }
+  return collectionMutexes.get(collection)!
+}
+
+// ─── Atomic Write ────────────────────────────────────────
+
+function atomicWrite(filePath: string, data: any): void {
+  const tmpPath = filePath + '.tmp'
+  const dir = path.dirname(filePath)
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true })
+  }
+  fs.writeFileSync(tmpPath, JSON.stringify(data, null, 2), 'utf-8')
+  // Atomic rename — on most filesystems this is an atomic metadata operation
+  fs.renameSync(tmpPath, filePath)
 }
 
 // ─── Helpers ─────────────────────────────────────────────
@@ -110,22 +113,17 @@ function matchesWhere(item: Record<string, any>, where?: WhereClause): boolean {
   if (!where || Object.keys(where).length === 0) return true
 
   for (const [key, value] of Object.entries(where)) {
-    // Handle OR
     if (key === 'OR' && Array.isArray(value)) {
       return value.some((subWhere) => matchesWhere(item, subWhere))
     }
-    // Handle AND
     if (key === 'AND' && Array.isArray(value)) {
       return value.every((subWhere) => matchesWhere(item, subWhere))
     }
-    // Handle NOT
     if (key === 'NOT') {
       return !matchesWhere(item, value as WhereClause)
     }
 
-    // Handle nested operators
     if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
-      // e.g. { contains, mode } | { gte, lt } | { not } | { in }
       if ('contains' in value) {
         const itemVal = String(getNestedValue(item, key) ?? '')
         const search = String((value as any).contains)
@@ -148,12 +146,10 @@ function matchesWhere(item: Record<string, any>, where?: WhereClause): boolean {
         const itemVal = getNestedValue(item, key)
         if (!(value as any).in.includes(itemVal)) return false
       } else {
-        // Direct object comparison (e.g. subscription field)
         const itemVal = getNestedValue(item, key)
         if (JSON.stringify(itemVal) !== JSON.stringify(value)) return false
       }
     } else {
-      // Direct equality
       const itemVal = getNestedValue(item, key)
       if (itemVal !== value) return false
     }
@@ -208,11 +204,9 @@ function selectFields(item: Record<string, any>, select?: Record<string, any>): 
 
 function applyInclude(item: Record<string, any>, include: Record<string, any>, allData: Record<string, any[]>, modelName: string): Record<string, any> {
   if (!include) return item
-
   const result = { ...item }
 
   for (const [relField, relConfig] of Object.entries(include)) {
-    // Skip _count
     if (relField === '_count') {
       const countSelect = (relConfig as any).select
       const counts: Record<string, number> = {}
@@ -230,27 +224,18 @@ function applyInclude(item: Record<string, any>, include: Record<string, any>, a
       if (Array.isArray(related)) {
         result[relField] = related.map((r: any) => {
           let processed = r
-          if ((relConfig as any).select) {
-            processed = selectFields(processed, (relConfig as any).select)
-          }
-          if ((relConfig as any).include) {
-            processed = applyInclude(processed, (relConfig as any).include, allData, guessModelName(relField))
-          }
+          if ((relConfig as any).select) processed = selectFields(processed, (relConfig as any).select)
+          if ((relConfig as any).include) processed = applyInclude(processed, (relConfig as any).include, allData, guessModelName(relField))
           return processed
         })
       } else if (related && typeof related === 'object') {
         let processed = related
-        if ((relConfig as any).select) {
-          processed = selectFields(processed, (relConfig as any).select)
-        }
-        if ((relConfig as any).include) {
-          processed = applyInclude(processed, (relConfig as any).include, allData, guessModelName(relField))
-        }
+        if ((relConfig as any).select) processed = selectFields(processed, (relConfig as any).select)
+        if ((relConfig as any).include) processed = applyInclude(processed, (relConfig as any).include, allData, guessModelName(relField))
         result[relField] = processed
       }
     }
   }
-
   return result
 }
 
@@ -258,24 +243,15 @@ function resolveRelation(item: Record<string, any>, field: string, modelName: st
   const relations = getModelRelations(modelName)
   const rel = relations[field]
   if (!rel) return undefined
-
   const relatedData = allData[rel.model] || []
-  if (rel.type === 'hasMany') {
-    return relatedData.filter((r) => r[rel.foreignKey] === item[rel.localKey])
-  }
-
-  if (rel.type === 'belongsTo') {
-    return relatedData.find((r) => r[rel.foreignKey] === getNestedValue(item, rel.localKey)) || null
-  }
-
+  if (rel.type === 'hasMany') return relatedData.filter((r) => r[rel.foreignKey] === item[rel.localKey])
+  if (rel.type === 'belongsTo') return relatedData.find((r) => r[rel.foreignKey] === getNestedValue(item, rel.localKey)) || null
   return undefined
 }
 
 function resolveCount(item: Record<string, any>, field: string, allData: Record<string, any[]>): number {
   const allRelations = getModelRelationsAll()
-  const modelRelations = allRelations as Record<string, ModelRelations>
-  // Find which model's relation has this as a field
-  for (const [, relations] of Object.entries(modelRelations)) {
+  for (const [, relations] of Object.entries(allRelations)) {
     const rel = relations[field]
     if (rel) {
       const relatedData = allData[rel.model] || []
@@ -287,63 +263,31 @@ function resolveCount(item: Record<string, any>, field: string, allData: Record<
 
 function guessModelName(relationField: string): string {
   const pluralMap: Record<string, string> = {
-    user: 'user',
-    users: 'user',
-    match: 'match',
-    matches: 'match',
-    prediction: 'prediction',
-    predictions: 'prediction',
-    team: 'team',
-    teams: 'team',
-    player: 'player',
-    players: 'player',
-    competition: 'competition',
-    competitions: 'competition',
-    league: 'league',
-    leagues: 'league',
-    member: 'leagueMember',
-    members: 'leagueMember',
-    squad: 'squad',
-    squads: 'squad',
-    squadMember: 'squadMember',
-    squadMembers: 'squadMember',
-    chatMessage: 'chatMessage',
-    chatMessages: 'chatMessage',
-    message: 'chatMessage',
-    messages: 'chatMessage',
-    notification: 'notification',
-    notifications: 'notification',
-    follower: 'follow',
-    followers: 'follow',
-    following: 'follow',
-    follow: 'follow',
-    event: 'matchEvent',
-    events: 'matchEvent',
-    matchEvent: 'matchEvent',
-    matchEvents: 'matchEvent',
-    standing: 'standing',
-    standings: 'standing',
-    sport: 'userSport',
-    sportPreferences: 'userSport',
-    teamPreferences: 'userTeam',
-    userSport: 'userSport',
-    userTeam: 'userTeam',
+    user: 'user', users: 'user',
+    match: 'match', matches: 'match',
+    team: 'team', teams: 'team',
+    player: 'player', players: 'player',
+    tournament: 'tournament', tournaments: 'tournament',
+    room: 'room', rooms: 'room',
+    roomMember: 'roomMember', roomMembers: 'roomMember',
+    bid: 'bid', bids: 'bid',
+    roster: 'roster', rosters: 'roster',
+    auctionState: 'auctionState',
+    fixture: 'fixture', fixtures: 'fixture',
+    playerMatchStat: 'playerMatchStat', playerMatchStats: 'playerMatchStat',
+    fantasyPointsLedger: 'fantasyPointsLedger',
+    chatMessage: 'chatMessage', chatMessages: 'chatMessage',
+    message: 'chatMessage', messages: 'chatMessage',
+    notification: 'notification', notifications: 'notification',
+    follower: 'follow', followers: 'follow', following: 'follow', follow: 'follow',
     subscription: 'subscription',
-    userAchievement: 'userAchievement',
-    userAchievements: 'userAchievement',
-    achievement: 'achievement',
-    achievements: 'achievement',
-    report: 'report',
-    reports: 'report',
-    reporter: 'report',
-    adminLog: 'adminLog',
-    adminLogs: 'adminLog',
-    scoringLog: 'scoringLog',
-    scoringLogs: 'scoringLog',
-    leaderboardSnapshot: 'leaderboardSnapshot',
-    leaderboardSnapshots: 'leaderboardSnapshot',
-    session: 'session',
-    sessions: 'session',
+    report: 'report', reports: 'report', reporter: 'report',
+    adminLog: 'adminLog', adminLogs: 'adminLog',
+    leaderboardSnapshot: 'leaderboardSnapshot', leaderboardSnapshots: 'leaderboardSnapshot',
+    session: 'session', sessions: 'session',
+    achievement: 'achievement', achievements: 'achievement',
+    userAchievement: 'userAchievement', userAchievements: 'userAchievement',
+    starredPlayer: 'starredPlayer', starredPlayers: 'starredPlayer',
   }
   return pluralMap[relationField] || relationField
 }
@@ -356,44 +300,40 @@ function getModelRelations(modelName: string): ModelRelations {
 function getModelRelationsAll(): Record<string, ModelRelations> {
   return {
     user: {
-      predictions: { type: 'hasMany', model: 'prediction', localKey: 'id', foreignKey: 'userId' },
-      following: { type: 'hasMany', model: 'follow', localKey: 'id', foreignKey: 'followerId' },
-      followers: { type: 'hasMany', model: 'follow', localKey: 'id', foreignKey: 'followingId' },
-      leagues: { type: 'hasMany', model: 'leagueMember', localKey: 'id', foreignKey: 'userId' },
-      squads: { type: 'hasMany', model: 'squadMember', localKey: 'id', foreignKey: 'userId' },
       notifications: { type: 'hasMany', model: 'notification', localKey: 'id', foreignKey: 'userId' },
-      userAchievements: { type: 'hasMany', model: 'userAchievement', localKey: 'id', foreignKey: 'userId' },
       chatMessages: { type: 'hasMany', model: 'chatMessage', localKey: 'id', foreignKey: 'userId' },
       reports: { type: 'hasMany', model: 'report', localKey: 'id', foreignKey: 'reporterId' },
+      following: { type: 'hasMany', model: 'follow', localKey: 'id', foreignKey: 'followerId' },
+      followers: { type: 'hasMany', model: 'follow', localKey: 'id', foreignKey: 'followingId' },
       subscription: { type: 'hasMany', model: 'subscription', localKey: 'id', foreignKey: 'userId' },
-      sportPreferences: { type: 'hasMany', model: 'userSport', localKey: 'id', foreignKey: 'userId' },
-      teamPreferences: { type: 'hasMany', model: 'userTeam', localKey: 'id', foreignKey: 'userId' },
+      userAchievements: { type: 'hasMany', model: 'userAchievement', localKey: 'id', foreignKey: 'userId' },
       sessions: { type: 'hasMany', model: 'session', localKey: 'id', foreignKey: 'userId' },
+      roomMembers: { type: 'hasMany', model: 'roomMember', localKey: 'id', foreignKey: 'userId' },
+      rosters: { type: 'hasMany', model: 'roster', localKey: 'id', foreignKey: 'userId' },
     },
-    match: {
-      predictions: { type: 'hasMany', model: 'prediction', localKey: 'id', foreignKey: 'matchId' },
-      events: { type: 'hasMany', model: 'matchEvent', localKey: 'id', foreignKey: 'matchId' },
-      competitionRel: { type: 'belongsTo', model: 'competition', localKey: 'competitionId', foreignKey: 'id' },
-      homeTeam: { type: 'belongsTo', model: 'team', localKey: 'homeTeamId', foreignKey: 'id' },
-      awayTeam: { type: 'belongsTo', model: 'team', localKey: 'awayTeamId', foreignKey: 'id' },
+    room: {
+      members: { type: 'hasMany', model: 'roomMember', localKey: 'id', foreignKey: 'roomId' },
+      auctionState: { type: 'belongsTo', model: 'auctionState', localKey: 'id', foreignKey: 'roomId' },
+      bids: { type: 'hasMany', model: 'bid', localKey: 'id', foreignKey: 'roomId' },
     },
-    prediction: {
-      user: { type: 'belongsTo', model: 'user', localKey: 'userId', foreignKey: 'id' },
-      match: { type: 'belongsTo', model: 'match', localKey: 'matchId', foreignKey: 'id' },
-    },
-    league: {
-      members: { type: 'hasMany', model: 'leagueMember', localKey: 'id', foreignKey: 'leagueId' },
-    },
-    leagueMember: {
-      league: { type: 'belongsTo', model: 'league', localKey: 'leagueId', foreignKey: 'id' },
+    roomMember: {
+      room: { type: 'belongsTo', model: 'room', localKey: 'roomId', foreignKey: 'id' },
       user: { type: 'belongsTo', model: 'user', localKey: 'userId', foreignKey: 'id' },
     },
-    squad: {
-      members: { type: 'hasMany', model: 'squadMember', localKey: 'id', foreignKey: 'squadId' },
-    },
-    squadMember: {
-      squad: { type: 'belongsTo', model: 'squad', localKey: 'squadId', foreignKey: 'id' },
+    roster: {
+      room: { type: 'belongsTo', model: 'room', localKey: 'roomId', foreignKey: 'id' },
       user: { type: 'belongsTo', model: 'user', localKey: 'userId', foreignKey: 'id' },
+      player: { type: 'belongsTo', model: 'player', localKey: 'playerId', foreignKey: 'id' },
+    },
+    bid: {
+      user: { type: 'belongsTo', model: 'user', localKey: 'userId', foreignKey: 'id' },
+      room: { type: 'belongsTo', model: 'room', localKey: 'roomId', foreignKey: 'id' },
+    },
+    fixture: {
+      playerMatchStats: { type: 'hasMany', model: 'playerMatchStat', localKey: 'id', foreignKey: 'fixtureId' },
+    },
+    playerMatchStat: {
+      fixture: { type: 'belongsTo', model: 'fixture', localKey: 'fixtureId', foreignKey: 'id' },
     },
     chatMessage: {
       user: { type: 'belongsTo', model: 'user', localKey: 'userId', foreignKey: 'id' },
@@ -406,23 +346,13 @@ function getModelRelationsAll(): Record<string, ModelRelations> {
       follower: { type: 'belongsTo', model: 'user', localKey: 'followerId', foreignKey: 'id' },
       following: { type: 'belongsTo', model: 'user', localKey: 'followingId', foreignKey: 'id' },
     },
-    team: {
-      homeMatches: { type: 'hasMany', model: 'match', localKey: 'id', foreignKey: 'homeTeamId' },
-      awayMatches: { type: 'hasMany', model: 'match', localKey: 'id', foreignKey: 'awayTeamId' },
-      players: { type: 'hasMany', model: 'player', localKey: 'id', foreignKey: 'teamId' },
-      userTeams: { type: 'hasMany', model: 'userTeam', localKey: 'id', foreignKey: 'teamId' },
-      standings: { type: 'hasMany', model: 'standing', localKey: 'id', foreignKey: 'teamId' },
-    },
-    player: {
-      team: { type: 'belongsTo', model: 'team', localKey: 'teamId', foreignKey: 'id' },
-    },
-    standing: {
-      competition: { type: 'belongsTo', model: 'competition', localKey: 'competitionId', foreignKey: 'id' },
-      team: { type: 'belongsTo', model: 'team', localKey: 'teamId', foreignKey: 'id' },
-    },
     report: {
       reporter: { type: 'belongsTo', model: 'user', localKey: 'reporterId', foreignKey: 'id' },
       message: { type: 'belongsTo', model: 'chatMessage', localKey: 'messageId', foreignKey: 'id' },
+    },
+    star: {
+      user: { type: 'belongsTo', model: 'user', localKey: 'userId', foreignKey: 'id' },
+      player: { type: 'belongsTo', model: 'player', localKey: 'playerId', foreignKey: 'id' },
     },
   }
 }
@@ -431,7 +361,6 @@ function resolveUpdates(data: Record<string, any>, existingRecord: Record<string
   const result: Record<string, any> = {}
   for (const [key, value] of Object.entries(data)) {
     if (value && typeof value === 'object' && 'increment' in value) {
-      // Handle Prisma-style { increment: x } operator
       result[key] = (existingRecord?.[key] || 0) + value.increment
     } else {
       result[key] = value
@@ -452,11 +381,9 @@ function createModelHandler(modelName: string, getData: () => any[], getAllData:
   return {
     findUnique({ where }: { where: Record<string, any> }) {
       const data = getData()
-      // Handle compound unique keys like userId_matchId
       if (where) {
         const whereKey = Object.keys(where)[0]
         if (whereKey && whereKey.includes('_')) {
-          // Compound key: { userId_matchId: { userId, matchId } }
           const compoundFields = where[whereKey]
           if (compoundFields && typeof compoundFields === 'object') {
             return data.find((item) =>
@@ -464,7 +391,6 @@ function createModelHandler(modelName: string, getData: () => any[], getAllData:
             ) || null
           }
         }
-        // Single field unique
         const fieldKey = Object.keys(where)[0]
         const fieldVal = where[fieldKey]
         return data.find((item) => getNestedValue(item, fieldKey) === fieldVal) || null
@@ -481,27 +407,13 @@ function createModelHandler(modelName: string, getData: () => any[], getAllData:
     findMany({ where, orderBy, take, skip, select, include } = {}) {
       let filtered = whereFilter(where)
       filtered = applyOrderBy(filtered, orderBy)
-
       if (skip) filtered = filtered.slice(skip)
       if (take) filtered = filtered.slice(0, take)
-
       const allData = getAllData()
-
       return filtered.map((item) => {
         let result: any = item
-        if (include) {
-          result = applyInclude(result, include, allData, modelName)
-        }
-        if (select) {
-          result = selectFields(result, select)
-
-          // Apply includes for select with include
-          if (select._count && result._count) {
-            for (const countField of Object.keys(select._count.select)) {
-              result._count[countField] = resolveCount(item, countField, allData)
-            }
-          }
-        }
+        if (include) result = applyInclude(result, include, allData, modelName)
+        if (select) result = selectFields(result, select)
         return result
       })
     },
@@ -536,9 +448,14 @@ function createModelHandler(modelName: string, getData: () => any[], getAllData:
       const records = getData()
       const whereKey = Object.keys(where)[0]
       const whereVal = where[whereKey]
-      const index = records.findIndex((item) => item[whereKey] === whereVal)
+      const index = records.findIndex((item) => {
+        // Compound key support (e.g. roomId_userId: { roomId, userId })
+        if (whereKey && whereKey.includes('_') && whereVal && typeof whereVal === 'object') {
+          return Object.entries(whereVal).every(([k, v]) => item[k] === v)
+        }
+        return item[whereKey] === whereVal
+      })
       if (index === -1) throw new Error(`Record not found in ${modelName}: ${JSON.stringify(where)}`)
-
       const updated = {
         ...records[index],
         ...resolveUpdates(data, records[index]),
@@ -571,10 +488,7 @@ function createModelHandler(modelName: string, getData: () => any[], getAllData:
       const whereKey = Object.keys(where)[0]
       const whereVal = where[whereKey]
       const existing = records.find((item) => item[whereKey] === whereVal)
-
-      if (existing) {
-        return this.update({ where, data: update })
-      }
+      if (existing) return this.update({ where, data: update })
       return this.create({ data: create })
     },
 
@@ -582,7 +496,13 @@ function createModelHandler(modelName: string, getData: () => any[], getAllData:
       const records = getData()
       const whereKey = Object.keys(where)[0]
       const whereVal = where[whereKey]
-      const index = records.findIndex((item) => item[whereKey] === whereVal)
+      const index = records.findIndex((item) => {
+        // Compound key support (e.g. roomId_userId: { roomId, userId })
+        if (whereKey && whereKey.includes('_') && whereVal && typeof whereVal === 'object') {
+          return Object.entries(whereVal).every(([k, v]) => item[k] === v)
+        }
+        return item[whereKey] === whereVal
+      })
       if (index === -1) throw new Error(`Record not found in ${modelName}: ${JSON.stringify(where)}`)
       const deleted = records.splice(index, 1)[0]
       persist()
@@ -594,9 +514,7 @@ function createModelHandler(modelName: string, getData: () => any[], getAllData:
       const toDelete = records.filter((item) => matchesWhere(item, where))
       const ids = new Set(toDelete.map((r) => r.id))
       for (let i = records.length - 1; i >= 0; i--) {
-        if (ids.has(records[i].id)) {
-          records.splice(i, 1)
-        }
+        if (ids.has(records[i].id)) records.splice(i, 1)
       }
       persist()
       return { count: toDelete.length }
@@ -612,12 +530,14 @@ function createModelHandler(modelName: string, getData: () => any[], getAllData:
 
 export class JsonDatabase {
   dataDir: string
+  backupDir: string
   data: Record<string, any[]>
   models: Record<string, ModelHandler>
   _initialized: boolean
 
   constructor(dataDir = DATA_DIR) {
     this.dataDir = dataDir
+    this.backupDir = BACKUP_DIR
     this.data = {}
     this.models = {}
     this._initialized = false
@@ -629,23 +549,19 @@ export class JsonDatabase {
     if (!fs.existsSync(this.dataDir)) {
       fs.mkdirSync(this.dataDir, { recursive: true })
     }
+    if (!fs.existsSync(this.backupDir)) {
+      fs.mkdirSync(this.backupDir, { recursive: true })
+    }
 
-    // Define all models
+    // AuctionXI model names
     const modelNames = [
-      'user', 'match', 'matchEvent', 'prediction',
-      'team', 'player', 'competition',
-      'league', 'leagueMember',
-      'squad', 'squadMember',
-      'chatMessage', 'notification',
-      'follow',
-      'subscription',
-      'report',
-      'achievement', 'userAchievement',
-      'standing',
-      'userSport', 'userTeam',
-      'session',
-      'adminLog', 'scoringLog',
-      'leaderboardSnapshot',
+      'user', 'tournament', 'player',
+      'room', 'roomMember', 'bid', 'roster', 'auctionState',
+      'fixture', 'playerMatchStat', 'fantasyPointsLedger',
+      'chatMessage', 'notification', 'follow',
+      'subscription', 'report', 'adminLog',
+      'session', 'starredPlayer',
+      'leaderboardSnapshot', 'achievement', 'userAchievement',
     ]
 
     for (const name of modelNames) {
@@ -664,7 +580,6 @@ export class JsonDatabase {
       this._loadSeedData(seedData)
     }
 
-    // Persist IDs for generating new ones
     this._persistChanges()
     this._initialized = true
 
@@ -672,7 +587,10 @@ export class JsonDatabase {
     for (const name of modelNames) {
       counts[name] = this.data[name].length
     }
-    logger.info({ event: 'database.initialized', counts }, `JSON Database initialized with ${Object.values(counts).reduce((a, b) => a + b, 0)} total records`)
+    logger.info(
+      { event: 'database.initialized', counts },
+      `JSON Database initialized with ${Object.values(counts).reduce((a, b) => a + b, 0)} total records`
+    )
   }
 
   _loadModel(name: string): any[] {
@@ -691,7 +609,11 @@ export class JsonDatabase {
   _saveModel(name: string): void {
     const filePath = path.join(this.dataDir, `${name}.json`)
     try {
-      fs.writeFileSync(filePath, JSON.stringify(this.data[name], null, 2), 'utf-8')
+      // Acquire per-collection mutex for atomic write
+      const mutex = getMutex(name)
+      mutex.runExclusive(() => {
+        atomicWrite(filePath, this.data[name])
+      })
     } catch (err: any) {
       logger.error({ event: 'database.save_error', model: name, err: err.message }, `Failed to save ${name}.json`)
     }
@@ -712,21 +634,34 @@ export class JsonDatabase {
     }
   }
 
-  // Prisma-compatible methods
   async $connect(): Promise<void> {}
 
   async $disconnect(): Promise<void> {
     this._persistChanges()
+    // Create a timestamped backup
+    try {
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+      const backupPath = path.join(this.backupDir, timestamp)
+      fs.mkdirSync(backupPath, { recursive: true })
+      for (const name of Object.keys(this.data)) {
+        const src = path.join(this.dataDir, `${name}.json`)
+        const dst = path.join(backupPath, `${name}.json`)
+        if (fs.existsSync(src)) {
+          fs.copyFileSync(src, dst)
+        }
+      }
+      logger.info({ event: 'database.backup_created', path: backupPath }, 'Database backup created on shutdown')
+    } catch (err: any) {
+      logger.warn({ event: 'database.backup_failed', err: err.message }, 'Failed to create backup on shutdown')
+    }
     logger.info({ event: 'database.disconnect' }, 'JSON Database disconnected and persisted')
   }
 
   async $queryRawUnsafe(_query: string): Promise<any[]> {
-    // Health check compatibility - return success
     return [{ '?column?': 1 }]
   }
 
   async $transaction(operations: Promise<any>[]): Promise<any[]> {
-    // Run operations sequentially (no real transaction support)
     const results = []
     for (const op of operations) {
       results.push(await op)
@@ -745,7 +680,6 @@ export function createJsonDatabase(dataDir?: string): any {
 
   return new Proxy(db, {
     get(target, prop: string | symbol) {
-      // PrismaClient methods
       if (prop === '$connect') return target.$connect.bind(target)
       if (prop === '$disconnect') return target.$disconnect.bind(target)
       if (prop === '$queryRawUnsafe') return target.$queryRawUnsafe.bind(target)
@@ -753,7 +687,6 @@ export function createJsonDatabase(dataDir?: string): any {
       if (prop === 'initialize') return target.initialize.bind(target)
       if (prop === 'data') return target.data
 
-      // Model accessors
       if (target.models[prop as string]) {
         return target.models[prop as string]
       }

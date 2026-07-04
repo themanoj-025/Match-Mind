@@ -321,11 +321,6 @@ export function splitIntoWords(text: string): string[] {
 export function kineticGradientForSport(sport: string): string {
   const gradients: Record<string, string> = {
     football: 'linear-gradient(135deg, #2ECC40, #27AE60)',
-    basketball: 'linear-gradient(135deg, #FF851B, #E67E22)',
-    'american_football': 'linear-gradient(135deg, #B10DC9, #8E44AD)',
-    tennis: 'linear-gradient(135deg, #FFDC00, #F1C40F)',
-    cricket: 'linear-gradient(135deg, #7FDBFF, #3498DB)',
-    hockey: 'linear-gradient(135deg, #01FF70, #2ECC71)',
   }
   return gradients[sport] || 'linear-gradient(135deg, #00E676, #00BFA5)'
 }

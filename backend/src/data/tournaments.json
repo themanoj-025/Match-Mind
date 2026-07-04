@@ -1,0 +1,19 @@
+[
+  {
+    "id": "fifa-wc-2026",
+    "name": "FIFA World Cup 2026",
+    "shortName": "WC26",
+    "status": "UPCOMING",
+    "confederation": "FIFA",
+    "hosts": ["USA", "Canada", "Mexico"],
+    "theme": { "primary": "#0B3D91", "accent": "#D4AF37" }
+  },
+  {
+    "id": "uefa-ucl-2026-27",
+    "name": "UEFA Champions League 2026/27",
+    "shortName": "UCL",
+    "status": "UPCOMING",
+    "confederation": "UEFA",
+    "theme": { "primary": "#0E1E4A", "accent": "#8E44FF" }
+  }
+]

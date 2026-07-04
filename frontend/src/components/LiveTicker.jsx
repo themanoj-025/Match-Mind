@@ -1,21 +1,10 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import useStore from '../store/useStore'
-
-const SPORT_EMOJI = {
-  FOOTBALL: '⚽',
-  BASKETBALL: '🏀',
-  AMERICAN_FOOTBALL: '🏈',
-  TENNIS: '🎾',
-  CRICKET: '🏏',
-  HOCKEY: '🏒',
-}
 
 export default function LiveTicker() {
-  const { liveMatches } = useStore()
-  const liveMatchesList = liveMatches.filter((m) => m.status === 'LIVE')
-
-  if (liveMatchesList.length === 0) return null
+  // LiveTicker is now used for live football matches from the fixtures API
+  // For now, return null until fixtures with LIVE status are available
+  return null
 
   return (
     <div className="fixed top-16 left-0 right-0 z-40 bg-[var(--mm-bg-secondary)] border-b border-[var(--border-subtle)] overflow-hidden h-10 backdrop-blur-sm">
@@ -31,12 +20,10 @@ export default function LiveTicker() {
           {[...liveMatchesList, ...liveMatchesList].map((match, idx) => (
             <Link
               key={`${match.id}-${idx}`}
-              to={`/live/${match.id}`}
+              to={`/matches/${match.id}`}
               className="flex items-center gap-2 whitespace-nowrap text-xs hover:text-[var(--mm-accent-green)] transition-colors shrink-0 group/ticker"
             >
-              <span className="opacity-60 group-hover/ticker:opacity-100 transition-opacity">
-                {SPORT_EMOJI[match.sport] || '⚽'}
-              </span>
+              <span className="opacity-60 group-hover/ticker:opacity-100 transition-opacity">⚽</span>
               <span className="font-medium">{match.homeTeam}</span>
               <span className="font-bold text-[var(--mm-accent-green)] tabular-nums">
                 {match.homeScore} — {match.awayScore}

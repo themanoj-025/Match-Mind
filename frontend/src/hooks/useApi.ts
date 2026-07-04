@@ -1,23 +1,15 @@
 import { useQuery, useMutation, useQueryClient, type QueryKey } from '@tanstack/react-query'
 import type {
-  Match,
-  MatchStats,
-  Lineups,
-  H2H,
-  TimelineEvent,
-  Prediction,
-  CreatePredictionInput,
-  LeaderboardEntry,
-  League,
-  Squad,
+  Room,
+  AuctionState,
+  RosterEntry,
+  Fixture,
+  PlayerMatchStat,
   User,
   Notification,
-  Highlight,
+  LeaderboardEntry,
   AdminStats,
   AdminLogEntry,
-  StandingEntry,
-  StripeStatus,
-  Team,
   Player,
 } from '../lib/types'
 
@@ -102,280 +94,164 @@ function authedHeaders(): Record<string, string> {
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
-// ─── Filter types for query keys ───────────────────────
-interface MatchFilters {
-  sport?: string
-  status?: string
-  date?: string
-}
-
-interface AdminUserFilters {
-  page?: number
-  search?: string
-}
-
-interface AdminMatchFilters {
-  page?: number
-  status?: string
-}
-
-interface AdminReportFilters {
-  page?: number
-  status?: string
-}
-
-interface PlayerFilters {
-  sport?: string
-}
-
-interface TeamFilters {
-  sport?: string
-}
-
 // ─── Query Keys ──────────────────────────────────────────
 export const keys = {
-  matches: (filters?: MatchFilters): QueryKey => ['matches', filters],
-  match: (id?: string): QueryKey => ['matches', id],
-  matchStats: (id?: string): QueryKey => ['matches', id, 'stats'],
-  matchLineups: (id?: string): QueryKey => ['matches', id, 'lineups'],
-  matchH2H: (id?: string): QueryKey => ['matches', id, 'h2h'],
-  matchTimeline: (id?: string): QueryKey => ['matches', id, 'timeline'],
-  leaderboard: (period?: string): QueryKey => ['leaderboard', period],
-  leaderboardSport: (sport?: string): QueryKey => ['leaderboard', 'sport', sport],
-  leaderboardFriends: (): QueryKey => ['leaderboard', 'friends'],
-  leaderboardHistory: (period?: string): QueryKey => ['leaderboard', 'history', period],
-  myPredictions: (): QueryKey => ['predictions', 'mine'],
-  matchPredictions: (id?: string): QueryKey => ['predictions', 'match', id],
-  myLeagues: (): QueryKey => ['leagues', 'mine'],
-  league: (id?: string): QueryKey => ['leagues', id],
-  leagueLeaderboard: (id?: string): QueryKey => ['leagues', id, 'leaderboard'],
-  mySquads: (): QueryKey => ['squads', 'mine'],
-  squad: (id?: string): QueryKey => ['squads', id],
-  highlights: (): QueryKey => ['highlights'],
+  tournaments: (): QueryKey => ['tournaments'],
+  players: (tournamentId?: string): QueryKey => ['players', tournamentId],
+  player: (id?: string): QueryKey => ['players', id],
+  rooms: (): QueryKey => ['rooms', 'mine'],
+  room: (id?: string): QueryKey => ['rooms', id],
+  auctionState: (roomId?: string): QueryKey => ['rooms', roomId, 'auction'],
+  franchise: (roomId: string, userId?: string): QueryKey => ['rooms', roomId, 'franchise', userId],
+  leaderboard: (roomId?: string): QueryKey => ['leaderboard', roomId],
+  fixtures: (tournamentId?: string): QueryKey => ['fixtures', tournamentId],
+  fixture: (id?: string): QueryKey => ['fixtures', id],
   user: (id?: string): QueryKey => ['users', id],
   checkUsername: (username?: string): QueryKey => ['users', 'check-username', username],
   notifications: (): QueryKey => ['notifications'],
   adminStats: (): QueryKey => ['admin', 'stats'],
-  adminUsers: (filters?: AdminUserFilters): QueryKey => ['admin', 'users', filters],
-  adminMatches: (filters?: AdminMatchFilters): QueryKey => ['admin', 'matches', filters],
-  adminReports: (filters?: AdminReportFilters): QueryKey => ['admin', 'reports', filters],
+  adminUsers: (): QueryKey => ['admin', 'users'],
   adminSettings: (): QueryKey => ['admin', 'settings'],
   stripeStatus: (): QueryKey => ['stripe', 'status'],
-  aiPredict: (matchId?: string): QueryKey => ['ai', 'predict', matchId],
-  aiSummary: (matchId?: string): QueryKey => ['ai', 'summary', matchId],
   conversations: (): QueryKey => ['messages', 'conversations'],
   messages: (userId?: string): QueryKey => ['messages', userId],
-  standings: (sport?: string): QueryKey => ['standings', sport],
-  teams: (filters?: TeamFilters): QueryKey => ['teams', filters],
-  team: (id?: string): QueryKey => ['teams', id],
-  players: (filters?: PlayerFilters): QueryKey => ['players', filters],
-  player: (id?: string): QueryKey => ['players', id],
-  search: (q?: string): QueryKey => ['search', q],
 }
 
-// ─── Matches ─────────────────────────────────────────────
-export function useMatches(filters: MatchFilters = {}) {
-  const params = new URLSearchParams()
-  if (filters.sport && filters.sport !== 'all') params.set('sport', filters.sport)
-  if (filters.status) params.set('status', filters.status)
-  if (filters.date) params.set('date', filters.date)
-  const qs = params.toString()
-  return useQuery<Match[]>({
-    queryKey: keys.matches(filters),
-    queryFn: () => fetchJSON<Match[]>(`/api/matches${qs ? `?${qs}` : ''}`),
-    staleTime: 10000,
-  })
-}
-
-export function useMatch(id?: string) {
-  return useQuery<Match>({
-    queryKey: keys.match(id),
-    queryFn: () => fetchJSON<Match>(`/api/matches/${id}`),
-    enabled: !!id,
-    staleTime: 10000,
-  })
-}
-
-export function useMatchStats(id?: string) {
-  return useQuery<MatchStats>({
-    queryKey: keys.matchStats(id),
-    queryFn: () => fetchJSON<MatchStats>(`/api/matches/${id}/stats`),
-    enabled: !!id,
-    staleTime: 15000,
-  })
-}
-
-export function useMatchLineups(id?: string) {
-  return useQuery<Lineups>({
-    queryKey: keys.matchLineups(id),
-    queryFn: () => fetchJSON<Lineups>(`/api/matches/${id}/lineups`),
-    enabled: !!id,
-    staleTime: 60000,
-  })
-}
-
-export function useMatchH2H(id?: string) {
-  return useQuery<H2H>({
-    queryKey: keys.matchH2H(id),
-    queryFn: () => fetchJSON<H2H>(`/api/matches/${id}/h2h`),
-    enabled: !!id,
-    staleTime: 120000,
-  })
-}
-
-export function useMatchTimeline(id?: string) {
-  return useQuery<TimelineEvent[]>({
-    queryKey: keys.matchTimeline(id),
-    queryFn: () => fetchJSON<TimelineEvent[]>(`/api/matches/${id}/timeline`),
-    enabled: !!id,
-    staleTime: 15000,
-  })
-}
-
-// ─── Predictions ─────────────────────────────────────────
-export function useMyPredictions({ enabled }: { enabled?: boolean } = {}) {
-  return useQuery<Prediction[]>({
-    queryKey: keys.myPredictions(),
-    queryFn: () => fetchJSON<Prediction[]>('/api/predictions/mine', { headers: authedHeaders() }),
-    enabled,
-  })
-}
-
-export function useMatchPredictions(matchId?: string) {
-  return useQuery<Prediction[]>({
-    queryKey: keys.matchPredictions(matchId),
-    queryFn: () => fetchJSON<Prediction[]>(`/api/predictions/match/${matchId}`),
-    enabled: !!matchId,
-  })
-}
-
-export function useCreatePrediction() {
-  const qc = useQueryClient()
-  return useMutation<Prediction, Error, CreatePredictionInput>({
-    mutationFn: (data) =>
-      fetchJSON<Prediction>('/api/predictions', {
-        method: 'POST',
-        headers: authedHeaders(),
-        body: JSON.stringify(data),
-      }),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['predictions'] })
-    },
-  })
-}
-
-// ─── Leaderboard ─────────────────────────────────────────
-export function useLeaderboard(period: string = 'global') {
-  const endpoint =
-    period === 'week'
-      ? '/api/leaderboard/weekly'
-      : period === 'month'
-        ? '/api/leaderboard/global'
-        : `/api/leaderboard/${period}`
-  return useQuery<LeaderboardEntry[]>({
-    queryKey: keys.leaderboard(period),
-    queryFn: () => fetchJSON<LeaderboardEntry[]>(endpoint),
-    staleTime: 30000,
-  })
-}
-
-export function useLeaderboardSport(sport?: string) {
-  return useQuery<LeaderboardEntry[]>({
-    queryKey: keys.leaderboardSport(sport),
-    queryFn: () => fetchJSON<LeaderboardEntry[]>(`/api/leaderboard/sport/${sport}`),
-    enabled: !!sport,
-    staleTime: 30000,
-  })
-}
-
-export function useLeaderboardHistory(period?: string) {
+// ─── Tournaments ─────────────────────────────────────────
+export function useTournaments() {
   return useQuery({
-    queryKey: keys.leaderboardHistory(period),
-    queryFn: () => fetchJSON(`/api/leaderboard/history/${period}`),
-    enabled: !!period,
+    queryKey: keys.tournaments(),
+    queryFn: () => fetchJSON('/api/tournaments'),
+    staleTime: 300000,
+  })
+}
+
+// ─── Players ────────────────────────────────────────────
+export function usePlayers(tournamentId?: string) {
+  const params = tournamentId ? `?tournamentId=${tournamentId}` : ''
+  return useQuery<Player[]>({
+    queryKey: keys.players(tournamentId),
+    queryFn: () => fetchJSON<Player[]>(`/api/players${params}`),
     staleTime: 60000,
   })
 }
 
-// ─── Leagues ─────────────────────────────────────────────
-export function useMyLeagues() {
-  return useQuery<League[]>({
-    queryKey: keys.myLeagues(),
-    queryFn: () => fetchJSON<League[]>('/api/leagues/mine', { headers: authedHeaders() }),
-  })
-}
-
-export function useLeague(id?: string) {
-  return useQuery<League>({
-    queryKey: keys.league(id),
-    queryFn: () => fetchJSON<League>(`/api/leagues/${id}`),
+export function usePlayer(id?: string) {
+  return useQuery<Player>({
+    queryKey: keys.player(id),
+    queryFn: () => fetchJSON<Player>(`/api/players/${id}`),
     enabled: !!id,
-    staleTime: 15000,
+    staleTime: 60000,
   })
 }
 
-export function useLeagueLeaderboard(id?: string) {
-  return useQuery<LeaderboardEntry[]>({
-    queryKey: keys.leagueLeaderboard(id),
-    queryFn: () => fetchJSON<LeaderboardEntry[]>(`/api/leagues/${id}/leaderboard`),
+// ─── Rooms ───────────────────────────────────────────────
+export function useMyRooms() {
+  return useQuery<Room[]>({
+    queryKey: keys.rooms(),
+    queryFn: () => fetchJSON<Room[]>('/api/rooms/mine', { headers: authedHeaders() }),
+  })
+}
+
+export function useRoom(id?: string) {
+  return useQuery<Room>({
+    queryKey: keys.room(id),
+    queryFn: () => fetchJSON<Room>(`/api/rooms/${id}`),
     enabled: !!id,
-    staleTime: 15000,
+    staleTime: 10000,
   })
 }
 
-export function useCreateLeague() {
+export function useCreateRoom() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (data: { name: string; description?: string; sport?: string }) =>
-      fetchJSON('/api/leagues', {
-        method: 'POST',
-        headers: authedHeaders(),
-        body: JSON.stringify(data),
-      }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['leagues'] }),
+    mutationFn: (data: {
+      tournamentId: string
+      name: string
+      totalBudget: number
+      rosterRules: { GK: number; DEF: number; MID: number; FWD: number; total: number }
+    }) => fetchJSON('/api/rooms', {
+      method: 'POST',
+      headers: authedHeaders(),
+      body: JSON.stringify(data),
+    }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['rooms'] }),
   })
 }
 
-export function useJoinLeague() {
+export function useJoinRoom() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({ leagueId, inviteCode }: { leagueId: string; inviteCode: string }) =>
-      fetchJSON(`/api/leagues/${leagueId}/join`, {
+    mutationFn: ({ roomId, inviteCode }: { roomId: string; inviteCode: string }) =>
+      fetchJSON(`/api/rooms/${roomId}/join`, {
         method: 'POST',
         headers: authedHeaders(),
         body: JSON.stringify({ inviteCode }),
       }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['leagues'] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['rooms'] }),
   })
 }
 
-// ─── Squads ──────────────────────────────────────────────
-export function useMySquads() {
-  return useQuery<Squad[]>({
-    queryKey: keys.mySquads(),
-    queryFn: () => fetchJSON<Squad[]>('/api/squads/mine', { headers: authedHeaders() }),
+// ─── Auction ─────────────────────────────────────────────
+export function useAuctionState(roomId?: string) {
+  return useQuery<AuctionState>({
+    queryKey: keys.auctionState(roomId),
+    queryFn: () => fetchJSON<AuctionState>(`/api/rooms/${roomId}/auction/state`, { headers: authedHeaders() }),
+    enabled: !!roomId,
+    staleTime: 5000,
+    refetchInterval: 5000,
   })
 }
 
-export function useSquad(id?: string) {
-  return useQuery<Squad>({
-    queryKey: keys.squad(id),
-    queryFn: () => fetchJSON<Squad>(`/api/squads/${id}`),
-    enabled: !!id,
+// ─── Franchise ───────────────────────────────────────────
+export function useFranchise(roomId: string, userId?: string) {
+  return useQuery<RosterEntry[]>({
+    queryKey: keys.franchise(roomId, userId),
+    queryFn: () => fetchJSON<RosterEntry[]>(`/api/rooms/${roomId}/franchises/${userId || 'me'}`, { headers: authedHeaders() }),
+    enabled: !!roomId,
+    staleTime: 10000,
+  })
+}
+
+export function useSetCaptain() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ roomId, playerId, isViceCaptain }: { roomId: string; playerId: string; isViceCaptain?: boolean }) =>
+      fetchJSON(`/api/rooms/${roomId}/franchises/me/captain`, {
+        method: 'PATCH',
+        headers: authedHeaders(),
+        body: JSON.stringify({ playerId, isViceCaptain }),
+      }),
+    onSuccess: (_data, vars) => qc.invalidateQueries({ queryKey: ['rooms', vars.roomId, 'franchise'] }),
+  })
+}
+
+// ─── Leaderboard ─────────────────────────────────────────
+export function useRoomLeaderboard(roomId?: string) {
+  return useQuery<LeaderboardEntry[]>({
+    queryKey: keys.leaderboard(roomId),
+    queryFn: () => fetchJSON<LeaderboardEntry[]>(`/api/rooms/${roomId}/leaderboard`),
+    enabled: !!roomId,
     staleTime: 15000,
   })
 }
 
-export function useCreateSquad() {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (data: { name: string; sport: string }) =>
-      fetchJSON('/api/squads', {
-        method: 'POST',
-        headers: authedHeaders(),
-        body: JSON.stringify(data),
-      }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['squads'] }),
+// ─── Fixtures ────────────────────────────────────────────
+export function useFixtures(tournamentId?: string) {
+  const params = tournamentId ? `?tournamentId=${tournamentId}` : ''
+  return useQuery<Fixture[]>({
+    queryKey: keys.fixtures(tournamentId),
+    queryFn: () => fetchJSON<Fixture[]>(`/api/fixtures${params}`),
+    staleTime: 30000,
+  })
+}
+
+export function useFixture(id?: string) {
+  return useQuery<Fixture>({
+    queryKey: keys.fixture(id),
+    queryFn: () => fetchJSON<Fixture>(`/api/fixtures/${id}`),
+    enabled: !!id,
+    staleTime: 15000,
   })
 }
 
@@ -407,87 +283,7 @@ export function useUpdateProfile() {
         headers: authedHeaders(),
         body: JSON.stringify(data),
       }),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['users'] })
-    },
-  })
-}
-
-export function useFollowUser() {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (userId: string) =>
-      fetchJSON(`/api/users/${userId}/follow`, {
-        method: 'POST',
-        headers: authedHeaders(),
-      }),
-    onMutate: async (userId) => {
-      await qc.cancelQueries({ queryKey: ['users'] })
-      const previousData = qc.getQueriesData({ queryKey: ['users'] })
-      qc.setQueriesData({ queryKey: ['users'] }, (old: unknown) => {
-        if (!old) return old
-        if (Array.isArray(old)) {
-          return old.map((u: User) =>
-            u.id === userId ? { ...u, isFollowing: true } : u
-          )
-        }
-        const u = old as User
-        if (u.id === userId) {
-          return { ...u, isFollowing: true }
-        }
-        return old
-      })
-      return { previousData }
-    },
-    onError: (_err, _userId, context) => {
-      if (context?.previousData) {
-        for (const [key, data] of context.previousData) {
-          qc.setQueryData(key, data)
-        }
-      }
-    },
-    onSettled: () => {
-      qc.invalidateQueries({ queryKey: ['users'] })
-    },
-  })
-}
-
-export function useUnfollowUser() {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (userId: string) =>
-      fetchJSON(`/api/users/${userId}/follow`, {
-        method: 'DELETE',
-        headers: authedHeaders(),
-      }),
-    onMutate: async (userId) => {
-      await qc.cancelQueries({ queryKey: ['users'] })
-      const previousData = qc.getQueriesData({ queryKey: ['users'] })
-      qc.setQueriesData({ queryKey: ['users'] }, (old: unknown) => {
-        if (!old) return old
-        if (Array.isArray(old)) {
-          return old.map((u: User) =>
-            u.id === userId ? { ...u, isFollowing: false } : u
-          )
-        }
-        const u = old as User
-        if (u.id === userId) {
-          return { ...u, isFollowing: false }
-        }
-        return old
-      })
-      return { previousData }
-    },
-    onError: (_err, _userId, context) => {
-      if (context?.previousData) {
-        for (const [key, data] of context.previousData) {
-          qc.setQueryData(key, data)
-        }
-      }
-    },
-    onSettled: () => {
-      qc.invalidateQueries({ queryKey: ['users'] })
-    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['users'] }),
   })
 }
 
@@ -512,34 +308,149 @@ export function useMarkNotificationsRead() {
   })
 }
 
-// ─── Highlights ──────────────────────────────────────────
-export function useHighlights() {
-  return useQuery<Highlight[]>({
-    queryKey: keys.highlights(),
-    queryFn: () => fetchJSON<Highlight[]>('/api/highlights'),
+// ─── Admin page stubs (legacy MatchMind admin) ────────────
+export function useAdminReports(_opts?: { status?: string }) {
+  return useQuery({
+    queryKey: ['admin', 'reports', _opts?.status],
+    queryFn: () => fetchJSON('/api/admin/reports'),
+    enabled: false,
+  })
+}
+
+export function useAdminMatches(_opts?: { status?: string }) {
+  return useQuery({
+    queryKey: ['admin', 'matches', _opts?.status],
+    queryFn: () => fetchJSON('/api/admin/matches'),
+    enabled: false,
+  })
+}
+
+export function useUpdateReport() {
+  return useMutation({
+    mutationFn: (_data: any) => Promise.resolve({}),
+  })
+}
+
+export function useUpdateMatch() {
+  return useMutation({
+    mutationFn: (_data: any) => Promise.resolve({}),
+  })
+}
+
+// ─── Legacy MatchMind hooks (stubs — old pages use these) ─
+export function useLeaderboard(_period?: string) {
+  return useQuery<LeaderboardEntry[]>({
+    queryKey: ['leaderboard', 'legacy', _period],
+    queryFn: () => fetchJSON<LeaderboardEntry[]>('/api/leaderboard/global'),
+    staleTime: 15000,
+  })
+}
+
+export function useLeaderboardSport(_sport?: string) {
+  return useQuery<LeaderboardEntry[]>({
+    queryKey: ['leaderboard', 'legacy-sport', _sport],
+    queryFn: () => fetchJSON<LeaderboardEntry[]>('/api/leaderboard/global'),
+    staleTime: 15000,
+  })
+}
+
+export function useMyPredictions() {
+  return useQuery({
+    queryKey: ['predictions', 'mine'],
+    queryFn: () => fetchJSON('/api/leaderboard/global'),
     staleTime: 60000,
   })
 }
 
-// ─── AI ───────────────────────────────────────────────────
-export function useAIPrediction(matchId?: string) {
-  return useQuery<{ prediction: string; confidence: number }>({
-    queryKey: keys.aiPredict(matchId),
-    queryFn: () =>
-      fetchJSON<{ prediction: string; confidence: number }>(`/api/ai/predict/${matchId}`, {
-        method: 'POST',
-        headers: authedHeaders(),
-      }),
-    enabled: !!matchId,
-    staleTime: 120000,
+export function useMatches(_tournamentId?: string) {
+  return useQuery({
+    queryKey: ['fixtures', _tournamentId],
+    queryFn: () => fetchJSON('/api/fixtures' + (_tournamentId ? `?tournamentId=${_tournamentId}` : '')),
+    staleTime: 30000,
+  })
+}
+
+export function useMatch(id?: string) {
+  return useQuery({
+    queryKey: ['fixtures', id],
+    queryFn: () => fetchJSON(`/api/fixtures/${id}`),
+    enabled: !!id,
+    staleTime: 15000,
+  })
+}
+
+export function useMatchStats(_id?: string) {
+  return useQuery({
+    queryKey: ['fixtures', _id, 'stats'],
+    queryFn: () => fetchJSON(`/api/fixtures/${_id}`),
+    enabled: !!_id,
+    staleTime: 15000,
+  })
+}
+
+export function useMatchLineups(_id?: string) {
+  return useQuery({
+    queryKey: ['fixtures', _id, 'lineups'],
+    queryFn: () => fetchJSON(`/api/fixtures/${_id}`),
+    enabled: !!_id,
+    staleTime: 15000,
+  })
+}
+
+export function useMatchH2H(_id?: string) {
+  return useQuery({
+    queryKey: ['fixtures', _id, 'h2h'],
+    queryFn: () => fetchJSON(`/api/fixtures/${_id}`),
+    enabled: !!_id,
+    staleTime: 30000,
+  })
+}
+
+export function useMatchTimeline(_id?: string) {
+  return useQuery({
+    queryKey: ['fixtures', _id, 'timeline'],
+    queryFn: () => fetchJSON(`/api/fixtures/${_id}`),
+    enabled: !!_id,
+    staleTime: 10000,
+  })
+}
+
+export function useCreatePrediction() {
+  return useMutation({
+    mutationFn: (_data: any) => Promise.resolve({}),
+  })
+}
+
+export function useSearch(_query?: string) {
+  return useQuery({
+    queryKey: ['search', _query],
+    queryFn: () => fetchJSON(`/api/search?q=${encodeURIComponent(_query || '')}`),
+    enabled: !!_query && _query.length >= 2,
+    staleTime: 30000,
+  })
+}
+
+export function useFollowUser() {
+  return useMutation({
+    mutationFn: (_userId: string) => fetchJSON(`/api/users/${_userId}/follow`, {
+      method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+    }),
+  })
+}
+
+export function useUnfollowUser() {
+  return useMutation({
+    mutationFn: (_userId: string) => fetchJSON(`/api/users/${_userId}/unfollow`, {
+      method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+    }),
   })
 }
 
 // ─── Stripe ─────────────────────────────────────────────
 export function useStripeStatus() {
-  return useQuery<StripeStatus>({
+  return useQuery({
     queryKey: keys.stripeStatus(),
-    queryFn: () => fetchJSON<StripeStatus>('/api/stripe/status', { headers: authedHeaders() }),
+    queryFn: () => fetchJSON('/api/stripe/status', { headers: authedHeaders() }),
     staleTime: 30000,
   })
 }
@@ -587,38 +498,10 @@ export function useAdminStats() {
   })
 }
 
-export function useAdminUsers(filters: AdminUserFilters = {}) {
-  const params = new URLSearchParams()
-  if (filters.page) params.set('page', String(filters.page))
-  if (filters.search) params.set('search', filters.search)
-  const qs = params.toString()
+export function useAdminUsers() {
   return useQuery({
-    queryKey: keys.adminUsers(filters),
-    queryFn: () => fetchJSON(`/api/admin/users${qs ? `?${qs}` : ''}`, { headers: authedHeaders() }),
-    staleTime: 15000,
-  })
-}
-
-export function useAdminMatches(filters: AdminMatchFilters = {}) {
-  const params = new URLSearchParams()
-  if (filters.page) params.set('page', String(filters.page))
-  if (filters.status) params.set('status', filters.status)
-  const qs = params.toString()
-  return useQuery({
-    queryKey: keys.adminMatches(filters),
-    queryFn: () => fetchJSON(`/api/admin/matches${qs ? `?${qs}` : ''}`, { headers: authedHeaders() }),
-    staleTime: 15000,
-  })
-}
-
-export function useAdminReports(filters: AdminReportFilters = {}) {
-  const params = new URLSearchParams()
-  if (filters.page) params.set('page', String(filters.page))
-  if (filters.status) params.set('status', filters.status)
-  const qs = params.toString()
-  return useQuery({
-    queryKey: keys.adminReports(filters),
-    queryFn: () => fetchJSON(`/api/admin/reports${qs ? `?${qs}` : ''}`, { headers: authedHeaders() }),
+    queryKey: keys.adminUsers(),
+    queryFn: () => fetchJSON('/api/admin/users', { headers: authedHeaders() }),
     staleTime: 15000,
   })
 }
@@ -670,99 +553,11 @@ export function useDeleteUser() {
   })
 }
 
-export function useUpdateReport() {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: ({ id, status }: { id: string; status: string }) =>
-      fetchJSON(`/api/admin/reports/${id}`, {
-        method: 'PATCH',
-        headers: authedHeaders(),
-        body: JSON.stringify({ status }),
-      }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'reports'] }),
-  })
-}
-
 export function useAdminUserDetail(id?: string) {
   return useQuery({
     queryKey: ['admin', 'users', id],
     queryFn: () => fetchJSON(`/api/admin/users/${id}`, { headers: authedHeaders() }),
     enabled: !!id,
     staleTime: 15000,
-  })
-}
-
-export function useUpdateMatch() {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: ({ id, ...data }: { id: string } & Record<string, unknown>) =>
-      fetchJSON(`/api/admin/matches/${id}`, {
-        method: 'PATCH',
-        headers: authedHeaders(),
-        body: JSON.stringify(data),
-      }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'matches'] }),
-  })
-}
-
-// ─── Teams ──────────────────────────────────────────────
-export function useTeams(filters: TeamFilters = {}) {
-  const params = new URLSearchParams()
-  if (filters.sport && filters.sport !== 'all') params.set('sport', filters.sport)
-  const qs = params.toString()
-  return useQuery<Team[]>({
-    queryKey: keys.teams(filters),
-    queryFn: () => fetchJSON<Team[]>(`/api/teams${qs ? `?${qs}` : ''}`),
-    staleTime: 30000,
-  })
-}
-
-export function useTeam(id?: string) {
-  return useQuery<Team>({
-    queryKey: keys.team(id),
-    queryFn: () => fetchJSON<Team>(`/api/teams/${id}`),
-    enabled: !!id,
-    staleTime: 15000,
-  })
-}
-
-// ─── Players ────────────────────────────────────────────
-export function usePlayers(filters: PlayerFilters = {}) {
-  const params = new URLSearchParams()
-  if (filters.sport && filters.sport !== 'all') params.set('sport', filters.sport)
-  const qs = params.toString()
-  return useQuery<Player[]>({
-    queryKey: keys.players(filters),
-    queryFn: () => fetchJSON<Player[]>(`/api/players${qs ? `?${qs}` : ''}`),
-    staleTime: 30000,
-  })
-}
-
-export function usePlayer(id?: string) {
-  return useQuery<Player>({
-    queryKey: keys.player(id),
-    queryFn: () => fetchJSON<Player>(`/api/players/${id}`),
-    enabled: !!id,
-    staleTime: 15000,
-  })
-}
-
-// ─── Search ────────────────────────────────────────────────
-export function useSearch(query?: string) {
-  return useQuery({
-    queryKey: keys.search(query),
-    queryFn: () => fetchJSON(`/api/search?q=${encodeURIComponent(query!)}`),
-    enabled: !!query && query.trim().length >= 2,
-    staleTime: 5000,
-  })
-}
-
-// ─── Standings ────────────────────────────────────────────
-export function useStandings(sport?: string) {
-  return useQuery<StandingEntry[] | null>({
-    queryKey: keys.standings(sport),
-    queryFn: () => fetchJSON<StandingEntry[]>(`/api/standings/${sport}`).catch(() => null),
-    enabled: !!sport,
-    staleTime: 60000,
   })
 }

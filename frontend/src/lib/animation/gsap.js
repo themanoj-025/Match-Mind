@@ -172,3 +172,6 @@ export function prefersReducedMotion() {
 export function killAllScrollTriggers() {
   ScrollTrigger.getAll().forEach((t) => t.kill())
 }
+
+// Re-export gsap for consumer convenience
+export { gsap }

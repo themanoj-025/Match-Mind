@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Bell, Search, User, Menu, X, LogIn, Trophy, Swords, Newspaper, Home } from 'lucide-react'
+import { Bell, Search, User, Menu, X, LogIn, Trophy, Swords, Home } from 'lucide-react'
 import useStore from '../store/useStore'
 
 export default function Navbar() {
@@ -23,15 +23,14 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-[var(--gradient-live)] flex items-center justify-center">
-                <span className="text-[var(--mm-text-inverse)] font-bold text-sm">MM</span>
+                <span className="text-[var(--mm-text-inverse)] font-bold text-sm">AX</span>
               </div>
-              <span className="display-l text-2xl tracking-tight">MatchMind</span>
+              <span className="display-l text-2xl tracking-tight">AuctionXI</span>
             </Link>
 
             <div className="hidden md:flex items-center gap-6">
-              <Link to="/live" className="body text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] transition-colors">Live</Link>
-              <Link to="/scores" className="body text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] transition-colors">Scores</Link>
-              <Link to="/explore" className="body text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] transition-colors">Explore</Link>
+              <Link to="/how-it-works" className="body text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] transition-colors">How It Works</Link>
+              <Link to="/pricing" className="body text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] transition-colors">Pricing</Link>
             </div>
 
             <div className="flex items-center gap-3">
@@ -55,26 +54,23 @@ export default function Navbar() {
               <button onClick={toggleNav} className="md:hidden p-2 text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)]">
                 {isNavOpen ? <X size={22} /> : <Menu size={22} />}
               </button>
-              <Link to="/feed" className="flex items-center gap-2">
+              <Link to="/dashboard" className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-[var(--gradient-live)] flex items-center justify-center">
-                  <span className="text-[var(--mm-text-inverse)] font-bold text-sm">MM</span>
+                  <span className="text-[var(--mm-text-inverse)] font-bold text-sm">AX</span>
                 </div>
-                <span className="display-l text-2xl tracking-tight hidden sm:block">MatchMind</span>
+                <span className="display-l text-2xl tracking-tight hidden sm:block">AuctionXI</span>
               </Link>
             </div>
 
             <div className="hidden md:flex items-center gap-6">
-              <Link to="/feed" className="flex items-center gap-1.5 body text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] transition-colors">
-                <Home size={16} /> Feed
+              <Link to="/dashboard" className="flex items-center gap-1.5 body text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] transition-colors">
+                <Home size={16} /> Dashboard
               </Link>
-              <Link to="/live" className="flex items-center gap-1.5 body text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] transition-colors">
-                <Trophy size={16} /> Live
-              </Link>
-              <Link to="/predictions" className="flex items-center gap-1.5 body text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] transition-colors">
-                <Swords size={16} /> Predict
+              <Link to="/rooms/new" className="flex items-center gap-1.5 body text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] transition-colors">
+                <Swords size={16} /> New Room
               </Link>
               <Link to="/leaderboard" className="flex items-center gap-1.5 body text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] transition-colors">
-                <Newspaper size={16} /> Leaderboard
+                <Trophy size={16} /> Leaderboard
               </Link>
             </div>
 
@@ -86,7 +82,7 @@ export default function Navbar() {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search..."
+                    placeholder="Search players, rooms..."
                     className="bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-primary)] body rounded-[var(--radius-md)] pl-9 pr-3 py-2 w-44 focus:w-56 transition-all border border-transparent focus:border-[var(--border-active)] focus:outline-none"
                   />
                 </div>
@@ -119,29 +115,14 @@ export default function Navbar() {
           <div className="absolute inset-0 bg-black/60" />
           <div className="absolute top-16 left-0 w-72 bg-[var(--mm-bg-secondary)] h-full border-r border-[var(--border-subtle)] p-6" onClick={(e) => e.stopPropagation()}>
             <div className="flex flex-col gap-2">
-              <Link to="/feed" className="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-md)] hover:bg-[var(--mm-bg-hover)] body" onClick={toggleNav}>
-                <Home size={18} /> Feed
+              <Link to="/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-md)] hover:bg-[var(--mm-bg-hover)] body" onClick={toggleNav}>
+                <Home size={18} /> Dashboard
               </Link>
-              <Link to="/live" className="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-md)] hover:bg-[var(--mm-bg-hover)] body" onClick={toggleNav}>
-                <Trophy size={18} /> Live Matches
-              </Link>
-              <Link to="/scores" className="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-md)] hover:bg-[var(--mm-bg-hover)] body" onClick={toggleNav}>
-                <Newspaper size={18} /> Scores
-              </Link>
-              <Link to="/predictions" className="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-md)] hover:bg-[var(--mm-bg-hover)] body" onClick={toggleNav}>
-                <Swords size={18} /> Predictions
+              <Link to="/rooms/new" className="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-md)] hover:bg-[var(--mm-bg-hover)] body" onClick={toggleNav}>
+                <Swords size={18} /> Create Room
               </Link>
               <Link to="/leaderboard" className="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-md)] hover:bg-[var(--mm-bg-hover)] body" onClick={toggleNav}>
                 <Trophy size={18} /> Leaderboard
-              </Link>
-              <Link to="/leagues" className="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-md)] hover:bg-[var(--mm-bg-hover)] body" onClick={toggleNav}>
-                <Swords size={18} /> Leagues
-              </Link>
-              <Link to="/squads" className="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-md)] hover:bg-[var(--mm-bg-hover)] body" onClick={toggleNav}>
-                <User size={18} /> Squads
-              </Link>
-              <Link to="/explore" className="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-md)] hover:bg-[var(--mm-bg-hover)] body" onClick={toggleNav}>
-                <Search size={18} /> Explore
               </Link>
               <div className="border-t border-[var(--border-subtle)] my-4" />
               <Link to="/profile/me" className="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-md)] hover:bg-[var(--mm-bg-hover)] body" onClick={toggleNav}>

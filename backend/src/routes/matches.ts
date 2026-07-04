@@ -1,9 +1,6 @@
 import express from 'express'
 import { authenticateToken } from '../middleware/auth'
 import { requireAdmin } from '../middleware/requireAdmin'
-import { finalizeMatch } from '../workflows/finalizeMatch'
-import { validate } from '../middleware/validate'
-import { finishMatchSchema } from '../config/schemas'
 import asyncHandler from '../middleware/asyncHandler'
 import type { AuthenticatedRequest } from '../middleware/auth'
 
@@ -173,7 +170,7 @@ router.get('/:id/h2h', asyncHandler(async (req, res) => {
 }))
 
 // POST /api/matches/:id/finish — manual finish (legacy, for admin override)
-router.post('/:id/finish', authenticateToken, requireAdmin, validate(finishMatchSchema), asyncHandler(async (req: AuthenticatedRequest, res) => {
+router.post('/:id/finish', authenticateToken, requireAdmin, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const { homeScore, awayScore } = req.body as { homeScore?: number; awayScore?: number }
 
@@ -191,15 +188,12 @@ router.post('/:id/finish', authenticateToken, requireAdmin, validate(finishMatch
 
   const updated = await prisma.match.update({ where: { id: req.params.id }, data })
 
-  const scoring = await finalizeMatch(prisma, String(req.params.id), { mode: 'auto', io: req.app.get('io') })
-
   const io = req.app.get('io')
   if (io) {
     io.to(`match:${req.params.id}`).emit('SIM_FULLTIME', { matchId: req.params.id, homeScore: updated.homeScore, awayScore: updated.awayScore })
-    io.to('global').emit('SIM_FULLTIME', { matchId: req.params.id, homeTeamName: updated.homeTeamName, awayTeamName: updated.awayTeamName, homeScore: updated.homeScore, awayScore: updated.awayScore })
   }
 
-  res.json({ match: updated, scoring })
+  res.json({ match: updated })
 }))
 
 // GET /api/matches/:id/timeline — real events from MatchEvent table

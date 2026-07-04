@@ -1,7 +1,5 @@
 import { create } from 'zustand'
-import type { User, Match, Notification, Prediction, LeaderboardEntry, ChatMessage as ChatMessageType } from '../lib/types'
-
-// ─── Store State Interface ──────────────────────────────
+import type { User, Notification, Room, AuctionState, RosterEntry, LeaderboardEntry, ChatMessage as ChatMessageType } from '../lib/types'
 
 interface StoreState {
   // Auth
@@ -15,22 +13,24 @@ interface StoreState {
   toggleNav: () => void
   closeNav: () => void
 
-  // Live Matches
-  liveMatches: Match[]
-  setLiveMatches: (matches: Match[]) => void
-  updateMatchScore: (matchId: string, homeScore: number, awayScore: number, minute: number) => void
-  updateMatchStatus: (matchId: string, status: string, minute: number) => void
-  addLiveMatch: (match: Match) => void
+  // Auction Rooms
+  activeRooms: Room[]
+  currentAuctionState: AuctionState | null
+  setActiveRooms: (rooms: Room[]) => void
+  setCurrentAuctionState: (state: AuctionState | null) => void
+  updateAuctionBid: (playerId: string, amount: number, bidderId: string, timerEndsAt: string) => void
+  updateAuctionPhase: (phase: AuctionState['phase']) => void
+
+  // Roster
+  myRoster: RosterEntry[]
+  setMyRoster: (roster: RosterEntry[]) => void
+  updateCaptain: (playerId: string | null, isViceCaptain?: boolean) => void
 
   // Chat
   chatMessages: Record<string, ChatMessageType[]>
   addChatMessage: (roomId: string, message: ChatMessageType) => void
   setChatMessages: (roomId: string, messages: ChatMessageType[]) => void
   addChatReaction: (roomId: string, messageId: string | number, emoji: string) => void
-
-  // Viewer Counts
-  viewerCounts: Record<string, number>
-  setViewerCount: (matchId: string, count: number) => void
 
   // Notifications
   notifications: Notification[]
@@ -39,12 +39,6 @@ interface StoreState {
   markAllRead: () => void
   markNotificationRead: (id: string) => void
   setNotifications: (notifications: Notification[]) => void
-
-  // Predictions
-  userPredictions: Prediction[]
-  setUserPredictions: (predictions: Prediction[]) => void
-  addPrediction: (prediction: Prediction) => void
-  updatePrediction: (id: string, updates: Partial<Prediction>) => void
 
   // Leaderboard
   leaderboard: LeaderboardEntry[]
@@ -66,8 +60,6 @@ interface StoreState {
   clearError: (key: string) => void
 }
 
-// ─── Store ──────────────────────────────────────────────
-
 const useStore = create<StoreState>((set) => ({
   // ── Auth ──────────────────────────────────────────
   user: null,
@@ -76,7 +68,9 @@ const useStore = create<StoreState>((set) => ({
   logout: () => set({
     user: null,
     isAuthenticated: false,
-    userPredictions: [],
+    activeRooms: [],
+    currentAuctionState: null,
+    myRoster: [],
     notifications: [],
     unreadCount: 0,
   }),
@@ -86,30 +80,43 @@ const useStore = create<StoreState>((set) => ({
   toggleNav: () => set((state) => ({ isNavOpen: !state.isNavOpen })),
   closeNav: () => set({ isNavOpen: false }),
 
-  // ── Live Matches ──────────────────────────────────
-  liveMatches: [],
-  setLiveMatches: (matches) => set({ liveMatches: matches }),
-  updateMatchScore: (matchId, homeScore, awayScore, minute) =>
+  // ── Auction Rooms ─────────────────────────────────
+  activeRooms: [],
+  currentAuctionState: null,
+  setActiveRooms: (rooms) => set({ activeRooms: rooms }),
+  setCurrentAuctionState: (state) => set({ currentAuctionState: state }),
+  updateAuctionBid: (playerId, amount, bidderId, timerEndsAt) =>
     set((state) => {
-      const matches: Match[] = state.liveMatches.map((m) => {
-        if (m.id !== matchId) return m
-        return { ...m, homeScore, awayScore, minute, status: 'SIMULATING' } as Match
-      })
-      return { liveMatches: matches }
+      if (!state.currentAuctionState) return state
+      return {
+        currentAuctionState: {
+          ...state.currentAuctionState,
+          currentBid: amount,
+          currentBidderId: bidderId,
+          timerEndsAt,
+          version: state.currentAuctionState.version + 1,
+        },
+      }
     }),
-  updateMatchStatus: (matchId, status, minute) =>
+  updateAuctionPhase: (phase) =>
     set((state) => {
-      const matches: Match[] = state.liveMatches.map((m) => {
-        if (m.id !== matchId) return m
-        return { ...m, status, minute } as Match
-      })
-      return { liveMatches: matches }
+      if (!state.currentAuctionState) return state
+      return {
+        currentAuctionState: { ...state.currentAuctionState, phase },
+      }
     }),
-  addLiveMatch: (match) =>
+
+  // ── Roster ────────────────────────────────────────
+  myRoster: [],
+  setMyRoster: (roster) => set({ myRoster: roster }),
+  updateCaptain: (playerId, isViceCaptain = false) =>
     set((state) => ({
-      liveMatches: state.liveMatches.some(m => m.id === match.id)
-        ? state.liveMatches
-        : [...state.liveMatches, match],
+      myRoster: state.myRoster.map((entry) => {
+        if (isViceCaptain) {
+          return { ...entry, isViceCaptain: entry.playerId === playerId }
+        }
+        return { ...entry, isCaptain: entry.playerId === playerId, isViceCaptain: false }
+      }),
     })),
 
   // ── Chat ──────────────────────────────────────────
@@ -125,16 +132,7 @@ const useStore = create<StoreState>((set) => ({
     set((state) => ({
       chatMessages: { ...state.chatMessages, [roomId]: messages },
     })),
-  addChatReaction: (_roomId, _messageId, _emoji) => {
-    // Handled optimistically on the client
-  },
-
-  // ── Viewer Counts ─────────────────────────────────
-  viewerCounts: {},
-  setViewerCount: (matchId, count) =>
-    set((state) => ({
-      viewerCounts: { ...state.viewerCounts, [matchId]: count },
-    })),
+  addChatReaction: () => {},
 
   // ── Notifications ─────────────────────────────────
   notifications: [],
@@ -161,20 +159,6 @@ const useStore = create<StoreState>((set) => ({
       notifications,
       unreadCount: notifications.filter((n) => !n.isRead).length,
     }),
-
-  // ── Predictions ───────────────────────────────────
-  userPredictions: [],
-  setUserPredictions: (predictions) => set({ userPredictions: predictions }),
-  addPrediction: (prediction) =>
-    set((state) => ({
-      userPredictions: [prediction, ...state.userPredictions],
-    })),
-  updatePrediction: (id, updates) =>
-    set((state) => ({
-      userPredictions: state.userPredictions.map((p) =>
-        p.id === id ? { ...p, ...updates } : p
-      ),
-    })),
 
   // ── Leaderboard ───────────────────────────────────
   leaderboard: [],

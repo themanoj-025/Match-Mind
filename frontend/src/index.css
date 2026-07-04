@@ -35,11 +35,6 @@
 
   /* ── SPORT COLOUR CODES ── */
   --sport-football: #2ECC40;
-  --sport-basketball: #FF851B;
-  --sport-american-fb: #B10DC9;
-  --sport-tennis: #FFDC00;
-  --sport-cricket: #7FDBFF;
-  --sport-hockey: #01FF70;
 
   /* ── TIER COLOURS ── */
   --tier-bronze: #CD7F32;
@@ -335,6 +330,30 @@ body {
   .animate-scroll-ticker {
     transform: none !important;
   }
+}
+
+/* ── TOURNAMENT THEME UTILITIES ── */
+.tournament-header {
+  background: linear-gradient(135deg, var(--tournament-primary, #0B3D91) 0%, color-mix(in srgb, var(--tournament-primary, #0B3D91) 60%, transparent) 100%);
+  border-bottom: 1px solid color-mix(in srgb, var(--tournament-accent, #D4AF37) 20%, transparent);
+}
+
+.tournament-accent-text {
+  color: var(--tournament-accent, var(--mm-accent-green));
+}
+
+.tournament-primary-bg {
+  background: var(--tournament-primary, var(--mm-accent-green));
+}
+
+.tournament-glow {
+  box-shadow: 0 0 20px color-mix(in srgb, var(--tournament-accent, #D4AF37) 20%, transparent);
+}
+
+.tournament-badge {
+  background: color-mix(in srgb, var(--tournament-accent, #D4AF37) 12%, transparent);
+  color: var(--tournament-accent, var(--mm-accent-green));
+  border: 1px solid color-mix(in srgb, var(--tournament-accent, #D4AF37) 25%, transparent);
 }
 
 /* ── UTILITY CLASSES ── */

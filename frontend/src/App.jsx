@@ -17,36 +17,24 @@ const SignupPage = lazy(() => import('./pages/SignupPage'))
 const ForgotPasswordPage = lazy(() => import('./pages/auth/ForgotPasswordPage'))
 const ResetPasswordPage = lazy(() => import('./pages/auth/ResetPasswordPage'))
 const VerifyEmailPage = lazy(() => import('./pages/auth/VerifyEmailPage'))
-const OnboardingPage = lazy(() => import('./pages/OnboardingPage'))
 const AboutPage = lazy(() => import('./pages/static/AboutPage'))
 const FAQPage = lazy(() => import('./pages/static/FAQPage'))
 const NotFoundPage = lazy(() => import('./pages/static/NotFoundPage'))
-const FeedPage = lazy(() => import('./pages/FeedPage'))
-const LiveHubPage = lazy(() => import('./pages/LiveHubPage'))
-const MatchRoomPage = lazy(() => import('./pages/MatchRoomPage'))
-const ScoresPage = lazy(() => import('./pages/ScoresPage'))
-const PredictionsPage = lazy(() => import('./pages/PredictionsPage'))
-const MakePredictionPage = lazy(() => import('./pages/MakePredictionPage'))
+const DashboardPage = lazy(() => import('./pages/DashboardPage'))
+const RoomWizardPage = lazy(() => import('./pages/RoomWizardPage'))
+const RoomLobbyPage = lazy(() => import('./pages/RoomLobbyPage'))
+const AuctionRoomPage = lazy(() => import('./pages/AuctionRoomPage'))
+const FranchisePage = lazy(() => import('./pages/FranchisePage'))
 const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'))
-const LeaguesPage = lazy(() => import('./pages/LeaguesPage'))
-const CreateLeaguePage = lazy(() => import('./pages/CreateLeaguePage'))
-const LeagueRoomPage = lazy(() => import('./pages/LeagueRoomPage'))
-const SquadsPage = lazy(() => import('./pages/SquadsPage'))
-const SquadPage = lazy(() => import('./pages/SquadPage'))
-const ExplorePage = lazy(() => import('./pages/ExplorePage'))
-const HighlightsPage = lazy(() => import('./pages/HighlightsPage'))
+const MatchCenterPage = lazy(() => import('./pages/MatchCenterPage'))
+const PlayerProfilePage = lazy(() => import('./pages/PlayerProfilePage'))
 const ProfilePage = lazy(() => import('./pages/ProfilePage'))
 const MyProfilePage = lazy(() => import('./pages/MyProfilePage'))
 const SettingsPage = lazy(() => import('./pages/SettingsPage'))
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage'))
-const StandingsPage = lazy(() => import('./pages/StandingsPage'))
-const TeamPage = lazy(() => import('./pages/TeamPage'))
-const PlayerPage = lazy(() => import('./pages/PlayerPage'))
-const SearchPage = lazy(() => import('./pages/SearchPage'))
-const AchievementsPage = lazy(() => import('./pages/AchievementsPage'))
-const ActivityPage = lazy(() => import('./pages/ActivityPage'))
 const MessagesPage = lazy(() => import('./pages/MessagesPage'))
 const PricingPage = lazy(() => import('./pages/PricingPage'))
+const SearchPage = lazy(() => import('./pages/SearchPage'))
 const AdminPage = lazy(() => import('./pages/AdminPage'))
 
 // ── Page transition wrapper ────────────────────────────
@@ -137,36 +125,22 @@ export default function App() {
                 <Route path="/forgot-password" element={<AnimatedRoute><ForgotPasswordPage /></AnimatedRoute>} />
                 <Route path="/reset-password" element={<AnimatedRoute><ResetPasswordPage /></AnimatedRoute>} />
                 <Route path="/verify-email" element={<AnimatedRoute><VerifyEmailPage /></AnimatedRoute>} />
-                <Route path="/onboarding" element={<AnimatedRoute><OnboardingPage /></AnimatedRoute>} />
                 <Route path="/about" element={<AnimatedRoute><AboutPage /></AnimatedRoute>} />
                 <Route path="/faq" element={<AnimatedRoute><FAQPage /></AnimatedRoute>} />
                 <Route path="/404" element={<AnimatedRoute><NotFoundPage /></AnimatedRoute>} />
                 <Route path="*" element={<AnimatedRoute><NotFoundPage /></AnimatedRoute>} />
-                <Route path="/feed" element={<AnimatedRoute><FeedPage /></AnimatedRoute>} />
-                <Route path="/live" element={<AnimatedRoute><LiveHubPage /></AnimatedRoute>} />
-                <Route path="/live/:matchId" element={<AnimatedRoute><MatchRoomPage /></AnimatedRoute>} />
-                <Route path="/scores" element={<AnimatedRoute><ScoresPage /></AnimatedRoute>} />
-                <Route path="/scores/:sport" element={<AnimatedRoute><ScoresPage /></AnimatedRoute>} />
-                <Route path="/predictions" element={<AnimatedRoute><PredictionsPage /></AnimatedRoute>} />
-                <Route path="/predictions/new/:matchId" element={<AnimatedRoute><MakePredictionPage /></AnimatedRoute>} />
+                <Route path="/dashboard" element={<AnimatedRoute><DashboardPage /></AnimatedRoute>} />
+                <Route path="/rooms/new" element={<AnimatedRoute><RoomWizardPage /></AnimatedRoute>} />
+                <Route path="/rooms/:roomId/lobby" element={<AnimatedRoute><RoomLobbyPage /></AnimatedRoute>} />
+                <Route path="/rooms/:roomId/auction" element={<AnimatedRoute><AuctionRoomPage /></AnimatedRoute>} />
+                <Route path="/rooms/:roomId/franchise/:userId" element={<AnimatedRoute><FranchisePage /></AnimatedRoute>} />
                 <Route path="/leaderboard" element={<AnimatedRoute><LeaderboardPage /></AnimatedRoute>} />
-                <Route path="/leaderboard/:leagueId" element={<AnimatedRoute><LeaderboardPage /></AnimatedRoute>} />
-                <Route path="/leagues" element={<AnimatedRoute><LeaguesPage /></AnimatedRoute>} />
-                <Route path="/leagues/create" element={<AnimatedRoute><CreateLeaguePage /></AnimatedRoute>} />
-                <Route path="/leagues/:leagueId" element={<AnimatedRoute><LeagueRoomPage /></AnimatedRoute>} />
-                <Route path="/squads" element={<AnimatedRoute><SquadsPage /></AnimatedRoute>} />
-                <Route path="/squads/:squadId" element={<AnimatedRoute><SquadPage /></AnimatedRoute>} />
-                <Route path="/explore" element={<AnimatedRoute><ExplorePage /></AnimatedRoute>} />
-                <Route path="/highlights" element={<AnimatedRoute><HighlightsPage /></AnimatedRoute>} />
+                <Route path="/matches/:matchId" element={<AnimatedRoute><MatchCenterPage /></AnimatedRoute>} />
+                <Route path="/players/:playerId" element={<AnimatedRoute><PlayerProfilePage /></AnimatedRoute>} />
                 <Route path="/profile/:userId" element={<AnimatedRoute><ProfilePage /></AnimatedRoute>} />
                 <Route path="/profile/me" element={<AnimatedRoute><MyProfilePage /></AnimatedRoute>} />
                 <Route path="/profile/me/settings" element={<AnimatedRoute><SettingsPage /></AnimatedRoute>} />
                 <Route path="/profile/me/notifications" element={<AnimatedRoute><NotificationsPage /></AnimatedRoute>} />
-                <Route path="/standings/:sport" element={<AnimatedRoute><StandingsPage /></AnimatedRoute>} />
-                <Route path="/teams/:teamId" element={<AnimatedRoute><TeamPage /></AnimatedRoute>} />
-                <Route path="/players/:playerId" element={<AnimatedRoute><PlayerPage /></AnimatedRoute>} />
-                <Route path="/achievements" element={<AnimatedRoute><AchievementsPage /></AnimatedRoute>} />
-                <Route path="/activity" element={<AnimatedRoute><ActivityPage /></AnimatedRoute>} />
                 <Route path="/messages" element={<AnimatedRoute><MessagesPage /></AnimatedRoute>} />
                 <Route path="/pricing" element={<AnimatedRoute><PricingPage /></AnimatedRoute>} />
                 <Route path="/search" element={<AnimatedRoute><SearchPage /></AnimatedRoute>} />

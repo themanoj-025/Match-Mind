@@ -1,36 +1,24 @@
 services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: matchmind-db
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: auctionxi-api
     restart: unless-stopped
     ports:
-      - "5433:5432"      # Port 5433 to avoid conflict with native PostgreSQL on 5432
+      - "3001:3001"
     environment:
-      POSTGRES_USER: matchmind
-      POSTGRES_PASSWORD: matchmind_pass
-      POSTGRES_DB: matchmind
+      NODE_ENV: production
+      PORT: 3001
+      DATA_DIR: /app/data
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - data:/app/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U matchmind"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
-  redis:
-    image: redis:7-alpine
-    container_name: matchmind-redis
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
-    volumes:
-      - redisdata:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
 volumes:
-  pgdata:
-  redisdata:
+  data:

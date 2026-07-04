@@ -15,15 +15,14 @@ router.use(authenticateToken, requireAdmin)
 /** Create an AdminService instance from the Express app's prisma client */
 function getAdminService(req: AuthenticatedRequest) {
   const prisma = req.app.get('prisma')
-  const { userRepository, matchRepository, reportRepository, adminLogRepository } = createRepositories(prisma)
+  const { userRepository, reportRepository, adminLogRepository } = createRepositories(prisma)
   return new AdminService({
     userRepository,
-    matchRepository,
     reportRepository,
     adminLogRepository,
     prisma: {
-      prediction: { count: (opts?: any) => prisma.prediction.count(opts) },
       user: { count: (opts?: any) => prisma.user.count(opts) },
+      room: { count: (opts?: any) => prisma.room.count(opts) },
     },
   })
 }
@@ -40,12 +39,7 @@ router.get('/stats', asyncHandler(async (req: AuthenticatedRequest, res) => {
   res.json({
     ...stats,
     sportDistribution: [
-      { name: 'Football', value: 45 },
-      { name: 'Basketball', value: 25 },
-      { name: 'NFL', value: 15 },
-      { name: 'Tennis', value: 8 },
-      { name: 'Cricket', value: 5 },
-      { name: 'Hockey', value: 2 },
+      { name: 'Football', value: 100 },
     ],
   })
 }))
@@ -111,11 +105,8 @@ router.get('/users/:id', asyncHandler(async (req: AuthenticatedRequest, res) => 
       subscription: true,
       _count: {
         select: {
-          predictions: true,
           followers: true,
           following: true,
-          leagues: true,
-          squads: true,
           notifications: true,
         },
       },
@@ -219,7 +210,7 @@ router.get('/matches', asyncHandler(async (req: AuthenticatedRequest, res) => {
         status: true,
         scheduledAt: true,
         competition: true,
-        _count: { select: { predictions: true } },
+        _count: { select: {} },
       },
       orderBy: { scheduledAt: 'desc' },
       skip: (page - 1) * limit,

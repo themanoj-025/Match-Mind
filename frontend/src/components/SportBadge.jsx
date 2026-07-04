@@ -2,11 +2,6 @@ import React from 'react'
 
 const sportConfig = {
   football: { icon: '⚽', color: 'var(--sport-football)', label: 'Football' },
-  basketball: { icon: '🏀', color: 'var(--sport-basketball)', label: 'Basketball' },
-  american_football: { icon: '🏈', color: 'var(--sport-american-fb)', label: 'NFL' },
-  tennis: { icon: '🎾', color: 'var(--sport-tennis)', label: 'Tennis' },
-  cricket: { icon: '🏏', color: 'var(--sport-cricket)', label: 'Cricket' },
-  hockey: { icon: '🏒', color: 'var(--sport-hockey)', label: 'Hockey' },
 }
 
 export default function SportBadge({ sport, size = 'md', showLabel = true }) {

@@ -1,81 +1,74 @@
 import express from 'express'
+import { authenticateToken } from '../middleware/auth'
 import asyncHandler from '../middleware/asyncHandler'
-import { toLeaderboardEntry } from '../services/leaderboardMapper'
+import { computeRoomLeaderboard } from '../services/leaderboardService'
 import type { AuthenticatedRequest } from '../middleware/auth'
+import logger from '../utils/logger'
 
 const router = express.Router()
 
-// GET /api/leaderboard/global
+// GET /api/rooms/:roomId/leaderboard — per-room leaderboard from fantasyPointsLedger
+router.get('/rooms/:roomId', asyncHandler(async (req, res) => {
+  const prisma = req.app.get('prisma')
+  const roomId = req.params.roomId as string
+
+  // Get the room to verify it exists
+  const room = await prisma.room.findUnique({
+    where: { id: roomId },
+    select: { id: true, tournamentId: true },
+  })
+  if (!room) {
+    return res.status(404).json({ error: { code: 'ROOM_NOT_FOUND', message: 'Room not found' } })
+  }
+
+  // Fetch all fantasy points ledger entries for this room
+  const ledger = await prisma.fantasyPointsLedger.findMany({
+    where: { roomId },
+  })
+
+  // Fetch all roster entries for cost calculation
+  const rosters = await prisma.roster.findMany({
+    where: { roomId },
+    select: { userId: true, soldPrice: true },
+  })
+
+  // Compute the leaderboard as a derived view
+  const entries = computeRoomLeaderboard(ledger, roomId, rosters)
+
+  res.json({
+    roomId: room.id,
+    tournamentId: room.tournamentId,
+    entries,
+    totalFixtures: ledger.length > 0
+      ? new Set(ledger.map((l: any) => l.fixtureId)).size
+      : 0,
+  })
+}))
+
+// GET /api/leaderboard/global — deprecated, redirects to a default tournament
 router.get('/global', asyncHandler(async (req, res) => {
-  const prisma = req.app.get('prisma')
-  const users = await prisma.user.findMany({
-    orderBy: { totalPoints: 'desc' },
-    select: { id: true, username: true, displayName: true, avatar: true, totalPoints: true, predAccuracy: true, streakCurrent: true, tier: true, countryCode: true },
-    take: 100,
-  })
-  res.json(users.map((u: any, i: number) => toLeaderboardEntry(u, i + 1)))
+  res.json({ message: 'Use /api/rooms/:roomId/leaderboard for per-room leaderboards' })
 }))
 
-// GET /api/leaderboard/sport/:sport
-router.get('/sport/:sport', asyncHandler(async (req, res) => {
-  const prisma = req.app.get('prisma')
-  const users = await prisma.user.findMany({
-    orderBy: { totalPoints: 'desc' },
-    take: 100,
-    select: { id: true, username: true, displayName: true, avatar: true, totalPoints: true, predAccuracy: true, streakCurrent: true, tier: true },
-  })
-  res.json(users.map((u: any, i: number) => toLeaderboardEntry(u, i + 1)))
+// DELETE /api/leaderboard/sport/:sport — removed (single-sport platform)
+router.get('/sport/:sport', asyncHandler(async (_req, res) => {
+  res.json({ message: 'Single-sport platform. Use /api/rooms/:roomId/leaderboard' })
 }))
 
-// GET /api/leaderboard/weekly
-router.get('/weekly', asyncHandler(async (req, res) => {
-  const prisma = req.app.get('prisma')
-  const users = await prisma.user.findMany({
-    orderBy: { weeklyPoints: 'desc' },
-    select: { id: true, username: true, displayName: true, avatar: true, weeklyPoints: true, predAccuracy: true, streakCurrent: true, tier: true, totalPoints: true },
-    take: 100,
-  })
-  res.json(users.map((u: any, i: number) => toLeaderboardEntry(u, i + 1, { pointField: 'weeklyPoints' })))
+// DELETE /api/leaderboard/weekly — removed (prediction streaks no longer exist)
+router.get('/weekly', asyncHandler(async (_req, res) => {
+  res.json({ message: 'Weekly ranking replaced by per-room fantasy leaderboard' })
 }))
 
-// GET /api/leaderboard/history/:period
-router.get('/history/:period', asyncHandler(async (req, res) => {
-  const prisma = req.app.get('prisma')
-  const period = String(req.params.period).toUpperCase()
-  if (period !== 'WEEKLY' && period !== 'MONTHLY') {
-    return res.status(400).json({ error: { code: 'INVALID_PERIOD', message: 'Invalid period. Use WEEKLY or MONTHLY' } })
-  }
-
-  const snapshot = await prisma.leaderboardSnapshot.findFirst({
-    where: { period },
-    orderBy: { createdAt: 'desc' },
-  })
-
-  if (!snapshot) {
-    return res.status(404).json({ error: { code: 'NO_SNAPSHOT', message: `No ${period} snapshot found` } })
-  }
-
-  res.json(snapshot)
+// DELETE /api/leaderboard/history/:period — removed (no more leaderboard snapshots from predictions)
+router.get('/history/:period', asyncHandler(async (_req, res) => {
+  res.json({ message: 'History not available. Fantasy points accumulate by fixture.' })
 }))
 
-// GET /api/leaderboard/friends
-router.get('/friends', asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
-  // Only return users that the current user follows (if authenticated)
-  if (!req.userId) {
-    return res.json([])
-  }
-  const follows = await prisma.follow.findMany({
-    where: { followerId: req.userId },
-    include: {
-      following: {
-        select: { id: true, username: true, displayName: true, avatar: true, totalPoints: true, predAccuracy: true, streakCurrent: true, tier: true },
-      },
-    },
-  })
-  const followedUsers = follows.map((f: any) => f.following)
-  followedUsers.sort((a: any, b: any) => b.totalPoints - a.totalPoints)
-  res.json(followedUsers.map((u: any, i: number) => toLeaderboardEntry(u, i + 1)))
+// DELETE /api/leaderboard/friends — simplified to show all users in a room
+router.get('/friends', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
+  // For now, return empty. Future: show cross-room aggregate ranking
+  res.json([])
 }))
 
 export default router

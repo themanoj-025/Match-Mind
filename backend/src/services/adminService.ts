@@ -5,7 +5,7 @@
  * Route handlers become thin HTTP adapters that call this service.
  */
 
-import type { IUserRepository, IMatchRepository } from '../repositories/types'
+import type { IUserRepository } from '../repositories/types'
 import logger from '../utils/logger'
 
 // ─── Dashboard Stats ─────────────────────────────────
@@ -13,10 +13,10 @@ import logger from '../utils/logger'
 export interface DashboardStats {
   totalUsers: number
   activeUsers: number
-  predictionsToday: number
+  activeRooms: number
+  liveAuctions: number
   proUsers: number
   pendingReports: number
-  scheduledMatches: number
   signupTrend: Array<{ day: string; signups: number }>
 }
 
@@ -24,12 +24,11 @@ export interface DashboardStats {
 
 export interface AdminServiceDeps {
   userRepository: IUserRepository
-  matchRepository: IMatchRepository
   reportRepository: { count: (where?: Record<string, unknown>) => Promise<number> }
   adminLogRepository: { create: (data: Record<string, unknown>) => Promise<unknown> }
   prisma: {
-    prediction: { count: (opts?: any) => Promise<number> }
     user: { count: (opts?: any) => Promise<number> }
+    room: { count: (opts?: any) => Promise<number> }
   }
 }
 
@@ -44,15 +43,15 @@ export class AdminService {
    * Get aggregated dashboard metrics.
    */
   async getDashboardStats(): Promise<DashboardStats> {
-    const { prisma, userRepository, matchRepository, reportRepository } = this.deps
+    const { prisma, userRepository, reportRepository } = this.deps
 
-    const [totalUsers, activeUsers, predictionsToday, proUsers, reports, matches] = await Promise.all([
+    const [totalUsers, activeUsers, activeRooms, liveAuctions, proUsers, reports] = await Promise.all([
       userRepository.count(),
       prisma.user.count({ where: { lastActiveAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } } as any }),
-      prisma.prediction.count({ where: { createdAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } } as any }),
+      prisma.room.count({ where: {} as any }),
+      prisma.room.count({ where: { status: 'DRAFTING' } as any }),
       prisma.user.count({ where: { isPro: true } as any }),
       reportRepository.count({ where: { status: 'pending' } }),
-      matchRepository.count({ where: { status: 'SCHEDULED' } }),
     ])
 
     // Signup trend (last 7 days)
@@ -74,10 +73,10 @@ export class AdminService {
     return {
       totalUsers,
       activeUsers,
-      predictionsToday,
+      activeRooms,
+      liveAuctions,
       proUsers,
       pendingReports: reports,
-      scheduledMatches: matches,
       signupTrend,
     }
   }

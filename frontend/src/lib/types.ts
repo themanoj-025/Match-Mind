@@ -1,3 +1,16 @@
+// ─── Tournament ────────────────────────────────────────
+export type TournamentId = 'fifa-wc-2026' | 'uefa-ucl-2026-27'
+
+export interface Tournament {
+  id: TournamentId
+  name: string
+  shortName: string
+  status: 'UPCOMING' | 'LIVE' | 'COMPLETED'
+  confederation: string
+  hosts?: string[]
+  theme: { primary: string; accent: string }
+}
+
 // ─── User ──────────────────────────────────────────────
 export interface User {
   id: string
@@ -15,149 +28,116 @@ export interface User {
 
 export type Tier = 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM' | 'DIAMOND' | 'LEGEND'
 
-// ─── Match ─────────────────────────────────────────────
-export interface Match {
-  id: string
-  homeTeam: string
-  awayTeam: string
-  homeTeamLogo: string | null
-  awayTeamLogo: string | null
-  homeScore: number | null
-  awayScore: number | null
-  status: MatchStatus
-  minute: number | null
-  competition: string
-  sport: Sport
-  stadium: string | null
-  scheduledAt: string | null
-  viewersCount?: number
-  homeTeamName?: string
-  awayTeamName?: string
-}
-
-export type MatchStatus = 'SCHEDULED' | 'LIVE' | 'SIMULATING' | 'HALFTIME' | 'FINISHED' | 'COMPLETED' | 'FT' | 'scheduled'
-
-export type Sport = 'football' | 'basketball' | 'american_football' | 'tennis' | 'cricket' | 'hockey'
-
-// ─── Team ──────────────────────────────────────────────
-export interface Team {
-  id: string
-  name: string
-  logo: string | null
-  sport: Sport
-}
-
-// ─── Player ────────────────────────────────────────────
+// ─── Player (AuctionXI) ────────────────────────────────
 export interface Player {
   id: string
+  tournamentId: TournamentId
   name: string
-  team: string
-  sport: Sport
-  position?: string
-  number?: number
+  club: string
+  nationality: string
+  position: 'GK' | 'DEF' | 'MID' | 'FWD'
+  basePrice: number
+  photoUrl?: string
 }
 
-// ─── Match Stats ───────────────────────────────────────
-export interface MatchStats {
-  possession: [number, number]
-  shots: [number, number]
-  shotsOnTarget: [number, number]
-  corners: [number, number]
-  fouls: [number, number]
-  yellowCards: [number, number]
-  xg: [number, number]
-}
-
-// ─── Lineups ───────────────────────────────────────────
-export interface Lineup {
-  formation: string
-  players: string[]
-}
-
-export interface Lineups {
-  home: Lineup
-  away: Lineup
-}
-
-// ─── H2H ───────────────────────────────────────────────
-export interface H2HMeeting {
-  date: string
-  score: string
-}
-
-export interface H2H {
-  homeWins: number
-  draws: number
-  awayWins: number
-  lastMeetings: H2HMeeting[]
-}
-
-// ─── Timeline Event ────────────────────────────────────
-export interface TimelineEvent {
-  minute: number
-  type: 'goal' | 'yellow' | 'red' | 'substitution' | 'penalty'
-  team: 'home' | 'away'
-  description: string
-  scorer?: string
-}
-
-// ─── Prediction ────────────────────────────────────────
-export interface Prediction {
+// ─── Room (Auction room, replaces League) ──────────────
+export interface Room {
   id: string
-  matchId: string
-  userId: string
-  homeGoals: number
-  awayGoals: number
-  firstScorer?: string
-  totalGoalsOU?: string
-  btts?: boolean
-  pointsAwarded?: number
-  status?: string
-  createdAt?: string
-}
-
-export interface CreatePredictionInput {
-  matchId: string
-  homeGoals: number
-  awayGoals: number
-  firstScorer?: string
-  totalGoalsOU?: string
-  btts?: boolean
-}
-
-// ─── Leaderboard ───────────────────────────────────────
-export interface LeaderboardEntry {
-  id?: string
-  userId: string
-  username: string
-  displayName: string
-  name?: string
-  avatar: string | null
-  totalPoints: number
-  points?: number
-  accuracy?: number
-  predAccuracy?: number
-  streak?: number
-  rank: number
-  tier: Tier
-}
-
-// ─── League ────────────────────────────────────────────
-export interface League {
-  id: string
+  tournamentId: TournamentId
+  hostId: string
   name: string
-  description?: string
-  inviteCode?: string
-  memberCount: number
+  inviteCode: string
+  totalBudget: number
+  rosterRules: { GK: number; DEF: number; MID: number; FWD: number; total: number }
+  status: 'LOBBY' | 'DRAFTING' | 'PAUSED' | 'COMPLETED'
   createdAt: string
+  members?: RoomMember[]
+  auctionState?: AuctionState
 }
 
-// ─── Squad ─────────────────────────────────────────────
-export interface Squad {
+export interface RoomMember {
   id: string
-  name: string
-  sport: Sport
-  playerCount: number
+  roomId: string
+  userId: string
+  role: 'host' | 'member'
+  remainingBudget: number
+  user?: { id: string; username: string; displayName: string; avatar: string | null }
+}
+
+export interface AuctionState {
+  roomId: string
+  phase: 'IDLE' | 'PLAYER_LIVE' | 'SOLD' | 'UNSOLD' | 'RE_AUCTION' | 'FINISHED'
+  currentPlayerId: string | null
+  currentBid: number
+  currentBidderId: string | null
+  timerEndsAt: string | null
+  poolQueue: string[]
+  unsoldPlayerIds: string[]
+  version: number
+}
+
+export interface Bid {
+  id: string
+  roomId: string
+  playerId: string
+  userId: string
+  amount: number
+  timestamp: string
+  version: number
+}
+
+export interface RosterEntry {
+  id: string
+  roomId: string
+  userId: string
+  playerId: string
+  soldPrice: number
+  acquiredAt: string
+  isCaptain: boolean
+  isViceCaptain: boolean
+  player?: Player
+}
+
+// ─── Fixture (real match) ──────────────────────────────
+export interface Fixture {
+  id: string
+  tournamentId: TournamentId
+  homeTeam: string
+  awayTeam: string
+  homeScore: number | null
+  awayScore: number | null
+  status: 'SCHEDULED' | 'LIVE' | 'HALFTIME' | 'COMPLETED'
+  scheduledAt: string
+  playerMatchStats?: PlayerMatchStat[]
+}
+
+export interface PlayerMatchStat {
+  id: string
+  fixtureId: string
+  playerId: string
+  minutesPlayed: number
+  goals: number
+  assists: number
+  cleanSheet: boolean
+  saves: number
+  penaltiesSaved: number
+  yellowCards: number
+  redCards: number
+  penaltiesMissed: number
+  ownGoals: number
+  goalsConceded: number
+}
+
+// ─── Fantasy Points ────────────────────────────────────
+export interface FantasyPointsResult {
+  playerId: string
+  userId: string
+  roomId: string
+  fixtureId: string
+  basePoints: number
+  captainMultiplier: number
+  totalPoints: number
+  breakdown: Record<string, number>
 }
 
 // ─── Notification ──────────────────────────────────────
@@ -175,6 +155,7 @@ export interface Notification {
 export interface ChatMessage {
   id: string | number
   user: {
+    id?: string
     name: string
     avatar: string | null
     tier?: Tier
@@ -190,12 +171,31 @@ export interface ChatMessage {
   isSystem?: boolean
 }
 
+// ─── Leaderboard ───────────────────────────────────────
+export interface LeaderboardEntry {
+  id?: string
+  userId: string
+  username: string
+  displayName: string
+  avatar: string | null
+  totalPoints: number
+  rank: number
+  tier: Tier
+}
+
+// ─── Squad (friend group) → Franchise ──────────────────
+export interface Squad {
+  id: string
+  name: string
+  playerCount: number
+}
+
 // ─── Admin ─────────────────────────────────────────────
 export interface AdminStats {
   totalUsers: number
-  totalMatches: number
-  totalPredictions: number
-  activeUsers: number
+  activeRooms: number
+  liveAuctions: number
+  proUsers: number
 }
 
 export interface AdminLogEntry {
@@ -213,27 +213,6 @@ export interface ApiError {
     code: string
     message: string
   }
-}
-
-// ─── Highlight ─────────────────────────────────────────
-export interface Highlight {
-  id: string
-  matchId: string
-  title: string
-  videoUrl?: string
-  thumbnailUrl?: string
-  sport: Sport
-  createdAt: string
-}
-
-// ─── Standings ─────────────────────────────────────────
-export interface StandingEntry {
-  teamName: string
-  played: number
-  won: number
-  drawn: number
-  lost: number
-  points: number
 }
 
 // ─── Stripe Status ─────────────────────────────────────
