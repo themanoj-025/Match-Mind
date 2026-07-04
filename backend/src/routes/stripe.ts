@@ -1,18 +1,20 @@
-const express = require('express')
+import express from 'express'
+import { authenticateToken } from '../middleware/auth'
+import { validate } from '../middleware/validate'
+import { createCheckoutSchema } from '../config/schemas'
+import asyncHandler from '../middleware/asyncHandler'
+import logger from '../utils/logger'
+import type { AuthenticatedRequest } from '../middleware/auth'
+
 const router = express.Router()
-const { authenticateToken } = require('../middleware/auth')
-const { validate } = require('../middleware/validate')
-const { createCheckoutSchema } = require('../config/schemas')
-const asyncHandler = require('../middleware/asyncHandler')
-const logger = require('../utils/logger')
 
 /**
  * POST /api/stripe/create-checkout
  * Creates a Stripe Checkout Session for Pro subscription
  */
-router.post('/create-checkout', authenticateToken, validate(createCheckoutSchema), asyncHandler(async (req, res) => {
+router.post('/create-checkout', authenticateToken, validate(createCheckoutSchema), asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
-  const { plan } = req.body // 'monthly' | 'annual'
+  const { plan } = req.body as { plan: string } // 'monthly' | 'annual'
 
   const user = await prisma.user.findUnique({ where: { id: req.userId } })
   if (!user) return res.status(404).json({ error: { code: 'USER_NOT_FOUND', message: 'User not found' } })
@@ -20,7 +22,7 @@ router.post('/create-checkout', authenticateToken, validate(createCheckoutSchema
   // If user already has a Stripe customer, reuse it
   const existingSub = await prisma.subscription.findUnique({ where: { userId: user.id } })
 
-  let stripe
+  let stripe: any
   try {
     stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
   } catch {
@@ -60,14 +62,14 @@ router.post('/create-checkout', authenticateToken, validate(createCheckoutSchema
  * Stripe webhook handler — listens for subscription lifecycle events
  */
 router.post('/webhook', async (req, res) => {
-  const sig = req.headers['stripe-signature']
-  let event
+  const sig = req.headers['stripe-signature'] as string
+  let event: any
 
   try {
     const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
     const body = Buffer.isBuffer(req.body) ? req.body : JSON.stringify(req.body)
     event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET)
-  } catch (err) {
+  } catch (err: any) {
     logger.error({ event: 'stripe.webhook_verification_failed', err: err.message }, 'Stripe webhook signature verification failed')
     return res.status(400).send(`Webhook Error: ${err.message}`)
   }
@@ -118,7 +120,7 @@ router.post('/webhook', async (req, res) => {
               proExpiresAt: new Date(sub.current_period_end * 1000),
             },
           })
-        } catch (err) {
+        } catch (err: any) {
           logger.error({ event: 'stripe.subscription_creation_failed', err: err.message }, 'Failed to process subscription')
         }
       }
@@ -157,7 +159,7 @@ router.post('/webhook', async (req, res) => {
             data: { isPro: false, proExpiresAt: null },
           })
         }
-      } catch (err) {
+      } catch (err: any) {
         logger.error({ event: 'stripe.subscription_update_failed', err: err.message }, 'Subscription update failed')
       }
       break
@@ -180,7 +182,7 @@ router.post('/webhook', async (req, res) => {
           where: { id: existing.userId },
           data: { isPro: false, proExpiresAt: null },
         })
-      } catch (err) {
+      } catch (err: any) {
         logger.error({ event: 'stripe.subscription_deletion_failed', err: err.message }, 'Subscription deletion failed')
       }
       break
@@ -197,7 +199,7 @@ router.post('/webhook', async (req, res) => {
  * POST /api/stripe/create-portal-session
  * Creates a Stripe Customer Portal session for managing billing
  */
-router.post('/create-portal-session', authenticateToken, asyncHandler(async (req, res) => {
+router.post('/create-portal-session', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const sub = await prisma.subscription.findUnique({ where: { userId: req.userId } })
 
@@ -205,7 +207,7 @@ router.post('/create-portal-session', authenticateToken, asyncHandler(async (req
     return res.status(400).json({ error: { code: 'NO_SUBSCRIPTION', message: 'No active subscription found' } })
   }
 
-  let stripe
+  let stripe: any
   try {
     stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
   } catch {
@@ -224,7 +226,7 @@ router.post('/create-portal-session', authenticateToken, asyncHandler(async (req
  * GET /api/stripe/status
  * Returns the current user's subscription status
  */
-router.get('/status', authenticateToken, asyncHandler(async (req, res) => {
+router.get('/status', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
 
   const user = await prisma.user.findUnique({
@@ -252,4 +254,4 @@ router.get('/status', authenticateToken, asyncHandler(async (req, res) => {
   })
 }))
 
-module.exports = router
+export default router

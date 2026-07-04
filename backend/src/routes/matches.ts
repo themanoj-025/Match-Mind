@@ -1,17 +1,19 @@
-const express = require('express')
+import express from 'express'
+import { authenticateToken } from '../middleware/auth'
+import { requireAdmin } from '../middleware/requireAdmin'
+import { finalizeMatch } from '../workflows/finalizeMatch'
+import { validate } from '../middleware/validate'
+import { finishMatchSchema } from '../config/schemas'
+import asyncHandler from '../middleware/asyncHandler'
+import type { AuthenticatedRequest } from '../middleware/auth'
+
 const router = express.Router()
-const { authenticateToken } = require('../middleware/auth')
-const { requireAdmin } = require('../middleware/requireAdmin')
-const { finalizeMatch } = require('../workflows/finalizeMatch')
-const { validate } = require('../middleware/validate')
-const { finishMatchSchema } = require('../config/schemas')
-const asyncHandler = require('../middleware/asyncHandler')
 
 // GET /api/matches
 router.get('/', asyncHandler(async (req, res) => {
   const prisma = req.app.get('prisma')
-  const { sport, date, status } = req.query
-  const where = {}
+  const { sport, date, status } = req.query as { sport?: string; date?: string; status?: string }
+  const where: Record<string, any> = {}
   if (sport && sport !== 'all') where.sport = sport.toUpperCase()
   if (status) where.status = status.toUpperCase()
   if (date) {
@@ -42,14 +44,14 @@ router.get('/:id/stats', asyncHandler(async (req, res) => {
     orderBy: { minute: 'asc' },
   })
 
-  const goalEvents = events.filter((e) => e.type === 'GOAL')
-  const yellowCards = events.filter((e) => e.type === 'YELLOW_CARD')
-  const redCards = events.filter((e) => e.type === 'RED_CARD')
-  const possessionTicks = events.filter((e) => e.type === 'POSSESSION_TICK')
+  const goalEvents = events.filter((e: any) => e.type === 'GOAL')
+  const yellowCards = events.filter((e: any) => e.type === 'YELLOW_CARD')
+  const redCards = events.filter((e: any) => e.type === 'RED_CARD')
+  const possessionTicks = events.filter((e: any) => e.type === 'POSSESSION_TICK')
 
   // Compute average possession from ticks
   const avgHomePossession = possessionTicks.length > 0
-    ? Math.round(possessionTicks.reduce((sum, e) => sum + (e.detail?.homePossession || 50), 0) / possessionTicks.length)
+    ? Math.round(possessionTicks.reduce((sum: number, e: any) => sum + (e.detail?.homePossession || 50), 0) / possessionTicks.length)
     : 50
 
   res.json({
@@ -58,7 +60,7 @@ router.get('/:id/stats', asyncHandler(async (req, res) => {
     awayScore: match.awayScore,
     status: match.status,
     events: events.length,
-    goals: goalEvents.map((e) => ({
+    goals: goalEvents.map((e: any) => ({
       minute: e.minute,
       teamId: e.teamId,
       detail: e.detail,
@@ -157,8 +159,8 @@ router.get('/:id/h2h', asyncHandler(async (req, res) => {
     homeWins,
     awayWins,
     draws,
-    avgHomeGoals: pastMatches.length > 0 ? (totalHomeGoals / pastMatches.length).toFixed(1) : 0,
-    avgAwayGoals: pastMatches.length > 0 ? (totalAwayGoals / pastMatches.length).toFixed(1) : 0,
+    avgHomeGoals: pastMatches.length > 0 ? (totalHomeGoals / pastMatches.length).toFixed(1) : '0',
+    avgAwayGoals: pastMatches.length > 0 ? (totalAwayGoals / pastMatches.length).toFixed(1) : '0',
     recentResults: pastMatches.slice(0, 5).map((m) => ({
       id: m.id,
       date: m.finishedAt,
@@ -171,9 +173,9 @@ router.get('/:id/h2h', asyncHandler(async (req, res) => {
 }))
 
 // POST /api/matches/:id/finish — manual finish (legacy, for admin override)
-router.post('/:id/finish', authenticateToken, requireAdmin, validate(finishMatchSchema), asyncHandler(async (req, res) => {
+router.post('/:id/finish', authenticateToken, requireAdmin, validate(finishMatchSchema), asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
-  const { homeScore, awayScore } = req.body
+  const { homeScore, awayScore } = req.body as { homeScore?: number; awayScore?: number }
 
   const match = await prisma.match.findUnique({ where: { id: req.params.id } })
   if (!match) {
@@ -183,7 +185,7 @@ router.post('/:id/finish', authenticateToken, requireAdmin, validate(finishMatch
     return res.status(400).json({ error: { code: 'MATCH_ALREADY_FINISHED', message: 'Match already finished' } })
   }
 
-  const data = { status: 'FINISHED', finishedAt: new Date(), minute: 90 }
+  const data: Record<string, any> = { status: 'FINISHED', finishedAt: new Date(), minute: 90 }
   if (homeScore !== undefined) data.homeScore = homeScore
   if (awayScore !== undefined) data.awayScore = awayScore
 
@@ -215,4 +217,4 @@ router.get('/:id/timeline', asyncHandler(async (req, res) => {
   res.json({ matchId: req.params.id, events })
 }))
 
-module.exports = router
+export default router

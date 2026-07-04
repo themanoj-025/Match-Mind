@@ -1,23 +1,21 @@
 // ─── Sentry instrumentation (must be first) ────────────────────────────
 if (process.env.SENTRY_DSN) {
-  require('../instrument')
+  await import('../instrument')
 }
 
-// @ts-nocheck — This file is in migration to TypeScript; new code should be .ts
-
-require('dotenv').config()
-const express = require('express')
-const cors = require('cors')
-const helmet = require('helmet')
-const pinoHttp = require('pino-http')
-const cookieParser = require('cookie-parser')
-const passport = require('passport')
-const { createServer } = require('http')
-const { Server } = require('socket.io')
-const { createJsonDatabase } = require('./lib/jsonDb')
+import 'dotenv/config'
+import express from 'express'
+import cors from 'cors'
+import helmet from 'helmet'
+import pinoHttp from 'pino-http'
+import cookieParser from 'cookie-parser'
+import passport from 'passport'
+import { createServer } from 'http'
+import { Server } from 'socket.io'
+import { createJsonDatabase } from './lib/jsonDb'
 
 // ─── Validate required environment variables ──────────────────────────
-const logger = require('./utils/logger')
+import logger from './utils/logger'
 
 const REQUIRED_ENV_VARS = ['JWT_SECRET', 'DATABASE_URL']
 for (const envVar of REQUIRED_ENV_VARS) {
@@ -32,48 +30,48 @@ for (const envVar of REQUIRED_ENV_VARS) {
 const prisma = createJsonDatabase()
 let dbInitialized = false
 
-async function initDatabase() {
+async function initDatabase(): Promise<void> {
   try {
     await prisma.initialize()
     dbInitialized = true
     logger.info({ event: 'database.initialized', dbType: 'json-file' }, 'JSON Database initialized (replaces Prisma/PostgreSQL)')
 
     // Log record counts per model
-    const counts = {}
+    const counts: Record<string, number> = {}
     for (const [name, records] of Object.entries(prisma.data)) {
       if (Array.isArray(records)) counts[name] = records.length
     }
     logger.info({ event: 'database.stats', counts }, `Database loaded: ${Object.values(counts).reduce((a, b) => a + b, 0)} total records`)
-  } catch (err) {
+  } catch (err: any) {
     logger.error({ event: 'database.initialization_failed', err: err.message }, 'Failed to initialize JSON Database')
     process.exit(1)
   }
 }
 
 // Initialize Passport strategies with shared database
-const { configurePassport } = require('./config/passport')
+import { configurePassport } from './config/passport'
 configurePassport(prisma)
 
-const authRoutes = require('./routes/auth')
-const matchRoutes = require('./routes/matches')
-const predictionRoutes = require('./routes/predictions')
-const leaderboardRoutes = require('./routes/leaderboard')
-const userRoutes = require('./routes/users')
-const leagueRoutes = require('./routes/leagues')
-const squadRoutes = require('./routes/squads')
-const highlightRoutes = require('./routes/highlights')
-const aiRoutes = require('./routes/ai')
-const stripeRoutes = require('./routes/stripe')
-const adminRoutes = require('./routes/admin')
-const teamRoutes = require('./routes/teams')
-const playerRoutes = require('./routes/players')
-const searchRoutes = require('./routes/search')
-const messageRoutes = require('./routes/messages')
-const simulationRoutes = require('./routes/simulation')
-const { setupSocket } = require('./socket')
-const { createWorkers } = require('./workers/scoringWorker')
-const { queueWeeklyReset, queueMonthlyReset } = require('./workers/queue')
-const { globalLimiter, authLimiter, passwordResetLimiter, predictionLimiter } = require('./middleware/rateLimiter')
+import authRoutes from './routes/auth'
+import matchRoutes from './routes/matches'
+import predictionRoutes from './routes/predictions'
+import leaderboardRoutes from './routes/leaderboard'
+import userRoutes from './routes/users'
+import leagueRoutes from './routes/leagues'
+import squadRoutes from './routes/squads'
+import highlightRoutes from './routes/highlights'
+import aiRoutes from './routes/ai'
+import stripeRoutes from './routes/stripe'
+import adminRoutes from './routes/admin'
+import teamRoutes from './routes/teams'
+import playerRoutes from './routes/players'
+import searchRoutes from './routes/search'
+import messageRoutes from './routes/messages'
+import simulationRoutes from './routes/simulation'
+import { setupSocket } from './socket'
+import { createWorkers } from './workers/scoringWorker'
+import { queueWeeklyReset, queueMonthlyReset } from './workers/queue'
+import { globalLimiter, authLimiter, passwordResetLimiter, predictionLimiter } from './middleware/rateLimiter'
 
 const app = express()
 
@@ -90,7 +88,7 @@ const io = new Server(httpServer, {
 // Middleware
 app.use(helmet())
 app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:3000', credentials: true }))
-app.use(pinoHttp({ logger }))
+app.use(pinoHttp({ logger } as any))
 
 // Stripe webhook needs raw body BEFORE express.json() consumes it
 app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }))
@@ -125,7 +123,7 @@ app.use('/api/admin', adminRoutes)
 app.use('/api/simulation', simulationRoutes)
 
 // Health check (before error handler)
-app.get('/api/health', async (req, res) => {
+app.get('/api/health', (_req, res) => {
   const checks = {
     status: 'healthy',
     timestamp: new Date().toISOString(),
@@ -138,17 +136,17 @@ app.get('/api/health', async (req, res) => {
 })
 
 // Error handler — must be last
-const { errorHandler } = require('./middleware/errorHandler')
+import { errorHandler } from './middleware/errorHandler'
 app.use(errorHandler)
 
 // Setup Socket.io
 setupSocket(io, prisma)
 
 // Make prisma accessible to workers for socket emission
-prisma._app = app
+;(prisma as any)._app = app
 
 // Initialize BullMQ workers
-let workers = null
+let workers: any = null
 let workersCreated = false
 try {
   workers = createWorkers(prisma)
@@ -156,7 +154,7 @@ try {
   logger.info({ event: 'workers.initialized' }, 'BullMQ workers initialized (score-predictions, reset-leaderboards, recalculate-ranks)')
 
   // Safe setTimeout wrapper that avoids 32-bit signed integer overflow
-  const safeSetTimeout = (fn, delay) => {
+  const safeSetTimeout = (fn: () => void, delay: number): NodeJS.Timeout => {
     const MAX_DELAY = 2147483647 // 2^31 - 1 (max safe for setTimeout)
     if (delay > MAX_DELAY) {
       // Split into chunks: poll every 24 hours until time is right
@@ -166,7 +164,7 @@ try {
   }
 
   // Schedule weekly reset (every Monday at 00:00 UTC)
-  const scheduleWeekly = () => {
+  const scheduleWeekly = (): void => {
     const now = new Date()
     const nextMonday = new Date(now)
     nextMonday.setDate(now.getDate() + ((8 - now.getDay()) % 7 || 7))
@@ -177,7 +175,7 @@ try {
       try {
         await queueWeeklyReset()
         logger.info({ event: 'scheduler.weekly_queued' }, 'Weekly leaderboard reset queued')
-      } catch (err) {
+      } catch (err: any) {
         logger.error({ event: 'scheduler.weekly_error', err: String(err) }, 'Weekly reset error')
       }
       scheduleWeekly()
@@ -185,7 +183,7 @@ try {
   }
 
   // Schedule monthly reset (1st of each month at 00:00 UTC)
-  const scheduleMonthly = () => {
+  const scheduleMonthly = (): void => {
     const now = new Date()
     const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1)
     const msTillNextMonth = nextMonth.getTime() - now.getTime()
@@ -194,7 +192,7 @@ try {
       try {
         await queueMonthlyReset()
         logger.info({ event: 'scheduler.monthly_queued' }, 'Monthly leaderboard snapshot queued')
-      } catch (err) {
+      } catch (err: any) {
         logger.error({ event: 'scheduler.monthly_error', err: err.message }, 'Monthly reset error')
       }
       scheduleMonthly()
@@ -204,12 +202,12 @@ try {
   scheduleWeekly()
   scheduleMonthly()
   logger.info({ event: 'scheduler.initialized' }, 'Leaderboard reset schedules initialized')
-} catch (err) {
+} catch (err: any) {
   logger.warn({ event: 'workers.unavailable', err: err.message }, 'BullMQ workers not available (Redis may not be running)')
   logger.warn({ event: 'workers.fallback' }, 'Scoring will need to be triggered directly via mode=direct')
 }
 
-const PORT = process.env.PORT || 4000
+const PORT = parseInt(process.env.PORT || '4000', 10)
 
 // Start database then server
 initDatabase().then(() => {
@@ -218,11 +216,10 @@ initDatabase().then(() => {
   })
 })
 
-// Import closeWorkers at top level
-const { closeWorkers } = require('./workers/scoringWorker')
+import { closeWorkers } from './workers/scoringWorker'
 
 // Graceful shutdown
-const shutdown = async (signal) => {
+const shutdown = async (signal: string): Promise<void> => {
   logger.info({ event: 'server.shutdown', signal }, `${signal} received. Starting graceful shutdown...`)
 
   const forceExit = setTimeout(() => {
@@ -233,7 +230,7 @@ const shutdown = async (signal) => {
 
   try {
     // 1. Stop accepting new connections
-    await new Promise((resolve) => httpServer.close(resolve))
+    await new Promise<void>((resolve) => httpServer.close(() => resolve()))
     logger.info({ event: 'server.http_closed' }, 'HTTP server closed')
 
     // 2. Close BullMQ workers
@@ -247,7 +244,7 @@ const shutdown = async (signal) => {
     // 3. Persist JSON database
     await prisma.$disconnect()
     logger.info({ event: 'server.db_closed' }, 'JSON Database persisted and closed')
-  } catch (err) {
+  } catch (err: any) {
     logger.error({ event: 'server.shutdown_error', err: err.message }, 'Error during graceful shutdown')
   }
 

@@ -5,24 +5,25 @@
  * Uses mocked Prisma to avoid needing a real database.
  */
 
-const request = require('supertest')
-const express = require('express')
+import { describe, it, expect, beforeEach } from 'vitest'
+import request from 'supertest'
+import express from 'express'
+import jwt from 'jsonwebtoken'
 
 process.env.JWT_SECRET = 'test-jwt-secret-64-chars-minimum-for-testing-purposes-only'
 process.env.JWT_REFRESH_SECRET = 'test-refresh-secret-64-chars-minimum-for-testing-purposes'
 
 // ─── JWT helper ───────────────────────────────────────
 
-const jwt = require('jsonwebtoken')
-function generateTestToken(userId = 'test-user-id') {
-  return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '1h' })
+function generateTestToken(userId = 'test-user-id'): string {
+  return jwt.sign({ userId }, process.env.JWT_SECRET!, { expiresIn: '1h' })
 }
 
 // ─── Mock Prisma factory ──────────────────────────────
 
 function createMockPrisma() {
-  const predictions = []
-  const matches = {
+  const predictions: any[] = []
+  const matches: Record<string, any> = {
     'match-scheduled': { id: 'match-scheduled', status: 'SCHEDULED' },
     'match-finished': { id: 'match-finished', status: 'FINISHED', homeScore: 2, awayScore: 1 },
     'match-not-scheduled': { id: 'match-not-scheduled', status: 'CANCELLED' },
@@ -30,10 +31,10 @@ function createMockPrisma() {
 
   return {
     match: {
-      findUnique: async ({ where }) => matches[where.id] || null,
+      findUnique: async ({ where }: { where: Record<string, any> }) => (matches as any)[where.id] || null,
     },
     prediction: {
-      findUnique: async ({ where }) => {
+      findUnique: async ({ where }: { where: Record<string, any> }) => {
         if (where.userId_matchId) {
           return predictions.find(
             (p) => p.userId === where.userId_matchId.userId && p.matchId === where.userId_matchId.matchId
@@ -44,15 +45,15 @@ function createMockPrisma() {
         }
         return null
       },
-      findMany: async ({ where }) => {
+      findMany: async ({ where }: { where?: Record<string, any> }) => {
         return predictions.filter((p) => {
-          if (where.matchId && p.matchId !== where.matchId) return false
-          if (where.userId && p.userId !== where.userId) return false
-          if (where.status && p.status !== where.status) return false
+          if (where?.matchId && p.matchId !== where.matchId) return false
+          if (where?.userId && p.userId !== where.userId) return false
+          if (where?.status && p.status !== where.status) return false
           return true
         })
       },
-      create: async ({ data }) => {
+      create: async ({ data }: { data: Record<string, any> }) => {
         const prediction = {
           id: `pred-${predictions.length + 1}`,
           ...data,
@@ -65,13 +66,13 @@ function createMockPrisma() {
         predictions.push(prediction)
         return prediction
       },
-      update: async ({ where, data }) => {
+      update: async ({ where, data }: { where: Record<string, any>; data: Record<string, any> }) => {
         const idx = predictions.findIndex((p) => p.id === where.id)
         if (idx === -1) throw new Error('Prediction not found')
         Object.assign(predictions[idx], data)
         return predictions[idx]
       },
-      updateMany: async ({ where, data }) => {
+      updateMany: async ({ where, data }: { where: Record<string, any>; data: Record<string, any> }) => {
         let count = 0
         for (const p of predictions) {
           if (where.matchId && p.matchId === where.matchId) {
@@ -95,14 +96,14 @@ function createMockPrisma() {
 
 // ─── App factory ─────────────────────────────────────
 
-function createTestApp(prismaMock) {
+async function createTestApp(prismaMock: any) {
   const app = express()
   app.use(express.json())
 
   // Mock req.app.get('prisma')
-  app.use((req, res, next) => {
+  app.use((req, _res, next) => {
     const originalGet = req.app.get.bind(req.app)
-    req.app.get = (key) => {
+    req.app.get = (key: string) => {
       if (key === 'prisma') return prismaMock
       return originalGet(key)
     }
@@ -110,24 +111,24 @@ function createTestApp(prismaMock) {
   })
 
   // Auth middleware mock
-  app.use('/api/predictions', (req, res, next) => {
+  app.use('/api/predictions', (req, _res, next) => {
     const authHeader = req.headers.authorization
     if (authHeader) {
       try {
         const token = authHeader.split(' ')[1]
-        const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        req.userId = decoded.userId
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string }
+        ;(req as any).userId = decoded.userId
       } catch {
-        return res.status(401).json({ message: 'Invalid token' })
+        return (_res as any).status(401).json({ message: 'Invalid token' })
       }
     }
     next()
   })
 
-  const predictionRoutes = require('./predictions')
+  const { default: predictionRoutes } = await import('./predictions')
   app.use('/api/predictions', predictionRoutes)
 
-  app.use((err, req, res, _next) => {
+  app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
     res.status(500).json({ error: { code: 'TEST_ERROR', message: err.message } })
   })
 
@@ -141,7 +142,7 @@ describe('Prediction Routes', () => {
   describe('POST /api/predictions', () => {
     it('creates a prediction for a scheduled match', async () => {
       const prisma = createMockPrisma()
-      const app = createTestApp(prisma)
+      const app = await createTestApp(prisma)
 
       const res = await request(app)
         .post('/api/predictions')
@@ -157,7 +158,7 @@ describe('Prediction Routes', () => {
 
     it('creates a prediction with optional fields (btts, ou)', async () => {
       const prisma = createMockPrisma()
-      const app = createTestApp(prisma)
+      const app = await createTestApp(prisma)
 
       const res = await request(app)
         .post('/api/predictions')
@@ -179,7 +180,7 @@ describe('Prediction Routes', () => {
 
     it('rejects duplicate prediction for the same match', async () => {
       const prisma = createMockPrisma()
-      const app = createTestApp(prisma)
+      const app = await createTestApp(prisma)
 
       await request(app)
         .post('/api/predictions')
@@ -197,7 +198,7 @@ describe('Prediction Routes', () => {
 
     it('rejects prediction for non-existent match', async () => {
       const prisma = createMockPrisma()
-      const app = createTestApp(prisma)
+      const app = await createTestApp(prisma)
 
       const res = await request(app)
         .post('/api/predictions')
@@ -210,7 +211,7 @@ describe('Prediction Routes', () => {
 
     it('rejects prediction for non-scheduled match', async () => {
       const prisma = createMockPrisma()
-      const app = createTestApp(prisma)
+      const app = await createTestApp(prisma)
 
       const res = await request(app)
         .post('/api/predictions')
@@ -223,7 +224,7 @@ describe('Prediction Routes', () => {
 
     it('rejects prediction without authentication', async () => {
       const prisma = createMockPrisma()
-      const app = createTestApp(prisma)
+      const app = await createTestApp(prisma)
 
       const res = await request(app)
         .post('/api/predictions')
@@ -234,7 +235,7 @@ describe('Prediction Routes', () => {
 
     it('rejects prediction with negative goals', async () => {
       const prisma = createMockPrisma()
-      const app = createTestApp(prisma)
+      const app = await createTestApp(prisma)
 
       const res = await request(app)
         .post('/api/predictions')
@@ -249,7 +250,7 @@ describe('Prediction Routes', () => {
   describe('GET /api/predictions/mine', () => {
     it('returns predictions for authenticated user', async () => {
       const prisma = createMockPrisma()
-      const app = createTestApp(prisma)
+      const app = await createTestApp(prisma)
 
       // Create a prediction first
       await request(app)
@@ -271,7 +272,7 @@ describe('Prediction Routes', () => {
   describe('POST /api/predictions/score/:matchId', () => {
     it('returns 400 for non-finished match', async () => {
       const prisma = createMockPrisma()
-      const app = createTestApp(prisma)
+      const app = await createTestApp(prisma)
 
       const res = await request(app)
         .post('/api/predictions/score/match-scheduled')
@@ -283,7 +284,7 @@ describe('Prediction Routes', () => {
 
     it('returns 404 for non-existent match', async () => {
       const prisma = createMockPrisma()
-      const app = createTestApp(prisma)
+      const app = await createTestApp(prisma)
 
       const res = await request(app)
         .post('/api/predictions/score/match-ghost')
@@ -295,10 +296,9 @@ describe('Prediction Routes', () => {
 
     it('triggers scoring with direct mode', async () => {
       const prisma = createMockPrisma()
-      const app = createTestApp(prisma)
+      const app = await createTestApp(prisma)
 
       // Create a prediction for the finished match
-      // Need to bypass the scheduled check - create prediction manually
       await prisma.prediction.create({
         data: {
           userId: 'test-user-id',

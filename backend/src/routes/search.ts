@@ -1,11 +1,12 @@
-const express = require('express')
+import express from 'express'
+import asyncHandler from '../middleware/asyncHandler'
+
 const router = express.Router()
-const asyncHandler = require('../middleware/asyncHandler')
 
 // GET /api/search?q= — search across users, teams, players, and matches
 router.get('/', asyncHandler(async (req, res) => {
   const prisma = req.app.get('prisma')
-  const { q } = req.query
+  const { q } = req.query as { q?: string }
   if (!q || q.trim().length < 2) {
     return res.json({ users: [], teams: [], players: [], matches: [] })
   }
@@ -60,4 +61,4 @@ router.get('/', asyncHandler(async (req, res) => {
   res.json({ users, teams, players, matches })
 }))
 
-module.exports = router
+export default router

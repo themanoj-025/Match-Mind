@@ -1,12 +1,13 @@
-const express = require('express')
+import express from 'express'
+import asyncHandler from '../middleware/asyncHandler'
+
 const router = express.Router()
-const asyncHandler = require('../middleware/asyncHandler')
 
 // GET /api/players — list players (optional sport filter)
 router.get('/', asyncHandler(async (req, res) => {
   const prisma = req.app.get('prisma')
-  const { sport } = req.query
-  const where = {}
+  const { sport } = req.query as { sport?: string }
+  const where: Record<string, any> = {}
   if (sport && sport !== 'all') where.sport = sport.toUpperCase()
   const players = await prisma.player.findMany({
     where,
@@ -30,4 +31,4 @@ router.get('/:id', asyncHandler(async (req, res) => {
   res.json(player)
 }))
 
-module.exports = router
+export default router

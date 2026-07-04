@@ -1,18 +1,21 @@
-const express = require('express')
+import express from 'express'
+import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
+import passport from 'passport'
+import { validate } from '../middleware/validate'
+import { authenticateToken } from '../middleware/auth'
+import { signupSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema, verifyEmailSchema } from '../config/schemas'
+import { generateTokens, setAuthCookies } from '../services/tokenService'
+import { AuthService } from '../services/authService'
+import { createRepositories } from '../repositories/index'
+import asyncHandler from '../middleware/asyncHandler'
+import logger from '../utils/logger'
+import type { AuthenticatedRequest } from '../middleware/auth'
+
 const router = express.Router()
-const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
-const passport = require('passport')
-const { validate } = require('../middleware/validate')
-const { signupSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema, verifyEmailSchema } = require('../config/schemas')
-const { generateTokens, setAuthCookies } = require('../services/tokenService')
-const { AuthService } = require('../services/authService')
-const { createRepositories } = require('../repositories/index')
-const asyncHandler = require('../middleware/asyncHandler')
-const logger = require('../utils/logger')
 
 /** Create an AuthService instance from the Express app's prisma client */
-function getAuthService(req) {
+function getAuthService(req: AuthenticatedRequest) {
   const prisma = req.app.get('prisma')
   const { userRepository } = createRepositories(prisma)
   return new AuthService({ userRepository })
@@ -41,17 +44,17 @@ router.post('/login', validate(loginSchema), asyncHandler(async (req, res) => {
 }))
 
 // POST /api/auth/logout
-router.post('/logout', (req, res) => {
+router.post('/logout', (_req, res) => {
   res.clearCookie('refreshToken')
   res.json({ message: 'Logged out' })
 })
 
 // GET /api/auth/google - OAuth redirect
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }))
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }) as any)
 
 // GET /api/auth/google/cb
 router.get('/google/cb', passport.authenticate('google', { session: false }), (req, res) => {
-  const tokens = generateTokens(req.user.id)
+  const tokens = generateTokens((req as any).user.id)
   setAuthCookies(res, tokens)
   res.redirect(`${process.env.FRONTEND_URL}/feed`)
 })
@@ -82,9 +85,9 @@ router.post('/reset-password', validate(resetPasswordSchema), asyncHandler(async
   const prisma = req.app.get('prisma')
   const { token, password } = req.body
 
-  let decoded
+  let decoded: { userId: string; purpose: string }
   try {
-    decoded = jwt.verify(token, process.env.JWT_RESET_SECRET || process.env.JWT_SECRET)
+    decoded = jwt.verify(token, process.env.JWT_RESET_SECRET || process.env.JWT_SECRET!) as any
   } catch (err) {
     return res.status(400).json({
       error: { code: 'INVALID_TOKEN', message: 'Reset token is invalid or expired' },
@@ -123,9 +126,9 @@ router.post('/verify-email', validate(verifyEmailSchema), asyncHandler(async (re
   const prisma = req.app.get('prisma')
   const { token } = req.body
 
-  let decoded
+  let decoded: { userId: string; purpose: string }
   try {
-    decoded = jwt.verify(token, process.env.JWT_SECRET)
+    decoded = jwt.verify(token, process.env.JWT_SECRET!) as any
   } catch (err) {
     return res.status(400).json({
       error: { code: 'INVALID_TOKEN', message: 'Verification token is invalid or expired' },
@@ -148,8 +151,8 @@ router.post('/verify-email', validate(verifyEmailSchema), asyncHandler(async (re
 }))
 
 // POST /api/auth/resend-verification
-router.post('/resend-verification', async (req, res) => {
+router.post('/resend-verification', (_req, res) => {
   res.json({ message: 'Verification email resent.' })
 })
 
-module.exports = router
+export default router

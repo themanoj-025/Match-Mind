@@ -1,14 +1,16 @@
-const express = require('express')
+import express from 'express'
+import { authenticateToken } from '../middleware/auth'
+import { validate } from '../middleware/validate'
+import { updateProfileSchema } from '../config/schemas'
+import asyncHandler from '../middleware/asyncHandler'
+import type { AuthenticatedRequest } from '../middleware/auth'
+
 const router = express.Router()
-const { authenticateToken } = require('../middleware/auth')
-const { validate } = require('../middleware/validate')
-const { updateProfileSchema } = require('../config/schemas')
-const asyncHandler = require('../middleware/asyncHandler')
 
 // GET /api/users/check-username
 router.get('/check-username', asyncHandler(async (req, res) => {
   const prisma = req.app.get('prisma')
-  const { username } = req.query
+  const { username } = req.query as { username?: string }
   if (!username || username.length < 3) {
     return res.json({ available: false })
   }
@@ -26,9 +28,15 @@ router.get('/:id', asyncHandler(async (req, res) => {
   res.json(user)
 }))
 
-router.patch('/me', authenticateToken, validate(updateProfileSchema), asyncHandler(async (req, res) => {
+router.patch('/me', authenticateToken, validate(updateProfileSchema), asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
-  const { displayName, avatar, bio, favouriteSports, favouriteTeams } = req.body
+  const { displayName, avatar, bio, favouriteSports, favouriteTeams } = req.body as {
+    displayName?: string
+    avatar?: string | null
+    bio?: string | null
+    favouriteSports?: string[]
+    favouriteTeams?: string[]
+  }
   const user = await prisma.user.update({
     where: { id: req.userId },
     data: { displayName, avatar, bio },
@@ -40,7 +48,7 @@ router.patch('/me', authenticateToken, validate(updateProfileSchema), asyncHandl
     await prisma.userSport.deleteMany({ where: { userId: req.userId } })
     if (favouriteSports.length > 0) {
       await prisma.userSport.createMany({
-        data: favouriteSports.map((sport) => ({ userId: req.userId, sport })),
+        data: favouriteSports.map((sport: string) => ({ userId: req.userId, sport })),
       })
     }
   }
@@ -50,7 +58,7 @@ router.patch('/me', authenticateToken, validate(updateProfileSchema), asyncHandl
     await prisma.userTeam.deleteMany({ where: { userId: req.userId } })
     if (favouriteTeams.length > 0) {
       await prisma.userTeam.createMany({
-        data: favouriteTeams.map((teamId) => ({ userId: req.userId, teamId })),
+        data: favouriteTeams.map((teamId: string) => ({ userId: req.userId, teamId })),
       })
     }
   }
@@ -58,28 +66,28 @@ router.patch('/me', authenticateToken, validate(updateProfileSchema), asyncHandl
   res.json(user)
 }))
 
-router.post('/:id/follow', authenticateToken, asyncHandler(async (req, res) => {
+router.post('/:id/follow', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const follow = await prisma.follow.create({ data: { followerId: req.userId, followingId: req.params.id } })
   res.status(201).json(follow)
 }))
 
-router.delete('/:id/follow', authenticateToken, asyncHandler(async (req, res) => {
+router.delete('/:id/follow', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   await prisma.follow.deleteMany({ where: { followerId: req.userId, followingId: req.params.id } })
   res.json({ message: 'Unfollowed' })
 }))
 
-router.get('/me/notifications', authenticateToken, asyncHandler(async (req, res) => {
+router.get('/me/notifications', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const notifications = await prisma.notification.findMany({ where: { userId: req.userId }, orderBy: { createdAt: 'desc' }, take: 50 })
   res.json(notifications)
 }))
 
-router.patch('/me/notifications/read', authenticateToken, asyncHandler(async (req, res) => {
+router.patch('/me/notifications/read', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   await prisma.notification.updateMany({ where: { userId: req.userId, isRead: false }, data: { isRead: true } })
   res.json({ message: 'All notifications marked as read' })
 }))
 
-module.exports = router
+export default router

@@ -1,17 +1,31 @@
-const express = require('express')
+import express from 'express'
+import { authenticateToken } from '../middleware/auth'
+import { aiPredictionLimiter } from '../middleware/rateLimiter'
+import logger from '../utils/logger'
+import asyncHandler from '../middleware/asyncHandler'
+import type { AuthenticatedRequest } from '../middleware/auth'
+
 const router = express.Router()
-const { authenticateToken } = require('../middleware/auth')
-const { aiPredictionLimiter } = require('../middleware/rateLimiter')
-const logger = require('../utils/logger')
-const asyncHandler = require('../middleware/asyncHandler')
+
+interface Match {
+  id: string
+  homeTeamName: string
+  awayTeamName: string
+  sport: string
+  competition: string
+  homeScore?: number | null
+  awayScore?: number | null
+  status?: string
+  events?: Array<{ type: string; minute: number; scorer?: string }>
+}
 
 /**
  * POST /api/ai/predict/:matchId
  * Returns AI-powered prediction for a match
  */
-router.post('/predict/:matchId', authenticateToken, aiPredictionLimiter, asyncHandler(async (req, res) => {
+router.post('/predict/:matchId', authenticateToken, aiPredictionLimiter, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
-  const match = await prisma.match.findUnique({ where: { id: req.params.matchId } })
+  const match: Match | null = await prisma.match.findUnique({ where: { id: req.params.matchId } })
   if (!match) return res.status(404).json({ error: { code: 'MATCH_NOT_FOUND', message: 'Match not found' } })
 
   const isPro = req.userId ? await checkProStatus(prisma, req.userId) : false
@@ -28,11 +42,11 @@ router.post('/predict/:matchId', authenticateToken, aiPredictionLimiter, asyncHa
   }
 
   // Try Anthropic SDK if configured
-  let anthropicResult = null
+  let anthropicResult: any = null
   if (process.env.ANTHROPIC_API_KEY) {
     try {
       anthropicResult = await getAnthropicPrediction(match)
-    } catch (err) {
+    } catch (err: any) {
       logger.error({ event: 'ai.anthropic_error', matchId: match.id, err: err.message }, 'Anthropic API error')
     }
   }
@@ -56,9 +70,9 @@ router.post('/predict/:matchId', authenticateToken, aiPredictionLimiter, asyncHa
  * POST /api/ai/summary/:matchId
  * Generates AI match summary after match completes
  */
-router.post('/summary/:matchId', authenticateToken, aiPredictionLimiter, asyncHandler(async (req, res) => {
+router.post('/summary/:matchId', authenticateToken, aiPredictionLimiter, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
-  const match = await prisma.match.findUnique({
+  const match: any = await prisma.match.findUnique({
     where: { id: req.params.matchId },
     include: { events: { orderBy: { minute: 'asc' } } },
   })
@@ -69,7 +83,7 @@ router.post('/summary/:matchId', authenticateToken, aiPredictionLimiter, asyncHa
   res.json({ summary })
 }))
 
-async function checkProStatus(prisma, userId) {
+async function checkProStatus(prisma: any, userId: string): Promise<boolean> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: { isPro: true, proExpiresAt: true },
@@ -80,7 +94,7 @@ async function checkProStatus(prisma, userId) {
   return true
 }
 
-async function getAnthropicPrediction(match) {
+async function getAnthropicPrediction(match: Match): Promise<any> {
   const Anthropic = require('@anthropic-ai/sdk')
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
@@ -106,7 +120,7 @@ Only respond with valid JSON, no other text.`,
   })
 
   try {
-    const text = msg.content[0]?.text || '{}'
+    const text = (msg.content[0] as any)?.text || '{}'
     const parsed = JSON.parse(text)
     return {
       homeGoals: parsed.homeGoals || 1,
@@ -119,7 +133,7 @@ Only respond with valid JSON, no other text.`,
   }
 }
 
-function generatePrediction(match) {
+function generatePrediction(match: Match): { homeGoals: number; awayGoals: number; confidence: number; reasoning: string } {
   const totalGoals = 1 + Math.floor(Math.random() * 3)
   const homeWinProb = 0.45 + Math.random() * 0.2
   const homeGoals = Math.round(totalGoals * homeWinProb)
@@ -140,17 +154,17 @@ function generatePrediction(match) {
   }
 }
 
-function generateMatchSummary(match) {
+function generateMatchSummary(match: any): string {
   const homeScore = match.homeScore || 0
   const awayScore = match.awayScore || 0
   const winner = homeScore > awayScore ? match.homeTeamName : awayScore > homeScore ? match.awayTeamName : 'Draw'
-  const goalEvents = (match.events || []).filter(e => e.type === 'GOAL')
+  const goalEvents = (match.events || []).filter((e: any) => e.type === 'GOAL')
 
   if (winner === 'Draw') {
-    return `${match.homeTeamName} and ${match.awayTeamName} played out a ${homeScore}-${awayScore} draw in the ${match.competition}. ${goalEvents.length > 0 ? `Goals from ${goalEvents.map(e => e.scorer || 'unknown').join(', ')}.` : 'Neither side could find the breakthrough.'} Both teams had chances but had to settle for a point each.`
+    return `${match.homeTeamName} and ${match.awayTeamName} played out a ${homeScore}-${awayScore} draw in the ${match.competition}. ${goalEvents.length > 0 ? `Goals from ${goalEvents.map((e: any) => e.scorer || 'unknown').join(', ')}.` : 'Neither side could find the breakthrough.'} Both teams had chances but had to settle for a point each.`
   }
 
-  return `${match.homeTeamName} defeated ${match.awayTeamName} ${homeScore}-${awayScore} in the ${match.competition}. ${goalEvents.length > 0 ? `Goals from ${goalEvents.map(e => e.scorer || 'unknown').join(', ')}.` : ''} A dominant performance from ${winner}, who controlled the game from start to finish.`
+  return `${match.homeTeamName} defeated ${match.awayTeamName} ${homeScore}-${awayScore} in the ${match.competition}. ${goalEvents.length > 0 ? `Goals from ${goalEvents.map((e: any) => e.scorer || 'unknown').join(', ')}.` : ''} A dominant performance from ${winner}, who controlled the game from start to finish.`
 }
 
-module.exports = router
+export default router

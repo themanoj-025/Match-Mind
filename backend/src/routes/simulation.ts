@@ -1,11 +1,12 @@
-const express = require('express')
+import express from 'express'
+import { authenticateToken } from '../middleware/auth'
+import { requireAdmin } from '../middleware/requireAdmin'
+import { runSimulation } from '../services/simulation/simulationRunner'
+import asyncHandler from '../middleware/asyncHandler'
+import logger from '../utils/logger'
+import type { AuthenticatedRequest } from '../middleware/auth'
+
 const router = express.Router()
-const { authenticateToken } = require('../middleware/auth')
-const { requireAdmin } = require('../middleware/requireAdmin')
-const { validate } = require('../middleware/validate')
-const { runSimulation } = require('../services/simulation/simulationRunner')
-const asyncHandler = require('../middleware/asyncHandler')
-const logger = require('../utils/logger')
 
 /**
  * POST /api/matches/:id/start-simulation
@@ -13,7 +14,7 @@ const logger = require('../utils/logger')
  * Only admins can trigger simulations.
  * The simulation runs server-side and automatically marks the match FINISHED.
  */
-router.post('/:id/start-simulation', authenticateToken, requireAdmin, asyncHandler(async (req, res) => {
+router.post('/:id/start-simulation', authenticateToken, requireAdmin, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
 
   const match = await prisma.match.findUnique({ where: { id: req.params.id } })
@@ -28,7 +29,7 @@ router.post('/:id/start-simulation', authenticateToken, requireAdmin, asyncHandl
 
   // Run simulation asynchronously (don't block the response)
   const io = req.app.get('io')
-  runSimulation(prisma, io, req.params.id, { skipDelay: false }).catch((err) => {
+  runSimulation(prisma, io, req.params.id, { skipDelay: false }).catch((err: any) => {
     logger.error({ event: 'simulation.start_failed', matchId: req.params.id, err: err.message }, `Simulation failed for match ${req.params.id}`)
   })
 
@@ -40,7 +41,7 @@ router.post('/:id/start-simulation', authenticateToken, requireAdmin, asyncHandl
  * Starts a simulation synchronously (for testing/small batches).
  * Blocks until the simulation completes.
  */
-router.post('/:id/start-simulation-sync', authenticateToken, requireAdmin, asyncHandler(async (req, res) => {
+router.post('/:id/start-simulation-sync', authenticateToken, requireAdmin, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
 
   const match = await prisma.match.findUnique({ where: { id: req.params.id } })
@@ -88,4 +89,4 @@ router.get('/:id/simulation-status', asyncHandler(async (req, res) => {
   res.json(match)
 }))
 
-module.exports = router
+export default router

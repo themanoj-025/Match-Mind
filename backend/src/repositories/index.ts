@@ -19,7 +19,7 @@ import type {
 } from './types'
 
 /** Minimal type compatible with both PrismaClient and JsonDatabase */
-type DatabaseClient = {
+export type DatabaseClient = {
   [model: string]: {
     findUnique: (args: any) => Promise<any>
     findFirst: (args: any) => Promise<any>

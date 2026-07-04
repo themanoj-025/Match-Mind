@@ -3,14 +3,15 @@
  *
  * Tests authentication endpoints using supertest.
  * Uses an in-memory Prisma mock for isolated testing without a real database.
- * Mocks the AuthService module since vitest can't resolve .ts files via CommonJS require().
+ * Mocks the AuthService module for isolated testing.
  */
 
-const request = require('supertest')
-const express = require('express')
-const cookieParser = require('cookie-parser')
-const jwt = require('jsonwebtoken')
-const bcrypt = require('bcryptjs')
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import request from 'supertest'
+import express from 'express'
+import cookieParser from 'cookie-parser'
+import jwt from 'jsonwebtoken'
+import bcrypt from 'bcryptjs'
 
 // Set required env vars before importing routes
 process.env.JWT_SECRET = 'test-jwt-secret-64-chars-minimum-for-testing-purposes-only'
@@ -18,10 +19,13 @@ process.env.JWT_REFRESH_SECRET = 'test-refresh-secret-64-chars-minimum-for-testi
 process.env.JWT_RESET_SECRET = 'test-reset-secret-64-chars-minimum-for-testing-purposes-only'
 
 // ─── Mock AuthService before any route imports ──────────
-// vitest can't resolve .ts files via CommonJS require(), so we mock the service module
 vi.mock('../services/authService', () => {
   class MockAuthError extends Error {
-    constructor(message, code, statusCode) {
+    public code: string
+    public statusCode: number
+    public isAppError: boolean
+
+    constructor(message: string, code: string, statusCode: number) {
       super(message)
       this.name = 'AuthError'
       this.code = code
@@ -31,11 +35,13 @@ vi.mock('../services/authService', () => {
   }
 
   class MockAuthService {
-    constructor(deps) {
+    private deps: any
+
+    constructor(deps: any) {
       this.deps = deps
     }
 
-    async signup(username, email, password) {
+    async signup(username: string, email: string, password: string) {
       const userRepository = this.deps.userRepository
       const existing = await userRepository.findByEmailOrUsername(email, username)
       if (existing) {
@@ -46,18 +52,18 @@ vi.mock('../services/authService', () => {
         )
       }
 
-      const bcrypt = require('bcryptjs')
+      const bcryptMod = await import('bcryptjs')
       const user = await userRepository.create({
         username,
         email,
-        passwordHash: await bcrypt.hash(password, 4),
+        passwordHash: await bcryptMod.hash(password, 4),
         displayName: username,
       })
 
-      const jwt = require('jsonwebtoken')
+      const jwtMod = await import('jsonwebtoken')
       const tokens = {
-        accessToken: jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '15m' }),
-        refreshToken: jwt.sign({ userId: user.id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '30d' }),
+        accessToken: jwtMod.default.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '15m' }),
+        refreshToken: jwtMod.default.sign({ userId: user.id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '30d' }),
       }
 
       return {
@@ -74,23 +80,23 @@ vi.mock('../services/authService', () => {
       }
     }
 
-    async login(email, password) {
+    async login(email: string, password: string) {
       const userRepository = this.deps.userRepository
       const user = await userRepository.findByEmail(email)
       if (!user || !user.passwordHash) {
         throw new MockAuthError('Invalid email or password', 'INVALID_CREDENTIALS', 401)
       }
 
-      const bcrypt = require('bcryptjs')
-      const valid = await bcrypt.compare(password, user.passwordHash)
+      const bcryptMod = await import('bcryptjs')
+      const valid = await bcryptMod.compare(password, user.passwordHash)
       if (!valid) {
         throw new MockAuthError('Invalid email or password', 'INVALID_CREDENTIALS', 401)
       }
 
-      const jwt = require('jsonwebtoken')
+      const jwtMod = await import('jsonwebtoken')
       const tokens = {
-        accessToken: jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '15m' }),
-        refreshToken: jwt.sign({ userId: user.id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '30d' }),
+        accessToken: jwtMod.default.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '15m' }),
+        refreshToken: jwtMod.default.sign({ userId: user.id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '30d' }),
       }
 
       return {
@@ -107,11 +113,11 @@ vi.mock('../services/authService', () => {
       }
     }
 
-    async refreshToken(refreshToken) {
-      const jwt = require('jsonwebtoken')
-      let decoded
+    async refreshToken(refreshToken: string) {
+      const jwtMod = await import('jsonwebtoken')
+      let decoded: { userId: string }
       try {
-        decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET)
+        decoded = jwtMod.default.verify(refreshToken, process.env.JWT_REFRESH_SECRET) as { userId: string }
       } catch {
         throw new MockAuthError('Invalid or expired refresh token', 'INVALID_TOKEN', 401)
       }
@@ -121,26 +127,26 @@ vi.mock('../services/authService', () => {
         throw new MockAuthError('User not found', 'USER_NOT_FOUND', 401)
       }
 
+      const jwtMod2 = await import('jsonwebtoken')
       return {
-        accessToken: jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '15m' }),
-        refreshToken: jwt.sign({ userId: user.id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '30d' }),
+        accessToken: jwtMod2.default.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '15m' }),
+        refreshToken: jwtMod2.default.sign({ userId: user.id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '30d' }),
       }
     }
 
-    async generatePasswordResetToken(email) {
-      const user = await this.deps.userRepository.findByEmail(email)
+    async generatePasswordResetToken(_email: string) {
       // Always return success to prevent email enumeration
     }
   }
 
   return {
-    AuthService: MockAuthService,
-    AuthError: MockAuthError,
-    generateTokens: (userId) => {
-      const jwt = require('jsonwebtoken')
+    AuthService: MockAuthService as any,
+    AuthError: MockAuthError as any,
+    generateTokens: (userId: string) => {
+      const jwtMod = require('jsonwebtoken') as typeof import('jsonwebtoken')
       return {
-        accessToken: jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '15m' }),
-        refreshToken: jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET, { expiresIn: '30d' }),
+        accessToken: jwtMod.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '15m' }),
+        refreshToken: jwtMod.sign({ userId }, process.env.JWT_REFRESH_SECRET, { expiresIn: '30d' }),
       }
     },
   }
@@ -149,71 +155,43 @@ vi.mock('../services/authService', () => {
 // ─── Also mock repositories/index.ts ───────────────────
 vi.mock('../repositories/index', () => {
   class MockUserRepository {
-    constructor(prisma) {
-      this.prisma = prisma
-    }
+    private prisma: any
+    constructor(prisma: any) { this.prisma = prisma }
 
-    async findById(id) {
+    async findById(id: string) {
       try {
-        const user = await this.prisma.user.findUnique({ where: { id } })
-        return user
+        return await this.prisma.user.findUnique({ where: { id } })
       } catch { return null }
     }
-
-    async findByEmail(email) {
+    async findByEmail(email: string) {
       try {
-        const user = await this.prisma.user.findUnique({ where: { email } })
-        return user
+        return await this.prisma.user.findUnique({ where: { email } })
       } catch { return null }
     }
-
-    async findByUsername(username) {
+    async findByUsername(username: string) {
       try {
-        const user = await this.prisma.user.findUnique({ where: { username } })
-        return user
+        return await this.prisma.user.findUnique({ where: { username } })
       } catch { return null }
     }
-
-    async findByEmailOrUsername(email, username) {
+    async findByEmailOrUsername(email: string, username: string) {
       try {
-        const user = await this.prisma.user.findFirst({
-          where: { OR: [{ email }, { username }] },
-        })
-        return user
+        return await this.prisma.user.findFirst({ where: { OR: [{ email }, { username }] } })
       } catch { return null }
     }
-
-    async create(data) {
-      return this.prisma.user.create({ data })
-    }
-
-    async update(id, data) {
-      return this.prisma.user.update({ where: { id }, data })
-    }
-
-    async delete(id) {
-      await this.prisma.user.delete({ where: { id } })
-    }
-
-    async findMany(opts) {
-      return this.prisma.user.findMany(opts)
-    }
-
-    async count(where) {
-      return this.prisma.user.count({ where })
-    }
-
-    async updateMany(where, data) {
-      return this.prisma.user.updateMany({ where, data })
-    }
+    async create(data: any) { return this.prisma.user.create({ data }) }
+    async update(id: string, data: any) { return this.prisma.user.update({ where: { id }, data }) }
+    async delete(id: string) { await this.prisma.user.delete({ where: { id } }) }
+    async findMany(opts: any) { return this.prisma.user.findMany(opts) }
+    async count(where?: any) { return this.prisma.user.count({ where }) }
+    async updateMany(where: any, data: any) { return this.prisma.user.updateMany({ where, data }) }
   }
 
   return {
-    createRepositories: (prisma) => ({
+    createRepositories: (prisma: any) => ({
       userRepository: new MockUserRepository(prisma),
-      matchRepository: {},
-      predictionRepository: {},
-      leaderboardRepository: {},
+      matchRepository: {} as any,
+      predictionRepository: {} as any,
+      leaderboardRepository: {} as any,
       reportRepository: { count: async () => 0 },
       adminLogRepository: { create: async () => ({}), findMany: async () => [], count: async () => 0 },
     }),
@@ -222,27 +200,38 @@ vi.mock('../repositories/index', () => {
 
 // ─── Helpers ──────────────────────────────────────────
 
-function createTestApp(prismaMock) {
+interface MockPrisma {
+  user: {
+    findUnique: (opts: { where: Record<string, any> }) => Promise<any>
+    findFirst: (opts: { where: Record<string, any> }) => Promise<any>
+    create: (opts: { data: Record<string, any> }) => Promise<any>
+    update: (opts: { where: Record<string, any>; data: Record<string, any> }) => Promise<any>
+  }
+  session: {
+    deleteMany: (opts: { where: Record<string, any> }) => Promise<{ count: number }>
+  }
+}
+
+async function createTestApp(prismaMock: MockPrisma) {
   const app = express()
   app.use(express.json())
   app.use(cookieParser())
 
   // Override app.get('prisma') to return our mock
-  app.use((req, res, next) => {
-    req.app.get = (key) => {
+  app.use((req, _res, next) => {
+    req.app.get = (key: string) => {
       if (key === 'prisma') return prismaMock
       return null
     }
     next()
   })
 
-  // Mount routes
-  const authRoutes = require('./auth')
+  // Mount routes — dynamically import the .ts file
+  const { default: authRoutes } = await import('./auth')
   app.use('/api/auth', authRoutes)
 
   // Error handler that mimics the real one
-  app.use((err, req, res, _next) => {
-    console.error('TEST ERROR HANDLER CAUGHT:', err)
+  app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
     if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
       return res.status(401).json({ error: { code: 'INVALID_TOKEN', message: 'Invalid or expired token' } })
     }
@@ -257,21 +246,21 @@ function createTestApp(prismaMock) {
   return app
 }
 
-function createMockPrisma() {
-  const users = {}
+function createMockPrisma(): MockPrisma {
+  const users: Record<string, any> = {}
   let nextId = 1
 
   return {
     user: {
       findUnique: async ({ where }) => {
         if (where.id) return users[where.id] || null
-        if (where.email) return Object.values(users).find(u => u.email === where.email) || null
+        if (where.email) return Object.values(users).find((u: any) => u.email === where.email) || null
         return null
       },
       findFirst: async ({ where }) => {
         if (where.OR) {
           for (const condition of where.OR) {
-            const match = Object.values(users).find(u => {
+            const match = Object.values(users).find((u: any) => {
               for (const [key, val] of Object.entries(condition)) {
                 if (u[key] === val) return true
               }
@@ -320,7 +309,7 @@ describe('Auth Routes', () => {
   describe('POST /api/auth/signup', () => {
     it('creates a new user and returns tokens', async () => {
       const prisma = createMockPrisma()
-      const app = createTestApp(prisma)
+      const app = await createTestApp(prisma)
 
       const res = await request(app)
         .post('/api/auth/signup')
@@ -336,7 +325,7 @@ describe('Auth Routes', () => {
 
     it('rejects duplicate email', async () => {
       const prisma = createMockPrisma()
-      const app = createTestApp(prisma)
+      const app = await createTestApp(prisma)
 
       await request(app)
         .post('/api/auth/signup')
@@ -352,7 +341,7 @@ describe('Auth Routes', () => {
 
     it('rejects duplicate username', async () => {
       const prisma = createMockPrisma()
-      const app = createTestApp(prisma)
+      const app = await createTestApp(prisma)
 
       await request(app)
         .post('/api/auth/signup')
@@ -368,7 +357,7 @@ describe('Auth Routes', () => {
 
     it('rejects invalid email format', async () => {
       const prisma = createMockPrisma()
-      const app = createTestApp(prisma)
+      const app = await createTestApp(prisma)
 
       const res = await request(app)
         .post('/api/auth/signup')
@@ -379,7 +368,7 @@ describe('Auth Routes', () => {
 
     it('rejects short password', async () => {
       const prisma = createMockPrisma()
-      const app = createTestApp(prisma)
+      const app = await createTestApp(prisma)
 
       const res = await request(app)
         .post('/api/auth/signup')
@@ -393,7 +382,7 @@ describe('Auth Routes', () => {
   describe('POST /api/auth/login', () => {
     it('logs in with valid credentials', async () => {
       const prisma = createMockPrisma()
-      const app = createTestApp(prisma)
+      const app = await createTestApp(prisma)
 
       // Create user first
       const passwordHash = await bcrypt.hash('Password123!', 4)
@@ -414,7 +403,7 @@ describe('Auth Routes', () => {
 
     it('rejects invalid password', async () => {
       const prisma = createMockPrisma()
-      const app = createTestApp(prisma)
+      const app = await createTestApp(prisma)
 
       const passwordHash = await bcrypt.hash('Password123!', 4)
       await prisma.user.create({
@@ -431,7 +420,7 @@ describe('Auth Routes', () => {
 
     it('rejects non-existent email', async () => {
       const prisma = createMockPrisma()
-      const app = createTestApp(prisma)
+      const app = await createTestApp(prisma)
 
       const res = await request(app)
         .post('/api/auth/login')
@@ -445,15 +434,14 @@ describe('Auth Routes', () => {
   describe('POST /api/auth/refresh', () => {
     it('refreshes tokens with valid refresh token', async () => {
       const prisma = createMockPrisma()
-      const app = createTestApp(prisma)
+      const app = await createTestApp(prisma)
 
-      const user = await prisma.user.create({
+      await prisma.user.create({
         data: { username: 'refreshtest', email: 'refresh@example.com' },
       })
-      expect(user).toBeDefined()
 
       const refreshToken = jwt.sign(
-        { userId: user.id },
+        { userId: 'user-1' },
         process.env.JWT_REFRESH_SECRET,
         { expiresIn: '7d' }
       )
@@ -468,7 +456,7 @@ describe('Auth Routes', () => {
 
     it('returns 401 with missing refresh token', async () => {
       const prisma = createMockPrisma()
-      const app = createTestApp(prisma)
+      const app = await createTestApp(prisma)
 
       const res = await request(app)
         .post('/api/auth/refresh')
@@ -480,7 +468,7 @@ describe('Auth Routes', () => {
 
     it('returns 401 with invalid refresh token', async () => {
       const prisma = createMockPrisma()
-      const app = createTestApp(prisma)
+      const app = await createTestApp(prisma)
 
       const res = await request(app)
         .post('/api/auth/refresh')
@@ -494,7 +482,7 @@ describe('Auth Routes', () => {
   describe('POST /api/auth/forgot-password', () => {
     it('returns success even for unknown email (no enumeration)', async () => {
       const prisma = createMockPrisma()
-      const app = createTestApp(prisma)
+      const app = await createTestApp(prisma)
 
       const res = await request(app)
         .post('/api/auth/forgot-password')
@@ -508,7 +496,7 @@ describe('Auth Routes', () => {
   describe('POST /api/auth/reset-password', () => {
     it('resets password with valid token', async () => {
       const prisma = createMockPrisma()
-      const app = createTestApp(prisma)
+      const app = await createTestApp(prisma)
 
       const user = await prisma.user.create({
         data: { username: 'resettest', email: 'reset@example.com' },
@@ -531,7 +519,7 @@ describe('Auth Routes', () => {
 
     it('rejects invalid reset token', async () => {
       const prisma = createMockPrisma()
-      const app = createTestApp(prisma)
+      const app = await createTestApp(prisma)
 
       const res = await request(app)
         .post('/api/auth/reset-password')

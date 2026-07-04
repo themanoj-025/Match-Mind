@@ -1,16 +1,26 @@
-const express = require('express')
+import express from 'express'
+import { authenticateToken } from '../middleware/auth'
+import { validate } from '../middleware/validate'
+import { createPredictionSchema, scorePredictionSchema } from '../config/schemas'
+import { predictionLimiter } from '../middleware/rateLimiter'
+import { finalizeMatch } from '../workflows/finalizeMatch'
+import asyncHandler from '../middleware/asyncHandler'
+import type { AuthenticatedRequest } from '../middleware/auth'
+
 const router = express.Router()
-const { authenticateToken } = require('../middleware/auth')
-const { validate } = require('../middleware/validate')
-const { createPredictionSchema, scorePredictionSchema } = require('../config/schemas')
-const { predictionLimiter } = require('../middleware/rateLimiter')
-const { finalizeMatch } = require('../workflows/finalizeMatch')
-const asyncHandler = require('../middleware/asyncHandler')
 
 // POST /api/predictions — rate limited to 30/min/user
-router.post('/', authenticateToken, predictionLimiter, validate(createPredictionSchema), asyncHandler(async (req, res) => {
+router.post('/', authenticateToken, predictionLimiter, validate(createPredictionSchema), asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
-  const { matchId, homeGoals, awayGoals, firstScorer: firstScorerName, totalGoalsOU, totalGoalsLine, btts } = req.body
+  const { matchId, homeGoals, awayGoals, firstScorer: firstScorerName, totalGoalsOU, totalGoalsLine, btts } = req.body as {
+    matchId: string
+    homeGoals: number
+    awayGoals: number
+    firstScorer?: string | null
+    totalGoalsOU?: string | null
+    totalGoalsLine?: number | null
+    btts?: boolean | null
+  }
 
   // Validate match exists and is SCHEDULED
   const match = await prisma.match.findUnique({ where: { id: matchId } })
@@ -42,7 +52,7 @@ router.post('/', authenticateToken, predictionLimiter, validate(createPrediction
 }))
 
 // GET /api/predictions/mine
-router.get('/mine', authenticateToken, asyncHandler(async (req, res) => {
+router.get('/mine', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const predictions = await prisma.prediction.findMany({
     where: { userId: req.userId },
@@ -65,9 +75,9 @@ router.get('/match/:matchId', asyncHandler(async (req, res) => {
 
 // POST /api/predictions/score/:matchId
 // Score all predictions for a finished match (manual trigger)
-router.post('/score/:matchId', authenticateToken, asyncHandler(async (req, res) => {
+router.post('/score/:matchId', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
-  const { mode } = req.query // 'queue' | 'direct' | 'auto'
+  const { mode } = req.query as { mode?: string }
 
   const match = await prisma.match.findUnique({ where: { id: req.params.matchId } })
   if (!match) return res.status(404).json({ error: { code: 'MATCH_NOT_FOUND', message: 'Match not found' } })
@@ -90,4 +100,4 @@ router.patch('/:id/score', validate(scorePredictionSchema), asyncHandler(async (
   res.json(prediction)
 }))
 
-module.exports = router
+export default router

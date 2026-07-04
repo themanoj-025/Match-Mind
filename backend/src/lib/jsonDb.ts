@@ -8,28 +8,105 @@
  * All writes are persisted to JSON files in src/data/ after each operation.
  */
 
-const fs = require('fs')
-const path = require('path')
-const crypto = require('crypto')
-const logger = require('../utils/logger')
+import fs from 'fs'
+import path from 'path'
+import crypto from 'crypto'
+import logger from '../utils/logger'
 
 const DATA_DIR = path.join(__dirname, '..', 'data')
 
+// ─── Types ─────────────────────────────────────────────
+
+interface WhereClause {
+  [key: string]: any
+  OR?: WhereClause[]
+  AND?: WhereClause[]
+  NOT?: WhereClause
+}
+
+interface QueryOpts {
+  where?: WhereClause
+  orderBy?: Record<string, 'asc' | 'desc'>
+  take?: number
+  skip?: number
+  select?: Record<string, any>
+  include?: Record<string, any>
+}
+
+interface CreateOpts {
+  data: Record<string, any>
+}
+
+interface UpdateOpts {
+  where: Record<string, any>
+  data: Record<string, any>
+}
+
+interface UpsertOpts {
+  where: Record<string, any>
+  create: Record<string, any>
+  update: Record<string, any>
+}
+
+interface DeleteOpts {
+  where: Record<string, any>
+}
+
+interface CreateManyOpts {
+  data: Record<string, any>[]
+}
+
+interface UpdateManyOpts {
+  where?: WhereClause
+  data: Record<string, any>
+}
+
+interface DeleteManyOpts {
+  where?: WhereClause
+}
+
+interface CountOpts {
+  where?: WhereClause
+}
+
+interface ModelRelations {
+  [relationName: string]: {
+    type: 'hasMany' | 'belongsTo'
+    model: string
+    localKey: string
+    foreignKey: string
+  }
+}
+
+interface ModelHandler {
+  findUnique: (opts: { where: Record<string, any> }) => any
+  findFirst: (opts: QueryOpts) => any
+  findMany: (opts?: QueryOpts) => any[]
+  create: (opts: CreateOpts) => any
+  createMany: (opts: CreateManyOpts) => { count: number }
+  update: (opts: UpdateOpts) => any
+  updateMany: (opts: UpdateManyOpts) => { count: number }
+  upsert: (opts: UpsertOpts) => any
+  delete: (opts: DeleteOpts) => any
+  deleteMany: (opts: DeleteManyOpts) => { count: number }
+  count: (opts?: CountOpts) => number
+}
+
 // ─── Helpers ─────────────────────────────────────────────
 
-function cuid() {
+function cuid(): string {
   return crypto.randomBytes(12).toString('hex')
 }
 
-function now() {
+function now(): string {
   return new Date().toISOString()
 }
 
-function deepClone(obj) {
+function deepClone<T>(obj: T): T {
   return JSON.parse(JSON.stringify(obj))
 }
 
-function matchesWhere(item, where) {
+function matchesWhere(item: Record<string, any>, where?: WhereClause): boolean {
   if (!where || Object.keys(where).length === 0) return true
 
   for (const [key, value] of Object.entries(where)) {
@@ -43,7 +120,7 @@ function matchesWhere(item, where) {
     }
     // Handle NOT
     if (key === 'NOT') {
-      return !matchesWhere(item, value)
+      return !matchesWhere(item, value as WhereClause)
     }
 
     // Handle nested operators
@@ -51,24 +128,25 @@ function matchesWhere(item, where) {
       // e.g. { contains, mode } | { gte, lt } | { not } | { in }
       if ('contains' in value) {
         const itemVal = String(getNestedValue(item, key) ?? '')
-        const search = String(value.contains)
-        const caseInsensitive = value.mode === 'insensitive'
+        const search = String((value as any).contains)
+        const caseInsensitive = (value as any).mode === 'insensitive'
         const matches = caseInsensitive
           ? itemVal.toLowerCase().includes(search.toLowerCase())
           : itemVal.includes(search)
         if (!matches) return false
       } else if ('gte' in value || 'lte' in value || 'gt' in value || 'lt' in value) {
         const itemVal = getNestedValue(item, key)
-        if (value.gte !== undefined && !(itemVal >= value.gte)) return false
-        if (value.lte !== undefined && !(itemVal <= value.lte)) return false
-        if (value.gt !== undefined && !(itemVal > value.gt)) return false
-        if (value.lt !== undefined && !(itemVal < value.lt)) return false
+        const v = value as Record<string, any>
+        if (v.gte !== undefined && !(itemVal >= v.gte)) return false
+        if (v.lte !== undefined && !(itemVal <= v.lte)) return false
+        if (v.gt !== undefined && !(itemVal > v.gt)) return false
+        if (v.lt !== undefined && !(itemVal < v.lt)) return false
       } else if ('not' in value) {
         const itemVal = getNestedValue(item, key)
-        if (itemVal === value.not) return false
-      } else if ('in' in value && Array.isArray(value.in)) {
+        if (itemVal === (value as any).not) return false
+      } else if ('in' in value && Array.isArray((value as any).in)) {
         const itemVal = getNestedValue(item, key)
-        if (!value.in.includes(itemVal)) return false
+        if (!(value as any).in.includes(itemVal)) return false
       } else {
         // Direct object comparison (e.g. subscription field)
         const itemVal = getNestedValue(item, key)
@@ -83,23 +161,13 @@ function matchesWhere(item, where) {
   return true
 }
 
-function getNestedValue(obj, path) {
-  return path.split('.').reduce((current, key) => {
+function getNestedValue(obj: any, pathStr: string): any {
+  return pathStr.split('.').reduce((current, key) => {
     return current && current[key] !== undefined ? current[key] : undefined
   }, obj)
 }
 
-function setNestedValue(obj, path, value) {
-  const keys = path.split('.')
-  let current = obj
-  for (let i = 0; i < keys.length - 1; i++) {
-    if (!current[keys[i]]) current[keys[i]] = {}
-    current = current[keys[i]]
-  }
-  current[keys[keys.length - 1]] = value
-}
-
-function applyOrderBy(items, orderBy) {
+function applyOrderBy(items: any[], orderBy?: Record<string, 'asc' | 'desc'>): any[] {
   if (!orderBy) return items
   const keys = Object.keys(orderBy)
   if (keys.length === 0) return items
@@ -119,24 +187,9 @@ function applyOrderBy(items, orderBy) {
   })
 }
 
-function applySelect(item, select) {
+function selectFields(item: Record<string, any>, select?: Record<string, any>): Record<string, any> {
   if (!select) return item
-  if (select === true) return item
-  // Handle _count select
-  if (select._count) {
-    const countSelect = select._count.select
-    const counts = {}
-    for (const relField of Object.keys(countSelect)) {
-      counts[relField] = 0 // Will be resolved by include logic
-    }
-    return { ...selectFields(item, select), _count: counts }
-  }
-  return selectFields(item, select)
-}
-
-function selectFields(item, select) {
-  if (!select) return item
-  const result = {}
+  const result: Record<string, any> = {}
   for (const key of Object.keys(select)) {
     if (key === '_count') continue
     const val = select[key]
@@ -144,7 +197,7 @@ function selectFields(item, select) {
       result[key] = item[key]
     } else if (typeof val === 'object' && val !== null) {
       if (Array.isArray(item[key])) {
-        result[key] = item[key].map((sub) => selectFields(sub, val))
+        result[key] = item[key].map((sub: any) => selectFields(sub, val))
       } else if (item[key] && typeof item[key] === 'object') {
         result[key] = selectFields(item[key], val)
       }
@@ -153,7 +206,7 @@ function selectFields(item, select) {
   return result
 }
 
-function applyInclude(item, include, allData, modelName) {
+function applyInclude(item: Record<string, any>, include: Record<string, any>, allData: Record<string, any[]>, modelName: string): Record<string, any> {
   if (!include) return item
 
   const result = { ...item }
@@ -161,9 +214,8 @@ function applyInclude(item, include, allData, modelName) {
   for (const [relField, relConfig] of Object.entries(include)) {
     // Skip _count
     if (relField === '_count') {
-      // Calculate counts
-      const countSelect = relConfig.select
-      const counts = {}
+      const countSelect = (relConfig as any).select
+      const counts: Record<string, number> = {}
       for (const countField of Object.keys(countSelect)) {
         counts[countField] = resolveCount(item, countField, allData)
       }
@@ -171,26 +223,30 @@ function applyInclude(item, include, allData, modelName) {
       continue
     }
 
+    const related = resolveRelation(item, relField, modelName, allData, true)
     if (relConfig === true) {
-      // Simple include - return the full related record
-      result[relField] = resolveRelation(item, relField, modelName, allData, true)
-    } else if (relConfig.select || relConfig.include) {
-      // Include with select/nested include
-      result[relField] = resolveRelation(item, relField, modelName, allData, true)
-      if (result[relField] && relConfig.select) {
-        if (Array.isArray(result[relField])) {
-          result[relField] = result[relField].map((r) => selectFields(r, relConfig.select))
-        } else {
-          result[relField] = selectFields(result[relField], relConfig.select)
+      result[relField] = related
+    } else if ((relConfig as any).select || (relConfig as any).include) {
+      if (Array.isArray(related)) {
+        result[relField] = related.map((r: any) => {
+          let processed = r
+          if ((relConfig as any).select) {
+            processed = selectFields(processed, (relConfig as any).select)
+          }
+          if ((relConfig as any).include) {
+            processed = applyInclude(processed, (relConfig as any).include, allData, guessModelName(relField))
+          }
+          return processed
+        })
+      } else if (related && typeof related === 'object') {
+        let processed = related
+        if ((relConfig as any).select) {
+          processed = selectFields(processed, (relConfig as any).select)
         }
-      }
-      // Handle nested includes (include within include)
-      if (result[relField] && relConfig.include) {
-        if (Array.isArray(result[relField])) {
-          result[relField] = result[relField].map((r) => applyInclude(r, relConfig.include, allData, guessModelName(relField)))
-        } else if (result[relField] && typeof result[relField] === 'object') {
-          result[relField] = applyInclude(result[relField], relConfig.include, allData, guessModelName(relField))
+        if ((relConfig as any).include) {
+          processed = applyInclude(processed, (relConfig as any).include, allData, guessModelName(relField))
         }
+        result[relField] = processed
       }
     }
   }
@@ -198,38 +254,39 @@ function applyInclude(item, include, allData, modelName) {
   return result
 }
 
-function resolveRelation(item, field, modelName, allData, includeFull) {
-  // Define model relations
+function resolveRelation(item: Record<string, any>, field: string, modelName: string, allData: Record<string, any[]>, _includeFull: boolean): any {
   const relations = getModelRelations(modelName)
   const rel = relations[field]
   if (!rel) return undefined
 
-  if (rel.type === 'hasMany' || rel.type === 'hasManyThrough') {
-    const relatedData = allData[rel.model] || []
-    if (rel.type === 'hasMany') {
-      return relatedData.filter((r) => r[rel.foreignKey] === item[rel.localKey])
-    }
+  const relatedData = allData[rel.model] || []
+  if (rel.type === 'hasMany') {
     return relatedData.filter((r) => r[rel.foreignKey] === item[rel.localKey])
   }
 
   if (rel.type === 'belongsTo') {
-    const relatedData = allData[rel.model] || []
     return relatedData.find((r) => r[rel.foreignKey] === getNestedValue(item, rel.localKey)) || null
   }
 
   return undefined
 }
 
-function resolveCount(item, field, allData) {
-  const modelRelations = getModelRelationsAll()
-  const rel = modelRelations[field]
-  if (!rel) return 0
-  const relatedData = allData[rel.model] || []
-  return relatedData.filter((r) => r[rel.foreignKey] === item[rel.localKey]).length
+function resolveCount(item: Record<string, any>, field: string, allData: Record<string, any[]>): number {
+  const allRelations = getModelRelationsAll()
+  const modelRelations = allRelations as Record<string, ModelRelations>
+  // Find which model's relation has this as a field
+  for (const [, relations] of Object.entries(modelRelations)) {
+    const rel = relations[field]
+    if (rel) {
+      const relatedData = allData[rel.model] || []
+      return relatedData.filter((r) => r[rel.foreignKey] === item[rel.localKey]).length
+    }
+  }
+  return 0
 }
 
-function guessModelName(relationField) {
-  const pluralMap = {
+function guessModelName(relationField: string): string {
+  const pluralMap: Record<string, string> = {
     user: 'user',
     users: 'user',
     match: 'match',
@@ -291,12 +348,12 @@ function guessModelName(relationField) {
   return pluralMap[relationField] || relationField
 }
 
-function getModelRelations(modelName) {
+function getModelRelations(modelName: string): ModelRelations {
   const all = getModelRelationsAll()
-  return all[modelName] || {}
+  return (all as any)[modelName] || {}
 }
 
-function getModelRelationsAll() {
+function getModelRelationsAll(): Record<string, ModelRelations> {
   return {
     user: {
       predictions: { type: 'hasMany', model: 'prediction', localKey: 'id', foreignKey: 'userId' },
@@ -370,17 +427,30 @@ function getModelRelationsAll() {
   }
 }
 
+function resolveUpdates(data: Record<string, any>, existingRecord: Record<string, any>): Record<string, any> {
+  const result: Record<string, any> = {}
+  for (const [key, value] of Object.entries(data)) {
+    if (value && typeof value === 'object' && 'increment' in value) {
+      // Handle Prisma-style { increment: x } operator
+      result[key] = (existingRecord?.[key] || 0) + value.increment
+    } else {
+      result[key] = value
+    }
+  }
+  return result
+}
+
 // ─── Model Handler Factory ───────────────────────────────
 
-function createModelHandler(modelName, getData, persist) {
-  function whereFilter(where) {
+function createModelHandler(modelName: string, getData: () => any[], persist: () => void): ModelHandler {
+  function whereFilter(where?: WhereClause): any[] {
     const data = getData()
     if (!where) return data
     return data.filter((item) => matchesWhere(item, where))
   }
 
   return {
-    findUnique({ where }) {
+    findUnique({ where }: { where: Record<string, any> }) {
       const data = getData()
       // Handle compound unique keys like userId_matchId
       if (where) {
@@ -402,7 +472,7 @@ function createModelHandler(modelName, getData, persist) {
       return data[0] || null
     },
 
-    findFirst({ where, orderBy }) {
+    findFirst({ where, orderBy }: QueryOpts) {
       const filtered = whereFilter(where)
       const ordered = applyOrderBy(filtered, orderBy)
       return ordered[0] || null
@@ -415,15 +485,15 @@ function createModelHandler(modelName, getData, persist) {
       if (skip) filtered = filtered.slice(skip)
       if (take) filtered = filtered.slice(0, take)
 
-      let data = getData()
+      const data = getData()
 
       return filtered.map((item) => {
-        let result = item
+        let result: any = item
         if (include) {
           result = applyInclude(result, include, data, modelName)
         }
         if (select) {
-          result = applySelect(result, select)
+          result = selectFields(result, select)
 
           // Apply includes for select with include
           if (select._count && result._count) {
@@ -436,7 +506,7 @@ function createModelHandler(modelName, getData, persist) {
       })
     },
 
-    create({ data }) {
+    create({ data }: CreateOpts) {
       const records = getData()
       const record = {
         id: cuid(),
@@ -449,7 +519,7 @@ function createModelHandler(modelName, getData, persist) {
       return deepClone(record)
     },
 
-    createMany({ data }) {
+    createMany({ data }: CreateManyOpts) {
       const records = getData()
       const created = data.map((item) => ({
         id: cuid(),
@@ -462,7 +532,7 @@ function createModelHandler(modelName, getData, persist) {
       return { count: created.length }
     },
 
-    update({ where, data }) {
+    update({ where, data }: UpdateOpts) {
       const records = getData()
       const whereKey = Object.keys(where)[0]
       const whereVal = where[whereKey]
@@ -479,7 +549,7 @@ function createModelHandler(modelName, getData, persist) {
       return deepClone(updated)
     },
 
-    updateMany({ where, data }) {
+    updateMany({ where, data }: UpdateManyOpts) {
       const records = getData()
       let count = 0
       for (let i = 0; i < records.length; i++) {
@@ -496,7 +566,7 @@ function createModelHandler(modelName, getData, persist) {
       return { count }
     },
 
-    upsert({ where, create, update }) {
+    upsert({ where, create, update }: UpsertOpts) {
       const records = getData()
       const whereKey = Object.keys(where)[0]
       const whereVal = where[whereKey]
@@ -508,7 +578,7 @@ function createModelHandler(modelName, getData, persist) {
       return this.create({ data: create })
     },
 
-    delete({ where }) {
+    delete({ where }: DeleteOpts) {
       const records = getData()
       const whereKey = Object.keys(where)[0]
       const whereVal = where[whereKey]
@@ -519,12 +589,9 @@ function createModelHandler(modelName, getData, persist) {
       return deepClone(deleted)
     },
 
-    deleteMany({ where }) {
+    deleteMany({ where }: DeleteManyOpts) {
       const records = getData()
-      const toDelete = records.filter((item, i) => {
-        const match = matchesWhere(item, where)
-        return match
-      })
+      const toDelete = records.filter((item) => matchesWhere(item, where))
       const ids = new Set(toDelete.map((r) => r.id))
       for (let i = records.length - 1; i >= 0; i--) {
         if (ids.has(records[i].id)) {
@@ -541,22 +608,14 @@ function createModelHandler(modelName, getData, persist) {
   }
 }
 
-function resolveUpdates(data, existingRecord) {
-  const result = {}
-  for (const [key, value] of Object.entries(data)) {
-    if (value && typeof value === 'object' && 'increment' in value) {
-      // Handle Prisma-style { increment: x } operator
-      result[key] = (existingRecord?.[key] || 0) + value.increment
-    } else {
-      result[key] = value
-    }
-  }
-  return result
-}
-
 // ─── Main DB Class ───────────────────────────────────────
 
-class JsonDatabase {
+export class JsonDatabase {
+  dataDir: string
+  data: Record<string, any[]>
+  models: Record<string, ModelHandler>
+  _initialized: boolean
+
   constructor(dataDir = DATA_DIR) {
     this.dataDir = dataDir
     this.data = {}
@@ -564,7 +623,7 @@ class JsonDatabase {
     this._initialized = false
   }
 
-  async initialize(seedData = null) {
+  async initialize(seedData: Record<string, any[]> | null = null): Promise<void> {
     if (this._initialized) return
 
     if (!fs.existsSync(this.dataDir)) {
@@ -608,42 +667,42 @@ class JsonDatabase {
     this._persistChanges()
     this._initialized = true
 
-    const counts = {}
+    const counts: Record<string, number> = {}
     for (const name of modelNames) {
       counts[name] = this.data[name].length
     }
     logger.info({ event: 'database.initialized', counts }, `JSON Database initialized with ${Object.values(counts).reduce((a, b) => a + b, 0)} total records`)
   }
 
-  _loadModel(name) {
+  _loadModel(name: string): any[] {
     const filePath = path.join(this.dataDir, `${name}.json`)
     try {
       if (fs.existsSync(filePath)) {
         const raw = fs.readFileSync(filePath, 'utf-8')
         return JSON.parse(raw)
       }
-    } catch (err) {
+    } catch (err: any) {
       logger.warn({ event: 'database.load_error', model: name, err: err.message }, `Failed to load ${name}.json`)
     }
     return []
   }
 
-  _saveModel(name) {
+  _saveModel(name: string): void {
     const filePath = path.join(this.dataDir, `${name}.json`)
     try {
       fs.writeFileSync(filePath, JSON.stringify(this.data[name], null, 2), 'utf-8')
-    } catch (err) {
+    } catch (err: any) {
       logger.error({ event: 'database.save_error', model: name, err: err.message }, `Failed to save ${name}.json`)
     }
   }
 
-  _persistChanges() {
+  _persistChanges(): void {
     for (const name of Object.keys(this.data)) {
       this._saveModel(name)
     }
   }
 
-  _loadSeedData(seedData) {
+  _loadSeedData(seedData: Record<string, any[]>): void {
     for (const [modelName, records] of Object.entries(seedData)) {
       if (this.data[modelName]) {
         this.data[modelName] = deepClone(records)
@@ -653,19 +712,19 @@ class JsonDatabase {
   }
 
   // Prisma-compatible methods
-  async $connect() {}
+  async $connect(): Promise<void> {}
 
-  async $disconnect() {
+  async $disconnect(): Promise<void> {
     this._persistChanges()
     logger.info({ event: 'database.disconnect' }, 'JSON Database disconnected and persisted')
   }
 
-  async $queryRawUnsafe(query) {
+  async $queryRawUnsafe(_query: string): Promise<any[]> {
     // Health check compatibility - return success
     return [{ '?column?': 1 }]
   }
 
-  async $transaction(operations) {
+  async $transaction(operations: Promise<any>[]): Promise<any[]> {
     // Run operations sequentially (no real transaction support)
     const results = []
     for (const op of operations) {
@@ -674,17 +733,17 @@ class JsonDatabase {
     return results
   }
 
-  get [Symbol.toStringTag]() {
+  get [Symbol.toStringTag](): string {
     return 'JsonDatabase'
   }
 }
 
 // Proxy to allow prisma.model.method() syntax
-function createJsonDatabase(dataDir) {
+export function createJsonDatabase(dataDir?: string): any {
   const db = new JsonDatabase(dataDir)
 
   return new Proxy(db, {
-    get(target, prop) {
+    get(target, prop: string | symbol) {
       // PrismaClient methods
       if (prop === '$connect') return target.$connect.bind(target)
       if (prop === '$disconnect') return target.$disconnect.bind(target)
@@ -694,13 +753,11 @@ function createJsonDatabase(dataDir) {
       if (prop === 'data') return target.data
 
       // Model accessors
-      if (target.models[prop]) {
-        return target.models[prop]
+      if (target.models[prop as string]) {
+        return target.models[prop as string]
       }
 
       return undefined
     },
   })
 }
-
-module.exports = { createJsonDatabase, JsonDatabase }

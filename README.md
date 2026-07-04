@@ -2,8 +2,9 @@
 
 ![Node.js](https://img.shields.io/badge/Node.js-20+-339933?logo=node.js&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?logo=postgresql&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white)
 ![Redis](https://img.shields.io/badge/Redis-7-DC382D?logo=redis&logoColor=white)
+![Sentry](https://img.shields.io/badge/Sentry-10-362D59?logo=sentry&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green)
 [![CI](https://img.shields.io/github/actions/workflow/status/themanoj-025/Match-Mind/ci.yml?branch=main&label=CI&logo=github)](https://github.com/themanoj-025/Match-Mind/actions/workflows/ci.yml)
 [![Dependabot](https://img.shields.io/badge/dependabot-enabled-025E8C?logo=dependabot)](https://github.com/themanoj-025/Match-Mind/security/dependabot)
@@ -65,29 +66,33 @@ WATCH → PREDICT → COMPETE → TALK → EARN → REPEAT
 ### Backend
 | Technology | Purpose |
 |------------|---------|
-| **Node.js + Express 5** | API server |
+| **Node.js + Express 5** | API server (TypeScript via tsx) |
+| **TypeScript 6** | Type safety across all server code |
 | **Socket.io** | Real-time events (chat, scores, notifications, scoring) |
 | **Passport.js** | Authentication (JWT + Google OAuth) |
-| **Prisma 7** | ORM with PostgreSQL (17 models, 10 enums) |
+| **JSON Database** | File-based in-memory DB with Prisma-compatible API |
 | **Redis** | Caching, sessions, pub-sub, BullMQ backend |
 | **BullMQ** | Background job queue (prediction scoring, leaderboard resets) |
 | **Stripe** | Subscription billing (checkout, webhooks, portal) |
 | **Anthropic Claude** | AI prediction hints via Claude Haiku |
 | **bcryptjs** | Password hashing (12 rounds) |
 | **JWT** | Access + refresh token auth |
+| **Pino** | Structured JSON logging with redaction |
+| **Sentry** | Error monitoring and performance tracing |
+| **Zod** | Runtime request validation with TypeScript inference |
+| **Vitest** | Test runner with 71+ tests (scoring, auth, predictions) |
 
 ### Services
+- **Sentry** — Error monitoring (backend + frontend)
 - **Stripe** — Pro subscription billing
 - **Anthropic Claude** — AI prediction hints
-- **SportRadar API** — Live scores, stats, lineups
-- **Cloudinary** — Media storage (avatars, banners)
+- **Tenor** — GIF search for chat
 
 ### Deployment
 - Frontend: Vercel / Netlify
 - Backend: Railway / Render
-- Database: Supabase (PostgreSQL)
 - CDN: Cloudflare
-- Monitoring: Sentry + Posthog
+- Monitoring: Sentry
 
 ---
 
@@ -174,38 +179,71 @@ Match Mind/
 │           ├── FAQPage.jsx            # /faq — Searchable accordion
 │           └── NotFoundPage.jsx       # * — Animated 404
 │
-└── backend/                          # Node.js + Express 5 API
+└── backend/                          # Node.js + Express 5 API (TypeScript)
     ├── package.json
-    ├── .env                          # Environment variables
-    ├── prisma.config.ts              # Prisma 7 datasource configuration
-    ├── prisma/
-    │   ├── schema.prisma             # Database schema (17 models, 10 enums)
-    │   └── seed.js                   # Comprehensive seed script
+    ├── tsconfig.json                 # TypeScript configuration
+    ├── vitest.config.js              # Test runner configuration
+    ├── instrument.ts                 # Sentry instrumentation (loaded first)
+    ├── .env.example                  # Environment variable template
     └── src/
-        ├── index.js                  # Server entry point + BullMQ init + scheduler
+        ├── index.ts                  # Server entry point + BullMQ init + scheduler
         ├── config/
-        │   └── passport.js           # Passport strategies (JWT + Google OAuth)
+        │   ├── constants.ts          # App-wide constants (scoring, rate limits, pagination)
+        │   ├── passport.ts           # Passport strategies (JWT + Google OAuth)
+        │   └── schemas.ts            # Zod validation schemas (14 schemas, typed)
+        ├── data/                     # JSON database files (25 model files)
+        │   ├── user.json
+        │   ├── match.json
+        │   ├── prediction.json
+        │   └── ...                   # 22 additional model JSON files
+        ├── lib/
+        │   └── jsonDb.ts             # JSON Database adapter (Prisma-compatible API)
+        ├── repositories/
+        │   ├── index.ts              # Prisma-style repository implementations
+        │   └── types.ts              # Repository interfaces & domain types
         ├── middleware/
-        │   └── auth.js               # JWT auth (Bearer header + cookie fallback)
+        │   ├── auth.ts               # JWT auth (Bearer header + cookie fallback)
+        │   ├── validate.ts           # Zod request validation middleware
+        │   ├── rateLimiter.ts         # Rate limiting (auth, prediction, AI, global tiers)
+        │   ├── errorHandler.ts       # Centralized error handler (JSON DB, JWT, AppError)
+        │   ├── asyncHandler.ts       # Async route wrapper (eliminates try/catch)
+        │   └── requireAdmin.ts       # Admin role guard middleware
         ├── socket/
-        │   └── index.js              # Socket.io event handlers
+        │   └── index.ts              # Socket.io event handlers (auth, chat, reactions, rooms)
         ├── services/
-        │   └── scoring.js            # Scoring engine: calc, streaks, tiers, snapshots
+        │   ├── scoring.ts            # Scoring engine: calc, streaks, tiers, snapshots
+        │   ├── authService.ts        # Auth business logic (signup, login, refresh, reset)
+        │   ├── adminService.ts       # Admin dashboard stats & logging
+        │   ├── tokenService.ts       # JWT generation + cookie helpers
+        │   ├── leaderboardMapper.ts  # User→LeaderboardEntry transformation
+        │   └── simulation/
+        │       ├── simulationEngine.ts  # Match simulation (Poisson, xG, PRNG)
+        │       └── simulationRunner.ts  # Orchestrates sim + DB + Socket.IO events
         ├── workers/
-        │   ├── queue.js              # BullMQ queue definitions
-        │   └── scoringWorker.js      # BullMQ workers + graceful shutdown
+        │   ├── queue.ts              # BullMQ queue definitions (3 queues)
+        │   └── scoringWorker.ts      # BullMQ workers + graceful shutdown
+        ├── workflows/
+        │   └── finalizeMatch.ts      # Match finalization (lock → score → rank → emit)
+        ├── utils/
+        │   ├── logger.ts             # Pino structured logger with redaction
+        │   └── AppError.ts           # Custom error class (code, statusCode, isAppError)
         └── routes/
-            ├── auth.js               # Signup, login, logout, OAuth, refresh, forgot/reset
-            ├── matches.js            # Matches, stats, lineups, H2H, finish match
-            ├── predictions.js        # Create, list, score, bulk scoring trigger
-            ├── leaderboard.js        # Global, weekly, history, sport, friends
-            ├── users.js              # Profile, follow, notifications, check-username
-            ├── leagues.js            # CRUD private leagues
-            ├── squads.js             # CRUD squads
-            ├── highlights.js         # Video highlights
-            ├── ai.js                 # AI prediction hints (Anthropic + heuristic)
-            ├── stripe.js             # Checkout, webhook, portal, status
-            └── admin.js              # Dashboard stats, user/matches/reports CRUD
+            ├── auth.ts               # Signup, login, logout, OAuth, refresh, forgot/reset
+            ├── matches.ts            # Matches, stats, lineups, H2H, finish match
+            ├── predictions.ts        # Create, list, score, bulk scoring trigger
+            ├── leaderboard.ts        # Global, weekly, history, sport, friends
+            ├── users.ts              # Profile, follow, notifications, check-username
+            ├── leagues.ts            # CRUD private leagues
+            ├── squads.ts             # CRUD squads
+            ├── highlights.ts         # Video highlights
+            ├── ai.ts                 # AI prediction hints (Anthropic + heuristic)
+            ├── messages.ts           # DM conversations & messaging
+            ├── players.ts            # Player profiles & search
+            ├── search.ts             # Global search (users, teams, players, matches)
+            ├── simulation.ts         # Match simulation triggers
+            ├── stripe.ts             # Checkout, webhook, portal, status
+            ├── teams.ts              # Team profiles with standings & form
+            └── admin.ts              # Dashboard stats, user/matches/reports CRUD
 ```
 
 ---
@@ -357,46 +395,29 @@ MatchMind uses a dark, stadium-atmosphere color palette with green accent as the
 
 ---
 
-## 💾 Database Schema (24 Models)
+## 💾 Database (JSON File-Based)
 
-### Core
-- **User** — Accounts with tier system, streaks, Pro status
-- **Match** — Sports events with live status, scores, competition
-- **Prediction** — User predictions with tiered scoring
-- **MatchEvent** — Goal/card/substitution events
+MatchMind uses a **file-based JSON database** that replaces the traditional PostgreSQL + Prisma setup. Data is stored as individual JSON files in `backend/src/data/` and loaded into an in-memory store with automatic persistence after every write operation.
 
-### Social
-- **Follow** — User follow relationships
-- **Notification** — In-app notifications (8 types)
-- **ChatMessage** — Real-time chat with reactions
-- **Report** — Chat message/user reports with moderation
+### Models (25 files)
+| Category | Models |
+|----------|--------|
+| **Core** | `user`, `match`, `prediction`, `matchEvent` |
+| **Social** | `follow`, `notification`, `chatMessage`, `report` |
+| **Groups** | `league`, `leagueMember`, `squad`, `squadMember` |
+| **Commerce** | `subscription`, `session` |
+| **Gamification** | `achievement`, `userAchievement`, `leaderboardSnapshot`, `scoringLog` |
+| **Sports Data** | `competition`, `team`, `player`, `standing`, `userSport`, `userTeam` |
+| **Admin** | `adminLog` |
 
-### Groups
-- **League** — Private prediction leagues with invite codes
-- **LeagueMember** — League membership with points/rank
-- **Squad** — Friend groups
-- **SquadMember** — Squad membership with roles
-
-### Achievements & Gamification
-- **Achievement** — Badge definitions with rarity tiers
-- **UserAchievement** — Unlocked achievements per user
-- **LeaderboardSnapshot** — Archived WEEKLY/MONTHLY leaderboards
-- **ScoringLog** — Audit trail for scoring events
-
-### Commerce
-- **Subscription** — Stripe subscription tracking
-- **Session** — JWT refresh token sessions
-
-### Sports Data
-- **Competition** — League/tournament definitions
-- **Team** — Sports teams
-- **Player** — Player profiles
-- **Standing** — League standings per season
-- **UserSport** — User sport preferences
-- **UserTeam** — User team preferences
-
-### Enums
-`Sport`, `MatchStatus`, `PredStatus`, `Tier`, `UserRole`, `NotifType`, `SubscriptionStatus`, `LeaderboardPeriod`
+### Key Features
+- **Prisma-compatible API** — Uses the same `findUnique`, `findMany`, `create`, `update`, `delete`, `count`, `upsert` interface
+- **Supports `include`/`select`** — Relation resolution and field selection work identically to Prisma
+- **Compound unique keys** — Supports composite keys like `userId_matchId`
+- **Query operators** — `contains`, `mode: 'insensitive'`, `gte`, `lte`, `in`, `not`, `OR`, `AND`, `NOT`
+- **Atomic increments** — `{ increment: x }` operator for Prisma-style updates
+- **Auto-persistence** — Every write triggers a synchronous file save to the corresponding JSON file
+- **Seed data** — 25 pre-seeded JSON files with thousands of records for development
 
 ---
 
@@ -501,42 +522,24 @@ Pro content is gated via the `<ProGate>` component, which blurs content with a g
 - Redis (optional — for BullMQ, falls back to direct scoring)
 
 ### Quick Start (Windows)
-Double-click `start.bat` in the root directory. It will:
-1. Check Node.js is installed
-2. Auto-install frontend + backend dependencies if missing
-3. Generate the Prisma client
-4. Open two terminal windows for backend (`:4000`) and frontend (`:3000`)
-5. Open `http://localhost:3000` in your browser
-
-### Manual Setup
 
 ```bash
-# 1. Install all dependencies (root + frontend + backend)
+# 1. Install dependencies
 npm run install:all
 
-# 2. Configure environment variables
-# Copy backend/.env.example to backend/.env and fill in:
-# DATABASE_URL, JWT_SECRET, JWT_REFRESH_SECRET
+# 2. Configure environment
+cp backend/.env.example backend/.env
+# Edit backend/.env — at minimum set JWT_SECRET and DATABASE_URL
 
-# 3. Generate Prisma client & push schema
-npm run prisma:generate
-npm run prisma:push
-
-# 4. Seed the database with mock data
-npm run prisma:seed
-
-# 5. Start both servers
+# 3. Start both servers
 npm run dev
 ```
 
-### One-Command Setup
-```bash
-npm run setup
-# This runs: install:all → prisma:generate → prisma:push → prisma:seed
-```
+The backend uses a **file-based JSON database** (no PostgreSQL required).
+On startup it auto-loads seed data from `backend/src/data/*.json` with 25 model files covering users, matches, predictions, teams, leagues, and more.
 
 ### Demo Account
-After seeding:
+After the database initializes (it loads pre-seeded JSON files):
 - **Email:** `demo@matchmind.gg`
 - **Password:** `password123`
 
@@ -625,6 +628,16 @@ After seeding:
 - Endpoints: finish match, score predictions, weekly leaderboard
 - LeaderboardSnapshot + ScoringLog database models
 
+### Phase 5 — TypeScript & Infrastructure ✅ (Complete)
+- **Full TypeScript migration**: All 45+ backend files converted from JavaScript to TypeScript
+- **JSON Database**: File-based in-memory DB replaces Prisma/PostgreSQL with Prisma-compatible API
+- **Repository pattern**: Type-safe repository interfaces with Prisma-style implementations
+- **Structured logging**: Pino replaces console.* with event-based logging and sensitive data redaction
+- **Error monitoring**: Sentry integrated on both backend and frontend for crash/performance tracking
+- **Zod validation**: Runtime request validation with TypeScript type inference
+- **Test suite**: 71 passing tests (vitest) for scoring engine, auth routes, and prediction endpoints
+- **Type safety**: 25+ `@types/*` packages installed for full type coverage
+
 ---
 
 ## 🔧 Environment Variables
@@ -635,58 +648,67 @@ PORT=4000
 BACKEND_URL="http://localhost:4000"
 FRONTEND_URL="http://localhost:3000"
 NODE_ENV="development"
+LOG_LEVEL="debug"               # pino log level (debug, info, warn, error)
 
 # Database
-DATABASE_URL="postgresql://user:password@localhost:5432/matchmind"
-REDIS_URL="redis://localhost:6379"
+DATABASE_URL="json://local"      # JSON file-based DB — no PostgreSQL needed
+REDIS_URL="redis://localhost:6379"  # Optional — for BullMQ queues
 
 # Auth
 JWT_SECRET="your-64-char-secret"
 JWT_REFRESH_SECRET="another-64-char-secret"
-GOOGLE_CLIENT_ID="your-client-id"
-GOOGLE_CLIENT_SECRET="your-client-secret"
+JWT_RESET_SECRET="your-reset-secret"
+GOOGLE_CLIENT_ID="your-client-id"     # Optional
+GOOGLE_CLIENT_SECRET="your-client-secret"  # Optional
 
-# Sports Data
-SPORTRADAR_API_KEY="your-api-key"
-
-# Media
-CLOUDINARY_URL="cloudinary://key:secret@cloud"
+# Monitoring
+SENTRY_DSN="your-sentry-dsn"      # Optional — error/performance monitoring
 
 # AI
-ANTHROPIC_API_KEY="your-anthropic-key"
+ANTHROPIC_API_KEY="your-anthropic-key"  # Optional — Claude prediction hints
 
 # Pro / Stripe
-STRIPE_SECRET_KEY="sk_test_..."
-STRIPE_WEBHOOK_SECRET="whsec_..."
-STRIPE_PRICE_MONTHLY="price_monthly_id"
-STRIPE_PRICE_ANNUAL="price_annual_id"
+STRIPE_SECRET_KEY="sk_test_..."    # Optional
+STRIPE_WEBHOOK_SECRET="whsec_..."  # Optional
+STRIPE_PRICE_MONTHLY="price_monthly_id"  # Optional
+STRIPE_PRICE_ANNUAL="price_annual_id"    # Optional
 
 # Features
-TENOR_API_KEY="your-tenor-key"
+TENOR_API_KEY="your-tenor-key"    # Optional — GIF search in chat
 ```
 
 ---
 
+## 🧪 Testing
+
+### Test Suite
+| File | What it tests | Tests |
+|------|---------------|-------|
+| `src/services/scoring.test.ts` | Points calculation, streaks, tier progression, constants | 47 |
+| `src/routes/auth.test.ts` | Signup, login, refresh, forgot/reset password | 14 |
+| `src/routes/predictions.test.ts` | Prediction creation, validation, scoring modes | 11 |
+
+_Total: **71 tests** across all test files._
+
+
+```bash
+# Run all tests
+npm test
+
+# Watch mode
+npm run test:watch
+
+# With coverage
+npm run test:coverage
+```
+
+### Test Approach
+- Uses **vitest** with supertest for HTTP integration testing
+- All external dependencies are mocked (AuthService, Prisma/JSON DB, JWT)
+- In-memory mock databases simulated for isolated test runs
+- No real database or Redis required
+
 ## 🛠️ Troubleshooting
-
-### Prisma 7 Datasource URL
-Prisma 7 requires the datasource URL in `prisma.config.ts`, NOT in `schema.prisma`:
-```ts
-// backend/prisma.config.ts
-export default defineConfig({
-  datasourceUrl: process.env.DATABASE_URL || 'postgresql://...',
-})
-```
-The `url` field in `schema.prisma` `datasource` block must be removed.
-
-### Prisma Config Errors
-If `npx prisma generate` fails with `TypeError [ERR_INVALID_ARG_TYPE]: The "paths[1]" argument must be of type string`, the `prisma.config.ts` format may be incorrect. Use the simplified format:
-```ts
-import { defineConfig } from '@prisma/config'
-export default defineConfig({
-  datasourceUrl: process.env.DATABASE_URL,
-})
-```
 
 ### Redis Not Running
 BullMQ requires Redis for background job queues. If Redis is unavailable:
@@ -698,8 +720,6 @@ BullMQ requires Redis for background job queues. If Redis is unavailable:
 If `npm install` fails with `ENOTEMPTY` errors when cleaning `node_modules`, delete the folder manually via File Explorer and re-run `npm install`.
 
 ### Build Issues
-- **Vite + @vitejs/plugin-react compatibility**: Current setup uses Vite 8 + @vitejs/plugin-react 6.
-- **Missing picomatch**: If Vite reports picomatch not found, run `npm install picomatch` in the frontend directory.
 - **Chunk size warnings**: Some vendor chunks exceed 500 kB — consider code-splitting or adjust `chunkSizeWarningLimit` in `vite.config.js`.
 
 ---
@@ -710,4 +730,4 @@ Built for demonstration and learning purposes.
 
 ---
 
-*Document version: 2.0 | Project: MatchMind | All 4 phases complete | Generated: June 2026*
+*Document version: 3.0 | Project: MatchMind | TypeScript + JSON DB + Sentry + Vitest | Generated: July 2026*

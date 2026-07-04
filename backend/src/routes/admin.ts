@@ -1,18 +1,19 @@
-const express = require('express')
+import express from 'express'
+import { authenticateToken } from '../middleware/auth'
+import { requireAdmin } from '../middleware/requireAdmin'
+import { AdminService } from '../services/adminService'
+import { createRepositories } from '../repositories/index'
+import asyncHandler from '../middleware/asyncHandler'
+import logger from '../utils/logger'
+import type { AuthenticatedRequest } from '../middleware/auth'
+
 const router = express.Router()
-const bcrypt = require('bcryptjs')
-const { authenticateToken } = require('../middleware/auth')
-const { requireAdmin } = require('../middleware/requireAdmin')
-const { AdminService } = require('../services/adminService')
-const { createRepositories } = require('../repositories/index')
-const asyncHandler = require('../middleware/asyncHandler')
-const logger = require('../utils/logger')
 
 // All admin routes require auth + admin role
 router.use(authenticateToken, requireAdmin)
 
 /** Create an AdminService instance from the Express app's prisma client */
-function getAdminService(req) {
+function getAdminService(req: AuthenticatedRequest) {
   const prisma = req.app.get('prisma')
   const { userRepository, matchRepository, reportRepository, adminLogRepository } = createRepositories(prisma)
   return new AdminService({
@@ -21,8 +22,8 @@ function getAdminService(req) {
     reportRepository,
     adminLogRepository,
     prisma: {
-      prediction: { count: (opts) => prisma.prediction.count(opts) },
-      user: { count: (opts) => prisma.user.count(opts) },
+      prediction: { count: (opts?: any) => prisma.prediction.count(opts) },
+      user: { count: (opts?: any) => prisma.user.count(opts) },
     },
   })
 }
@@ -33,7 +34,7 @@ function getAdminService(req) {
  * GET /api/admin/stats
  * Returns aggregated dashboard metrics via AdminService
  */
-router.get('/stats', asyncHandler(async (req, res) => {
+router.get('/stats', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const stats = await getAdminService(req).getDashboardStats()
 
   res.json({
@@ -55,13 +56,13 @@ router.get('/stats', asyncHandler(async (req, res) => {
  * GET /api/admin/users
  * List users with pagination and search
  */
-router.get('/users', asyncHandler(async (req, res) => {
+router.get('/users', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
-  const page = parseInt(req.query.page) || 1
-  const limit = parseInt(req.query.limit) || 20
-  const search = req.query.search || ''
+  const page = parseInt(req.query.page as string) || 1
+  const limit = parseInt(req.query.limit as string) || 20
+  const search = (req.query.search as string) || ''
 
-  const where = search
+  const where: Record<string, any> = search
     ? {
         OR: [
           { username: { contains: search, mode: 'insensitive' } },
@@ -102,7 +103,7 @@ router.get('/users', asyncHandler(async (req, res) => {
  * GET /api/admin/users/:id
  * Get detailed user info
  */
-router.get('/users/:id', asyncHandler(async (req, res) => {
+router.get('/users/:id', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const user = await prisma.user.findUnique({
     where: { id: req.params.id },
@@ -128,11 +129,17 @@ router.get('/users/:id', asyncHandler(async (req, res) => {
  * PATCH /api/admin/users/:id
  * Update user fields
  */
-router.patch('/users/:id', asyncHandler(async (req, res) => {
+router.patch('/users/:id', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
-  const { role, tier, username, email, displayName } = req.body
+  const { role, tier, username, email, displayName } = req.body as {
+    role?: string
+    tier?: string
+    username?: string
+    email?: string
+    displayName?: string
+  }
 
-  const data = {}
+  const data: Record<string, any> = {}
   if (role) data.role = role
   if (tier) data.tier = tier
   if (username) data.username = username
@@ -152,11 +159,11 @@ router.patch('/users/:id', asyncHandler(async (req, res) => {
  * DELETE /api/admin/users/:id
  * Soft-delete or permanently delete user
  */
-router.delete('/users/:id', asyncHandler(async (req, res) => {
+router.delete('/users/:id', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   // Cascade delete user data
   await prisma.user.delete({ where: { id: req.params.id } })
-  getAdminService(req).logAction(req.userId, 'USER_DELETED', req.params.id, 'user', {})
+  getAdminService(req).logAction(req.userId!, 'USER_DELETED', req.params.id, 'user', {})
   res.json({ message: 'User deleted' })
 }))
 
@@ -164,7 +171,7 @@ router.delete('/users/:id', asyncHandler(async (req, res) => {
  * POST /api/admin/users/:id/toggle-pro
  * Toggle Pro status for a user
  */
-router.post('/users/:id/toggle-pro', asyncHandler(async (req, res) => {
+router.post('/users/:id/toggle-pro', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const user = await prisma.user.findUnique({ where: { id: req.params.id }, select: { isPro: true } })
   if (!user) return res.status(404).json({ error: { code: 'USER_NOT_FOUND', message: 'User not found' } })
@@ -178,7 +185,7 @@ router.post('/users/:id/toggle-pro', asyncHandler(async (req, res) => {
     select: { id: true, isPro: true, proExpiresAt: true },
   })
 
-  getAdminService(req).logAction(req.userId, 'PRO_TOGGLED', req.params.id, 'user', {
+  getAdminService(req).logAction(req.userId!, 'PRO_TOGGLED', req.params.id, 'user', {
     wasPro: user.isPro,
     nowPro: !user.isPro,
   })
@@ -191,11 +198,11 @@ router.post('/users/:id/toggle-pro', asyncHandler(async (req, res) => {
  * GET /api/admin/matches
  * List all matches with pagination
  */
-router.get('/matches', asyncHandler(async (req, res) => {
+router.get('/matches', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
-  const page = parseInt(req.query.page) || 1
-  const limit = parseInt(req.query.limit) || 20
-  const status = req.query.status
+  const page = parseInt(req.query.page as string) || 1
+  const limit = parseInt(req.query.limit as string) || 20
+  const status = req.query.status as string | undefined
 
   const where = status ? { status } : {}
 
@@ -228,11 +235,16 @@ router.get('/matches', asyncHandler(async (req, res) => {
  * PATCH /api/admin/matches/:id
  * Update match details (score, status)
  */
-router.patch('/matches/:id', asyncHandler(async (req, res) => {
+router.patch('/matches/:id', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
-  const { homeScore, awayScore, status, minute } = req.body
+  const { homeScore, awayScore, status, minute } = req.body as {
+    homeScore?: number
+    awayScore?: number
+    status?: string
+    minute?: number
+  }
 
-  const data = {}
+  const data: Record<string, any> = {}
   if (homeScore !== undefined) data.homeScore = homeScore
   if (awayScore !== undefined) data.awayScore = awayScore
   if (status) data.status = status
@@ -244,7 +256,7 @@ router.patch('/matches/:id', asyncHandler(async (req, res) => {
     select: { id: true, homeTeamName: true, awayTeamName: true, homeScore: true, awayScore: true, status: true },
   })
 
-  getAdminService(req).logAction(req.userId, 'MATCH_UPDATED', req.params.id, 'match', { ...data })
+  getAdminService(req).logAction(req.userId!, 'MATCH_UPDATED', req.params.id, 'match', { ...data })
   res.json({ match })
 }))
 
@@ -254,11 +266,11 @@ router.patch('/matches/:id', asyncHandler(async (req, res) => {
  * GET /api/admin/reports
  * List reports with pagination and status filter
  */
-router.get('/reports', asyncHandler(async (req, res) => {
+router.get('/reports', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
-  const page = parseInt(req.query.page) || 1
-  const limit = parseInt(req.query.limit) || 20
-  const status = req.query.status || 'pending'
+  const page = parseInt(req.query.page as string) || 1
+  const limit = parseInt(req.query.limit as string) || 20
+  const status = (req.query.status as string) || 'pending'
 
   const [reports, total] = await Promise.all([
     prisma.report.findMany({
@@ -281,9 +293,9 @@ router.get('/reports', asyncHandler(async (req, res) => {
  * PATCH /api/admin/reports/:id
  * Resolve or dismiss a report
  */
-router.patch('/reports/:id', asyncHandler(async (req, res) => {
+router.patch('/reports/:id', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
-  const { status } = req.body // 'resolved' | 'dismissed'
+  const { status } = req.body as { status?: string } // 'resolved' | 'dismissed'
 
   const report = await prisma.report.update({
     where: { id: req.params.id },
@@ -298,7 +310,7 @@ router.patch('/reports/:id', asyncHandler(async (req, res) => {
     })
   }
 
-  getAdminService(req).logAction(req.userId, status === 'resolved' ? 'REPORT_RESOLVED' : 'REPORT_DISMISSED', req.params.id, 'report', {
+  getAdminService(req).logAction(req.userId!, status === 'resolved' ? 'REPORT_RESOLVED' : 'REPORT_DISMISSED', req.params.id, 'report', {
     reportStatus: status,
   })
   res.json({ report })
@@ -310,10 +322,10 @@ router.patch('/reports/:id', asyncHandler(async (req, res) => {
  * GET /api/admin/activity-log
  * Returns recent admin actions with pagination
  */
-router.get('/activity-log', asyncHandler(async (req, res) => {
+router.get('/activity-log', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
-  const page = parseInt(req.query.page) || 1
-  const limit = parseInt(req.query.limit) || 50
+  const page = parseInt(req.query.page as string) || 1
+  const limit = parseInt(req.query.limit as string) || 50
 
   const [logs, total] = await Promise.all([
     prisma.adminLog.findMany({
@@ -333,7 +345,7 @@ router.get('/activity-log', asyncHandler(async (req, res) => {
  * GET /api/admin/settings
  * Get feature flags and system settings
  */
-router.get('/settings', async (req, res) => {
+router.get('/settings', (_req, res) => {
   // Feature flags stored in env or a settings table; for now return defaults
   res.json({
     settings: [
@@ -346,4 +358,4 @@ router.get('/settings', async (req, res) => {
   })
 })
 
-module.exports = router
+export default router

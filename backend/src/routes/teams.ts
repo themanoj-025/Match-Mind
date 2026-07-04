@@ -1,12 +1,13 @@
-const express = require('express')
+import express from 'express'
+import asyncHandler from '../middleware/asyncHandler'
+
 const router = express.Router()
-const asyncHandler = require('../middleware/asyncHandler')
 
 // GET /api/teams — list teams (optional sport filter)
 router.get('/', asyncHandler(async (req, res) => {
   const prisma = req.app.get('prisma')
-  const { sport } = req.query
-  const where = {}
+  const { sport } = req.query as { sport?: string }
+  const where: Record<string, any> = {}
   if (sport && sport !== 'all') where.sport = sport.toUpperCase()
   const teams = await prisma.team.findMany({ where, orderBy: { name: 'asc' }, take: 50 })
   res.json(teams)
@@ -39,7 +40,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
 
   // Compute form from last 5 matches
   const last5 = recentMatches.slice(0, 5).reverse()
-  const form = last5.map((m) => {
+  const form = last5.map((m: any) => {
     if (m.status !== 'FINISHED') return '—'
     const isHome = m.homeTeamId === team.id
     const teamScore = isHome ? m.homeScore : m.awayScore
@@ -57,4 +58,4 @@ router.get('/:id', asyncHandler(async (req, res) => {
   })
 }))
 
-module.exports = router
+export default router

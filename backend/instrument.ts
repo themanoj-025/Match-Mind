@@ -5,10 +5,10 @@
  * It initializes Sentry for error monitoring and performance tracing.
  *
  * Usage:
- *   require('./instrument')  // first line of src/index.js
+ *   import './instrument'  // first line of src/index.ts
  */
 
-const Sentry = require('@sentry/node')
+import * as Sentry from '@sentry/node'
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN || '',
@@ -34,4 +34,4 @@ Sentry.init({
   },
 })
 
-module.exports = Sentry
+export default Sentry

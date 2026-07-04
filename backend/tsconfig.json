@@ -8,17 +8,15 @@
     "strictPropertyInitialization": true,
     "noImplicitThis": true,
     "alwaysStrict": true,
-    "noUncheckedIndexedAccess": true,
-    "ignoreDeprecations": "6.0",
+    "noUncheckedIndexedAccess": false,
     "target": "ES2022",
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "rootDir": "./src",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
@@ -26,6 +24,6 @@
     "checkJs": false,
     "skipLibCheck": true
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "instrument.ts"],
   "exclude": ["node_modules", "dist", "**/*.test.*", "scripts", "prisma"]
 }

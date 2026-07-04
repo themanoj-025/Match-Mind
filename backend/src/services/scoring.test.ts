@@ -1,8 +1,27 @@
-const { calculatePredictionPoints, updateUserStreaks, checkTierProgression, TIER_THRESHOLDS, TIER_ORDER, getTierForPoints } = require('./scoring')
+/**
+ * Scoring Engine Tests — MatchMind
+ *
+ * Tests the core scoring logic:
+ * - calculatePredictionPoints
+ * - updateUserStreaks
+ * - checkTierProgression
+ * - getTierForPoints
+ * - Tier constants
+ */
+
+import { describe, it, expect } from 'vitest'
+import {
+  calculatePredictionPoints,
+  updateUserStreaks,
+  checkTierProgression,
+  TIER_THRESHOLDS,
+  TIER_ORDER,
+  getTierForPoints,
+} from './scoring'
 
 // ─── Helpers ──────────────────────────────────────────
 
-function mockUser(overrides = {}) {
+function mockUser(overrides: Record<string, any> = {}) {
   return {
     id: 'user-1',
     streakCurrent: 0,
@@ -16,18 +35,18 @@ function mockUser(overrides = {}) {
   }
 }
 
-function mockPrisma(userOverrides = {}) {
+function mockPrisma(userOverrides: Record<string, any> = {}) {
   const user = mockUser(userOverrides)
   let currentUser = { ...user }
 
   return {
     user: {
-      findUnique: async ({ where }) => {
+      findUnique: async ({ where }: { where: Record<string, any> }) => {
         if (where.id === currentUser.id) return { ...currentUser }
         if (where.id === 'not-found') return null
         return null
       },
-      update: async ({ where, data }) => {
+      update: async ({ where, data }: { where: Record<string, any>; data: Record<string, any> }) => {
         if (where.id === currentUser.id) {
           currentUser = { ...currentUser, ...data }
         }
@@ -40,11 +59,11 @@ function mockPrisma(userOverrides = {}) {
   }
 }
 
-function mockMatch(homeScore = 2, awayScore = 1) {
+function mockMatch(homeScore = 2, awayScore = 1): { homeScore: number; awayScore: number; status: string } {
   return { homeScore, awayScore, status: 'FINISHED' }
 }
 
-function mockPrediction(overrides = {}) {
+function mockPrediction(overrides: Record<string, any> = {}): Record<string, any> {
   return {
     id: 'pred-1',
     userId: 'user-1',
@@ -113,10 +132,6 @@ describe('calculatePredictionPoints', () => {
     })
 
     it('awards 30 points for correct draw prediction with wrong score', () => {
-      const prediction = mockPrediction({ homeGoals: 2, awayGoals: 2 })
-      const match = mockMatch(0, 0)
-      // pred draws (GD=0), actual draws (GD=0) => same GD => result+GD = 40
-      // For result-only, need different GD while same result
       const prediction2 = mockPrediction({ homeGoals: 5, awayGoals: 1 })
       const match2 = mockMatch(3, 0)
       const result = calculatePredictionPoints(prediction2, match2)
@@ -250,14 +265,14 @@ describe('calculatePredictionPoints', () => {
     it('handles undefined scores as 0', () => {
       const prediction = mockPrediction({ homeGoals: 0, awayGoals: 0 })
       const match = { homeScore: undefined, awayScore: undefined }
-      const result = calculatePredictionPoints(prediction, match)
+      const result = calculatePredictionPoints(prediction, match as any)
       expect(result.points).toBe(55) // exact 0-0
     })
 
     it('handles null scores as 0', () => {
       const prediction = mockPrediction({ homeGoals: 0, awayGoals: 0 })
       const match = { homeScore: null, awayScore: null }
-      const result = calculatePredictionPoints(prediction, match)
+      const result = calculatePredictionPoints(prediction, match as any)
       expect(result.points).toBe(55) // exact 0-0
     })
 
@@ -278,12 +293,6 @@ describe('calculatePredictionPoints', () => {
     })
 
     it('awards correct result for away win with wrong GD', () => {
-      const prediction = mockPrediction({ homeGoals: 1, awayGoals: 3 })
-      const match = mockMatch(0, 2)
-      const result = calculatePredictionPoints(prediction, match)
-      // away win correct, but GD differs (-2 vs -2) → same GD → result+GD branch
-      // GD is -2 for both: 1-3 (GD=-2), 0-2 (GD=-2) → same!
-      // Let's use different GD
       const prediction2 = mockPrediction({ homeGoals: 0, awayGoals: 4 })
       const match2 = mockMatch(0, 2)
       const result2 = calculatePredictionPoints(prediction2, match2)
@@ -301,7 +310,7 @@ describe('calculatePredictionPoints', () => {
 describe('updateUserStreaks', () => {
   it('increments streak on correct prediction from 0', async () => {
     const prisma = mockPrisma({ streakCurrent: 0, streakBest: 0 })
-    await updateUserStreaks(prisma, 'user-1', true)
+    await updateUserStreaks(prisma as any, 'user-1', true)
     const user = prisma.getCurrentUser()
     expect(user.streakCurrent).toBe(1)
     expect(user.streakBest).toBe(1)
@@ -309,7 +318,7 @@ describe('updateUserStreaks', () => {
 
   it('increments streak on correct prediction from 5', async () => {
     const prisma = mockPrisma({ streakCurrent: 5, streakBest: 8 })
-    await updateUserStreaks(prisma, 'user-1', true)
+    await updateUserStreaks(prisma as any, 'user-1', true)
     const user = prisma.getCurrentUser()
     expect(user.streakCurrent).toBe(6)
     expect(user.streakBest).toBe(8) // best unchanged
@@ -317,7 +326,7 @@ describe('updateUserStreaks', () => {
 
   it('resets streak to 0 on incorrect prediction', async () => {
     const prisma = mockPrisma({ streakCurrent: 5, streakBest: 8 })
-    await updateUserStreaks(prisma, 'user-1', false)
+    await updateUserStreaks(prisma as any, 'user-1', false)
     const user = prisma.getCurrentUser()
     expect(user.streakCurrent).toBe(0)
     expect(user.streakBest).toBe(8) // best unchanged
@@ -325,7 +334,7 @@ describe('updateUserStreaks', () => {
 
   it('updates streakBest when current exceeds previous best', async () => {
     const prisma = mockPrisma({ streakCurrent: 5, streakBest: 5 })
-    await updateUserStreaks(prisma, 'user-1', true)
+    await updateUserStreaks(prisma as any, 'user-1', true)
     const user = prisma.getCurrentUser()
     expect(user.streakCurrent).toBe(6)
     expect(user.streakBest).toBe(6)
@@ -333,15 +342,15 @@ describe('updateUserStreaks', () => {
 
   it('handles not-found user gracefully', async () => {
     const prisma = mockPrisma()
-    await expect(updateUserStreaks(prisma, 'not-found', true)).resolves.toBeUndefined()
+    await expect(updateUserStreaks(prisma as any, 'not-found', true)).resolves.toBeUndefined()
   })
 
   it('handles streak staying at 0 after multiple incorrect predictions', async () => {
     const prisma = mockPrisma({ streakCurrent: 0, streakBest: 0 })
-    await updateUserStreaks(prisma, 'user-1', false)
+    await updateUserStreaks(prisma as any, 'user-1', false)
     expect(prisma.getCurrentUser().streakCurrent).toBe(0)
 
-    await updateUserStreaks(prisma, 'user-1', false)
+    await updateUserStreaks(prisma as any, 'user-1', false)
     expect(prisma.getCurrentUser().streakCurrent).toBe(0)
   })
 })
@@ -353,61 +362,61 @@ describe('updateUserStreaks', () => {
 describe('checkTierProgression', () => {
   it('stays at BRONZE when below SILVER threshold', async () => {
     const prisma = mockPrisma({ tier: 'BRONZE', totalPoints: 100 })
-    await checkTierProgression(prisma, 'user-1', 100, 'BRONZE')
+    await checkTierProgression(prisma as any, 'user-1', 100, 'BRONZE')
     expect(prisma.getCurrentUser().tier).toBe('BRONZE')
   })
 
   it('upgrades from BRONZE to SILVER at 500 points', async () => {
     const prisma = mockPrisma({ tier: 'BRONZE', totalPoints: 499 })
-    await checkTierProgression(prisma, 'user-1', 500, 'BRONZE')
+    await checkTierProgression(prisma as any, 'user-1', 500, 'BRONZE')
     expect(prisma.getCurrentUser().tier).toBe('SILVER')
   })
 
   it('upgrades from SILVER to GOLD at 1500 points', async () => {
     const prisma = mockPrisma({ tier: 'SILVER', totalPoints: 1499 })
-    await checkTierProgression(prisma, 'user-1', 1500, 'SILVER')
+    await checkTierProgression(prisma as any, 'user-1', 1500, 'SILVER')
     expect(prisma.getCurrentUser().tier).toBe('GOLD')
   })
 
   it('upgrades from GOLD to PLATINUM at 3500 points', async () => {
     const prisma = mockPrisma({ tier: 'GOLD', totalPoints: 3499 })
-    await checkTierProgression(prisma, 'user-1', 3500, 'GOLD')
+    await checkTierProgression(prisma as any, 'user-1', 3500, 'GOLD')
     expect(prisma.getCurrentUser().tier).toBe('PLATINUM')
   })
 
   it('upgrades from PLATINUM to DIAMOND at 7000 points', async () => {
     const prisma = mockPrisma({ tier: 'PLATINUM', totalPoints: 6999 })
-    await checkTierProgression(prisma, 'user-1', 7000, 'PLATINUM')
+    await checkTierProgression(prisma as any, 'user-1', 7000, 'PLATINUM')
     expect(prisma.getCurrentUser().tier).toBe('DIAMOND')
   })
 
   it('upgrades from DIAMOND to LEGEND at 12000 points', async () => {
     const prisma = mockPrisma({ tier: 'DIAMOND', totalPoints: 11999 })
-    await checkTierProgression(prisma, 'user-1', 12000, 'DIAMOND')
+    await checkTierProgression(prisma as any, 'user-1', 12000, 'DIAMOND')
     expect(prisma.getCurrentUser().tier).toBe('LEGEND')
   })
 
   it('stays in same tier when points are exactly at threshold and already in that tier', async () => {
     const prisma = mockPrisma({ tier: 'SILVER', totalPoints: 500 })
-    await checkTierProgression(prisma, 'user-1', 500, 'SILVER')
+    await checkTierProgression(prisma as any, 'user-1', 500, 'SILVER')
     expect(prisma.getCurrentUser().tier).toBe('SILVER')
   })
 
   it('downgrades to correct tier when points decrease', async () => {
     const prisma = mockPrisma({ tier: 'GOLD', totalPoints: 2000 })
-    await checkTierProgression(prisma, 'user-1', 100, 'GOLD')
+    await checkTierProgression(prisma as any, 'user-1', 100, 'GOLD')
     // The scoring engine scans from top tier down; 100 points = BRONZE
     expect(prisma.getCurrentUser().tier).toBe('BRONZE')
   })
 
   it('handles non-existent user', async () => {
     const prisma = mockPrisma()
-    await expect(checkTierProgression(prisma, 'not-found', 100, null)).resolves.toBeUndefined()
+    await expect(checkTierProgression(prisma as any, 'not-found', 100, null as any)).resolves.toBeUndefined()
   })
 
   it('resolves tier from DB when currentTier is null', async () => {
     const prisma = mockPrisma({ tier: 'BRONZE', totalPoints: 600 })
-    await checkTierProgression(prisma, 'user-1', 600, null)
+    await checkTierProgression(prisma as any, 'user-1', 600, null as any)
     expect(prisma.getCurrentUser().tier).toBe('SILVER')
   })
 })
@@ -435,7 +444,7 @@ describe('getTierForPoints', () => {
   })
 
   it('returns correct tier at each boundary', () => {
-    const boundaries = [
+    const boundaries: [number, string][] = [
       [0, 'BRONZE'],
       [499, 'BRONZE'],
       [500, 'SILVER'],
@@ -469,7 +478,7 @@ describe('tier constants', () => {
 
   it('thresholds are strictly increasing', () => {
     for (let i = 1; i < TIER_ORDER.length; i++) {
-      expect(TIER_THRESHOLDS[TIER_ORDER[i]]).toBeGreaterThan(TIER_THRESHOLDS[TIER_ORDER[i - 1]])
+      expect(TIER_THRESHOLDS[TIER_ORDER[i]]).toBeGreaterThan(TIER_THRESHOLDS[TIER_ORDER[i - 1]!]!)
     }
   })
 })
