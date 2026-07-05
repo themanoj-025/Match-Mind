@@ -8,7 +8,7 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState('')
   const navigate = useNavigate()
 
-  const handleSearch = (e) => {
+  const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
@@ -81,7 +81,7 @@ export default function Navbar() {
                   <input
                     type="text"
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
                     placeholder="Search players, rooms..."
                     className="bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-primary)] body rounded-[var(--radius-md)] pl-9 pr-3 py-2 w-44 focus:w-56 transition-all border border-transparent focus:border-[var(--border-active)] focus:outline-none"
                   />
@@ -97,8 +97,8 @@ export default function Navbar() {
               </Link>
               <Link to="/profile/me" className="flex items-center gap-2 p-1.5 rounded-[var(--radius-md)] hover:bg-[var(--mm-bg-hover)] transition-colors">
                 <div className="w-8 h-8 rounded-full bg-[var(--gradient-predict)] flex items-center justify-center overflow-hidden">
-                  {user?.avatar ? (
-                    <img src={user.avatar} alt="" className="w-full h-full object-cover" />
+                  {(user as { avatar?: string })?.avatar ? (
+                    <img src={(user as { avatar?: string }).avatar || ''} alt="" className="w-full h-full object-cover" />
                   ) : (
                     <User size={16} className="text-[var(--mm-text-inverse)]" />
                   )}
@@ -113,7 +113,7 @@ export default function Navbar() {
       {isNavOpen && (
         <div className="fixed inset-0 z-40 md:hidden" onClick={toggleNav}>
           <div className="absolute inset-0 bg-black/60" />
-          <div className="absolute top-16 left-0 w-72 bg-[var(--mm-bg-secondary)] h-full border-r border-[var(--border-subtle)] p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="absolute top-16 left-0 w-72 bg-[var(--mm-bg-secondary)] h-full border-r border-[var(--border-subtle)] p-6" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
             <div className="flex flex-col gap-2">
               <Link to="/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-md)] hover:bg-[var(--mm-bg-hover)] body" onClick={toggleNav}>
                 <Home size={18} /> Dashboard

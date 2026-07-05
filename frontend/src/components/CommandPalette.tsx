@@ -3,9 +3,26 @@ import { useNavigate } from 'react-router-dom'
 import { Search, ArrowRight, Trophy, Users, User, Zap, Star, X, Command, Sparkles } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
+// ── Types ─────────────────────────────────────────────
+
+interface SectionItem {
+  id: string
+  label: string
+  icon: React.ComponentType<{ size?: number }> | string
+  path?: string
+  shortcut?: string
+  meta?: string
+}
+
+interface Section {
+  id: string
+  label: string
+  items: SectionItem[]
+}
+
 // ── Search Data ───────────────────────────────────────
 
-const SECTIONS = [
+const SECTIONS: Section[] = [
   {
     id: 'quick',
     label: 'Quick Actions',
@@ -20,7 +37,13 @@ const SECTIONS = [
 
 // ── Suggestion Chips ──────────────────────────────────
 
-function SuggestionChip({ text, onClick, icon }) {
+interface SuggestionChipProps {
+  text: string
+  onClick: () => void
+  icon?: React.ReactNode
+}
+
+function SuggestionChip({ text, onClick, icon }: SuggestionChipProps) {
   return (
     <button
       onClick={onClick}
@@ -34,12 +57,17 @@ function SuggestionChip({ text, onClick, icon }) {
 
 // ── Command Palette ───────────────────────────────────
 
-export default function CommandPalette({ isOpen, onClose }) {
+interface CommandPaletteProps {
+  isOpen: boolean
+  onClose: () => void
+}
+
+export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [selectedIdx, setSelectedIdx] = useState(0)
-  const inputRef = useRef(null)
-  const listRef = useRef(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const listRef = useRef<HTMLDivElement>(null)
 
   // Flatten all items for keyboard navigation
   const allItems = useMemo(() => {
@@ -79,7 +107,7 @@ export default function CommandPalette({ isOpen, onClose }) {
   }, [isOpen])
 
   // Keyboard navigation
-  const handleKeyDown = useCallback((e) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault()
       setSelectedIdx(prev => Math.min(prev + 1, filteredItems.length - 1))
@@ -97,10 +125,10 @@ export default function CommandPalette({ isOpen, onClose }) {
     }
   }, [filteredItems, selectedIdx, onClose])
 
-  const handleSelect = (item) => {
+  const handleSelect = useCallback((item: SectionItem) => {
     if (item.path) navigate(item.path)
     onClose()
-  }
+  }, [navigate, onClose])
 
   // Scroll selected item into view
   useEffect(() => {
@@ -131,7 +159,7 @@ export default function CommandPalette({ isOpen, onClose }) {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: -10 }}
         transition={{ duration: 0.15, ease: 'easeOut' }}
-        onClick={(e) => e.stopPropagation()}
+        onClick={(e: React.MouseEvent) => e.stopPropagation()}
         className="relative w-full max-w-xl bg-[var(--mm-bg-secondary)] border border-[var(--border-default)] rounded-[var(--radius-xl)] shadow-[var(--shadow-modal)] overflow-hidden"
         role="dialog"
         aria-modal="true"
@@ -144,7 +172,7 @@ export default function CommandPalette({ isOpen, onClose }) {
             ref={inputRef}
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Search rooms, players, pages..."
             className="flex-1 bg-transparent text-[var(--mm-text-primary)] body outline-none placeholder:text-[var(--mm-text-muted)]"
@@ -199,7 +227,7 @@ export default function CommandPalette({ isOpen, onClose }) {
                         {ItemIcon ? (
                           <ItemIcon size={16} className="text-[var(--mm-text-secondary)] shrink-0" />
                         ) : (
-                          <span className="text-base w-5 text-center shrink-0">{item.icon}</span>
+                          <span className="text-base w-5 text-center shrink-0">{item.icon as string}</span>
                         )}
 
                         {/* Label */}

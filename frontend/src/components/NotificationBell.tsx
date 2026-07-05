@@ -3,20 +3,27 @@ import { Bell } from 'lucide-react'
 import useStore from '../store/useStore'
 import { Link } from 'react-router-dom'
 
+interface Notification {
+  id?: string
+  title?: string
+  message?: string
+  isRead?: boolean
+}
+
 export default function NotificationBell() {
   const { unreadCount, notifications, markAllRead } = useStore()
   const [open, setOpen] = useState(false)
-  const ref = useRef(null)
+  const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false)
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
     }
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const recentNotifs = notifications?.slice(0, 5) || []
+  const recentNotifs: Notification[] = (notifications as Notification[])?.slice(0, 5) || []
 
   return (
     <div className="relative" ref={ref}>
