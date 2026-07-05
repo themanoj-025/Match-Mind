@@ -157,4 +157,13 @@ export const publicLimiter = createLimiter({
   prefix: 'rl:public:',
 })
 
+// Draft Mode: start draft limited to 5 per minute per user (prevents ticket-exploit scripting §1.11)
+export const draftLimiter = createLimiter({
+  windowMs: 60 * 1000,
+  max: 5,
+  message: 'Too many draft attempts, please slow down',
+  prefix: 'rl:draft:',
+  keyGenerator: (req) => (req as any).userId || req.ip,
+})
+
 export const isRedisConnected = () => sharedRedisClient !== null && sharedRedisClient.isOpen

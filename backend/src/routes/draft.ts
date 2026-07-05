@@ -19,10 +19,8 @@ import express from 'express'
 import { authenticateToken } from '../middleware/auth'
 import { validate } from '../middleware/validate'
 import asyncHandler from '../middleware/asyncHandler'
-import { requireDraftEnabled } from '../middleware/draftGate'
 import { draftStartSchema, draftPickSchema } from '../config/schemas'
 import type { AuthenticatedRequest } from '../middleware/auth'
-import type { RarityTierName } from '../config/constants'
 import {
   startDraft,
   getNextRound,
@@ -31,11 +29,17 @@ import {
   getSessionState,
   listUserDrafts,
   loadFormations,
+  type ChoiceRound,
+  type DraftSession,
+  type DraftPick,
+  type SquadPlayer,
 } from '../services/draftService'
 import {
   consumeTicket,
   getTicketBalance,
 } from '../services/draftTicketService'
+import { getDraftEnabledTournaments } from '../middleware/draftGate'
+import { draftLimiter } from '../middleware/rateLimiter'
 import logger from '../utils/logger'
 
 const router = express.Router()
@@ -47,14 +51,14 @@ router.use(authenticateToken)
 
 router.post(
   '/start',
+  draftLimiter,
   validate(draftStartSchema),
   asyncHandler(async (req: AuthenticatedRequest, res) => {
     const prisma = req.app.get('prisma')
     const { tournamentId, formation } = req.body as { tournamentId: string; formation: string }
 
     // Verify Draft Mode is enabled for this tournament
-    const draftEnabledRaw = process.env.DRAFT_ENABLED_TOURNAMENTS || ''
-    const enabledTournaments = draftEnabledRaw.split(',').map((s) => s.trim()).filter(Boolean)
+    const enabledTournaments = getDraftEnabledTournaments()
     if (!enabledTournaments.includes(tournamentId)) {
       return res.status(403).json({
         error: {
