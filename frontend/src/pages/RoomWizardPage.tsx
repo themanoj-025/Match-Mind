@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, Gavel } from 'lucide-react'
@@ -9,20 +9,24 @@ const STEPS = ['Tournament', 'Budget & Rules', 'Review']
 export default function RoomWizardPage() {
   const navigate = useNavigate()
   const { data: tournaments } = useTournaments()
-  const liveTournaments = (tournaments || []).filter((t) => t.status === 'LIVE')
+  const liveTournaments = useMemo(
+    () => (tournaments || []).filter((t) => t.status === 'LIVE'),
+    [tournaments]
+  )
   const [step, setStep] = useState(0)
   const [name, setName] = useState('')
-  // Auto-select first live tournament if available
   const [tournamentId, setTournamentId] = useState<string>('')
+
+  // Auto-select first live tournament once data loads
+  useEffect(() => {
+    if (!tournamentId && liveTournaments.length > 0) {
+      setTournamentId(liveTournaments[0].id)
+    }
+  }, [tournamentId, liveTournaments])
   const [totalBudget, setTotalBudget] = useState(500)
   const [rosterRules, setRosterRules] = useState({ ...DEFAULT_ROSTER_RULES })
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
-
-  // Auto-select first live tournament once data loads
-  if (!tournamentId && liveTournaments.length > 0) {
-    setTournamentId(liveTournaments[0].id)
-  }
 
   const handleCreate = async () => {
     if (!name.trim()) { setError('Room name is required'); return }
@@ -41,7 +45,7 @@ export default function RoomWizardPage() {
         throw new Error(data.error?.message || 'Failed to create room')
       }
       const room = await res.json()
-      navigate(`/rooms/${room.id}/lobby`)
+      navigate(`/t/${tournamentId}/rooms/${room.id}/lobby`)
     } catch (err: any) {
       setError(err.message)
     } finally {

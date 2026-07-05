@@ -28,7 +28,7 @@ export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>
 
 export const createRoomSchema = z.object({
   name: z.string().min(1, 'Room name is required').max(100),
-  tournamentId: z.string().refine(isValidTournamentId, { message: 'Invalid tournament ID — must be a known tournament in the registry' }),
+  tournamentId: z.string().refine(isValidTournamentId, { message: 'Invalid tournament ID — must match a known tournament in the registry (e.g. fifa-wc-2026, uefa-ucl-2026-27, etc.)' }),
   totalBudget: z.number().int().positive().default(500),
   rosterRules: z.object({
     GK: z.number().int().min(1).max(5).default(2),

@@ -1,25 +1,35 @@
-import { type ReactNode } from 'react'
+import { type ReactNode, useMemo } from 'react'
 import { useTournaments } from '../lib/tournaments'
 
 interface Props {
   tournamentId?: string
   children: ReactNode
   className?: string
+  /**
+   * Optional inline theme for tournament-scoped pages where data is already fetched.
+   * Falls back to looking up from useTournaments() if not provided.
+   */
+  theme?: { primary: string; accent: string }
 }
 
 /**
  * Wraps content with tournament-specific CSS variables for dynamic theming.
- * Driven by the registry response, not hardcoded color lookups.
+ * Accepts an optional `theme` prop for tournament-scoped pages where the parent
+ * has already fetched the tournament data (avoids extra API call in presentational wrapper).
+ * Falls back to lookup via useTournaments() if no theme prop is provided.
  * 
  * Usage:
  *   <TournamentThemeWrapper tournamentId={room.tournamentId}>
  *     <PageContent />
  *   </TournamentThemeWrapper>
  */
-export default function TournamentThemeWrapper({ tournamentId, children, className }: Props) {
+export default function TournamentThemeWrapper({ tournamentId, children, className, theme: themeProp }: Props) {
   const { data: tournaments } = useTournaments()
-  const tournament = tournaments?.find((t) => t.id === tournamentId)
-  const theme = tournament?.theme
+  const theme = useMemo(() => {
+    if (themeProp) return themeProp
+    const tournament = tournaments?.find((t) => t.id === tournamentId)
+    return tournament?.theme
+  }, [themeProp, tournaments, tournamentId])
 
   return (
     <div
