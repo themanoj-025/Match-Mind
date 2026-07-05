@@ -1,22 +1,16 @@
-/**
- * HeroScene — Three.js animated particle background
- * MatchMind v3.0 Landing Page Hero Section
- *
- * Floating sport-icon particles with mouse parallax effect.
- * Falls back to static CSS stars if WebGL is unavailable.
- */
+import React, { useMemo, useEffect } from 'react'
 
-import React, { useRef, useMemo, useEffect, useCallback } from 'react'
-
-// Lazy-load Three.js to avoid blocking initial render
 const HeroScene = React.lazy(() => import('./HeroSceneImpl'))
 
-export default function HeroSceneWrapper(props) {
+interface HeroSceneWrapperProps {
+  [key: string]: unknown
+}
+
+export default function HeroSceneWrapper(props: HeroSceneWrapperProps) {
   const [hasWebGL, setHasWebGL] = React.useState(true)
   const [isLoaded, setIsLoaded] = React.useState(false)
 
   useEffect(() => {
-    // Check WebGL support
     try {
       const canvas = document.createElement('canvas')
       const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
@@ -36,9 +30,6 @@ export default function HeroSceneWrapper(props) {
   )
 }
 
-/**
- * Static CSS star field fallback when WebGL unavailable
- */
 function StaticFallback() {
   const stars = useMemo(() =>
     Array.from({ length: 50 }, (_, i) => ({

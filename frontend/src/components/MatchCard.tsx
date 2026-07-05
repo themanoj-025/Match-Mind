@@ -4,7 +4,31 @@ import { Users, Clock } from 'lucide-react'
 import SportBadge from './SportBadge'
 import LiveBadge from './LiveBadge'
 
-export default function MatchCard({ match, onEnterRoom, onPredict }) {
+interface MatchCardMatch {
+  id: string
+  homeTeam?: string
+  awayTeam?: string
+  homeTeamLogo?: string
+  awayTeamLogo?: string
+  homeScore?: number | null
+  awayScore?: number | null
+  status?: string
+  minute?: number
+  competition?: string
+  viewersCount?: number
+  sport?: string
+  scheduledAt?: string
+  homeTeamName?: string
+  awayTeamName?: string
+}
+
+interface MatchCardProps {
+  match: MatchCardMatch
+  onEnterRoom?: () => void
+  onPredict?: () => void
+}
+
+export default function MatchCard({ match, onEnterRoom, onPredict }: MatchCardProps) {
   const {
     id, homeTeam, awayTeam, homeTeamLogo, awayTeamLogo,
     homeScore, awayScore, status, minute, competition,
@@ -15,7 +39,7 @@ export default function MatchCard({ match, onEnterRoom, onPredict }) {
   const isFinished = status === 'FINISHED' || status === 'FT'
   const isScheduled = status === 'SCHEDULED' || status === 'scheduled'
 
-  const formatTime = (date) => {
+  const formatTime = (date: string) => {
     const d = new Date(date)
     return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
   }
@@ -29,7 +53,7 @@ export default function MatchCard({ match, onEnterRoom, onPredict }) {
       {/* Competition Header */}
       <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--border-subtle)]">
         <div className="flex items-center gap-2">
-          <SportBadge sport={sport} size="sm" />
+          <SportBadge sport={sport || 'football'} size="sm" />
           <span className="caption text-[var(--mm-text-muted)]">{competition}</span>
         </div>
         {isLive && <LiveBadge minute={minute} />}
@@ -37,7 +61,7 @@ export default function MatchCard({ match, onEnterRoom, onPredict }) {
         {isScheduled && (
           <div className="flex items-center gap-1 text-[var(--mm-text-muted)]">
             <Clock size={12} />
-            <span className="caption">{formatTime(scheduledAt)}</span>
+            <span className="caption">{scheduledAt ? formatTime(scheduledAt) : ''}</span>
           </div>
         )}
       </div>
@@ -51,7 +75,7 @@ export default function MatchCard({ match, onEnterRoom, onPredict }) {
               {homeTeamLogo ? (
                 <img src={homeTeamLogo} alt={homeTeam} className="w-8 h-8 object-contain" />
               ) : (
-                <span className="text-[var(--mm-text-muted)] font-bold text-lg">{homeTeam.charAt(0)}</span>
+                <span className="text-[var(--mm-text-muted)] font-bold text-lg">{(homeTeam || '?').charAt(0)}</span>
               )}
             </div>
             <span className="body text-[var(--mm-text-primary)] text-center truncate max-w-full">{homeTeam}</span>
@@ -82,7 +106,7 @@ export default function MatchCard({ match, onEnterRoom, onPredict }) {
               {awayTeamLogo ? (
                 <img src={awayTeamLogo} alt={awayTeam} className="w-8 h-8 object-contain" />
               ) : (
-                <span className="text-[var(--mm-text-muted)] font-bold text-lg">{awayTeam.charAt(0)}</span>
+                <span className="text-[var(--mm-text-muted)] font-bold text-lg">{(awayTeam || '?').charAt(0)}</span>
               )}
             </div>
             <span className="body text-[var(--mm-text-primary)] text-center truncate max-w-full">{awayTeam}</span>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, ArrowRight, Trophy, Users, User, Zap, Star, X, Command, Sparkles } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 
 // ── Types ─────────────────────────────────────────────
 
@@ -199,9 +199,8 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
         )}
 
         {/* Results */}
-        <div ref={listRef} className="max-h-[50vh] overflow-y-auto py-2">
-          {filteredSections.length > 0 ? (
-            filteredSections.map((section) => {
+        <div ref={listRef} className="max-h-[50vh] overflow-y-auto py-2">            {filteredSections.length > 0 ? (
+            filteredSections.map((section, si) => {
               return (
                 <div key={section.id}>
                   <div className="px-5 py-1.5 caption text-[var(--mm-text-muted)] font-medium flex items-center gap-2">
@@ -240,7 +239,7 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
                       </button>
                     )
                   })}
-                  {filteredSections.indexOf(section) < filteredSections.length - 1 && (
+                  {si < filteredSections.length - 1 && (
                     <div className="mx-5 my-1 border-t border-[var(--border-subtle)]" />
                   )}
                 </div>
