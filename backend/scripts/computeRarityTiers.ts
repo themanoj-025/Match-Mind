@@ -138,7 +138,8 @@ function main() {
 
   // Write a cache file with computation timestamp
   const cachePath = path.join(DATA_DIR, 'playerRarityCache.json')
-  const cache = tournamentIds
+  const tidArray = Array.from(tournamentIds)
+  const cache = tidArray
     .filter((tid) => !targetId || tid === targetId)
     .map((tid) => ({
       tournamentId: tid,
