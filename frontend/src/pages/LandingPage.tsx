@@ -100,10 +100,10 @@ export default function LandingPage() {
       <section className="py-20 bg-[var(--mm-bg-secondary)] border-y border-[var(--border-subtle)]">
         <div className="max-w-5xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {[
-            { icon: '⚽', value: tournaments?.filter(t => t.status === 'LIVE').length || 0, suffix: ' Tournaments', label: 'Live' },
+            { icon: '⚽', value: tournaments?.filter(t => t.status === 'LIVE').length ?? 2, suffix: ' Tournaments', label: 'Live' },
             { icon: '🏃', value: 500, suffix: '+', label: 'Players to Draft' },
             { icon: '👥', value: 1000, suffix: '+', label: 'Active Players' },
-            { icon: '🏆', value: tournaments?.filter(t => t.status === 'LIVE').length || 0, suffix: ' Leagues', label: 'Supported' },
+            { icon: '🏆', value: tournaments?.filter(t => t.status === 'LIVE').length ?? 2, suffix: ' Leagues', label: 'Supported' },
           ].map((stat) => (
             <div key={stat.label} className="hero-anim">
               <div className="text-3xl mb-2">{stat.icon}</div>

@@ -34,6 +34,7 @@ export default function TournamentThemeWrapper({ tournamentId, children, classNa
   return (
     <div
       className={className}
+      data-tournament={tournamentId}
       style={
         theme
           ? {

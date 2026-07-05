@@ -158,16 +158,26 @@ export const setupSocket = (io: Server, prisma: any): void => {
       const roomPrefix = roomId.split(':')[0]
       if (!ALLOWED_ROOM_TYPES.includes(roomPrefix)) return
 
-      // Tournament-namespaced room joining — §3.3: auction:${tournamentId}:${roomId}
-      const namespaceRoomId = roomPrefix === 'auction' && tournamentId
-        ? `auction:${tournamentId}:${roomId.replace(/^auction:/, '')}`
-        : roomId
+      // Always join the legacy room name for backward compatibility with existing broadcasts
+      socket.join(roomId)
 
-      socket.join(namespaceRoomId)
+      // Tournament-namespaced room joining — §3.3: auction:${tournamentId}:${roomId}
+      // Clients join both the legacy room name (room:uuid) AND the namespaced
+      // auction room (auction:${tournamentId}:${uuid}) so broadcasts using either
+      // format reach them. Broadcasts should eventually migrate to the namespaced
+      // format, but this dual-join ensures no messages are lost during transition.
+      // Note: we check for 'room' prefix here because clients send 'room:uuid'
+      // format for auction rooms, not 'auction:uuid'.
+      if (roomPrefix === 'room' && tournamentId) {
+        const roomUuid = roomId.replace(/^room:/, '')
+        socket.join(`auction:${tournamentId}:${roomUuid}`)
+      }
 
       // Send current auction state if joining an auction room
-      if (roomId.startsWith('auction:') || namespaceRoomId.startsWith('auction:')) {
-        const actualRoomId = roomId.startsWith('auction:') ? roomId.replace('auction:', '') : roomId
+      // Note: clients join with the legacy 'room:' prefix; the 'auction:' prefix is only
+      // used for the tournament-namespaced secondary join below
+      if (roomId.startsWith('room:')) {
+        const actualRoomId = roomId.replace('room:', '')
         prisma.auctionState.findUnique({ where: { roomId: actualRoomId } })
           .then((state: any) => {
             if (state) {
@@ -186,10 +196,17 @@ export const setupSocket = (io: Server, prisma: any): void => {
 
     socket.on('LEAVE_ROOM', ({ roomId, tournamentId }: { roomId?: string; tournamentId?: string }) => {
       if (!roomId || typeof roomId !== 'string') return
-      const namespaceRoomId = roomId.startsWith('auction:') && tournamentId
-        ? `auction:${tournamentId}:${roomId.replace(/^auction:/, '')}`
-        : roomId
-      socket.leave(namespaceRoomId)
+
+      // Always leave the legacy room name
+      socket.leave(roomId)
+
+      // Also leave the tournament-namespaced room if applicable
+      // Note: clients join auction rooms with 'room:uuid' format, so we
+      // derive the namespaced room from that same 'room:' prefix
+      if (roomId.startsWith('room:') && tournamentId) {
+        const roomUuid = roomId.replace(/^room:/, '')
+        socket.leave(`auction:${tournamentId}:${roomUuid}`)
+      }
       if (roomId.startsWith('match:')) {
         const matchId = roomId.replace('match:', '')
         const roomSize = io.sockets.adapter.rooms.get(roomId)?.size || 0
