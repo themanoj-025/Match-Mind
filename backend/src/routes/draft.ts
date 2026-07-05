@@ -21,7 +21,7 @@ import express from 'express'
 import { authenticateToken } from '../middleware/auth'
 import { validate } from '../middleware/validate'
 import asyncHandler from '../middleware/asyncHandler'
-import { draftStartSchema, draftPickSchema } from '../config/schemas'
+import { draftStartSchema, draftPickSchema, enterRunSchema } from '../config/schemas'
 import type { AuthenticatedRequest } from '../middleware/auth'
 import {
   startDraft,
@@ -39,6 +39,7 @@ import {
 import {
   enterRun,
   getRunStatus,
+  resolveNextMatchday,
 } from '../services/draftRunService'
 import {
   consumeTicket,
@@ -303,6 +304,7 @@ router.post(
 
 router.post(
   '/:sessionId/enter-run',
+  validate(enterRunSchema),
   asyncHandler(async (req: AuthenticatedRequest, res) => {
     const prisma = req.app.get('prisma')
     const result = await enterRun(prisma, req.params.sessionId as string, req.userId!)
@@ -330,6 +332,7 @@ router.post(
 
 router.get(
   '/:sessionId/run-status',
+  validate(enterRunSchema),
   asyncHandler(async (req: AuthenticatedRequest, res) => {
     const prisma = req.app.get('prisma')
     const result = await getRunStatus(prisma, req.params.sessionId as string, req.userId!)
@@ -342,6 +345,37 @@ router.get(
     }
 
     res.json(result.state)
+  }),
+)
+
+// ─── POST /api/draft/:sessionId/resolve-matchday (§2.2) ──
+
+router.post(
+  '/:sessionId/resolve-matchday',
+  validate(enterRunSchema),
+  asyncHandler(async (req: AuthenticatedRequest, res) => {
+    const prisma = req.app.get('prisma')
+    const result = await resolveNextMatchday(prisma, req.params.sessionId as string, req.userId!)
+
+    if (!result.success) {
+      return res.status(400).json({
+        error: { code: 'RESOLVE_FAILED', message: result.error || 'Failed to resolve matchday' },
+      })
+    }
+
+    logger.info({
+      event: 'draft_run.matchday_resolved',
+      sessionId: req.params.sessionId,
+      userId: req.userId,
+      roundNumber: result.round?.roundNumber,
+      outcome: result.round?.outcome,
+    })
+
+    res.json({
+      success: true,
+      round: result.round,
+      state: result.state,
+    })
   }),
 )
 
