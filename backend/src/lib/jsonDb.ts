@@ -562,6 +562,15 @@ export class JsonDatabase {
       'subscription', 'report', 'adminLog',
       'session', 'starredPlayer',
       'leaderboardSnapshot', 'achievement', 'userAchievement',
+      // Draft Mode models (§1.9)
+      'formation',
+      'draftSession',
+      'draftPick',
+      'draftRunResult',
+      'draftTicket',
+      'draftRewardsCatalog',
+      'playerRarityCache',
+      'roomTemplate',
     ]
 
     for (const name of modelNames) {

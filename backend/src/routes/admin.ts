@@ -6,6 +6,7 @@ import { createRepositories } from '../repositories/index'
 import asyncHandler from '../middleware/asyncHandler'
 import logger from '../utils/logger'
 import type { AuthenticatedRequest } from '../middleware/auth'
+import { validateTournamentDraftPool } from '../../scripts/validateDraftPoolLib'
 
 const router = express.Router()
 
@@ -323,7 +324,13 @@ router.get('/activity-log', asyncHandler(async (req: AuthenticatedRequest, res) 
  * Get feature flags and system settings
  */
 router.get('/settings', (_req, res) => {
-  // Feature flags stored in env or a settings table; for now return defaults
+  // Parse draft-enabled tournaments from env (comma-separated ids, e.g. "fifa-wc-2026,uefa-ucl-2026-27")
+  const draftEnabledRaw = process.env.DRAFT_ENABLED_TOURNAMENTS || ''
+  const draftEnabledTournaments = draftEnabledRaw
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+
   res.json({
     settings: [
       { flag: 'AI Hints', key: 'FLAG_AI_HINTS', enabled: process.env.FLAG_AI_HINTS !== 'false' },
@@ -331,8 +338,67 @@ router.get('/settings', (_req, res) => {
       { flag: 'Chat GIFs', key: 'FLAG_CHAT_GIFS', enabled: process.env.FLAG_CHAT_GIFS !== 'false' },
       { flag: 'Leaderboard Realtime', key: 'FLAG_LB_REALTIME', enabled: process.env.FLAG_LB_REALTIME === 'true' },
       { flag: 'Direct Messages', key: 'FLAG_DM', enabled: process.env.FLAG_DM === 'true' },
+      { flag: 'Draft Mode', key: 'DRAFT_ENABLED_TOURNAMENTS', enabled: draftEnabledTournaments.length > 0, tournaments: draftEnabledTournaments },
     ],
   })
 })
+
+/**
+ * POST /api/admin/settings/draft-mode/:tournamentId/:action
+ * Enable or disable Draft Mode for a tournament.
+ * Uses the shared validateDraftPoolLib module — no subprocess needed.
+ * Refuses to enable if validation fails (§6.4).
+ */
+router.post('/settings/draft-mode/:tournamentId/:action', asyncHandler(async (req: AuthenticatedRequest, res) => {
+  const tournamentId = String(req.params.tournamentId)
+  const action = String(req.params.action)
+
+  const dataDir = req.app.get('prisma')?.data?.dataDir || undefined
+  const validationResult = validateTournamentDraftPool(tournamentId, dataDir)
+
+  if (action === 'enable') {
+    if (!validationResult.passed) {
+      return res.status(400).json({
+        error: {
+          code: 'DRAFT_POOL_INSUFFICIENT',
+          message: 'Draft Mode cannot be enabled — player pool validation failed',
+          details: validationResult,
+        },
+      })
+    }
+
+    // Add to env-controlled list (in production this would update a DB/config store)
+    const current = (process.env.DRAFT_ENABLED_TOURNAMENTS || '').split(',').map((s) => s.trim()).filter(Boolean)
+    if (!current.includes(tournamentId)) {
+      current.push(tournamentId)
+      process.env.DRAFT_ENABLED_TOURNAMENTS = current.join(',')
+    }
+
+    getAdminService(req).logAction(req.userId!, 'DRAFT_MODE_ENABLED', tournamentId, 'tournament', {
+      validationPassed: true,
+    })
+
+    res.json({
+      message: `Draft Mode enabled for ${tournamentId}`,
+      tournamentId,
+      validation: validationResult,
+    })
+  } else if (action === 'disable') {
+    const current = (process.env.DRAFT_ENABLED_TOURNAMENTS || '').split(',').map((s) => s.trim()).filter(Boolean)
+    process.env.DRAFT_ENABLED_TOURNAMENTS = current.filter((id) => id !== tournamentId).join(',')
+
+    getAdminService(req).logAction(req.userId!, 'DRAFT_MODE_DISABLED', tournamentId, 'tournament', {})
+
+    res.json({ message: `Draft Mode disabled for ${tournamentId}` })
+  } else if (action === 'validate') {
+    res.json({
+      tournamentId,
+      validation: validationResult,
+      canEnable: validationResult.passed,
+    })
+  } else {
+    res.status(400).json({ error: { code: 'INVALID_ACTION', message: 'Action must be enable, disable, or validate' } })
+  }
+}))
 
 export default router
