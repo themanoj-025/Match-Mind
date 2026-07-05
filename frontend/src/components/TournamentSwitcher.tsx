@@ -9,7 +9,7 @@
  */
 
 import { useNavigate, useParams } from 'react-router-dom'
-import { useTournaments } from '../lib/tournaments'
+import { useTournaments, TOURNAMENT_ICONS } from '../lib/tournaments'
 import { ChevronDown } from 'lucide-react'
 
 export default function TournamentSwitcher() {
@@ -86,13 +86,4 @@ export default function TournamentSwitcher() {
   )
 }
 
-// ─── Tournament Icons Map ────────────────────────────────
 
-const TOURNAMENT_ICONS: Record<string, string> = {
-  trophy: '🏆',
-  'star-ball': '⭐',
-  'orange-ball': '⚽',
-  'continent-africa': '🌍',
-  'trophy-women': '🏆',
-  'continent-samerica': '🌎',
-}

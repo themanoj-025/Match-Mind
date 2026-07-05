@@ -12,14 +12,21 @@ export default function RoomWizardPage() {
   const liveTournaments = (tournaments || []).filter((t) => t.status === 'LIVE')
   const [step, setStep] = useState(0)
   const [name, setName] = useState('')
+  // Auto-select first live tournament if available
   const [tournamentId, setTournamentId] = useState<string>('')
   const [totalBudget, setTotalBudget] = useState(500)
   const [rosterRules, setRosterRules] = useState({ ...DEFAULT_ROSTER_RULES })
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
+  // Auto-select first live tournament once data loads
+  if (!tournamentId && liveTournaments.length > 0) {
+    setTournamentId(liveTournaments[0].id)
+  }
+
   const handleCreate = async () => {
     if (!name.trim()) { setError('Room name is required'); return }
+    if (!tournamentId) { setError('Please select a tournament'); return }
     setSubmitting(true)
     setError('')
     try {

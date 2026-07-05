@@ -153,15 +153,21 @@ export const setupSocket = (io: Server, prisma: any): void => {
 
     // ─── Room Management ─────────────────────────────────
 
-    socket.on('JOIN_ROOM', ({ roomId }: { roomId?: string }) => {
+    socket.on('JOIN_ROOM', ({ roomId, tournamentId }: { roomId?: string; tournamentId?: string }) => {
       if (!roomId || typeof roomId !== 'string') return
       const roomPrefix = roomId.split(':')[0]
       if (!ALLOWED_ROOM_TYPES.includes(roomPrefix)) return
-      socket.join(roomId)
+
+      // Tournament-namespaced room joining — §3.3: auction:${tournamentId}:${roomId}
+      const namespaceRoomId = roomPrefix === 'auction' && tournamentId
+        ? `auction:${tournamentId}:${roomId.replace(/^auction:/, '')}`
+        : roomId
+
+      socket.join(namespaceRoomId)
 
       // Send current auction state if joining an auction room
-      if (roomId.startsWith('room:')) {
-        const actualRoomId = roomId.replace('room:', '')
+      if (roomId.startsWith('auction:') || namespaceRoomId.startsWith('auction:')) {
+        const actualRoomId = roomId.startsWith('auction:') ? roomId.replace('auction:', '') : roomId
         prisma.auctionState.findUnique({ where: { roomId: actualRoomId } })
           .then((state: any) => {
             if (state) {
@@ -178,9 +184,12 @@ export const setupSocket = (io: Server, prisma: any): void => {
       }
     })
 
-    socket.on('LEAVE_ROOM', ({ roomId }: { roomId?: string }) => {
+    socket.on('LEAVE_ROOM', ({ roomId, tournamentId }: { roomId?: string; tournamentId?: string }) => {
       if (!roomId || typeof roomId !== 'string') return
-      socket.leave(roomId)
+      const namespaceRoomId = roomId.startsWith('auction:') && tournamentId
+        ? `auction:${tournamentId}:${roomId.replace(/^auction:/, '')}`
+        : roomId
+      socket.leave(namespaceRoomId)
       if (roomId.startsWith('match:')) {
         const matchId = roomId.replace('match:', '')
         const roomSize = io.sockets.adapter.rooms.get(roomId)?.size || 0

@@ -39,20 +39,17 @@ export default function TournamentGuard({ children, requireLive = false }: Tourn
     return <Navigate to="/404" replace />
   }
 
-  // ANNOUNCED — show teaser
+  // ANNOUNCED — always show teaser, never the regular children
+  // (Read-only pages can optionally show a preview behind the teaser in future)
   if (tournament.status === 'ANNOUNCED') {
-    if (requireLive) {
-      // Room creation, bidding, etc. are blocked
-      return (
-        <div className="pt-16">
-          <ComingSoonTeaser tournament={tournament} />
-        </div>
-      )
-    }
-    // Read-only pages (fixtures, players, etc.) show teaser with a preview
     return (
       <div className="pt-16">
-        {children}
+        <ComingSoonTeaser tournament={tournament} />
+        {!requireLive && (
+          <div className="max-w-5xl mx-auto px-4 mt-8 opacity-60 pointer-events-none select-none">
+            {children}
+          </div>
+        )}
       </div>
     )
   }
