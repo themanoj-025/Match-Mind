@@ -1,11 +1,14 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Gavel, Users, Timer } from 'lucide-react'
-import io from 'socket.io-client'
+import { ArrowLeft, Users, MessageSquare, Gavel } from 'lucide-react'
 import useStore from '../store/useStore'
 import TournamentThemeWrapper from '../components/TournamentThemeWrapper'
-import type { AuctionState, Player, RoomMember } from '../lib/types'
+import PlayerAuctionCard from '../components/PlayerAuctionCard'
+import AuctionActivityFeed from '../components/AuctionActivityFeed'
+import RosterBoard from '../components/RosterBoard'
+import { useAuctionSocket } from '../hooks/useAuctionSocket'
+import type { AuctionState, Player, RoomMember, Bid, Room } from '../lib/types'
 
 export default function AuctionRoomPage() {
   const { roomId } = useParams<{ roomId: string }>()
@@ -13,34 +16,27 @@ export default function AuctionRoomPage() {
   const user = useStore((s) => s.user)
   const { currentAuctionState, setCurrentAuctionState } = useStore()
 
-  const [room, setRoom] = useState<any>(null)
+  // ─── Local state ───────────────────────────────────────
+  const [room, setRoom] = useState<Room | null>(null)
   const [players, setPlayers] = useState<Record<string, Player>>({})
-  const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null)
   const [myBudget, setMyBudget] = useState(0)
   const [myRoster, setMyRoster] = useState<any[]>([])
   const [bidHistory, setBidHistory] = useState<any[]>([])
-  const [timeLeft, setTimeLeft] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [starredPlayers, setStarredPlayers] = useState<Set<string>>(new Set())
 
-  // Keep a ref to the latest auction state to avoid stale closures in WebSocket handlers
-  const auctionStateRef = useRef(currentAuctionState)
-  auctionStateRef.current = currentAuctionState
+  // ─── Derived values ────────────────────────────────────
+  const currentPlayerId = currentAuctionState?.currentPlayerId
+  const currentPlayer = currentPlayerId ? players[currentPlayerId] || null : null
+  const rosterRules = room?.rosterRules || { GK: 2, DEF: 5, MID: 5, FWD: 3, total: 15 }
 
-  // Helper to update auction state from partial updates (reads from ref, not closure)
-  const patchAuctionState = useCallback((patch: Partial<AuctionState>) => {
-    const state = auctionStateRef.current
-    setCurrentAuctionState(state ? { ...state, ...patch } : null)
-  }, [])
-
-  const socketRef = useRef<any>(null)
-
-  // Load room + players
+  // ─── Load room + players on mount ─────────────────────
   useEffect(() => {
     if (!roomId) return
     Promise.all([
       fetch(`/api/rooms/${roomId}`, { credentials: 'include' }).then(r => r.json()),
-      fetch(`/api/players?tournamentId=`, { credentials: 'include' }).then(r => r.json()),
+      fetch(`/api/players`, { credentials: 'include' }).then(r => r.json()),
     ]).then(([roomData, playersData]) => {
       setRoom(roomData)
       const playerMap: Record<string, Player> = {}
@@ -49,9 +45,6 @@ export default function AuctionRoomPage() {
 
       if (roomData.auctionState) {
         setCurrentAuctionState(roomData.auctionState)
-        if (roomData.auctionState.currentPlayerId) {
-          setCurrentPlayer(playerMap[roomData.auctionState.currentPlayerId] || null)
-        }
       }
 
       // Find my membership
@@ -64,8 +57,8 @@ export default function AuctionRoomPage() {
     }).catch(() => setLoading(false))
   }, [roomId])
 
-  // Load my roster
-  useEffect(() => {
+  // ─── Load my roster ────────────────────────────────────
+  const loadMyRoster = useCallback(() => {
     if (!roomId || !user) return
     fetch(`/api/rooms/${roomId}/franchises/${user.id}`, { credentials: 'include' })
       .then(r => r.json())
@@ -73,102 +66,111 @@ export default function AuctionRoomPage() {
       .catch(() => {})
   }, [roomId, user])
 
-  // WebSocket connection
   useEffect(() => {
+    loadMyRoster()
+  }, [loadMyRoster])
+
+  // ─── Set Captain/VC ────────────────────────────────────
+  const setCaptain = async (playerId: string, isViceCaptain: boolean = false) => {
     if (!roomId) return
-    const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1]
-    
-    const socket = io(import.meta.env.VITE_WS_URL || 'http://localhost:4000', {
-      auth: { token },
+    const res = await fetch(`/api/rooms/${roomId}/franchises/me/captain`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ playerId, isViceCaptain }),
     })
+    if (res.ok) {
+      const updated = await res.json()
+      setMyRoster(updated)
+    }
+  }
 
-    socket.on('connect', () => {
-      socket.emit('JOIN_ROOM', { roomId: `room:${roomId}` })
-    })
+  // ─── Socket callbacks ─────────────────────────────────
+  const onStateSync = useCallback((state: AuctionState) => {
+    setCurrentAuctionState(state)
+  }, [])
 
-    socket.on('ROOM_STATE_SYNC', (data: { auctionState: AuctionState }) => {
-      setCurrentAuctionState(data.auctionState)
-      if (data.auctionState.currentPlayerId) {
-        setCurrentPlayer(players[data.auctionState.currentPlayerId] || null)
-      }
-    })
+  const onNewBid = useCallback((data: any) => {
+    setCurrentAuctionState(prev => prev ? {
+      ...prev,
+      currentBid: data.amount,
+      currentBidderId: data.bidderId,
+      timerEndsAt: data.timerEndsAt,
+      version: data.version,
+    } : null)
 
-    socket.on('NEW_BID', (data: any) => {
-      patchAuctionState({
-        currentBid: data.amount,
-        currentBidderId: data.bidderId,
-        timerEndsAt: data.timerEndsAt,
-        version: data.version,
-      })
-      
-      setBidHistory(h => [{
-        playerId: data.playerId,
-        amount: data.amount,
-        bidderId: data.bidderId,
-        timestamp: new Date().toISOString(),
-      }, ...h].slice(0, 50))
-    })
-
-    socket.on('PLAYER_SOLD', (_data: any) => {
-      patchAuctionState({ phase: 'SOLD' as const })
-      // Refresh roster after a moment
-      setTimeout(() => {
-        if (user) {
-          fetch(`/api/rooms/${roomId}/franchises/${user.id}`, { credentials: 'include' })
-            .then(r => r.json())
-            .then(d => setMyRoster(d.roster || []))
-            .catch(() => {})
-        }
-      }, 500)
-    })
-
-    socket.on('PLAYER_UNSOLD', () => {
-      patchAuctionState({ phase: 'UNSOLD' as const })
-    })
-
-    socket.on('AUCTION_PHASE_CHANGE', (data: any) => {
-      setCurrentAuctionState(data.state)
-      if (data.state.currentPlayerId) {
-        setCurrentPlayer(players[data.state.currentPlayerId] || null)
-      }
-    })
-
-    socket.on('AUCTION_FINISHED', () => {
-      patchAuctionState({ phase: 'FINISHED' as const })
-    })
-
-    socket.on('BID_REJECTED', (data: any) => {
-      setError(data.message || 'Bid rejected')
-      setTimeout(() => setError(''), 3000)
-    })
-
-    socketRef.current = socket
-    return () => { socket.disconnect() }
+    setBidHistory(h => [{
+      id: `${data.playerId}-${data.timestamp || Date.now()}`,
+      roomId: roomId || '',
+      playerId: data.playerId,
+      userId: data.bidderId,
+      amount: data.amount,
+      timestamp: data.timestamp || new Date().toISOString(),
+      version: data.version,
+    }, ...h].slice(0, 50))
   }, [roomId])
 
-  // Timer countdown
-  useEffect(() => {
-    if (!currentAuctionState?.timerEndsAt) return
-    const interval = setInterval(() => {
-      const endsAt = currentAuctionState.timerEndsAt!
-      const diff = Math.max(0, Math.floor((new Date(endsAt).getTime() - Date.now()) / 1000))
-      setTimeLeft(diff)
-    }, 200)
-    return () => clearInterval(interval)
-  }, [currentAuctionState?.timerEndsAt])
+  const onPlayerSold = useCallback((data: any) => {
+    setCurrentAuctionState(prev => prev ? { ...prev, phase: 'SOLD' } : null)
+    // Refresh budget and roster after sale
+    if (data.buyerId === user?.id) {
+      setMyBudget(prev => prev - (data.price || 0))
+    }
+    setTimeout(() => loadMyRoster(), 500)
+  }, [user, loadMyRoster])
 
-  const placeBid = useCallback((amount: number) => {
-    if (!socketRef.current || !currentAuctionState || !currentPlayer) return
-    socketRef.current.emit('PLACE_BID', {
-      roomId,
-      playerId: currentPlayer.id,
-      amount,
-      expectedVersion: currentAuctionState.version,
+  const onPlayerUnsold = useCallback(() => {
+    setCurrentAuctionState(prev => prev ? { ...prev, phase: 'UNSOLD' } : null)
+  }, [])
+
+  const onAuctionPhaseChange = useCallback((data: any) => {
+    setCurrentAuctionState(data.state)
+  }, [])
+
+  const onAuctionFinished = useCallback(() => {
+    setCurrentAuctionState(prev => prev ? { ...prev, phase: 'FINISHED' } : null)
+  }, [])
+
+  const onReAuctionStarted = useCallback(() => {
+    setCurrentAuctionState(prev => prev ? { ...prev, phase: 'RE_AUCTION' } : null)
+  }, [])
+
+  const onBidRejected = useCallback((data: { code: string; message: string }) => {
+    setError(data.message || 'Bid rejected')
+    setTimeout(() => setError(''), 3000)
+  }, [])
+
+  // ─── Connect WebSocket via hook ────────────────────────
+  const { placeBid, toggleStar: socketToggleStar } = useAuctionSocket(roomId, {
+    onStateSync,
+    onNewBid,
+    onPlayerSold,
+    onPlayerUnsold,
+    onAuctionPhaseChange,
+    onAuctionFinished,
+    onReAuctionStarted,
+    onBidRejected,
+  })
+
+  // ─── Bid handler ───────────────────────────────────────
+  const handleBid = useCallback((amount: number) => {
+    if (!currentPlayerId || !currentAuctionState) return
+    placeBid(currentPlayerId, amount, currentAuctionState.version)
+  }, [currentPlayerId, currentAuctionState, placeBid])
+
+  // ─── Star toggle ───────────────────────────────────────
+  const handleToggleStar = useCallback(() => {
+    if (!currentPlayerId) return
+    socketToggleStar(currentPlayerId)
+    setStarredPlayers(prev => {
+      const next = new Set(prev)
+      if (next.has(currentPlayerId)) next.delete(currentPlayerId)
+      else next.add(currentPlayerId)
+      return next
     })
-  }, [roomId, currentAuctionState, currentPlayer])
+  }, [currentPlayerId, socketToggleStar])
 
-  const isMyBid = currentAuctionState?.currentBidderId === user?.id
-
+  // ─── Loading state ────────────────────────────────────
   if (loading) return (
     <div className="min-h-screen pt-16 flex items-center justify-center">
       <div className="w-10 h-10 border-2 border-[var(--mm-accent-green)] border-t-transparent rounded-full animate-spin" />
@@ -178,18 +180,31 @@ export default function AuctionRoomPage() {
   return (
     <TournamentThemeWrapper tournamentId={room?.tournamentId} className="min-h-screen pt-16 pb-20">
       <Helmet><title>{room?.name || 'Auction'} — AuctionXI</title></Helmet>
-      
-      {/* Top bar */}
+
+      {/* ── Top bar ─────────────────────────────────────── */}
       <div className="bg-[var(--mm-bg-secondary)] border-b border-[var(--border-subtle)] sticky top-16 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button onClick={() => navigate(`/rooms/${roomId}/lobby`)} className="p-1.5 rounded-[var(--radius-sm)] text-[var(--mm-text-muted)] hover:text-[var(--mm-text-primary)]">
+            <button
+              onClick={() => navigate(`/rooms/${roomId}/lobby`)}
+              className="p-1.5 rounded-[var(--radius-sm)] text-[var(--mm-text-muted)] hover:text-[var(--mm-text-primary)] transition-colors"
+              aria-label="Back to lobby"
+            >
               <ArrowLeft size={18} />
             </button>
             <div>
               <h2 className="heading-3">{room?.name || 'Auction Room'}</h2>
               <span className="caption text-[var(--mm-text-muted)]">
-                Phase: <span className="text-[var(--mm-accent-green)]">{currentAuctionState?.phase || 'IDLE'}</span>
+                Phase:{' '}
+                <span className={`font-semibold ${
+                  currentAuctionState?.phase === 'PLAYER_LIVE'
+                    ? 'text-[var(--mm-accent-green)]'
+                    : currentAuctionState?.phase === 'FINISHED'
+                      ? 'text-[var(--mm-accent-amber)]'
+                      : 'text-[var(--mm-text-secondary)]'
+                }`}>
+                  {currentAuctionState?.phase || 'IDLE'}
+                </span>
               </span>
             </div>
           </div>
@@ -197,144 +212,116 @@ export default function AuctionRoomPage() {
             <span className="caption text-[var(--mm-text-secondary)] flex items-center gap-1">
               <Users size={14} /> {room?.members?.length || 0}
             </span>
-            <span className="caption text-[var(--mm-accent-amber)] flex items-center gap-1">
+            <span className={`caption flex items-center gap-1 font-semibold ${
+              myBudget < 50 ? 'text-[var(--mm-accent-red)]' : 'text-[var(--mm-accent-amber)]'
+            }`}>
               🪙 ${myBudget}
             </span>
           </div>
         </div>
       </div>
 
+      {/* ── Main grid ───────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 grid lg:grid-cols-3 gap-6">
-        {/* Main: Player Under Hammer */}
+        {/* Left column: Player card + Roster */}
         <div className="lg:col-span-2 space-y-4">
-          {/* Current Player Card */}
-          {currentAuctionState?.phase === 'PLAYER_LIVE' && currentPlayer ? (
-            <div className="bg-[var(--mm-bg-secondary)] border-2 border-[var(--border-active)] rounded-[var(--radius-xl)] p-8 text-center relative overflow-hidden">
-              {/* Timer */}
-              <div className="absolute top-4 right-4">
-                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-full)] ${
-                  timeLeft <= 5 ? 'bg-[var(--mm-accent-red)]/20 text-[var(--mm-accent-red)] animate-glow-pulse' :
-                  'bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-secondary)]'
-                }`}>
-                  <Timer size={16} />
-                  <span className="font-bold text-lg font-[var(--font-mono)]">{timeLeft}s</span>
-                </div>
-              </div>
-
-              <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-[var(--mm-accent-green)] to-[var(--mm-accent-blue)] flex items-center justify-center text-3xl font-bold text-[var(--mm-text-inverse)]">
-                {currentPlayer.name.charAt(0)}
-              </div>
-              <h1 className="display-l mb-1">{currentPlayer.name}</h1>
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <span className="px-3 py-1 bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-full)] caption font-semibold">
-                  {currentPlayer.position}
-                </span>
-                <span className="caption text-[var(--mm-text-secondary)]">{currentPlayer.club}</span>
-                <span className="caption text-[var(--mm-text-muted)]">{currentPlayer.nationality}</span>
-              </div>
-              <div className="caption text-[var(--mm-text-muted)] mb-6">Base: 🪙 ${currentPlayer.basePrice}</div>
-
-              {/* Current Bid */}
-              <div className="text-4xl font-bold text-[var(--mm-accent-amber)] mb-2">
-                🪙 ${currentAuctionState.currentBid || currentPlayer.basePrice}
-              </div>
-              {isMyBid ? (
-                <div className="text-[var(--mm-accent-green)] font-semibold animate-glow-pulse">You are the highest bidder!</div>
-              ) : currentAuctionState.currentBidderId ? (
-                <div className="text-[var(--mm-text-secondary)]">Highest bidder: User #{currentAuctionState.currentBidderId.slice(0, 6)}</div>
-              ) : (
-                <div className="text-[var(--mm-text-muted)]">No bids yet</div>
-              )}
-
-              {/* Bid Buttons */}
-              <div className="flex items-center justify-center gap-3 mt-6">
-                <button
-                  onClick={() => placeBid((currentAuctionState.currentBid || currentPlayer.basePrice) + 5)}
-                  disabled={currentAuctionState.currentBidderId === user?.id}
-                  className="px-8 py-4 bg-[var(--gradient-live)] text-[var(--mm-text-inverse)] font-bold text-lg rounded-[var(--radius-lg)] hover:opacity-90 transition-all disabled:opacity-40"
-                >
-                  Bid 🪙 ${(currentAuctionState.currentBid || currentPlayer.basePrice) + 5}
-                </button>
-              </div>
-
-              {/* Error toast */}
-              {error && (
-                <div className="mt-4 bg-[var(--mm-accent-red)]/10 border border-[var(--border-error)] rounded-[var(--radius-md)] p-3 body text-[var(--mm-accent-red)]">
-                  {error}
-                </div>
-              )}
+          {/* Inline error toast */}
+          {error && (
+            <div
+              className="bg-[var(--mm-accent-red)]/10 border border-[var(--border-error)] rounded-[var(--radius-md)] p-3 body text-[var(--mm-accent-red)] flex items-center gap-2"
+              role="alert"
+            >
+              <span>⚠️</span>
+              <span>{error}</span>
             </div>
-          ) : currentAuctionState?.phase === 'SOLD' ? (
-            <div className="bg-[var(--mm-bg-secondary)] rounded-[var(--radius-xl)] p-8 text-center">
-              <div className="text-6xl mb-4">🎉</div>
-              <h2 className="heading-1 text-[var(--mm-accent-green)] mb-2">SOLD!</h2>
-              <p className="body text-[var(--mm-text-secondary)]">Waiting for next player...</p>
+          )}
+
+          {/* Waiting state */}
+          {(!currentAuctionState || currentAuctionState.phase === 'IDLE') && (
+            <div className="bg-[var(--mm-bg-secondary)] rounded-[var(--radius-xl)] p-12 text-center border border-[var(--border-subtle)]">
+              <Gavel size={48} className="mx-auto mb-4 text-[var(--mm-text-muted)] opacity-30" />
+              <h2 className="heading-2 mb-2">Waiting for Auction</h2>
+              <p className="body text-[var(--mm-text-secondary)]">
+                The host will start the auction shortly.
+              </p>
             </div>
-          ) : currentAuctionState?.phase === 'FINISHED' ? (
-            <div className="bg-[var(--mm-bg-secondary)] rounded-[var(--radius-xl)] p-8 text-center">
+          )}
+
+          {/* Player Auction Card (PLAYER_LIVE, SOLD, UNSOLD, FINISHED) */}
+          {currentAuctionState && currentAuctionState.phase !== 'IDLE' && currentPlayer && (
+            <PlayerAuctionCard
+              player={currentPlayer}
+              auctionState={currentAuctionState}
+              myBudget={myBudget}
+              myUserId={user?.id}
+              isStarred={starredPlayers.has(currentPlayerId || '')}
+              rosterRules={rosterRules}
+              roster={myRoster}
+              players={players}
+              totalBudget={room?.totalBudget || 500}
+              onBid={handleBid}
+              onToggleStar={handleToggleStar}
+            />
+          )}
+
+          {/* Finished state (when no current player) */}
+          {currentAuctionState?.phase === 'FINISHED' && !currentPlayer && (
+            <div className="bg-[var(--mm-bg-secondary)] rounded-[var(--radius-xl)] p-12 text-center border border-[var(--border-subtle)]">
               <div className="text-6xl mb-4">🏆</div>
               <h2 className="heading-1 text-[var(--mm-accent-amber)] mb-2">Auction Complete!</h2>
-              <p className="body text-[var(--mm-text-secondary)] mb-4">All players have been drafted.</p>
+              <p className="body text-[var(--mm-text-secondary)] mb-6">All players have been drafted.</p>
               <button
                 onClick={() => navigate(`/rooms/${roomId}/franchise/me`)}
-                className="px-6 py-3 bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] font-semibold rounded-[var(--radius-md)]"
+                className="px-6 py-3 bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] font-semibold rounded-[var(--radius-md)] hover:shadow-[var(--shadow-glow-green)] transition-all duration-300"
               >
                 View My Franchise
               </button>
             </div>
-          ) : (
-            <div className="bg-[var(--mm-bg-secondary)] rounded-[var(--radius-xl)] p-8 text-center">
-              <Gavel size={48} className="mx-auto mb-4 text-[var(--mm-text-muted)] opacity-30" />
-              <h2 className="heading-2 mb-2">Waiting for Auction</h2>
-              <p className="body text-[var(--mm-text-secondary)]">The host will start the auction shortly.</p>
+          )}
+
+          {/* Re-auction state */}
+          {currentAuctionState?.phase === 'RE_AUCTION' && (
+            <div className="bg-[var(--mm-bg-secondary)] rounded-[var(--radius-xl)] p-8 text-center border border-[var(--mm-accent-purple)]">
+              <h2 className="heading-2 text-[var(--mm-accent-purple)] mb-2">🔄 Re-Auction Round</h2>
+              <p className="body text-[var(--mm-text-secondary)]">
+                Unsold players are back in the pool with reduced base prices.
+              </p>
             </div>
           )}
 
-          {/* My Roster Summary */}
+          {/* Roster Board */}
           <div className="bg-[var(--mm-bg-secondary)] rounded-[var(--radius-lg)] p-4 border border-[var(--border-subtle)]">
-            <h3 className="heading-3 mb-3">My Roster ({myRoster.length})</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {(['GK', 'DEF', 'MID', 'FWD'] as const).map((pos) => (
-                <div key={pos} className="bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-md)] p-2 text-center">
-                  <span className="caption text-[var(--mm-text-muted)]">{pos}</span>
-                  <div className="heading-3">{myRoster.filter((r: any) => {
-                    const p = players[r.playerId]
-                    return p?.position === pos
-                  }).length}</div>
-                </div>
-              ))}
-            </div>
+            <h3 className="heading-3 mb-3 flex items-center gap-2">
+              My Roster
+              <span className="caption text-[var(--mm-text-muted)] font-normal">({myRoster.length} players)</span>
+            </h3>
+            <RosterBoard
+              roster={myRoster}
+              players={players}
+              isOwn={true}
+              onSetCaptain={(playerId) => setCaptain(playerId)}
+              onSetViceCaptain={(playerId) => setCaptain(playerId, true)}
+              rosterRules={rosterRules}
+            />
           </div>
         </div>
 
-        {/* Sidebar: Bid History */}
+        {/* Right sidebar: Activity Feed */}
         <div className="space-y-4">
-          <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4">
-            <h3 className="heading-3 mb-3">Bid Activity</h3>
-            {bidHistory.length === 0 ? (
-              <div className="text-center py-8 text-[var(--mm-text-muted)] caption">
-                No bids placed yet
-              </div>
-            ) : (
-              <div className="space-y-2 max-h-96 overflow-y-auto">
-                {bidHistory.map((bid, i) => (
-                  <div key={i} className="flex items-center justify-between py-1.5 border-b border-[var(--border-subtle)] last:border-0">
-                    <span className="caption text-[var(--mm-text-secondary)]">
-                      {players[bid.playerId]?.name || bid.playerId.slice(0, 8)}
-                    </span>
-                    <span className="caption font-semibold text-[var(--mm-accent-amber)]">
-                      🪙 ${bid.amount}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <AuctionActivityFeed
+            bids={bidHistory}
+            players={players}
+          />
 
+          {/* Quick chat area */}
           <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4">
-            <h3 className="heading-3 mb-3">Budget</h3>
-            <div className="text-3xl font-bold text-[var(--mm-accent-amber)]">🪙 ${myBudget}</div>
-            <div className="caption text-[var(--mm-text-muted)] mt-1">remaining</div>
+            <h3 className="heading-3 flex items-center gap-2 mb-3">
+              <MessageSquare size={16} className="text-[var(--mm-accent-blue)]" />
+              Room Chat
+            </h3>
+            <p className="caption text-[var(--mm-text-muted)] text-center py-4">
+              Chat with other bidders during the auction
+            </p>
           </div>
         </div>
       </div>
