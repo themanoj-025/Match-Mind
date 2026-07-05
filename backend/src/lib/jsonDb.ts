@@ -563,7 +563,6 @@ export class JsonDatabase {
       'session', 'starredPlayer',
       'leaderboardSnapshot', 'achievement', 'userAchievement',
       // Draft Mode models (§1.9)
-      'formation',
       'draftSession',
       'draftPick',
       'draftRunResult',

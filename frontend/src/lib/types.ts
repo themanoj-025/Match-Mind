@@ -70,7 +70,6 @@ export interface DraftSession {
   createdAt: string
   synergyScore: number
   formationBonusApplied: boolean
-  slots: DraftPick[]
 }
 
 export interface DraftPick {

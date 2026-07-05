@@ -2,8 +2,8 @@
  * validateDraftPool.ts — AuctionXI v4 §6.3
  *
  * CLI entry point for Draft Mode pool validation.
- * Delegates to the shared library (validateDraftPoolLib.ts) so that
- * both the CLI and the admin API use identical validation logic.
+ * Delegates to the shared library in src/lib/ so that both
+ * the CLI and the admin API use identical validation logic.
  *
  * Usage:
  *   npx tsx scripts/validateDraftPool.ts               # all tournaments
@@ -14,13 +14,22 @@
 
 import fs from 'fs'
 import path from 'path'
-import { validateTournamentDraftPool, formatValidationResult } from './validateDraftPoolLib'
+import {
+  validateTournamentDraftPool,
+  formatValidationResult,
+} from '../src/lib/validateDraftPool'
 
 const DATA_DIR = path.join(__dirname, '..', 'src', 'data')
 
 function main() {
   const targetId = process.argv[2]
-  const registryPath = path.join(__dirname, '..', 'src', 'config', 'tournamentRegistry.json')
+  const registryPath = path.join(
+    __dirname,
+    '..',
+    'src',
+    'config',
+    'tournamentRegistry.json',
+  )
 
   let tournamentIds: string[] = []
   if (targetId) {
@@ -49,11 +58,15 @@ function main() {
 
   console.log(`${'='.repeat(50)}`)
   if (allPassed) {
-    console.log('✅ Draft Mode pool validation PASSED for all checked tournaments.')
+    console.log(
+      '✅ Draft Mode pool validation PASSED for all checked tournaments.',
+    )
     console.log('   Safe to enable the Draft Mode feature flag.')
   } else {
     console.log('❌ Draft Mode pool validation FAILED.')
-    console.log('   Fix errors above before enabling the DRAFT_ENABLED feature flag for these tournaments.')
+    console.log(
+      '   Fix errors above before enabling the DRAFT_ENABLED feature flag for these tournaments.',
+    )
     console.log('   See §6.3 of v4 spec for details.')
   }
 
