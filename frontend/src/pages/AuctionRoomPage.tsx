@@ -21,7 +21,7 @@ export default function AuctionRoomPage() {
   const [players, setPlayers] = useState<Record<string, Player>>({})
   const [myBudget, setMyBudget] = useState(0)
   const [myRoster, setMyRoster] = useState<any[]>([])
-  const [bidHistory, setBidHistory] = useState<any[]>([])
+  const [bidHistory, setBidHistory] = useState<Bid[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [starredPlayers, setStarredPlayers] = useState<Set<string>>(new Set())
@@ -135,6 +135,16 @@ export default function AuctionRoomPage() {
     setCurrentAuctionState(prev => prev ? { ...prev, phase: 'RE_AUCTION' } : null)
   }, [])
 
+  const onAuctionPaused = useCallback(() => {
+    setCurrentAuctionState(prev => prev ? { ...prev, phase: 'IDLE' } : null)
+  }, [])
+
+  const onAuctionResumed = useCallback((data: any) => {
+    if (data.state) {
+      setCurrentAuctionState(data.state)
+    }
+  }, [])
+
   const onBidRejected = useCallback((data: { code: string; message: string }) => {
     setError(data.message || 'Bid rejected')
     setTimeout(() => setError(''), 3000)
@@ -149,6 +159,8 @@ export default function AuctionRoomPage() {
     onAuctionPhaseChange,
     onAuctionFinished,
     onReAuctionStarted,
+    onAuctionPaused,
+    onAuctionResumed,
     onBidRejected,
   })
 
