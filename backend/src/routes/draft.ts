@@ -1,18 +1,20 @@
 /**
- * Draft Mode Routes — AuctionXI v4 §1.10
+ * Draft Mode Routes — AuctionXI v4 §1.10, §2
  *
  * REST endpoints for the Draft Mode feature.
  * No WebSocket required (Draft Mode is asynchronous/solo by nature).
  *
  * Endpoints:
- *   POST   /api/draft/start          — Start a new draft (consumes ticket)
- *   GET    /api/draft/:sessionId      — Full session state
+ *   POST   /api/draft/start              — Start a new draft (consumes ticket)
+ *   GET    /api/draft/:sessionId          — Full session state
  *   GET    /api/draft/:sessionId/next-round — Get next choice round
- *   POST   /api/draft/:sessionId/pick — Pick a player
- *   POST   /api/draft/:sessionId/commit — Commit squad
- *   GET    /api/draft/mine            — List user's draft sessions
- *   GET    /api/draft/tickets         — Ticket balance
- *   GET    /api/draft/formations      — List available formations
+ *   POST   /api/draft/:sessionId/pick     — Pick a player
+ *   POST   /api/draft/:sessionId/commit   — Commit squad
+ *   POST   /api/draft/:sessionId/enter-run — Enter Draft Run (§2.1)
+ *   GET    /api/draft/:sessionId/run-status — Get Draft Run status (§2.3)
+ *   GET    /api/draft/mine                — List user's draft sessions
+ *   GET    /api/draft/tickets             — Ticket balance
+ *   GET    /api/draft/formations          — List available formations
  */
 
 import express from 'express'
@@ -34,6 +36,10 @@ import {
   type DraftPick,
   type SquadPlayer,
 } from '../services/draftService'
+import {
+  enterRun,
+  getRunStatus,
+} from '../services/draftRunService'
 import {
   consumeTicket,
   getTicketBalance,
@@ -290,6 +296,52 @@ router.post(
       formationBonus: result.formationBonus,
       squad: result.squad,
     })
+  }),
+)
+
+// ─── POST /api/draft/:sessionId/enter-run (§2.1) ──────
+
+router.post(
+  '/:sessionId/enter-run',
+  asyncHandler(async (req: AuthenticatedRequest, res) => {
+    const prisma = req.app.get('prisma')
+    const result = await enterRun(prisma, req.params.sessionId as string, req.userId!)
+
+    if (!result.success) {
+      return res.status(400).json({
+        error: { code: 'ENTER_RUN_FAILED', message: result.error || 'Failed to enter Draft Run' },
+      })
+    }
+
+    logger.info({
+      event: 'draft_run.entered_api',
+      sessionId: req.params.sessionId,
+      userId: req.userId,
+    })
+
+    res.status(201).json({
+      success: true,
+      result: result.result,
+    })
+  }),
+)
+
+// ─── GET /api/draft/:sessionId/run-status (§2.3) ──────
+
+router.get(
+  '/:sessionId/run-status',
+  asyncHandler(async (req: AuthenticatedRequest, res) => {
+    const prisma = req.app.get('prisma')
+    const result = await getRunStatus(prisma, req.params.sessionId as string, req.userId!)
+
+    if (!result.success) {
+      const status = result.error?.includes('not found') ? 404 : 400
+      return res.status(status).json({
+        error: { code: 'RUN_STATUS_ERROR', message: result.error || 'Failed to get run status' },
+      })
+    }
+
+    res.json(result.state)
   }),
 )
 
