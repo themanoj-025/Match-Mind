@@ -141,6 +141,12 @@ const WC_DEF = section([
   { name: 'Nahuel Molina', club: 'Atlético Madrid', nationality: 'AR', position: 'DEF', basePrice: 30 },
   { name: 'Riccardo Calafiori', club: 'Bologna', nationality: 'IT', position: 'DEF', basePrice: 16 },
   { name: 'Tino Livramento', club: 'Newcastle', nationality: 'GB', position: 'DEF', basePrice: 20 },
+  { name: 'Jarrad Branthwaite', club: 'Everton', nationality: 'GB', position: 'DEF', basePrice: 48 },
+  { name: 'Nico Tagliafico', club: 'Lyon', nationality: 'AR', position: 'DEF', basePrice: 22 },
+  { name: 'Noussair Mazraoui', club: 'Manchester United', nationality: 'MA', position: 'DEF', basePrice: 46 },
+  { name: 'Jan Paul van Hecke', club: 'Brighton', nationality: 'NL', position: 'DEF', basePrice: 44 },
+  { name: 'Joško Gvardiol', club: 'Manchester City', nationality: 'HR', position: 'DEF', basePrice: 48 },
+  { name: 'Matías Viña', club: 'Flamengo', nationality: 'UY', position: 'DEF', basePrice: 18 },
   { name: 'Lewis Hall', club: 'Newcastle', nationality: 'GB', position: 'DEF', basePrice: 16 },
   { name: 'Héctor Fort', club: 'Barcelona', nationality: 'ES', position: 'DEF', basePrice: 16 },
   { name: 'Inigo Martínez', club: 'Barcelona', nationality: 'ES', position: 'DEF', basePrice: 24 },
@@ -317,6 +323,9 @@ const UCL_GK = section([
   { name: 'Yassine Bounou', club: 'Al Hilal', nationality: 'MA', position: 'GK', basePrice: 30 },
   { name: 'Koen Casteels', club: 'Al Qadsiah', nationality: 'BE', position: 'GK', basePrice: 26 },
   { name: 'Jordan Pickford', club: 'Everton', nationality: 'GB', position: 'GK', basePrice: 34 },
+  { name: 'Mark Flekken', club: 'Brentford', nationality: 'NL', position: 'GK', basePrice: 28 },
+  { name: 'Alex Meret', club: 'Napoli', nationality: 'IT', position: 'GK', basePrice: 26 },
+  { name: 'Mathew Ryan', club: 'AZ Alkmaar', nationality: 'AU', position: 'GK', basePrice: 16 },
 ])
 
 const UCL_DEF = section([
@@ -388,6 +397,14 @@ const UCL_DEF = section([
   { name: 'Niklas Süle', club: 'Borussia Dortmund', nationality: 'DE', position: 'DEF', basePrice: 42 },
   { name: 'Piero Hincapié', club: 'Bayer Leverkusen', nationality: 'EC', position: 'DEF', basePrice: 40 },
   { name: 'Waldemar Anton', club: 'Borussia Dortmund', nationality: 'DE', position: 'DEF', basePrice: 38 },
+  { name: 'Noussair Mazraoui', club: 'Manchester United', nationality: 'MA', position: 'DEF', basePrice: 46 },
+  { name: 'Joško Gvardiol', club: 'Manchester City', nationality: 'HR', position: 'DEF', basePrice: 48 },
+  { name: 'Jan Paul van Hecke', club: 'Brighton', nationality: 'NL', position: 'DEF', basePrice: 44 },
+  { name: 'Jarrad Branthwaite', club: 'Everton', nationality: 'GB', position: 'DEF', basePrice: 48 },
+  { name: 'Nico Tagliafico', club: 'Lyon', nationality: 'AR', position: 'DEF', basePrice: 24 },
+  { name: 'Cristian Romero', club: 'Tottenham', nationality: 'AR', position: 'DEF', basePrice: 36 },
+  { name: 'Aymeric Laporte', club: 'Al Nassr', nationality: 'ES', position: 'DEF', basePrice: 38 },
+  { name: 'Chris Richards', club: 'Crystal Palace', nationality: 'US', position: 'DEF', basePrice: 40 },
 ])
 
 const UCL_MID = section([
