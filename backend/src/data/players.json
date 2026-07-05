@@ -4176,5 +4176,176 @@
     "nationality": "CI",
     "position": "FWD",
     "basePrice": 24
+  },
+  {
+    "id": "patch-1",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Trevoh Chalobah",
+    "club": "Chelsea",
+    "nationality": "GB",
+    "position": "DEF",
+    "basePrice": 48
+  },
+  {
+    "id": "patch-2",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Maxence Lacroix",
+    "club": "Crystal Palace",
+    "nationality": "FR",
+    "position": "DEF",
+    "basePrice": 48
+  },
+  {
+    "id": "patch-3",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Ousmane Diomande",
+    "club": "Sporting CP",
+    "nationality": "CI",
+    "position": "DEF",
+    "basePrice": 50
+  },
+  {
+    "id": "patch-4",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Gonçalo Inácio",
+    "club": "Sporting CP",
+    "nationality": "PT",
+    "position": "DEF",
+    "basePrice": 50
+  },
+  {
+    "id": "patch-5",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Lucas Beraldo",
+    "club": "Paris Saint-Germain",
+    "nationality": "BR",
+    "position": "DEF",
+    "basePrice": 48
+  },
+  {
+    "id": "patch-6",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Mikkel Damsgaard",
+    "club": "Brentford",
+    "nationality": "DK",
+    "position": "FWD",
+    "basePrice": 48
+  },
+  {
+    "id": "patch-7",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Anatoliy Trubin",
+    "club": "Benfica",
+    "nationality": "UA",
+    "position": "GK",
+    "basePrice": 34
+  },
+  {
+    "id": "patch-8",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Michał Karbownik",
+    "club": "PAOK",
+    "nationality": "PL",
+    "position": "GK",
+    "basePrice": 32
+  },
+  {
+    "id": "patch-9",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Trevoh Chalobah",
+    "club": "Chelsea",
+    "nationality": "GB",
+    "position": "DEF",
+    "basePrice": 50
+  },
+  {
+    "id": "patch-10",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Maxence Lacroix",
+    "club": "Crystal Palace",
+    "nationality": "FR",
+    "position": "DEF",
+    "basePrice": 48
+  },
+  {
+    "id": "patch-11",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Gonçalo Inácio",
+    "club": "Sporting CP",
+    "nationality": "PT",
+    "position": "DEF",
+    "basePrice": 50
+  },
+  {
+    "id": "patch-12",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Ousmane Diomande",
+    "club": "Sporting CP",
+    "nationality": "CI",
+    "position": "DEF",
+    "basePrice": 50
+  },
+  {
+    "id": "patch-13",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Mikkel Damsgaard",
+    "club": "Brentford",
+    "nationality": "DK",
+    "position": "FWD",
+    "basePrice": 48
+  },
+  {
+    "id": "patch-14",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Ansu Fati",
+    "club": "Barcelona",
+    "nationality": "ES",
+    "position": "FWD",
+    "basePrice": 50
+  },
+  {
+    "id": "patch-15",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Fábio Carvalho",
+    "club": "Brentford",
+    "nationality": "PT",
+    "position": "FWD",
+    "basePrice": 46
+  },
+  {
+    "id": "patch-16",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Anatoliy Trubin",
+    "club": "Benfica",
+    "nationality": "UA",
+    "position": "GK",
+    "basePrice": 36
+  },
+  {
+    "id": "patch-17",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Robin Zentner",
+    "club": "Mainz",
+    "nationality": "DE",
+    "position": "GK",
+    "basePrice": 32
+  },
+  {
+    "id": "patch-18",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Kevin Trapp",
+    "club": "Eintracht Frankfurt",
+    "nationality": "DE",
+    "position": "GK",
+    "basePrice": 30
+  },
+  {
+    "id": "patch-19",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Jesper Lindstrøm",
+    "club": "Napoli",
+    "nationality": "DK",
+    "position": "GK",
+    "basePrice": 28
   }
 ]
