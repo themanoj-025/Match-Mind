@@ -2,22 +2,20 @@
   {
     "id": "player-1",
     "tournamentId": "fifa-wc-2026",
-    "name": "Alisson Becker",
-    "club": "Liverpool",
-    "nationality": "BR",
-    "position": "GK",
-    "basePrice": 50,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-2",
-    "tournamentId": "fifa-wc-2026",
     "name": "Thibaut Courtois",
     "club": "Real Madrid",
     "nationality": "BE",
     "position": "GK",
-    "basePrice": 55,
-    "rarityTier": "BRONZE"
+    "basePrice": 72
+  },
+  {
+    "id": "player-2",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Alisson Becker",
+    "club": "Liverpool",
+    "nationality": "BR",
+    "position": "GK",
+    "basePrice": 68
   },
   {
     "id": "player-3",
@@ -26,8 +24,7 @@
     "club": "Manchester City",
     "nationality": "BR",
     "position": "GK",
-    "basePrice": 48,
-    "rarityTier": "BRONZE"
+    "basePrice": 62
   },
   {
     "id": "player-4",
@@ -36,38 +33,34 @@
     "club": "AC Milan",
     "nationality": "FR",
     "position": "GK",
-    "basePrice": 45,
-    "rarityTier": "BRONZE"
+    "basePrice": 60
   },
   {
     "id": "player-5",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Marc-André ter Stegen",
-    "club": "Barcelona",
-    "nationality": "DE",
-    "position": "GK",
-    "basePrice": 44,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-6",
     "tournamentId": "fifa-wc-2026",
     "name": "Gianluigi Donnarumma",
     "club": "Paris Saint-Germain",
     "nationality": "IT",
     "position": "GK",
-    "basePrice": 46,
-    "rarityTier": "BRONZE"
+    "basePrice": 58
+  },
+  {
+    "id": "player-6",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Marc-André ter Stegen",
+    "club": "Barcelona",
+    "nationality": "DE",
+    "position": "GK",
+    "basePrice": 56
   },
   {
     "id": "player-7",
     "tournamentId": "fifa-wc-2026",
-    "name": "David Raya",
-    "club": "Arsenal",
-    "nationality": "ES",
+    "name": "Jan Oblak",
+    "club": "Atlético Madrid",
+    "nationality": "SI",
     "position": "GK",
-    "basePrice": 38,
-    "rarityTier": "BRONZE"
+    "basePrice": 54
   },
   {
     "id": "player-8",
@@ -76,28 +69,25 @@
     "club": "Aston Villa",
     "nationality": "AR",
     "position": "GK",
-    "basePrice": 42,
-    "rarityTier": "BRONZE"
+    "basePrice": 52
   },
   {
     "id": "player-9",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Jan Oblak",
-    "club": "Atlético Madrid",
-    "nationality": "SI",
-    "position": "GK",
-    "basePrice": 40,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-10",
     "tournamentId": "fifa-wc-2026",
     "name": "Manuel Neuer",
     "club": "Bayern Munich",
     "nationality": "DE",
     "position": "GK",
-    "basePrice": 41,
-    "rarityTier": "BRONZE"
+    "basePrice": 48
+  },
+  {
+    "id": "player-10",
+    "tournamentId": "fifa-wc-2026",
+    "name": "David Raya",
+    "club": "Arsenal",
+    "nationality": "ES",
+    "position": "GK",
+    "basePrice": 46
   },
   {
     "id": "player-11",
@@ -106,28 +96,25 @@
     "club": "Borussia Dortmund",
     "nationality": "CH",
     "position": "GK",
-    "basePrice": 35,
-    "rarityTier": "BRONZE"
+    "basePrice": 42
   },
   {
     "id": "player-12",
-    "tournamentId": "fifa-wc-2026",
-    "name": "André Onana",
-    "club": "Manchester United",
-    "nationality": "CM",
-    "position": "GK",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-13",
     "tournamentId": "fifa-wc-2026",
     "name": "Diogo Costa",
     "club": "FC Porto",
     "nationality": "PT",
     "position": "GK",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 40
+  },
+  {
+    "id": "player-13",
+    "tournamentId": "fifa-wc-2026",
+    "name": "André Onana",
+    "club": "Manchester United",
+    "nationality": "CM",
+    "position": "GK",
+    "basePrice": 38
   },
   {
     "id": "player-14",
@@ -136,38 +123,34 @@
     "club": "Athletic Bilbao",
     "nationality": "ES",
     "position": "GK",
-    "basePrice": 33,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
     "id": "player-15",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Yassine Bounou",
-    "club": "Al Hilal",
-    "nationality": "MA",
-    "position": "GK",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-16",
     "tournamentId": "fifa-wc-2026",
     "name": "Jordan Pickford",
     "club": "Everton",
     "nationality": "GB",
     "position": "GK",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
+  },
+  {
+    "id": "player-16",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Giorgi Mamardashvili",
+    "club": "Valencia",
+    "nationality": "GE",
+    "position": "GK",
+    "basePrice": 32
   },
   {
     "id": "player-17",
     "tournamentId": "fifa-wc-2026",
-    "name": "Lunin Andriy",
-    "club": "Real Madrid",
-    "nationality": "UA",
+    "name": "Yassine Bounou",
+    "club": "Al Hilal",
+    "nationality": "MA",
     "position": "GK",
-    "basePrice": 28,
-    "rarityTier": "SILVER"
+    "basePrice": 30
   },
   {
     "id": "player-18",
@@ -176,18 +159,16 @@
     "club": "Real Sociedad",
     "nationality": "ES",
     "position": "GK",
-    "basePrice": 27,
-    "rarityTier": "SILVER"
+    "basePrice": 28
   },
   {
     "id": "player-19",
     "tournamentId": "fifa-wc-2026",
-    "name": "Giorgi Mamardashvili",
-    "club": "Valencia",
-    "nationality": "GE",
+    "name": "Lunin Andriy",
+    "club": "Real Madrid",
+    "nationality": "UA",
     "position": "GK",
-    "basePrice": 29,
-    "rarityTier": "SILVER"
+    "basePrice": 26
   },
   {
     "id": "player-20",
@@ -196,8 +177,7 @@
     "club": "Chelsea",
     "nationality": "ES",
     "position": "GK",
-    "basePrice": 25,
-    "rarityTier": "SILVER"
+    "basePrice": 24
   },
   {
     "id": "player-21",
@@ -206,8 +186,7 @@
     "club": "West Ham",
     "nationality": "FR",
     "position": "GK",
-    "basePrice": 22,
-    "rarityTier": "SILVER"
+    "basePrice": 20
   },
   {
     "id": "player-22",
@@ -216,8 +195,7 @@
     "club": "Brentford",
     "nationality": "NL",
     "position": "GK",
-    "basePrice": 18,
-    "rarityTier": "GOLD"
+    "basePrice": 16
   },
   {
     "id": "player-23",
@@ -226,8 +204,7 @@
     "club": "Al Qadsiah",
     "nationality": "BE",
     "position": "GK",
-    "basePrice": 15,
-    "rarityTier": "GOLD"
+    "basePrice": 14
   },
   {
     "id": "player-24",
@@ -236,8 +213,7 @@
     "club": "AZ Alkmaar",
     "nationality": "AU",
     "position": "GK",
-    "basePrice": 12,
-    "rarityTier": "GOLD"
+    "basePrice": 10
   },
   {
     "id": "player-25",
@@ -246,8 +222,7 @@
     "club": "Liverpool",
     "nationality": "NL",
     "position": "DEF",
-    "basePrice": 55,
-    "rarityTier": "BRONZE"
+    "basePrice": 55
   },
   {
     "id": "player-26",
@@ -256,8 +231,7 @@
     "club": "Manchester City",
     "nationality": "PT",
     "position": "DEF",
-    "basePrice": 50,
-    "rarityTier": "BRONZE"
+    "basePrice": 50
   },
   {
     "id": "player-27",
@@ -266,8 +240,7 @@
     "club": "Arsenal",
     "nationality": "FR",
     "position": "DEF",
-    "basePrice": 45,
-    "rarityTier": "BRONZE"
+    "basePrice": 45
   },
   {
     "id": "player-28",
@@ -276,8 +249,7 @@
     "club": "AC Milan",
     "nationality": "FR",
     "position": "DEF",
-    "basePrice": 40,
-    "rarityTier": "BRONZE"
+    "basePrice": 40
   },
   {
     "id": "player-29",
@@ -286,8 +258,7 @@
     "club": "Paris Saint-Germain",
     "nationality": "MA",
     "position": "DEF",
-    "basePrice": 42,
-    "rarityTier": "BRONZE"
+    "basePrice": 42
   },
   {
     "id": "player-30",
@@ -296,8 +267,7 @@
     "club": "Real Madrid",
     "nationality": "DE",
     "position": "DEF",
-    "basePrice": 44,
-    "rarityTier": "BRONZE"
+    "basePrice": 44
   },
   {
     "id": "player-31",
@@ -306,8 +276,7 @@
     "club": "Barcelona",
     "nationality": "FR",
     "position": "DEF",
-    "basePrice": 40,
-    "rarityTier": "BRONZE"
+    "basePrice": 40
   },
   {
     "id": "player-32",
@@ -316,8 +285,7 @@
     "club": "Real Madrid",
     "nationality": "ES",
     "position": "DEF",
-    "basePrice": 38,
-    "rarityTier": "BRONZE"
+    "basePrice": 38
   },
   {
     "id": "player-33",
@@ -326,8 +294,7 @@
     "club": "Manchester City",
     "nationality": "HR",
     "position": "DEF",
-    "basePrice": 43,
-    "rarityTier": "BRONZE"
+    "basePrice": 43
   },
   {
     "id": "player-34",
@@ -336,8 +303,7 @@
     "club": "Bayern Munich",
     "nationality": "FR",
     "position": "DEF",
-    "basePrice": 38,
-    "rarityTier": "BRONZE"
+    "basePrice": 38
   },
   {
     "id": "player-35",
@@ -346,8 +312,7 @@
     "club": "Manchester City",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
     "id": "player-36",
@@ -356,8 +321,7 @@
     "club": "Barcelona",
     "nationality": "UY",
     "position": "DEF",
-    "basePrice": 37,
-    "rarityTier": "BRONZE"
+    "basePrice": 37
   },
   {
     "id": "player-37",
@@ -366,8 +330,7 @@
     "club": "Liverpool",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 42,
-    "rarityTier": "BRONZE"
+    "basePrice": 42
   },
   {
     "id": "player-38",
@@ -376,8 +339,7 @@
     "club": "Manchester City",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
     "id": "player-39",
@@ -386,8 +348,7 @@
     "club": "Bayern Munich",
     "nationality": "CA",
     "position": "DEF",
-    "basePrice": 39,
-    "rarityTier": "BRONZE"
+    "basePrice": 39
   },
   {
     "id": "player-40",
@@ -396,8 +357,7 @@
     "club": "Arsenal",
     "nationality": "BR",
     "position": "DEF",
-    "basePrice": 35,
-    "rarityTier": "BRONZE"
+    "basePrice": 35
   },
   {
     "id": "player-41",
@@ -406,8 +366,7 @@
     "club": "Manchester United",
     "nationality": "NL",
     "position": "DEF",
-    "basePrice": 33,
-    "rarityTier": "BRONZE"
+    "basePrice": 33
   },
   {
     "id": "player-42",
@@ -416,8 +375,7 @@
     "club": "Real Madrid",
     "nationality": "BR",
     "position": "DEF",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
     "id": "player-43",
@@ -426,8 +384,7 @@
     "club": "Tottenham",
     "nationality": "NL",
     "position": "DEF",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
     "id": "player-44",
@@ -436,8 +393,7 @@
     "club": "Barcelona",
     "nationality": "PT",
     "position": "DEF",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
     "id": "player-45",
@@ -446,8 +402,7 @@
     "club": "Barcelona",
     "nationality": "ES",
     "position": "DEF",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
+    "basePrice": 30
   },
   {
     "id": "player-46",
@@ -456,8 +411,7 @@
     "club": "Chelsea",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 28,
-    "rarityTier": "SILVER"
+    "basePrice": 28
   },
   {
     "id": "player-47",
@@ -466,8 +420,7 @@
     "club": "Borussia Dortmund",
     "nationality": "DE",
     "position": "DEF",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
+    "basePrice": 30
   },
   {
     "id": "player-48",
@@ -476,8 +429,7 @@
     "club": "Bayer Leverkusen",
     "nationality": "DE",
     "position": "DEF",
-    "basePrice": 29,
-    "rarityTier": "SILVER"
+    "basePrice": 29
   },
   {
     "id": "player-49",
@@ -486,8 +438,7 @@
     "club": "Aston Villa",
     "nationality": "ES",
     "position": "DEF",
-    "basePrice": 28,
-    "rarityTier": "SILVER"
+    "basePrice": 28
   },
   {
     "id": "player-50",
@@ -496,8 +447,7 @@
     "club": "Arsenal",
     "nationality": "NL",
     "position": "DEF",
-    "basePrice": 27,
-    "rarityTier": "SILVER"
+    "basePrice": 27
   },
   {
     "id": "player-51",
@@ -506,8 +456,7 @@
     "club": "Tottenham",
     "nationality": "AR",
     "position": "DEF",
-    "basePrice": 31,
-    "rarityTier": "BRONZE"
+    "basePrice": 31
   },
   {
     "id": "player-52",
@@ -516,8 +465,7 @@
     "club": "Manchester United",
     "nationality": "MA",
     "position": "DEF",
-    "basePrice": 24,
-    "rarityTier": "SILVER"
+    "basePrice": 24
   },
   {
     "id": "player-53",
@@ -526,8 +474,7 @@
     "club": "Chelsea",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 26,
-    "rarityTier": "SILVER"
+    "basePrice": 26
   },
   {
     "id": "player-54",
@@ -536,8 +483,7 @@
     "club": "Atlético Madrid",
     "nationality": "ES",
     "position": "DEF",
-    "basePrice": 22,
-    "rarityTier": "SILVER"
+    "basePrice": 22
   },
   {
     "id": "player-55",
@@ -546,8 +492,7 @@
     "club": "AC Milan",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 25,
-    "rarityTier": "SILVER"
+    "basePrice": 25
   },
   {
     "id": "player-56",
@@ -556,8 +501,7 @@
     "club": "Manchester United",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 24,
-    "rarityTier": "SILVER"
+    "basePrice": 24
   },
   {
     "id": "player-57",
@@ -566,8 +510,7 @@
     "club": "Real Madrid",
     "nationality": "AT",
     "position": "DEF",
-    "basePrice": 26,
-    "rarityTier": "SILVER"
+    "basePrice": 26
   },
   {
     "id": "player-58",
@@ -576,8 +519,7 @@
     "club": "Bayern Munich",
     "nationality": "KR",
     "position": "DEF",
-    "basePrice": 23,
-    "rarityTier": "SILVER"
+    "basePrice": 23
   },
   {
     "id": "player-59",
@@ -586,8 +528,7 @@
     "club": "Tottenham",
     "nationality": "BR",
     "position": "DEF",
-    "basePrice": 18,
-    "rarityTier": "GOLD"
+    "basePrice": 18
   },
   {
     "id": "player-60",
@@ -596,8 +537,7 @@
     "club": "Las Palmas",
     "nationality": "ES",
     "position": "DEF",
-    "basePrice": 12,
-    "rarityTier": "GOLD"
+    "basePrice": 12
   },
   {
     "id": "player-61",
@@ -606,8 +546,7 @@
     "club": "Brighton",
     "nationality": "EC",
     "position": "DEF",
-    "basePrice": 20,
-    "rarityTier": "GOLD"
+    "basePrice": 20
   },
   {
     "id": "player-62",
@@ -616,8 +555,7 @@
     "club": "Chelsea",
     "nationality": "ES",
     "position": "DEF",
-    "basePrice": 18,
-    "rarityTier": "GOLD"
+    "basePrice": 18
   },
   {
     "id": "player-63",
@@ -626,8 +564,7 @@
     "club": "Manchester City",
     "nationality": "NL",
     "position": "DEF",
-    "basePrice": 22,
-    "rarityTier": "SILVER"
+    "basePrice": 22
   },
   {
     "id": "player-64",
@@ -636,8 +573,7 @@
     "club": "Bologna",
     "nationality": "IT",
     "position": "DEF",
-    "basePrice": 16,
-    "rarityTier": "GOLD"
+    "basePrice": 16
   },
   {
     "id": "player-65",
@@ -646,8 +582,7 @@
     "club": "Everton",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 14,
-    "rarityTier": "GOLD"
+    "basePrice": 14
   },
   {
     "id": "player-66",
@@ -656,8 +591,7 @@
     "club": "Roma",
     "nationality": "ES",
     "position": "DEF",
-    "basePrice": 15,
-    "rarityTier": "GOLD"
+    "basePrice": 15
   },
   {
     "id": "player-67",
@@ -666,8 +600,7 @@
     "club": "Al Shabab",
     "nationality": "MA",
     "position": "DEF",
-    "basePrice": 10,
-    "rarityTier": "GOLD"
+    "basePrice": 10
   },
   {
     "id": "player-68",
@@ -676,8 +609,7 @@
     "club": "Bayern Munich",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 13,
-    "rarityTier": "GOLD"
+    "basePrice": 13
   },
   {
     "id": "player-69",
@@ -686,8 +618,7 @@
     "club": "Real Madrid",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 80,
-    "rarityTier": "BRONZE"
+    "basePrice": 80
   },
   {
     "id": "player-70",
@@ -696,8 +627,7 @@
     "club": "Manchester City",
     "nationality": "ES",
     "position": "MID",
-    "basePrice": 70,
-    "rarityTier": "BRONZE"
+    "basePrice": 70
   },
   {
     "id": "player-71",
@@ -706,8 +636,7 @@
     "club": "Arsenal",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 55,
-    "rarityTier": "BRONZE"
+    "basePrice": 55
   },
   {
     "id": "player-72",
@@ -716,8 +645,7 @@
     "club": "Manchester City",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 60,
-    "rarityTier": "BRONZE"
+    "basePrice": 60
   },
   {
     "id": "player-73",
@@ -726,8 +654,7 @@
     "club": "Bayern Munich",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 65,
-    "rarityTier": "BRONZE"
+    "basePrice": 65
   },
   {
     "id": "player-74",
@@ -736,8 +663,7 @@
     "club": "Bayer Leverkusen",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 60,
-    "rarityTier": "BRONZE"
+    "basePrice": 60
   },
   {
     "id": "player-75",
@@ -746,8 +672,7 @@
     "club": "Arsenal",
     "nationality": "NO",
     "position": "MID",
-    "basePrice": 55,
-    "rarityTier": "BRONZE"
+    "basePrice": 55
   },
   {
     "id": "player-76",
@@ -756,8 +681,7 @@
     "club": "Real Madrid",
     "nationality": "UY",
     "position": "MID",
-    "basePrice": 54,
-    "rarityTier": "BRONZE"
+    "basePrice": 54
   },
   {
     "id": "player-77",
@@ -766,8 +690,7 @@
     "club": "Real Madrid",
     "nationality": "FR",
     "position": "MID",
-    "basePrice": 48,
-    "rarityTier": "BRONZE"
+    "basePrice": 48
   },
   {
     "id": "player-78",
@@ -776,8 +699,7 @@
     "club": "Real Madrid",
     "nationality": "FR",
     "position": "MID",
-    "basePrice": 46,
-    "rarityTier": "BRONZE"
+    "basePrice": 46
   },
   {
     "id": "player-79",
@@ -786,8 +708,7 @@
     "club": "Barcelona",
     "nationality": "ES",
     "position": "MID",
-    "basePrice": 52,
-    "rarityTier": "BRONZE"
+    "basePrice": 52
   },
   {
     "id": "player-80",
@@ -796,8 +717,7 @@
     "club": "Barcelona",
     "nationality": "ES",
     "position": "MID",
-    "basePrice": 48,
-    "rarityTier": "BRONZE"
+    "basePrice": 48
   },
   {
     "id": "player-81",
@@ -806,8 +726,7 @@
     "club": "Manchester City",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 42,
-    "rarityTier": "BRONZE"
+    "basePrice": 42
   },
   {
     "id": "player-82",
@@ -816,8 +735,7 @@
     "club": "Manchester City",
     "nationality": "BE",
     "position": "MID",
-    "basePrice": 58,
-    "rarityTier": "BRONZE"
+    "basePrice": 58
   },
   {
     "id": "player-83",
@@ -826,8 +744,7 @@
     "club": "Manchester United",
     "nationality": "PT",
     "position": "MID",
-    "basePrice": 44,
-    "rarityTier": "BRONZE"
+    "basePrice": 44
   },
   {
     "id": "player-84",
@@ -836,8 +753,7 @@
     "club": "Chelsea",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 50,
-    "rarityTier": "BRONZE"
+    "basePrice": 50
   },
   {
     "id": "player-85",
@@ -846,8 +762,7 @@
     "club": "Tottenham",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 38,
-    "rarityTier": "BRONZE"
+    "basePrice": 38
   },
   {
     "id": "player-86",
@@ -856,8 +771,7 @@
     "club": "Chelsea",
     "nationality": "AR",
     "position": "MID",
-    "basePrice": 40,
-    "rarityTier": "BRONZE"
+    "basePrice": 40
   },
   {
     "id": "player-87",
@@ -866,8 +780,7 @@
     "club": "Chelsea",
     "nationality": "EC",
     "position": "MID",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
     "id": "player-88",
@@ -876,8 +789,7 @@
     "club": "Liverpool",
     "nationality": "AR",
     "position": "MID",
-    "basePrice": 39,
-    "rarityTier": "BRONZE"
+    "basePrice": 39
   },
   {
     "id": "player-89",
@@ -886,8 +798,7 @@
     "club": "Liverpool",
     "nationality": "HU",
     "position": "MID",
-    "basePrice": 37,
-    "rarityTier": "BRONZE"
+    "basePrice": 37
   },
   {
     "id": "player-90",
@@ -896,8 +807,7 @@
     "club": "Liverpool",
     "nationality": "NL",
     "position": "MID",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
+    "basePrice": 30
   },
   {
     "id": "player-91",
@@ -906,8 +816,7 @@
     "club": "Manchester City",
     "nationality": "JM",
     "position": "MID",
-    "basePrice": 28,
-    "rarityTier": "SILVER"
+    "basePrice": 28
   },
   {
     "id": "player-92",
@@ -916,8 +825,7 @@
     "club": "Manchester United",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 26,
-    "rarityTier": "SILVER"
+    "basePrice": 26
   },
   {
     "id": "player-93",
@@ -926,8 +834,7 @@
     "club": "Manchester United",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
     "id": "player-94",
@@ -936,8 +843,7 @@
     "club": "Manchester City",
     "nationality": "PT",
     "position": "MID",
-    "basePrice": 45,
-    "rarityTier": "BRONZE"
+    "basePrice": 45
   },
   {
     "id": "player-95",
@@ -946,8 +852,7 @@
     "club": "Barcelona",
     "nationality": "NL",
     "position": "MID",
-    "basePrice": 40,
-    "rarityTier": "BRONZE"
+    "basePrice": 40
   },
   {
     "id": "player-96",
@@ -956,8 +861,7 @@
     "club": "Real Betis",
     "nationality": "ES",
     "position": "MID",
-    "basePrice": 20,
-    "rarityTier": "GOLD"
+    "basePrice": 20
   },
   {
     "id": "player-97",
@@ -966,8 +870,7 @@
     "club": "Barcelona",
     "nationality": "ES",
     "position": "MID",
-    "basePrice": 35,
-    "rarityTier": "BRONZE"
+    "basePrice": 35
   },
   {
     "id": "player-98",
@@ -976,8 +879,7 @@
     "club": "Paris Saint-Germain",
     "nationality": "FR",
     "position": "MID",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
     "id": "player-99",
@@ -986,8 +888,7 @@
     "club": "Paris Saint-Germain",
     "nationality": "PT",
     "position": "MID",
-    "basePrice": 30,
-    "rarityTier": "SILVER"
+    "basePrice": 30
   },
   {
     "id": "player-100",
@@ -996,8 +897,7 @@
     "club": "Inter Milan",
     "nationality": "TR",
     "position": "MID",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
     "id": "player-101",
@@ -1006,8 +906,7 @@
     "club": "Inter Milan",
     "nationality": "IT",
     "position": "MID",
-    "basePrice": 35,
-    "rarityTier": "BRONZE"
+    "basePrice": 35
   },
   {
     "id": "player-102",
@@ -1016,8 +915,7 @@
     "club": "Bayern Munich",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 38,
-    "rarityTier": "BRONZE"
+    "basePrice": 38
   },
   {
     "id": "player-103",
@@ -1026,8 +924,7 @@
     "club": "Bayern Munich",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 30,
-    "rarityTier": "SILVER"
+    "basePrice": 30
   },
   {
     "id": "player-104",
@@ -1036,8 +933,7 @@
     "club": "Borussia Dortmund",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 24,
-    "rarityTier": "SILVER"
+    "basePrice": 24
   },
   {
     "id": "player-105",
@@ -1046,8 +942,7 @@
     "club": "Borussia Dortmund",
     "nationality": "AT",
     "position": "MID",
-    "basePrice": 22,
-    "rarityTier": "SILVER"
+    "basePrice": 22
   },
   {
     "id": "player-106",
@@ -1056,8 +951,7 @@
     "club": "Bayer Leverkusen",
     "nationality": "AR",
     "position": "MID",
-    "basePrice": 25,
-    "rarityTier": "SILVER"
+    "basePrice": 25
   },
   {
     "id": "player-107",
@@ -1066,8 +960,7 @@
     "club": "Bayer Leverkusen",
     "nationality": "CH",
     "position": "MID",
-    "basePrice": 24,
-    "rarityTier": "SILVER"
+    "basePrice": 24
   },
   {
     "id": "player-108",
@@ -1076,8 +969,7 @@
     "club": "Manchester City",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 14,
-    "rarityTier": "GOLD"
+    "basePrice": 14
   },
   {
     "id": "player-109",
@@ -1086,8 +978,7 @@
     "club": "Aston Villa",
     "nationality": "BE",
     "position": "MID",
-    "basePrice": 22,
-    "rarityTier": "GOLD"
+    "basePrice": 22
   },
   {
     "id": "player-110",
@@ -1096,8 +987,7 @@
     "club": "Aston Villa",
     "nationality": "BE",
     "position": "MID",
-    "basePrice": 20,
-    "rarityTier": "GOLD"
+    "basePrice": 20
   },
   {
     "id": "player-111",
@@ -1106,8 +996,7 @@
     "club": "Aston Villa",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 16,
-    "rarityTier": "GOLD"
+    "basePrice": 16
   },
   {
     "id": "player-112",
@@ -1116,8 +1005,7 @@
     "club": "Napoli",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 18,
-    "rarityTier": "GOLD"
+    "basePrice": 18
   },
   {
     "id": "player-113",
@@ -1126,8 +1014,7 @@
     "club": "Newcastle",
     "nationality": "IT",
     "position": "MID",
-    "basePrice": 28,
-    "rarityTier": "SILVER"
+    "basePrice": 28
   },
   {
     "id": "player-114",
@@ -1136,8 +1023,7 @@
     "club": "Newcastle",
     "nationality": "BR",
     "position": "MID",
-    "basePrice": 30,
-    "rarityTier": "SILVER"
+    "basePrice": 30
   },
   {
     "id": "player-115",
@@ -1146,8 +1032,7 @@
     "club": "Atlético Madrid",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 20,
-    "rarityTier": "GOLD"
+    "basePrice": 20
   },
   {
     "id": "player-116",
@@ -1156,8 +1041,7 @@
     "club": "Real Madrid",
     "nationality": "TR",
     "position": "MID",
-    "basePrice": 28,
-    "rarityTier": "SILVER"
+    "basePrice": 28
   },
   {
     "id": "player-117",
@@ -1167,8 +1051,7 @@
     "nationality": "FR",
     "position": "FWD",
     "basePrice": 85,
-    "isEligibleForIcon": true,
-    "rarityTier": "BRONZE"
+    "isEligibleForIcon": true
   },
   {
     "id": "player-118",
@@ -1178,8 +1061,7 @@
     "nationality": "NO",
     "position": "FWD",
     "basePrice": 90,
-    "isEligibleForIcon": true,
-    "rarityTier": "BRONZE"
+    "isEligibleForIcon": true
   },
   {
     "id": "player-119",
@@ -1188,8 +1070,7 @@
     "club": "Real Madrid",
     "nationality": "BR",
     "position": "FWD",
-    "basePrice": 75,
-    "rarityTier": "BRONZE"
+    "basePrice": 75
   },
   {
     "id": "player-120",
@@ -1198,8 +1079,7 @@
     "club": "Arsenal",
     "nationality": "GB",
     "position": "FWD",
-    "basePrice": 65,
-    "rarityTier": "BRONZE"
+    "basePrice": 65
   },
   {
     "id": "player-121",
@@ -1208,8 +1088,7 @@
     "club": "Barcelona",
     "nationality": "ES",
     "position": "FWD",
-    "basePrice": 70,
-    "rarityTier": "BRONZE"
+    "basePrice": 70
   },
   {
     "id": "player-122",
@@ -1218,8 +1097,7 @@
     "club": "Atlético Madrid",
     "nationality": "FR",
     "position": "FWD",
-    "basePrice": 50,
-    "rarityTier": "BRONZE"
+    "basePrice": 50
   },
   {
     "id": "player-123",
@@ -1228,8 +1106,7 @@
     "club": "Real Madrid",
     "nationality": "BR",
     "position": "FWD",
-    "basePrice": 55,
-    "rarityTier": "BRONZE"
+    "basePrice": 55
   },
   {
     "id": "player-124",
@@ -1238,8 +1115,7 @@
     "club": "Bayern Munich",
     "nationality": "GB",
     "position": "FWD",
-    "basePrice": 58,
-    "rarityTier": "BRONZE"
+    "basePrice": 58
   },
   {
     "id": "player-125",
@@ -1248,8 +1124,7 @@
     "club": "Liverpool",
     "nationality": "EG",
     "position": "FWD",
-    "basePrice": 60,
-    "rarityTier": "BRONZE"
+    "basePrice": 60
   },
   {
     "id": "player-126",
@@ -1258,8 +1133,7 @@
     "club": "Inter Milan",
     "nationality": "AR",
     "position": "FWD",
-    "basePrice": 52,
-    "rarityTier": "BRONZE"
+    "basePrice": 52
   },
   {
     "id": "player-127",
@@ -1268,8 +1142,7 @@
     "club": "Paris Saint-Germain",
     "nationality": "FR",
     "position": "FWD",
-    "basePrice": 48,
-    "rarityTier": "BRONZE"
+    "basePrice": 48
   },
   {
     "id": "player-128",
@@ -1278,8 +1151,7 @@
     "club": "Barcelona",
     "nationality": "BR",
     "position": "FWD",
-    "basePrice": 45,
-    "rarityTier": "BRONZE"
+    "basePrice": 45
   },
   {
     "id": "player-129",
@@ -1288,8 +1160,7 @@
     "club": "Arsenal",
     "nationality": "BR",
     "position": "FWD",
-    "basePrice": 42,
-    "rarityTier": "BRONZE"
+    "basePrice": 42
   },
   {
     "id": "player-130",
@@ -1298,8 +1169,7 @@
     "club": "Manchester United",
     "nationality": "GB",
     "position": "FWD",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
     "id": "player-131",
@@ -1308,8 +1178,7 @@
     "club": "Manchester United",
     "nationality": "DK",
     "position": "FWD",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
     "id": "player-132",
@@ -1318,8 +1187,7 @@
     "club": "Chelsea",
     "nationality": "SN",
     "position": "FWD",
-    "basePrice": 30,
-    "rarityTier": "SILVER"
+    "basePrice": 30
   },
   {
     "id": "player-133",
@@ -1328,8 +1196,7 @@
     "club": "Chelsea",
     "nationality": "FR",
     "position": "FWD",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
     "id": "player-134",
@@ -1338,8 +1205,7 @@
     "club": "Liverpool",
     "nationality": "UY",
     "position": "FWD",
-    "basePrice": 35,
-    "rarityTier": "BRONZE"
+    "basePrice": 35
   },
   {
     "id": "player-135",
@@ -1348,8 +1214,7 @@
     "club": "Atlético Madrid",
     "nationality": "AR",
     "position": "FWD",
-    "basePrice": 40,
-    "rarityTier": "BRONZE"
+    "basePrice": 40
   },
   {
     "id": "player-136",
@@ -1358,8 +1223,7 @@
     "club": "Galatasaray",
     "nationality": "NG",
     "position": "FWD",
-    "basePrice": 44,
-    "rarityTier": "BRONZE"
+    "basePrice": 44
   },
   {
     "id": "player-137",
@@ -1368,8 +1232,7 @@
     "club": "Bayern Munich",
     "nationality": "FR",
     "position": "FWD",
-    "basePrice": 38,
-    "rarityTier": "BRONZE"
+    "basePrice": 38
   },
   {
     "id": "player-138",
@@ -1378,8 +1241,7 @@
     "club": "Bayern Munich",
     "nationality": "DE",
     "position": "FWD",
-    "basePrice": 40,
-    "rarityTier": "BRONZE"
+    "basePrice": 40
   },
   {
     "id": "player-139",
@@ -1388,8 +1250,7 @@
     "club": "Bayern Munich",
     "nationality": "DE",
     "position": "FWD",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
     "id": "player-140",
@@ -1398,8 +1259,7 @@
     "club": "Borussia Dortmund",
     "nationality": "NL",
     "position": "FWD",
-    "basePrice": 26,
-    "rarityTier": "SILVER"
+    "basePrice": 26
   },
   {
     "id": "player-141",
@@ -1408,8 +1268,7 @@
     "club": "Borussia Dortmund",
     "nationality": "DE",
     "position": "FWD",
-    "basePrice": 28,
-    "rarityTier": "SILVER"
+    "basePrice": 28
   },
   {
     "id": "player-142",
@@ -1418,8 +1277,7 @@
     "club": "AC Milan",
     "nationality": "ES",
     "position": "FWD",
-    "basePrice": 30,
-    "rarityTier": "SILVER"
+    "basePrice": 30
   },
   {
     "id": "player-143",
@@ -1428,8 +1286,7 @@
     "club": "Los Angeles FC",
     "nationality": "FR",
     "position": "FWD",
-    "basePrice": 24,
-    "rarityTier": "SILVER"
+    "basePrice": 24
   },
   {
     "id": "player-144",
@@ -1438,8 +1295,7 @@
     "club": "Liverpool",
     "nationality": "NL",
     "position": "FWD",
-    "basePrice": 33,
-    "rarityTier": "BRONZE"
+    "basePrice": 33
   },
   {
     "id": "player-145",
@@ -1448,8 +1304,7 @@
     "club": "Liverpool",
     "nationality": "CO",
     "position": "FWD",
-    "basePrice": 37,
-    "rarityTier": "BRONZE"
+    "basePrice": 37
   },
   {
     "id": "player-146",
@@ -1458,8 +1313,7 @@
     "club": "Chelsea",
     "nationality": "GB",
     "position": "FWD",
-    "basePrice": 28,
-    "rarityTier": "SILVER"
+    "basePrice": 28
   },
   {
     "id": "player-147",
@@ -1468,8 +1322,7 @@
     "club": "Manchester City",
     "nationality": "BE",
     "position": "FWD",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
     "id": "player-148",
@@ -1478,8 +1331,7 @@
     "club": "Manchester City",
     "nationality": "GB",
     "position": "FWD",
-    "basePrice": 30,
-    "rarityTier": "SILVER"
+    "basePrice": 30
   },
   {
     "id": "player-149",
@@ -1488,8 +1340,7 @@
     "club": "Real Sociedad",
     "nationality": "JP",
     "position": "FWD",
-    "basePrice": 22,
-    "rarityTier": "GOLD"
+    "basePrice": 22
   },
   {
     "id": "player-150",
@@ -1498,8 +1349,7 @@
     "club": "Dynamo Kyiv",
     "nationality": "UA",
     "position": "FWD",
-    "basePrice": 12,
-    "rarityTier": "GOLD"
+    "basePrice": 12
   },
   {
     "id": "player-151",
@@ -1508,8 +1358,7 @@
     "club": "Aston Villa",
     "nationality": "FR",
     "position": "FWD",
-    "basePrice": 26,
-    "rarityTier": "SILVER"
+    "basePrice": 26
   },
   {
     "id": "player-152",
@@ -1518,8 +1367,7 @@
     "club": "Aston Villa",
     "nationality": "JM",
     "position": "FWD",
-    "basePrice": 22,
-    "rarityTier": "GOLD"
+    "basePrice": 22
   },
   {
     "id": "player-153",
@@ -1528,8 +1376,7 @@
     "club": "Al Hilal",
     "nationality": "RS",
     "position": "FWD",
-    "basePrice": 25,
-    "rarityTier": "SILVER"
+    "basePrice": 25
   },
   {
     "id": "player-154",
@@ -1538,8 +1385,7 @@
     "club": "Tottenham",
     "nationality": "BR",
     "position": "FWD",
-    "basePrice": 24,
-    "rarityTier": "SILVER"
+    "basePrice": 24
   },
   {
     "id": "player-155",
@@ -1548,8 +1394,7 @@
     "club": "Tottenham",
     "nationality": "GB",
     "position": "FWD",
-    "basePrice": 18,
-    "rarityTier": "GOLD"
+    "basePrice": 18
   },
   {
     "id": "player-156",
@@ -1558,8 +1403,7 @@
     "club": "Tottenham",
     "nationality": "SE",
     "position": "FWD",
-    "basePrice": 28,
-    "rarityTier": "SILVER"
+    "basePrice": 28
   },
   {
     "id": "player-157",
@@ -1568,8 +1412,7 @@
     "club": "Athletic Bilbao",
     "nationality": "ES",
     "position": "FWD",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
     "id": "player-158",
@@ -1578,8 +1421,7 @@
     "club": "Porto",
     "nationality": "ES",
     "position": "FWD",
-    "basePrice": 16,
-    "rarityTier": "GOLD"
+    "basePrice": 16
   },
   {
     "id": "player-159",
@@ -1588,8 +1430,7 @@
     "club": "Paris Saint-Germain",
     "nationality": "PT",
     "position": "FWD",
-    "basePrice": 30,
-    "rarityTier": "SILVER"
+    "basePrice": 30
   },
   {
     "id": "player-160",
@@ -1598,8 +1439,7 @@
     "club": "Napoli",
     "nationality": "GE",
     "position": "FWD",
-    "basePrice": 38,
-    "rarityTier": "BRONZE"
+    "basePrice": 38
   },
   {
     "id": "player-161",
@@ -1608,8 +1448,7 @@
     "club": "Real Madrid",
     "nationality": "BE",
     "position": "GK",
-    "basePrice": 58,
-    "rarityTier": "BRONZE"
+    "basePrice": 72
   },
   {
     "id": "player-162",
@@ -1618,8 +1457,7 @@
     "club": "Liverpool",
     "nationality": "BR",
     "position": "GK",
-    "basePrice": 52,
-    "rarityTier": "BRONZE"
+    "basePrice": 66
   },
   {
     "id": "player-163",
@@ -1628,8 +1466,7 @@
     "club": "Manchester City",
     "nationality": "BR",
     "position": "GK",
-    "basePrice": 50,
-    "rarityTier": "BRONZE"
+    "basePrice": 60
   },
   {
     "id": "player-164",
@@ -1638,58 +1475,52 @@
     "club": "AC Milan",
     "nationality": "FR",
     "position": "GK",
-    "basePrice": 48,
-    "rarityTier": "BRONZE"
+    "basePrice": 58
   },
   {
     "id": "player-165",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Marc-André ter Stegen",
-    "club": "Barcelona",
-    "nationality": "DE",
-    "position": "GK",
-    "basePrice": 46,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-166",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Gianluigi Donnarumma",
     "club": "Paris Saint-Germain",
     "nationality": "IT",
     "position": "GK",
-    "basePrice": 48,
-    "rarityTier": "BRONZE"
+    "basePrice": 56
+  },
+  {
+    "id": "player-166",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Marc-André ter Stegen",
+    "club": "Barcelona",
+    "nationality": "DE",
+    "position": "GK",
+    "basePrice": 54
   },
   {
     "id": "player-167",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "David Raya",
-    "club": "Arsenal",
-    "nationality": "ES",
-    "position": "GK",
-    "basePrice": 40,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-168",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Jan Oblak",
     "club": "Atlético Madrid",
     "nationality": "SI",
     "position": "GK",
-    "basePrice": 42,
-    "rarityTier": "BRONZE"
+    "basePrice": 52
   },
   {
-    "id": "player-169",
+    "id": "player-168",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Manuel Neuer",
     "club": "Bayern Munich",
     "nationality": "DE",
     "position": "GK",
-    "basePrice": 43,
-    "rarityTier": "BRONZE"
+    "basePrice": 50
+  },
+  {
+    "id": "player-169",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "David Raya",
+    "club": "Arsenal",
+    "nationality": "ES",
+    "position": "GK",
+    "basePrice": 46
   },
   {
     "id": "player-170",
@@ -1698,28 +1529,25 @@
     "club": "Borussia Dortmund",
     "nationality": "CH",
     "position": "GK",
-    "basePrice": 38,
-    "rarityTier": "BRONZE"
+    "basePrice": 42
   },
   {
     "id": "player-171",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "André Onana",
-    "club": "Manchester United",
-    "nationality": "CM",
-    "position": "GK",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-172",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Diogo Costa",
     "club": "FC Porto",
     "nationality": "PT",
     "position": "GK",
-    "basePrice": 38,
-    "rarityTier": "BRONZE"
+    "basePrice": 40
+  },
+  {
+    "id": "player-172",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "André Onana",
+    "club": "Manchester United",
+    "nationality": "CM",
+    "position": "GK",
+    "basePrice": 38
   },
   {
     "id": "player-173",
@@ -1728,8 +1556,7 @@
     "club": "Athletic Bilbao",
     "nationality": "ES",
     "position": "GK",
-    "basePrice": 35,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
     "id": "player-174",
@@ -1738,28 +1565,25 @@
     "club": "Valencia",
     "nationality": "GE",
     "position": "GK",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
     "id": "player-175",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Lukáš Hrádecký",
-    "club": "Bayer Leverkusen",
-    "nationality": "FI",
-    "position": "GK",
-    "basePrice": 28,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-176",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Yann Sommer",
     "club": "Inter Milan",
     "nationality": "CH",
     "position": "GK",
-    "basePrice": 30,
-    "rarityTier": "SILVER"
+    "basePrice": 32
+  },
+  {
+    "id": "player-176",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Lukáš Hrádecký",
+    "club": "Bayer Leverkusen",
+    "nationality": "FI",
+    "position": "GK",
+    "basePrice": 30
   },
   {
     "id": "player-177",
@@ -1768,78 +1592,70 @@
     "club": "Bournemouth",
     "nationality": "ES",
     "position": "GK",
-    "basePrice": 26,
-    "rarityTier": "SILVER"
+    "basePrice": 26
   },
   {
     "id": "player-178",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Marco Sportiello",
-    "club": "AC Milan",
-    "nationality": "IT",
-    "position": "GK",
-    "basePrice": 20,
-    "rarityTier": "GOLD"
-  },
-  {
-    "id": "player-179",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Alex Meret",
     "club": "Napoli",
     "nationality": "IT",
     "position": "GK",
-    "basePrice": 24,
-    "rarityTier": "SILVER"
+    "basePrice": 24
   },
   {
-    "id": "player-180",
+    "id": "player-179",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Rui Patrício",
     "club": "Roma",
     "nationality": "PT",
     "position": "GK",
-    "basePrice": 22,
-    "rarityTier": "GOLD"
+    "basePrice": 22
   },
   {
-    "id": "player-181",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Mile Svilar",
-    "club": "Roma",
-    "nationality": "RS",
-    "position": "GK",
-    "basePrice": 16,
-    "rarityTier": "GOLD"
-  },
-  {
-    "id": "player-182",
+    "id": "player-180",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Bart Verbruggen",
     "club": "Brighton",
     "nationality": "NL",
     "position": "GK",
-    "basePrice": 22,
-    "rarityTier": "GOLD"
+    "basePrice": 22
   },
   {
-    "id": "player-183",
+    "id": "player-181",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Péter Gulácsi",
     "club": "RB Leipzig",
     "nationality": "HU",
     "position": "GK",
-    "basePrice": 20,
-    "rarityTier": "GOLD"
+    "basePrice": 20
   },
   {
-    "id": "player-184",
+    "id": "player-182",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Marco Sportiello",
+    "club": "AC Milan",
+    "nationality": "IT",
+    "position": "GK",
+    "basePrice": 18
+  },
+  {
+    "id": "player-183",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Alexander Nübel",
     "club": "Stuttgart",
     "nationality": "DE",
     "position": "GK",
-    "basePrice": 18,
-    "rarityTier": "GOLD"
+    "basePrice": 16
+  },
+  {
+    "id": "player-184",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Mile Svilar",
+    "club": "Roma",
+    "nationality": "RS",
+    "position": "GK",
+    "basePrice": 14
   },
   {
     "id": "player-185",
@@ -1848,8 +1664,7 @@
     "club": "Liverpool",
     "nationality": "NL",
     "position": "DEF",
-    "basePrice": 52,
-    "rarityTier": "BRONZE"
+    "basePrice": 52
   },
   {
     "id": "player-186",
@@ -1858,8 +1673,7 @@
     "club": "Manchester City",
     "nationality": "PT",
     "position": "DEF",
-    "basePrice": 50,
-    "rarityTier": "BRONZE"
+    "basePrice": 50
   },
   {
     "id": "player-187",
@@ -1868,8 +1682,7 @@
     "club": "Arsenal",
     "nationality": "FR",
     "position": "DEF",
-    "basePrice": 46,
-    "rarityTier": "BRONZE"
+    "basePrice": 46
   },
   {
     "id": "player-188",
@@ -1878,8 +1691,7 @@
     "club": "Real Madrid",
     "nationality": "DE",
     "position": "DEF",
-    "basePrice": 45,
-    "rarityTier": "BRONZE"
+    "basePrice": 45
   },
   {
     "id": "player-189",
@@ -1888,8 +1700,7 @@
     "club": "Barcelona",
     "nationality": "FR",
     "position": "DEF",
-    "basePrice": 42,
-    "rarityTier": "BRONZE"
+    "basePrice": 42
   },
   {
     "id": "player-190",
@@ -1898,8 +1709,7 @@
     "club": "Real Madrid",
     "nationality": "ES",
     "position": "DEF",
-    "basePrice": 40,
-    "rarityTier": "BRONZE"
+    "basePrice": 40
   },
   {
     "id": "player-191",
@@ -1908,8 +1718,7 @@
     "club": "Manchester City",
     "nationality": "HR",
     "position": "DEF",
-    "basePrice": 44,
-    "rarityTier": "BRONZE"
+    "basePrice": 44
   },
   {
     "id": "player-192",
@@ -1918,8 +1727,7 @@
     "club": "Bayern Munich",
     "nationality": "FR",
     "position": "DEF",
-    "basePrice": 40,
-    "rarityTier": "BRONZE"
+    "basePrice": 40
   },
   {
     "id": "player-193",
@@ -1928,8 +1736,7 @@
     "club": "Manchester City",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 38,
-    "rarityTier": "BRONZE"
+    "basePrice": 38
   },
   {
     "id": "player-194",
@@ -1938,8 +1745,7 @@
     "club": "Barcelona",
     "nationality": "UY",
     "position": "DEF",
-    "basePrice": 39,
-    "rarityTier": "BRONZE"
+    "basePrice": 39
   },
   {
     "id": "player-195",
@@ -1948,8 +1754,7 @@
     "club": "Liverpool",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 44,
-    "rarityTier": "BRONZE"
+    "basePrice": 44
   },
   {
     "id": "player-196",
@@ -1958,8 +1763,7 @@
     "club": "Manchester City",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
     "id": "player-197",
@@ -1968,8 +1772,7 @@
     "club": "Bayern Munich",
     "nationality": "CA",
     "position": "DEF",
-    "basePrice": 40,
-    "rarityTier": "BRONZE"
+    "basePrice": 40
   },
   {
     "id": "player-198",
@@ -1978,8 +1781,7 @@
     "club": "Arsenal",
     "nationality": "BR",
     "position": "DEF",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
     "id": "player-199",
@@ -1988,8 +1790,7 @@
     "club": "Manchester United",
     "nationality": "NL",
     "position": "DEF",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
     "id": "player-200",
@@ -1998,8 +1799,7 @@
     "club": "Real Madrid",
     "nationality": "BR",
     "position": "DEF",
-    "basePrice": 38,
-    "rarityTier": "BRONZE"
+    "basePrice": 38
   },
   {
     "id": "player-201",
@@ -2008,8 +1808,7 @@
     "club": "Athletic Bilbao",
     "nationality": "ES",
     "position": "DEF",
-    "basePrice": 26,
-    "rarityTier": "SILVER"
+    "basePrice": 26
   },
   {
     "id": "player-202",
@@ -2018,8 +1817,7 @@
     "club": "Atlético Madrid",
     "nationality": "FR",
     "position": "DEF",
-    "basePrice": 28,
-    "rarityTier": "SILVER"
+    "basePrice": 28
   },
   {
     "id": "player-203",
@@ -2028,8 +1826,7 @@
     "club": "Paris Saint-Germain",
     "nationality": "FR",
     "position": "DEF",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
     "id": "player-204",
@@ -2038,8 +1835,7 @@
     "club": "Paris Saint-Germain",
     "nationality": "PT",
     "position": "DEF",
-    "basePrice": 30,
-    "rarityTier": "SILVER"
+    "basePrice": 30
   },
   {
     "id": "player-205",
@@ -2048,8 +1844,7 @@
     "club": "Paris Saint-Germain",
     "nationality": "SK",
     "position": "DEF",
-    "basePrice": 30,
-    "rarityTier": "SILVER"
+    "basePrice": 30
   },
   {
     "id": "player-206",
@@ -2058,8 +1853,7 @@
     "club": "Inter Milan",
     "nationality": "IT",
     "position": "DEF",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
     "id": "player-207",
@@ -2068,8 +1862,7 @@
     "club": "Inter Milan",
     "nationality": "IT",
     "position": "DEF",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
     "id": "player-208",
@@ -2078,8 +1871,7 @@
     "club": "Inter Milan",
     "nationality": "FR",
     "position": "DEF",
-    "basePrice": 30,
-    "rarityTier": "SILVER"
+    "basePrice": 30
   },
   {
     "id": "player-209",
@@ -2088,8 +1880,7 @@
     "club": "Juventus",
     "nationality": "BR",
     "position": "DEF",
-    "basePrice": 26,
-    "rarityTier": "SILVER"
+    "basePrice": 26
   },
   {
     "id": "player-210",
@@ -2098,8 +1889,7 @@
     "club": "Juventus",
     "nationality": "BR",
     "position": "DEF",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
     "id": "player-211",
@@ -2108,8 +1898,7 @@
     "club": "Juventus",
     "nationality": "IT",
     "position": "DEF",
-    "basePrice": 22,
-    "rarityTier": "GOLD"
+    "basePrice": 22
   },
   {
     "id": "player-212",
@@ -2118,8 +1907,7 @@
     "club": "Bayer Leverkusen",
     "nationality": "BF",
     "position": "DEF",
-    "basePrice": 28,
-    "rarityTier": "SILVER"
+    "basePrice": 28
   },
   {
     "id": "player-213",
@@ -2128,8 +1916,7 @@
     "club": "Bayer Leverkusen",
     "nationality": "DE",
     "position": "DEF",
-    "basePrice": 30,
-    "rarityTier": "SILVER"
+    "basePrice": 30
   },
   {
     "id": "player-214",
@@ -2138,8 +1925,7 @@
     "club": "Bayern Munich",
     "nationality": "HR",
     "position": "DEF",
-    "basePrice": 24,
-    "rarityTier": "SILVER"
+    "basePrice": 24
   },
   {
     "id": "player-215",
@@ -2148,8 +1934,7 @@
     "club": "Borussia Dortmund",
     "nationality": "DE",
     "position": "DEF",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
     "id": "player-216",
@@ -2158,8 +1943,7 @@
     "club": "Borussia Dortmund",
     "nationality": "NO",
     "position": "DEF",
-    "basePrice": 22,
-    "rarityTier": "GOLD"
+    "basePrice": 22
   },
   {
     "id": "player-217",
@@ -2168,8 +1952,7 @@
     "club": "Borussia Dortmund",
     "nationality": "DZ",
     "position": "DEF",
-    "basePrice": 18,
-    "rarityTier": "GOLD"
+    "basePrice": 18
   },
   {
     "id": "player-218",
@@ -2178,8 +1961,7 @@
     "club": "Arsenal",
     "nationality": "NL",
     "position": "DEF",
-    "basePrice": 28,
-    "rarityTier": "SILVER"
+    "basePrice": 28
   },
   {
     "id": "player-219",
@@ -2188,8 +1970,7 @@
     "club": "Arsenal",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 30,
-    "rarityTier": "SILVER"
+    "basePrice": 30
   },
   {
     "id": "player-220",
@@ -2198,8 +1979,7 @@
     "club": "Chelsea",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 26,
-    "rarityTier": "SILVER"
+    "basePrice": 26
   },
   {
     "id": "player-221",
@@ -2208,8 +1988,7 @@
     "club": "Chelsea",
     "nationality": "FR",
     "position": "DEF",
-    "basePrice": 24,
-    "rarityTier": "SILVER"
+    "basePrice": 24
   },
   {
     "id": "player-222",
@@ -2218,8 +1997,7 @@
     "club": "Manchester United",
     "nationality": "FR",
     "position": "DEF",
-    "basePrice": 28,
-    "rarityTier": "SILVER"
+    "basePrice": 28
   },
   {
     "id": "player-223",
@@ -2228,8 +2006,7 @@
     "club": "Manchester United",
     "nationality": "PT",
     "position": "DEF",
-    "basePrice": 24,
-    "rarityTier": "SILVER"
+    "basePrice": 24
   },
   {
     "id": "player-224",
@@ -2238,8 +2015,7 @@
     "club": "Ajax",
     "nationality": "NL",
     "position": "DEF",
-    "basePrice": 22,
-    "rarityTier": "GOLD"
+    "basePrice": 22
   },
   {
     "id": "player-225",
@@ -2248,8 +2024,7 @@
     "club": "Feyenoord",
     "nationality": "SK",
     "position": "DEF",
-    "basePrice": 18,
-    "rarityTier": "GOLD"
+    "basePrice": 18
   },
   {
     "id": "player-226",
@@ -2258,8 +2033,7 @@
     "club": "Inter Milan",
     "nationality": "NL",
     "position": "DEF",
-    "basePrice": 20,
-    "rarityTier": "GOLD"
+    "basePrice": 20
   },
   {
     "id": "player-227",
@@ -2268,8 +2042,7 @@
     "club": "Marseille",
     "nationality": "FR",
     "position": "DEF",
-    "basePrice": 12,
-    "rarityTier": "GOLD"
+    "basePrice": 12
   },
   {
     "id": "player-228",
@@ -2278,8 +2051,7 @@
     "club": "Southampton",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 14,
-    "rarityTier": "GOLD"
+    "basePrice": 14
   },
   {
     "id": "player-229",
@@ -2289,8 +2061,7 @@
     "nationality": "GB",
     "position": "MID",
     "basePrice": 85,
-    "isEligibleForIcon": true,
-    "rarityTier": "BRONZE"
+    "isEligibleForIcon": true
   },
   {
     "id": "player-230",
@@ -2299,8 +2070,7 @@
     "club": "Manchester City",
     "nationality": "ES",
     "position": "MID",
-    "basePrice": 75,
-    "rarityTier": "BRONZE"
+    "basePrice": 75
   },
   {
     "id": "player-231",
@@ -2309,8 +2079,7 @@
     "club": "Manchester City",
     "nationality": "BE",
     "position": "MID",
-    "basePrice": 60,
-    "rarityTier": "BRONZE"
+    "basePrice": 60
   },
   {
     "id": "player-232",
@@ -2319,8 +2088,7 @@
     "club": "Arsenal",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 58,
-    "rarityTier": "BRONZE"
+    "basePrice": 58
   },
   {
     "id": "player-233",
@@ -2329,8 +2097,7 @@
     "club": "Bayern Munich",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 70,
-    "rarityTier": "BRONZE"
+    "basePrice": 70
   },
   {
     "id": "player-234",
@@ -2339,8 +2106,7 @@
     "club": "Bayer Leverkusen",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 62,
-    "rarityTier": "BRONZE"
+    "basePrice": 62
   },
   {
     "id": "player-235",
@@ -2349,8 +2115,7 @@
     "club": "Real Madrid",
     "nationality": "UY",
     "position": "MID",
-    "basePrice": 56,
-    "rarityTier": "BRONZE"
+    "basePrice": 56
   },
   {
     "id": "player-236",
@@ -2359,8 +2124,7 @@
     "club": "Real Madrid",
     "nationality": "FR",
     "position": "MID",
-    "basePrice": 50,
-    "rarityTier": "BRONZE"
+    "basePrice": 50
   },
   {
     "id": "player-237",
@@ -2369,8 +2133,7 @@
     "club": "Real Madrid",
     "nationality": "FR",
     "position": "MID",
-    "basePrice": 48,
-    "rarityTier": "BRONZE"
+    "basePrice": 48
   },
   {
     "id": "player-238",
@@ -2379,8 +2142,7 @@
     "club": "Barcelona",
     "nationality": "ES",
     "position": "MID",
-    "basePrice": 54,
-    "rarityTier": "BRONZE"
+    "basePrice": 54
   },
   {
     "id": "player-239",
@@ -2389,8 +2151,7 @@
     "club": "Barcelona",
     "nationality": "ES",
     "position": "MID",
-    "basePrice": 50,
-    "rarityTier": "BRONZE"
+    "basePrice": 50
   },
   {
     "id": "player-240",
@@ -2399,8 +2160,7 @@
     "club": "Barcelona",
     "nationality": "NL",
     "position": "MID",
-    "basePrice": 42,
-    "rarityTier": "BRONZE"
+    "basePrice": 42
   },
   {
     "id": "player-241",
@@ -2409,8 +2169,7 @@
     "club": "Manchester City",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 44,
-    "rarityTier": "BRONZE"
+    "basePrice": 44
   },
   {
     "id": "player-242",
@@ -2419,8 +2178,7 @@
     "club": "Manchester City",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 58,
-    "rarityTier": "BRONZE"
+    "basePrice": 58
   },
   {
     "id": "player-243",
@@ -2429,8 +2187,7 @@
     "club": "Manchester United",
     "nationality": "PT",
     "position": "MID",
-    "basePrice": 46,
-    "rarityTier": "BRONZE"
+    "basePrice": 46
   },
   {
     "id": "player-244",
@@ -2439,8 +2196,7 @@
     "club": "Manchester United",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
     "id": "player-245",
@@ -2449,8 +2205,7 @@
     "club": "Chelsea",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 52,
-    "rarityTier": "BRONZE"
+    "basePrice": 52
   },
   {
     "id": "player-246",
@@ -2459,8 +2214,7 @@
     "club": "Chelsea",
     "nationality": "AR",
     "position": "MID",
-    "basePrice": 42,
-    "rarityTier": "BRONZE"
+    "basePrice": 42
   },
   {
     "id": "player-247",
@@ -2469,8 +2223,7 @@
     "club": "Chelsea",
     "nationality": "EC",
     "position": "MID",
-    "basePrice": 38,
-    "rarityTier": "BRONZE"
+    "basePrice": 38
   },
   {
     "id": "player-248",
@@ -2479,8 +2232,7 @@
     "club": "Liverpool",
     "nationality": "AR",
     "position": "MID",
-    "basePrice": 40,
-    "rarityTier": "BRONZE"
+    "basePrice": 40
   },
   {
     "id": "player-249",
@@ -2489,8 +2241,7 @@
     "club": "Liverpool",
     "nationality": "HU",
     "position": "MID",
-    "basePrice": 38,
-    "rarityTier": "BRONZE"
+    "basePrice": 38
   },
   {
     "id": "player-250",
@@ -2499,8 +2250,7 @@
     "club": "Liverpool",
     "nationality": "NL",
     "position": "MID",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
     "id": "player-251",
@@ -2509,8 +2259,7 @@
     "club": "Manchester City",
     "nationality": "PT",
     "position": "MID",
-    "basePrice": 46,
-    "rarityTier": "BRONZE"
+    "basePrice": 46
   },
   {
     "id": "player-252",
@@ -2519,8 +2268,7 @@
     "club": "Arsenal",
     "nationality": "NO",
     "position": "MID",
-    "basePrice": 52,
-    "rarityTier": "BRONZE"
+    "basePrice": 52
   },
   {
     "id": "player-253",
@@ -2529,8 +2277,7 @@
     "club": "Tottenham",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
     "id": "player-254",
@@ -2539,8 +2286,7 @@
     "club": "Bayern Munich",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 40,
-    "rarityTier": "BRONZE"
+    "basePrice": 40
   },
   {
     "id": "player-255",
@@ -2549,8 +2295,7 @@
     "club": "Bayern Munich",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
     "id": "player-256",
@@ -2559,8 +2304,7 @@
     "club": "Paris Saint-Germain",
     "nationality": "FR",
     "position": "MID",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
     "id": "player-257",
@@ -2569,8 +2313,7 @@
     "club": "Paris Saint-Germain",
     "nationality": "PT",
     "position": "MID",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
     "id": "player-258",
@@ -2579,8 +2322,7 @@
     "club": "Inter Milan",
     "nationality": "IT",
     "position": "MID",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
     "id": "player-259",
@@ -2589,8 +2331,7 @@
     "club": "Inter Milan",
     "nationality": "TR",
     "position": "MID",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
     "id": "player-260",
@@ -2599,8 +2340,7 @@
     "club": "Inter Milan",
     "nationality": "AM",
     "position": "MID",
-    "basePrice": 24,
-    "rarityTier": "GOLD"
+    "basePrice": 24
   },
   {
     "id": "player-261",
@@ -2609,8 +2349,7 @@
     "club": "Barcelona",
     "nationality": "ES",
     "position": "MID",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
     "id": "player-262",
@@ -2619,8 +2358,7 @@
     "club": "Barcelona",
     "nationality": "ES",
     "position": "MID",
-    "basePrice": 28,
-    "rarityTier": "SILVER"
+    "basePrice": 28
   },
   {
     "id": "player-263",
@@ -2629,8 +2367,7 @@
     "club": "Manchester United",
     "nationality": "AR",
     "position": "MID",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
     "id": "player-264",
@@ -2639,8 +2376,7 @@
     "club": "Manchester United",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 26,
-    "rarityTier": "SILVER"
+    "basePrice": 26
   },
   {
     "id": "player-265",
@@ -2649,8 +2385,7 @@
     "club": "Atlético Madrid",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 22,
-    "rarityTier": "GOLD"
+    "basePrice": 22
   },
   {
     "id": "player-266",
@@ -2659,8 +2394,7 @@
     "club": "Atlético Madrid",
     "nationality": "AR",
     "position": "MID",
-    "basePrice": 30,
-    "rarityTier": "SILVER"
+    "basePrice": 30
   },
   {
     "id": "player-267",
@@ -2669,8 +2403,7 @@
     "club": "Atlético Madrid",
     "nationality": "FR",
     "position": "MID",
-    "basePrice": 20,
-    "rarityTier": "GOLD"
+    "basePrice": 20
   },
   {
     "id": "player-268",
@@ -2679,8 +2412,7 @@
     "club": "Bayer Leverkusen",
     "nationality": "CH",
     "position": "MID",
-    "basePrice": 26,
-    "rarityTier": "SILVER"
+    "basePrice": 26
   },
   {
     "id": "player-269",
@@ -2689,8 +2421,7 @@
     "club": "Bayer Leverkusen",
     "nationality": "AR",
     "position": "MID",
-    "basePrice": 26,
-    "rarityTier": "SILVER"
+    "basePrice": 26
   },
   {
     "id": "player-270",
@@ -2699,8 +2430,7 @@
     "club": "Borussia Dortmund",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 28,
-    "rarityTier": "SILVER"
+    "basePrice": 28
   },
   {
     "id": "player-271",
@@ -2709,8 +2439,7 @@
     "club": "Borussia Dortmund",
     "nationality": "AT",
     "position": "MID",
-    "basePrice": 24,
-    "rarityTier": "GOLD"
+    "basePrice": 24
   },
   {
     "id": "player-272",
@@ -2719,8 +2448,7 @@
     "club": "Inter Milan",
     "nationality": "NL",
     "position": "MID",
-    "basePrice": 16,
-    "rarityTier": "GOLD"
+    "basePrice": 16
   },
   {
     "id": "player-273",
@@ -2729,8 +2457,7 @@
     "club": "AC Milan",
     "nationality": "NL",
     "position": "MID",
-    "basePrice": 28,
-    "rarityTier": "SILVER"
+    "basePrice": 28
   },
   {
     "id": "player-274",
@@ -2739,8 +2466,7 @@
     "club": "AC Milan",
     "nationality": "US",
     "position": "MID",
-    "basePrice": 30,
-    "rarityTier": "SILVER"
+    "basePrice": 30
   },
   {
     "id": "player-275",
@@ -2749,8 +2475,7 @@
     "club": "AC Milan",
     "nationality": "DZ",
     "position": "MID",
-    "basePrice": 26,
-    "rarityTier": "SILVER"
+    "basePrice": 26
   },
   {
     "id": "player-276",
@@ -2759,8 +2484,7 @@
     "club": "Bologna",
     "nationality": "CH",
     "position": "MID",
-    "basePrice": 16,
-    "rarityTier": "GOLD"
+    "basePrice": 16
   },
   {
     "id": "player-277",
@@ -2770,8 +2494,7 @@
     "nationality": "FR",
     "position": "FWD",
     "basePrice": 92,
-    "isEligibleForIcon": true,
-    "rarityTier": "BRONZE"
+    "isEligibleForIcon": true
   },
   {
     "id": "player-278",
@@ -2781,8 +2504,7 @@
     "nationality": "NO",
     "position": "FWD",
     "basePrice": 95,
-    "isEligibleForIcon": true,
-    "rarityTier": "BRONZE"
+    "isEligibleForIcon": true
   },
   {
     "id": "player-279",
@@ -2791,8 +2513,7 @@
     "club": "Real Madrid",
     "nationality": "BR",
     "position": "FWD",
-    "basePrice": 80,
-    "rarityTier": "BRONZE"
+    "basePrice": 80
   },
   {
     "id": "player-280",
@@ -2801,8 +2522,7 @@
     "club": "Bayern Munich",
     "nationality": "GB",
     "position": "FWD",
-    "basePrice": 82,
-    "rarityTier": "BRONZE"
+    "basePrice": 82
   },
   {
     "id": "player-281",
@@ -2811,8 +2531,7 @@
     "club": "Barcelona",
     "nationality": "ES",
     "position": "FWD",
-    "basePrice": 78,
-    "rarityTier": "BRONZE"
+    "basePrice": 78
   },
   {
     "id": "player-282",
@@ -2821,8 +2540,7 @@
     "club": "Liverpool",
     "nationality": "EG",
     "position": "FWD",
-    "basePrice": 62,
-    "rarityTier": "BRONZE"
+    "basePrice": 62
   },
   {
     "id": "player-283",
@@ -2831,8 +2549,7 @@
     "club": "Arsenal",
     "nationality": "GB",
     "position": "FWD",
-    "basePrice": 66,
-    "rarityTier": "BRONZE"
+    "basePrice": 66
   },
   {
     "id": "player-284",
@@ -2841,8 +2558,7 @@
     "club": "Paris Saint-Germain",
     "nationality": "FR",
     "position": "FWD",
-    "basePrice": 50,
-    "rarityTier": "BRONZE"
+    "basePrice": 50
   },
   {
     "id": "player-285",
@@ -2851,8 +2567,7 @@
     "club": "Barcelona",
     "nationality": "BR",
     "position": "FWD",
-    "basePrice": 48,
-    "rarityTier": "BRONZE"
+    "basePrice": 48
   },
   {
     "id": "player-286",
@@ -2861,8 +2576,7 @@
     "club": "Real Madrid",
     "nationality": "BR",
     "position": "FWD",
-    "basePrice": 56,
-    "rarityTier": "BRONZE"
+    "basePrice": 56
   },
   {
     "id": "player-287",
@@ -2871,8 +2585,7 @@
     "club": "Inter Milan",
     "nationality": "AR",
     "position": "FWD",
-    "basePrice": 54,
-    "rarityTier": "BRONZE"
+    "basePrice": 54
   },
   {
     "id": "player-288",
@@ -2881,8 +2594,7 @@
     "club": "Manchester United",
     "nationality": "GB",
     "position": "FWD",
-    "basePrice": 38,
-    "rarityTier": "BRONZE"
+    "basePrice": 38
   },
   {
     "id": "player-289",
@@ -2891,8 +2603,7 @@
     "club": "Chelsea",
     "nationality": "FR",
     "position": "FWD",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
     "id": "player-290",
@@ -2901,8 +2612,7 @@
     "club": "Chelsea",
     "nationality": "SN",
     "position": "FWD",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
     "id": "player-291",
@@ -2911,8 +2621,7 @@
     "club": "Liverpool",
     "nationality": "UY",
     "position": "FWD",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
     "id": "player-292",
@@ -2921,8 +2630,7 @@
     "club": "Liverpool",
     "nationality": "CO",
     "position": "FWD",
-    "basePrice": 38,
-    "rarityTier": "BRONZE"
+    "basePrice": 38
   },
   {
     "id": "player-293",
@@ -2931,8 +2639,7 @@
     "club": "Liverpool",
     "nationality": "NL",
     "position": "FWD",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
     "id": "player-294",
@@ -2941,8 +2648,7 @@
     "club": "Arsenal",
     "nationality": "BR",
     "position": "FWD",
-    "basePrice": 42,
-    "rarityTier": "BRONZE"
+    "basePrice": 42
   },
   {
     "id": "player-295",
@@ -2951,8 +2657,7 @@
     "club": "Bayern Munich",
     "nationality": "FR",
     "position": "FWD",
-    "basePrice": 40,
-    "rarityTier": "BRONZE"
+    "basePrice": 40
   },
   {
     "id": "player-296",
@@ -2961,8 +2666,7 @@
     "club": "Bayern Munich",
     "nationality": "DE",
     "position": "FWD",
-    "basePrice": 42,
-    "rarityTier": "BRONZE"
+    "basePrice": 42
   },
   {
     "id": "player-297",
@@ -2971,8 +2675,7 @@
     "club": "Bayern Munich",
     "nationality": "DE",
     "position": "FWD",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
     "id": "player-298",
@@ -2981,8 +2684,7 @@
     "club": "Borussia Dortmund",
     "nationality": "NL",
     "position": "FWD",
-    "basePrice": 28,
-    "rarityTier": "SILVER"
+    "basePrice": 28
   },
   {
     "id": "player-299",
@@ -2991,8 +2693,7 @@
     "club": "Borussia Dortmund",
     "nationality": "DE",
     "position": "FWD",
-    "basePrice": 30,
-    "rarityTier": "SILVER"
+    "basePrice": 30
   },
   {
     "id": "player-300",
@@ -3001,8 +2702,7 @@
     "club": "Atlético Madrid",
     "nationality": "AR",
     "position": "FWD",
-    "basePrice": 42,
-    "rarityTier": "BRONZE"
+    "basePrice": 42
   },
   {
     "id": "player-301",
@@ -3011,8 +2711,7 @@
     "club": "Atlético Madrid",
     "nationality": "FR",
     "position": "FWD",
-    "basePrice": 48,
-    "rarityTier": "BRONZE"
+    "basePrice": 48
   },
   {
     "id": "player-302",
@@ -3021,8 +2720,7 @@
     "club": "Galatasaray",
     "nationality": "NG",
     "position": "FWD",
-    "basePrice": 46,
-    "rarityTier": "BRONZE"
+    "basePrice": 46
   },
   {
     "id": "player-303",
@@ -3031,8 +2729,7 @@
     "club": "Napoli",
     "nationality": "GE",
     "position": "FWD",
-    "basePrice": 40,
-    "rarityTier": "BRONZE"
+    "basePrice": 40
   },
   {
     "id": "player-304",
@@ -3041,8 +2738,7 @@
     "club": "Chelsea",
     "nationality": "GB",
     "position": "FWD",
-    "basePrice": 28,
-    "rarityTier": "SILVER"
+    "basePrice": 28
   },
   {
     "id": "player-305",
@@ -3051,8 +2747,7 @@
     "club": "Manchester City",
     "nationality": "BE",
     "position": "FWD",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
     "id": "player-306",
@@ -3061,8 +2756,7 @@
     "club": "Manchester City",
     "nationality": "GB",
     "position": "FWD",
-    "basePrice": 32,
-    "rarityTier": "SILVER"
+    "basePrice": 32
   },
   {
     "id": "player-307",
@@ -3071,8 +2765,7 @@
     "club": "Athletic Bilbao",
     "nationality": "ES",
     "position": "FWD",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
     "id": "player-308",
@@ -3081,8 +2774,7 @@
     "club": "AC Milan",
     "nationality": "ES",
     "position": "FWD",
-    "basePrice": 32,
-    "rarityTier": "SILVER"
+    "basePrice": 32
   },
   {
     "id": "player-309",
@@ -3091,8 +2783,7 @@
     "club": "AC Milan",
     "nationality": "NG",
     "position": "FWD",
-    "basePrice": 24,
-    "rarityTier": "GOLD"
+    "basePrice": 24
   },
   {
     "id": "player-310",
@@ -3101,8 +2792,7 @@
     "club": "AC Milan",
     "nationality": "US",
     "position": "FWD",
-    "basePrice": 28,
-    "rarityTier": "SILVER"
+    "basePrice": 28
   },
   {
     "id": "player-311",
@@ -3111,8 +2801,7 @@
     "club": "AC Milan",
     "nationality": "CH",
     "position": "FWD",
-    "basePrice": 20,
-    "rarityTier": "GOLD"
+    "basePrice": 20
   },
   {
     "id": "player-312",
@@ -3121,8 +2810,7 @@
     "club": "Tottenham",
     "nationality": "SE",
     "position": "FWD",
-    "basePrice": 30,
-    "rarityTier": "SILVER"
+    "basePrice": 30
   },
   {
     "id": "player-313",
@@ -3131,8 +2819,7 @@
     "club": "Tottenham",
     "nationality": "GB",
     "position": "FWD",
-    "basePrice": 20,
-    "rarityTier": "GOLD"
+    "basePrice": 20
   },
   {
     "id": "player-314",
@@ -3141,8 +2828,7 @@
     "club": "Paris Saint-Germain",
     "nationality": "PT",
     "position": "FWD",
-    "basePrice": 32,
-    "rarityTier": "SILVER"
+    "basePrice": 32
   },
   {
     "id": "player-315",
@@ -3151,8 +2837,7 @@
     "club": "Paris Saint-Germain",
     "nationality": "FR",
     "position": "FWD",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
     "id": "player-316",
@@ -3161,8 +2846,7 @@
     "club": "Paris Saint-Germain",
     "nationality": "FR",
     "position": "FWD",
-    "basePrice": 30,
-    "rarityTier": "SILVER"
+    "basePrice": 30
   },
   {
     "id": "player-317",
@@ -3171,8 +2855,7 @@
     "club": "Bayern Munich",
     "nationality": "FR",
     "position": "FWD",
-    "basePrice": 26,
-    "rarityTier": "SILVER"
+    "basePrice": 26
   },
   {
     "id": "player-318",
@@ -3181,8 +2864,7 @@
     "club": "Bayern Munich",
     "nationality": "FR",
     "position": "FWD",
-    "basePrice": 32,
-    "rarityTier": "SILVER"
+    "basePrice": 32
   },
   {
     "id": "player-319",
@@ -3191,8 +2873,7 @@
     "club": "Borussia Dortmund",
     "nationality": "GB",
     "position": "FWD",
-    "basePrice": 18,
-    "rarityTier": "GOLD"
+    "basePrice": 18
   },
   {
     "id": "player-320",
@@ -3201,7 +2882,6 @@
     "club": "Real Madrid",
     "nationality": "BR",
     "position": "FWD",
-    "basePrice": 28,
-    "rarityTier": "SILVER"
+    "basePrice": 28
   }
 ]
