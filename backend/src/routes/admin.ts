@@ -413,12 +413,12 @@ router.get('/draft/pool-validation', asyncHandler(async (_req: AuthenticatedRequ
   const results = TOURNAMENTS.map((t: any) => {
     const result = validateTournamentDraftPool(t.id)
     return {
-      tournamentId: t.id,
+      ...result,
       tournamentName: t.name,
       shortName: t.shortName,
       status: t.status,
       iconCount: 0, // populated below
-      ...result,
+      playerCount: 0,
       enabled: (process.env.DRAFT_ENABLED_TOURNAMENTS || '').split(',').map((s: string) => s.trim()).filter(Boolean).includes(t.id),
     }
   })
@@ -444,9 +444,7 @@ router.get('/draft/pool-validation', asyncHandler(async (_req: AuthenticatedRequ
  * GET /api/admin/draft/icons
  * Lists all ICON-rarity players across all tournaments.
  */
-router.get('/draft/icons', asyncHandler(async (_req: AuthenticatedRequest, res) => {
-  const prisma = (await import('../lib/jsonDb')).default || _req.app.get('prisma')
-  // Fall back to reading players.json directly
+router.get('/draft/icons', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const fs = require('fs')
   const path = require('path')
   const playersPath = path.join(__dirname, '..', 'data', 'players.json')
@@ -539,7 +537,6 @@ router.post('/draft/revalidate', asyncHandler(async (req: AuthenticatedRequest, 
   const tournamentId = req.body.tournamentId as string | undefined
 
   // 1. Re-compute rarity tiers
-  const { computeRarityForTournament } = require('../lib/validateDraftPool')
   const fs = require('fs')
   const path = require('path')
   const playersPath = path.join(__dirname, '..', 'data', 'players.json')
@@ -577,7 +574,7 @@ router.post('/draft/revalidate', asyncHandler(async (req: AuthenticatedRequest, 
       const percentile = ((i + 1) / total) * 100
       const bottomPct = 100 - percentile
 
-      let assignedTier = 'BRONZE'
+      let assignedTier: string = 'BRONZE'
       for (const t of RARITY_TIERS_FN) {
         if (bottomPct <= t.maxPercentile) {
           assignedTier = t.tier
@@ -596,7 +593,7 @@ router.post('/draft/revalidate', asyncHandler(async (req: AuthenticatedRequest, 
     // Apply to allPlayers
     allPlayers = allPlayers.map((p: any) =>
       p.tournamentId === tid && rarityMap.has(p.id)
-        ? { ...p, rarityTier: rarityMap.get(p.id) }
+        ? { ...p, rarityTier: rarityMap.get(p.id) as string }
         : p,
     )
   }
@@ -607,10 +604,10 @@ router.post('/draft/revalidate', asyncHandler(async (req: AuthenticatedRequest, 
   fs.renameSync(tmpPath, playersPath)
 
   // 2. Re-validate
-  const results = tournamentIds.map((tid: string) => {
+  const tidArray = Array.from(tournamentIds) as string[]
+  const results = tidArray.map((tid: string) => {
     const result = validateTournamentDraftPool(tid)
     return {
-      tournamentId: tid,
       ...result,
     }
   })
