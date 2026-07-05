@@ -141,11 +141,19 @@ function firstName(nationality: string): string {
   return allNames[Math.floor(Math.random() * allNames.length)]
 }
 
+function womenFirstName(nationality: string): string {
+  const names = WOMEN_FIRST_NAMES[nationality]
+  if (names) return names[Math.floor(Math.random() * names.length)]
+  const allNames = Object.values(WOMEN_FIRST_NAMES).flat()
+  return allNames[Math.floor(Math.random() * allNames.length)]
+}
+
 function generateFillerPlayers(
   existing: PlayerTemplate[],
   targetCount: number,
   nationalities: string[],
   clubs: string[],
+  womenNames?: boolean,
 ): PlayerTemplate[] {
   if (existing.length >= targetCount) return []
 
@@ -184,7 +192,7 @@ function generateFillerPlayers(
       // Generate unique name
       let name = ''
       for (let attempt = 0; attempt < 50; attempt++) {
-        const first = firstName(nat)
+        const first = womenNames ? womenFirstName(nat) : firstName(nat)
         const last = pick(LAST_NAMES)
         const candidate = `${first} ${last}`
         if (!existingNames.has(candidate) && !usedNames.has(candidate)) {
@@ -985,7 +993,7 @@ function main() {
   const uclFillers = generateFillerPlayers(uclBase, UCL_TARGET, UCL_NATIONALITIES, UCL_CLUBS)
   const uelFillers = generateFillerPlayers(uelBase, UEL_TARGET, UEL_NATIONALITIES, UEL_CLUBS)
   const afconFillers = generateFillerPlayers(afconBase, AFCON_TARGET, AFCON_NATIONALITIES, AFCON_CLUBS)
-  const wwcFillers = generateFillerPlayers(wwcBase, WWC_TARGET, WWC_NATIONALITIES, WWC_CLUBS)
+  const wwcFillers = generateFillerPlayers(wwcBase, WWC_TARGET, WWC_NATIONALITIES, WWC_CLUBS, true)
   const copaFillers = generateFillerPlayers(copaBase, COPA_TARGET, COPA_NATIONALITIES, COPA_CLUBS)
 
   const wcPlayers = [...wcBase, ...wcFillers]
