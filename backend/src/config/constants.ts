@@ -3,7 +3,7 @@
  *
  * Magic numbers and configuration values extracted from route handlers
  * and scoring logic. Single source of truth for scoring points,
- * pagination defaults, retry configs, and rate-limit tiers.
+ * pagination defaults, retry configs, rate-limit tiers, and Draft Mode config.
  */
 
 // ─── Scoring Points ────────────────────────────────────
@@ -61,3 +61,41 @@ export const MATCH = {
 export const CHAT = {
   MAX_TEXT_LENGTH: 500,
 } as const
+
+// ─── Draft Mode — Rarity Tiers (§1.3) ─────────────────
+export interface RarityTier {
+  tier: 'BRONZE' | 'SILVER' | 'GOLD' | 'ICON'
+  maxPercentile: number
+  packWeight: number
+  badgeColor: string
+}
+
+export const RARITY_TIERS: readonly RarityTier[] = [
+  { tier: 'BRONZE', maxPercentile: 60, packWeight: 0.55, badgeColor: '#CD7F32' },
+  { tier: 'SILVER', maxPercentile: 85, packWeight: 0.30, badgeColor: '#C0C0C0' },
+  { tier: 'GOLD',   maxPercentile: 97, packWeight: 0.13, badgeColor: '#FFD700' },
+  { tier: 'ICON',   maxPercentile: 100, packWeight: 0.02, badgeColor: 'linear-gradient(135deg,#FFD700,#FFFFFF)' },
+] as const
+
+export type RarityTierName = (typeof RARITY_TIERS)[number]['tier']
+
+// ─── Draft Mode — Core Config (§1) ────────────────────
+export const DRAFT = {
+  PICK_TIMER_SECONDS: 20,
+  OFFERED_PLAYERS_PER_ROUND: 3,
+  MAX_WINS: 5,
+  MAX_LOSSES: 3,
+  SYNERGY_NATIONALITY_THRESHOLD: 3,
+  SYNERGY_CLUB_THRESHOLD: 2,
+  SYNERGY_NATIONALITY_BONUS_PER: 1,   // +1% per player beyond threshold
+  SYNERGY_CLUB_BONUS_PER: 2,           // +2% per player beyond threshold
+  SYNERGY_MAX_BONUS: 15,               // cap at +15%
+  FORMATION_FILL_BONUS: 5,             // flat +5% for filling all slots
+  BENCH_SLOTS: 7,                      // max bench size
+  MIN_PLAYERS_PER_POSITION_RARITY: 8,  // floor for seeding gate (§6.3)
+  ICON_MIN_PER_POSITION: 1,            // exempt from 8-min, but need at least 1
+  FREE_TICKETS_PER_TOURNAMENT: 1,      // free tier ticket allowance per 7d
+  PRO_TICKETS_PER_DAY: 5,              // Pro tier ticket allowance per day
+  TICKET_RESET_DAYS: 7,                // rolling window for free ticket reset
+} as const
+

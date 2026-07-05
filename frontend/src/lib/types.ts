@@ -43,6 +43,67 @@ export interface Player {
   position: 'GK' | 'DEF' | 'MID' | 'FWD'
   basePrice: number
   photoUrl?: string
+  rarityTier?: 'BRONZE' | 'SILVER' | 'GOLD' | 'ICON'  // computed (§1.3)
+  isEligibleForIcon?: boolean  // admin gate (§1.3)
+}
+
+// ─── Draft Mode — Types (§1.9) ─────────────────────────
+export type DraftSessionStatus = 'DRAFTING' | 'SQUAD_COMPLETE' | 'RUN_IN_PROGRESS' | 'RUN_COMPLETE' | 'ABANDONED'
+export type FormationName = '4-3-3' | '4-4-2' | '4-2-3-1' | '3-5-2' | '5-3-2'
+export type Position = 'GK' | 'DEF' | 'MID' | 'FWD'
+export type RarityTier = 'BRONZE' | 'SILVER' | 'GOLD' | 'ICON'
+
+export interface Formation {
+  id: string
+  name: string
+  slots: { position: Position; count: number }[]
+  benchSlots: number
+}
+
+export interface DraftSession {
+  id: string
+  userId: string
+  tournamentId: string
+  formation: string
+  status: DraftSessionStatus
+  ticketConsumedId: string
+  createdAt: string
+  synergyScore: number
+  formationBonusApplied: boolean
+  slots: DraftPick[]
+}
+
+export interface DraftPick {
+  slotIndex: number
+  position: Position
+  offeredPlayerIds: string[]
+  offeredRarities: RarityTier[]
+  pickedPlayerId: string | null
+  autoPicked: boolean
+  pickedAt: string | null
+}
+
+export interface DraftRunRound {
+  round: number
+  fixtureMatchdayId: string
+  opponentDraftSessionId: string | 'BENCHMARK'
+  myScore: number
+  opponentScore: number
+  result: 'WIN' | 'LOSS' | 'DRAW'
+  playedAt: string
+}
+
+export interface DraftTicketInfo {
+  remaining: number
+  resetsAt: string | null
+  isPro: boolean
+}
+
+export interface DraftReward {
+  winCountThreshold: number
+  cosmeticId: string
+  name: string
+  description: string
 }
 
 // ─── Room (Auction room) ──────────────────────────────

@@ -132,3 +132,27 @@ export const playerStatSchema = z.object({
 export const enterPlayerStatsSchema = z.object({
   playerStats: z.array(playerStatSchema).min(1),
 }).strict()
+
+// ─── Draft Mode — Schemas (§1.9) ───────────────────────
+
+export const RARITY_TIER_NAMES = ['BRONZE', 'SILVER', 'GOLD', 'ICON'] as const
+export type RarityTierName = (typeof RARITY_TIER_NAMES)[number]
+
+export const FORMATION_NAMES = ['4-3-3', '4-4-2', '4-2-3-1', '3-5-2', '5-3-2'] as const
+export type FormationName = (typeof FORMATION_NAMES)[number]
+
+export const DRAFT_SESSION_STATUSES = ['DRAFTING', 'SQUAD_COMPLETE', 'RUN_IN_PROGRESS', 'RUN_COMPLETE', 'ABANDONED'] as const
+export type DraftSessionStatus = (typeof DRAFT_SESSION_STATUSES)[number]
+
+export const draftStartSchema = z.object({
+  tournamentId: z.string().min(1, 'Tournament ID is required'),
+  formation: z.enum(FORMATION_NAMES, { message: 'Invalid formation — must be one of: 4-3-3, 4-4-2, 4-2-3-1, 3-5-2, 5-3-2' }),
+}).strict()
+
+export const draftPickSchema = z.object({
+  slotIndex: z.number().int().min(0),
+  pickedPlayerId: z.string().min(1, 'Player ID is required'),
+}).strict()
+
+export type DraftStartInput = z.infer<typeof draftStartSchema>
+export type DraftPickInput = z.infer<typeof draftPickSchema>
