@@ -66,6 +66,9 @@ const WOMEN_FIRST_NAMES: Record<string, string[]> = {
   US: ['Megan','Alex','Sophia','Mallory','Trinity','Lindsey','Crystal','Rose','Naomi','Alyssa','Julie','Catarina','Ashley','Emily','Abby','Carli','Tobin','Kelley','Samantha','Morgan','Lynn','Casey','Lindsay','Hayley'],
   BR: ['Marta','Cristiane','Ana','Beatriz','Gabi','Tamires','Debinha','Bia','Andressa','Aline','Letícia','Ludmila','Rafaelle','Rosana','Duda','Geyse','Thais','Kerolyn','Lorena','Antônia','Yasmim','Mônica','Luana','Angelina'],
   NO: ['Ada','Caroline','Guro','Frida','Maren','Tuva','Lisa','Emilie','Karina','Synne','Ingrid','Cecilie','Maria','Martine','Julie','Andrea','Rikke','Sigrid','Helene','Sara','Thea','Nora','Oda','Sofie'],
+  NL: ['Vivianne','Danique','Jill','Lieke','Merel','Dominique','Damaris','Katja','Sari','Liza','Sanne','Sherida','Lynn','Anouk','Renate','Tessel','Lisanne','Stefanie','Nadine','Ashley','Jonna','Ella','Kayleigh','Esmee'],
+  JP: ['Saki','Mana','Yui','Hikaru','Moeka','Riko','Fuka','Narumi','Miyabi','Tomomi','Kumi','Honoka','Minami','Risa','Miyu','Yuka','Yoshimi','Ami','Mizuho','Aya','Shinobu','Kozue','Moe','Fubuki'],
+  AU: ['Sam','Ellie','Mary','Hayley','Katrina','Alanna','Emily','Clare','Tameka','Teagan','Kyah','Mackenzie','Cortnee','Charlize','Lydia','Kaitlyn','Michelle','Chloe','Sarah','Steph','Amy','Grace','Danielle','Elise'],
   SE: ['Fridolina','Kosovare','Stina','Lina','Hanna','Filippa','Johanna','Nathalie','Madelene','Olivia','Julia','Rebecca','Emma','Josefine','Loreta','Nilla','Jessica','Sofia','Elin','Mimmi'],
 }
 
