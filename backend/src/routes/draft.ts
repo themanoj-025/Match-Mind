@@ -167,13 +167,13 @@ router.get(
     }
 
     // Load player details for the squad
-    const allPlayers = result.session
+    const allPlayers: any[] = result.session
       ? await prisma.player.findMany({ where: { tournamentId: result.session.tournamentId } })
       : []
 
-    const playersMap = new Map(allPlayers.map((p: any) => [p.id, p]))
+    const playersMap = new Map<string, any>(allPlayers.map((p) => [p.id, p]))
     const squadWithPlayers = result.squad.map((sp) => {
-      const player = playersMap.get(sp.playerId)
+      const player: any = playersMap.get(sp.playerId)
       return {
         ...sp,
         player: player
@@ -196,7 +196,7 @@ router.get(
       picks: result.picks.map((p) => ({
         ...p,
         players: p.offeredPlayerIds
-          .map((pid) => playersMap.get(pid))
+          .map((pid: string) => playersMap.get(pid))
           .filter(Boolean),
       })),
       squad: squadWithPlayers,
