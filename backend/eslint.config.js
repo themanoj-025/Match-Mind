@@ -47,6 +47,15 @@ export default defineConfig([
 
       // Consistent return
       'consistent-return': 'warn',
+
+      // Cyclomatic complexity — flag functions over 10 branches
+      complexity: ['warn', 10],
+
+      // Max lines per function — flag God functions
+      'max-lines-per-function': ['warn', { max: 80, skipBlankLines: true, skipComments: true }],
+
+      // Max params — prevents excessive coupling
+      'max-params': ['warn', 5],
     },
   },
 ])

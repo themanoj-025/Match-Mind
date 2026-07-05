@@ -5,10 +5,9 @@ Thank you for your interest in contributing to Match-Mind, the sports prediction
 ## Getting Started
 
 ### Prerequisites
-- Node.js 18+
-- npm or yarn
-- PostgreSQL 14+
-- Redis 6+ (for BullMQ queue)
+- Node.js 20+
+- npm
+- Redis 6+ (optional, for BullMQ queue)
 - Stripe account (for payment features, optional for development)
 - Anthropic API key (for AI features, optional for development)
 - Google OAuth credentials (for social login, optional for development)
@@ -22,8 +21,6 @@ Thank you for your interest in contributing to Match-Mind, the sports prediction
    cd backend
    npm install
    cp .env.example .env  # create and fill in your env vars
-   npx prisma migrate dev
-   npm run db:seed       # optional: seed sample data
    ```
 
 3. **Frontend setup:**
@@ -32,18 +29,13 @@ Thank you for your interest in contributing to Match-Mind, the sports prediction
    npm install
    ```
 
-4. **Start infrastructure (Docker):**
-   ```bash
-   docker-compose up -d  # starts PostgreSQL + Redis
-   ```
-
-5. **Run the backend:**
+4. **Run the backend:**
    ```bash
    cd backend
    npm run dev           # or `npm run dev:watch` with nodemon
    ```
 
-6. **Run the frontend:**
+5. **Run the frontend:**
    ```bash
    cd frontend
    npm run dev
@@ -52,7 +44,6 @@ Thank you for your interest in contributing to Match-Mind, the sports prediction
 ### Expected Environment Variables
 | Variable | Description |
 |---|---|
-| `DATABASE_URL` | PostgreSQL connection string |
 | `JWT_SECRET` | JWT signing secret |
 | `PORT` | Backend server port |
 | `GOOGLE_CLIENT_ID` | Google OAuth client ID (optional) |
@@ -64,29 +55,31 @@ Thank you for your interest in contributing to Match-Mind, the sports prediction
 
 ## Code Style
 
-### Backend (JavaScript/Node.js)
-- Use CommonJS modules (`require`/`module.exports`).
+### Backend (TypeScript)
+- Use ES modules (`import`/`export`) — TypeScript via tsx handles ESM natively.
 - Follow standard Express.js patterns with async route handlers.
-- Use descriptive function and variable names.
-- Add JSDoc comments for route handlers and service functions.
+- All new files must be `.ts` (no `.js` files allowed in `src/`).
+- Use descriptive function and variable names with explicit TypeScript types.
 - Keep route files focused — routes should call service functions, not contain business logic.
 
-### Frontend (React/JSX)
-- Use functional components with hooks.
-- Use React Query for server state management.
-- Use Zustand for client state (auth, UI preferences).
+### Frontend (React/TypeScript)
+- Use functional components with hooks (`useState`, `useEffect`, custom hooks).
+- Use React Query for server state management (`useApi.ts`).
+- Use Zustand for client state (`useStore.ts`).
 - Follow existing component patterns (file structure, naming).
+- All new components and pages must be `.tsx` (no `.jsx` files allowed in `src/`).
 
 ## Project Architecture
 
 ### Backend (`backend/src/`)
-- **`index.js`** — Express + Socket.IO server entry point
-- **`routes/`** — 15 route files (auth, matches, predictions, leagues, users, admin, ai, highlights, messages, players, search, squads, stripe, teams, leaderboard)
-- **`services/`** — Business logic (scoring.js)
-- **`middleware/`** — Auth middleware, error handling
+- **`index.ts`** — Express + Socket.IO server entry point
+- **`routes/`** — 15+ route files (auth, rooms, auction, tournaments, players, fixtures, leaderboard, users, messages, search, admin, stripe, ai, etc.)
+- **`services/`** — Business logic (auctionEngine, fantasyPoints, adminService, authService, leaderboardService, etc.)
+- **`middleware/`** — Auth, rate limiting, CSRF, idempotency, validation, error handling, circuit breaker
 - **`socket/`** — Socket.IO event handlers
-- **`workers/`** — BullMQ background job workers
-- **`config/`** — Server configuration
+- **`lib/`** — Core infrastructure (jsonDb.ts — the JSON database adapter)
+- **`repositories/`** — Type-safe repository layer abstracting over the JSON DB
+- **`config/`** — Server configuration (passport, schemas, tournaments)
 
 ### Frontend (`frontend/src/`)
 - **`pages/`** — Page-level components
@@ -96,17 +89,20 @@ Thank you for your interest in contributing to Match-Mind, the sports prediction
 - **`utils/`** — Utility functions (api.js)
 
 ### Database
-- Prisma ORM v7 with PostgreSQL
-- Schema defined in `backend/prisma/schema.prisma`
-- Migrations in `backend/prisma/migration.sql`
-- Seeding via `backend/prisma/seed.js`
+- **JSON DB** (`backend/src/lib/jsonDb.ts`) — the production database. An in-memory store backed by JSON files in `backend/src/data/`. No database server required.
+- The JSON DB implements a **Prisma-compatible API** — all route handlers and services use `prisma.model.method()` syntax (`prisma.user.findUnique`, `prisma.room.findMany`, etc.), which a Proxy transparently maps to the JSON file backend.
+- New models are created by adding a `.json` file to `backend/src/data/` and registering the name in `jsonDb.ts`. No migrations needed.
 
 ## Running Tests
 
-No test suite is currently configured. If you add tests:
-- Use Jest or Vitest for the frontend.
-- Use Jest or Mocha for the backend.
-- Place tests in a `__tests__` directory near the code being tested.
+```bash
+cd backend && npx vitest run          # Run all backend tests (194+ tests)
+cd backend && npx vitest run --coverage  # With coverage report
+cd backend && npx vitest run --reporter=verbose  # Verbose output
+cd frontend && npm run typecheck      # Frontend type checking
+```
+
+Tests use isolated JSON-DB instances in temp directories — no shared mutable state, no database server required.
 
 ## Submitting Changes
 
@@ -115,16 +111,22 @@ No test suite is currently configured. If you add tests:
    git checkout -b feat/my-feature
    ```
 2. Make focused, minimal changes.
-3. Run linting and type-checking if available.
-4. Test manually by running both backend and frontend.
+3. Run checks locally before pushing:
+   ```bash
+   cd backend && npm run typecheck && npm run lint && npm test
+   ```
+4. Verify the frontend builds and typechecks:
+   ```bash
+   cd frontend && npm run typecheck && npm run build
+   ```
 5. Commit with a descriptive message:
    - Format: `type(scope): description`
    - Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`
    - Examples:
-     - `feat(predictions): add confidence multiplier scoring`
-     - `fix(api): correct leaderboard pagination`
+     - `feat(auction): add anti-snipe timer extension`
+     - `fix(bids): correct budget deduction on force-sold`
      - `feat(stripe): add subscription tier support`
-6. Push and open a Pull Request.
+6. Push and open a Pull Request. CI will run lint → typecheck → test → build automatically.
 
 ## Reporting Issues
 
@@ -138,25 +140,26 @@ Include in your report:
 
 ### New API Route
 1. Create the route file in `backend/src/routes/`.
-2. Register it in `backend/src/index.js`.
-3. Add corresponding Prisma queries if new data models are needed.
-4. Run `npx prisma migrate dev` for schema changes.
+2. Register it in `backend/src/index.ts`.
+3. The JSON DB auto-loads new collections — just create a `.json` file in `backend/src/data/`.
 
 ### New Socket Event
 1. Add event handlers in `backend/src/socket/`.
 2. Emit events from the appropriate service or route.
 
 ### New Database Model
-1. Edit `backend/prisma/schema.prisma`.
-2. Run `npx prisma migrate dev --name description`.
-3. Update the seed script if applicable.
+1. Create a new JSON file in `backend/src/data/` (e.g., `newmodel.json` with an empty array `[]`).
+2. Add the model name to the `modelNames` array in `backend/src/lib/jsonDb.ts`.
+3. No migrations needed — the JSON DB dynamically loads `.json` files on startup.
 
 ## Deployment Notes
 
 - Frontend deploys to Vercel (`vercel.json` config present).
-- Backend expects PostgreSQL and Redis (docker-compose.yml for local dev).
-- BullMQ requires a running Redis instance for background job processing.
+- Backend deploys to any Node.js host (Railway, Render, Fly.io, etc.). The JSON database is file-based and requires a persistent volume or ephemeral storage.
+- Docker Compose includes a production container (`docker-compose.yml`) — the API container uses a named volume for data persistence.
+- BullMQ queues require Redis — if Redis is unavailable, scoring falls back to direct synchronous processing.
 - Socket.IO requires WebSocket support from the hosting provider.
+- Scheduled backups: use `backend/scripts/backup-data.sh` for nightly data snapshots to S3-compatible storage.
 
 ## Code of Conduct
 

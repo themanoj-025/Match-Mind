@@ -8,6 +8,7 @@ import type { AuthenticatedRequest } from '../middleware/auth'
 import logger from '../utils/logger'
 import { computeRoomLeaderboard } from '../services/leaderboardService'
 import { createRoomLimiter, joinRoomLimiter } from '../middleware/rateLimiter'
+import { idempotent } from '../middleware/idempotency'
 
 const router = express.Router()
 
@@ -43,8 +44,8 @@ function generateInviteCode(): string {
 
 // ─── Routes ─────────────────────────────────────────────
 
-// POST /api/rooms — create room (host, rate-limited)
-router.post('/', createRoomLimiter, authenticateToken, validate(createRoomSchema), asyncHandler(async (req: AuthenticatedRequest, res) => {
+// POST /api/rooms — create room (host, rate-limited, idempotent)
+router.post('/', idempotent(), createRoomLimiter, authenticateToken, validate(createRoomSchema), asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const { name, tournamentId, totalBudget, rosterRules } = req.body as z.infer<typeof createRoomSchema>
 

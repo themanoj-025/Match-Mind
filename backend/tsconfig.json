@@ -25,5 +25,5 @@
     "skipLibCheck": true
   },
   "include": ["src/**/*.ts", "instrument.ts"],
-  "exclude": ["node_modules", "dist", "**/*.test.*", "scripts", "prisma"]
+  "exclude": ["node_modules", "dist", "**/*.test.*", "scripts"]
 }

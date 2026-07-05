@@ -7,12 +7,14 @@ import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
+import compression from 'compression'
 import pinoHttp from 'pino-http'
 import cookieParser from 'cookie-parser'
 import passport from 'passport'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
 import { createJsonDatabase } from './lib/jsonDb'
+import { requestId } from './middleware/requestId'
 
 // ─── Validate required environment variables ──────────────────────────
 import logger from './utils/logger'
@@ -79,8 +81,37 @@ import stripeRoutes from './routes/stripe'
 import aiRoutes from './routes/ai'
 import { setupSocket } from './socket'
 import { globalLimiter, authLimiter, passwordResetLimiter, publicLimiter } from './middleware/rateLimiter'
+import asyncHandler from './middleware/asyncHandler'
 
 const app = express()
+
+// ─── Request-ID MUST be first (available for every downstream log line) ───
+app.use(requestId)
+
+// ─── Response compression ───────────────────────────────────
+app.use(compression())
+
+// ─── Security headers (Helmet with explicit CSP) ─────────────────
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https://js.stripe.com', 'https://www.googletagmanager.com'],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+      imgSrc: ["'self'", 'data:', 'https:', 'blob:'],
+      fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
+      connectSrc: ["'self'", 'https://api.stripe.com', 'https://o*.sentry.io', 'https://sentry.io'],
+      frameSrc: ["'self'", 'https://js.stripe.com'],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: [],
+    },
+  },
+  strictTransportSecurity: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true,
+  },
+}))
 
 // ─── Rate limiters applied before routes ────────────────────────────
 app.use(globalLimiter)
@@ -98,10 +129,14 @@ const io = new Server(httpServer, {
   },
 })
 
-// Middleware
-app.use(helmet())
 app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:3000', credentials: true }))
-app.use(pinoHttp({ logger } as any))
+app.use(pinoHttp({
+  logger,
+  // Include request ID in all pino-http log lines
+  customProps: (req: any) => ({
+    requestId: req.id,
+  }),
+} as any))
 
 // Stripe webhook needs raw body BEFORE express.json() consumes it
 app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }))
@@ -133,16 +168,56 @@ app.use('/api/admin', adminRoutes)
 app.use('/api/stripe', stripeRoutes)
 app.use('/api/ai', aiRoutes)
 
+// ─── Cache for Sentry health check (avoids dynamic import per request) ─
+let sentryAvailable: boolean | null = null
+if (process.env.SENTRY_DSN) {
+  import('../instrument').then(m => { sentryAvailable = !!m.default }).catch(() => { sentryAvailable = false })
+}
+
+// HTTP → HTTPS redirect middleware
+app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const proto = (req.headers['x-forwarded-proto'] as string) || ''
+  if (proto === 'http' || proto.startsWith('http,')) {
+    res.redirect(301, `https://${req.headers.host}${req.url}`)
+  } else {
+    next()
+  }
+})
+
 // Health check (before error handler, with public rate limiter)
-app.get('/api/health', publicLimiter, (_req, res) => {
-  const checks = {
+app.get('/api/health', publicLimiter, async (req: express.Request, res: express.Response) => {
+  const checks: Record<string, any> = {
     status: 'healthy',
     timestamp: new Date().toISOString(),
     checks: {
       database: { status: 'ok', type: 'json-file' },
     },
   }
-  res.json(checks)
+
+  // Check file writability (data dir exists and is writable)
+  try {
+    const testFile = `${prisma.dataDir}/.healthcheck-${Date.now()}.tmp`
+    require('fs').writeFileSync(testFile, 'ok')
+    require('fs').unlinkSync(testFile)
+  } catch {
+    checks.checks.database.status = 'degraded'
+    checks.checks.database.error = 'data directory not writable'
+    checks.status = 'degraded'
+  }
+
+  // Check Sentry connectivity (cached at startup)
+  if (process.env.SENTRY_DSN) {
+    checks.checks.sentry = {
+      status: sentryAvailable === null ? 'pending' : sentryAvailable ? 'ok' : 'degraded',
+    }
+  }
+
+  // Return 503 if degraded
+  if (checks.status === 'degraded') {
+    res.status(503).json(checks)
+  } else {
+    res.json(checks)
+  }
 })
 
 // Error handler — must be last
@@ -154,6 +229,15 @@ setupSocket(io, prisma)
 
 // Make prisma accessible to services for socket emission
 ;(prisma as any)._app = app
+
+// ─── Prometheus metrics endpoint ────────────────────────────────
+import { metricsMiddleware, metricsEndpoint } from './middleware/metrics'
+app.use(metricsMiddleware)
+app.get('/api/metrics', asyncHandler(async (_req: express.Request, res: express.Response) => {
+  const metrics = await metricsEndpoint()
+  res.setHeader('Content-Type', 'text/plain')
+  res.send(metrics)
+}))
 
 // ─── Auction Timer Expiry Check ────────────────────────────────────
 // Runs every 2 seconds to auto-advance auctions when player timers expire.

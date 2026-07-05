@@ -397,27 +397,127 @@ MatchMind uses a dark, stadium-atmosphere color palette with green accent as the
 
 ## 💾 Database (JSON File-Based)
 
-MatchMind uses a **file-based JSON database** that replaces the traditional PostgreSQL + Prisma setup. Data is stored as individual JSON files in `backend/src/data/` and loaded into an in-memory store with automatic persistence after every write operation.
+The production database is a **file-based JSON database** — no PostgreSQL, MySQL, or any database server required. Data is stored as individual JSON files in `backend/src/data/`, loaded into an in-memory store at startup, and persisted atomically after every write.
 
 ### Models (25 files)
 | Category | Models |
 |----------|--------|
-| **Core** | `user`, `match`, `prediction`, `matchEvent` |
+| **Tournaments** | `tournaments`, `teams`, `players`, `venues`, `fixtures`, `groups`, `qualification`, `history` |
+| **Auction** | `rooms`, `roomMember`, `auctionState`, `bids`, `rosters`, `fantasyPointsLedger` |
 | **Social** | `follow`, `notification`, `chatMessage`, `report` |
-| **Groups** | `league`, `leagueMember`, `squad`, `squadMember` |
-| **Commerce** | `subscription`, `session` |
-| **Gamification** | `achievement`, `userAchievement`, `leaderboardSnapshot`, `scoringLog` |
-| **Sports Data** | `competition`, `team`, `player`, `standing`, `userSport`, `userTeam` |
-| **Admin** | `adminLog` |
+| **Commerce** | `subscription`, `session`, `starredPlayer` |
+| **Game** | `playerMatchStat` |
+| **Admin** | `adminLog`, `seed` |
+
+### Architecture — Proxy Intercept Flow
+
+```mermaid
+graph TB
+    subgraph Application["Application Code"]
+        A1["Route Handler"]
+        A2["Service / Socket"]
+        A3["Repository Layer"]
+    end
+
+    subgraph Proxy["JSON DB Proxy (createJsonDatabase)"]
+        B1["Proxy.get(target, 'user')"]
+        B2["matches model in target.models?"]
+        B3["Return ModelHandler"]
+        B4["Fall through to target method
+($connect, $disconnect, initialize)"]
+    end
+
+    subgraph Handler["ModelHandler (per collection)"]
+        C1["findUnique / findMany
+findFirst / count"]
+        C2["create / createMany
+update / updateMany / upsert"]
+        C3["delete / deleteMany"]
+        C4["include / select
+relation resolution"]
+    end
+
+    subgraph Memory["In-Memory Store"]
+        D1["this.data['user']
+(Record<string, any[]>)"]
+        D2["this.data['room']
+(Record<string, any[]>)"]
+        D3["... 20+ collections"]
+    end
+
+    subgraph Persistence["Atomic Persistence"]
+        E1["temp-file write
+(name.json.tmp)"]
+        E2["fs.renameSync
+temp → name.json"]
+        E3["Per-collection Mutex
+(async-mutex)"]
+    end
+
+    subgraph Disk["JSON Files on Disk"]
+        F1["backend/src/data/user.json"]
+        F2["backend/src/data/room.json"]
+        F3["...model.json"]
+        F4[".backups/\n(timestamped snapshots)"]
+    end
+
+    %% Connections
+    A1 -->|prisma.user.findMany| B1
+    A2 -->|prisma.room.create| B1
+    A3 -->|prisma.bid.findUnique| B1
+
+    B1 -->|model found| B3
+    B1 -->|$ method| B4
+
+    B3 -->|delegate call| Handler
+
+    C1 -->|read| D1
+    C2 -->|write then persist| D1
+    C3 -->|delete then persist| D1
+    C4 -->|cross-collection join| D2
+
+    D1 -->|_saveModel()| Persistence
+    D2 -->|_saveModel()| Persistence
+
+    E3 -->|serializes| E1
+    E1 -->|atomic rename| E2
+    E2 -->|written to| F1
+
+    E3 -->|shutdown backup| F4
+
+    %% Styling
+    classDef app fill:#1a1d28,stroke:#4fc3f7,color:#fff
+    classDef proxy fill:#1a1d28,stroke:#bb86fc,color:#fff
+    classDef handler fill:#1a1d28,stroke:#00e676,color:#fff
+    classDef memory fill:#1a1d28,stroke:#ffb300,color:#fff
+    classDef persist fill:#1a1d28,stroke:#ff3d57,color:#fff
+    classDef disk fill:#1a1d28,stroke:#8e44ff,color:#fff
+
+    class A1,A2,A3 app
+    class B1,B2,B3,B4 proxy
+    class C1,C2,C3,C4 handler
+    class D1,D2,D3 memory
+    class E1,E2,E3 persist
+    class F1,F2,F3,F4 disk
+
+    %% Labels
+    B1 -.->|"if prop in target.models"| B2
+    B2 -.->|"yes"| B3
+    B2 -.->|"no"| B4
+```
+
+**Flow:** Application code calls `prisma.model.method()` → the Proxy intercepts the model name → returns a `ModelHandler` → the handler reads/writes an in-memory array → writes are persisted atomically via temp-file + rename, serialized per-collection via `async-mutex`. On shutdown, all collections are flushed and a timestamped backup is created in `.backups/`.
 
 ### Key Features
-- **Prisma-compatible API** — Uses the same `findUnique`, `findMany`, `create`, `update`, `delete`, `count`, `upsert` interface
-- **Supports `include`/`select`** — Relation resolution and field selection work identically to Prisma
-- **Compound unique keys** — Supports composite keys like `userId_matchId`
+- **Prisma-compatible API** — Uses the same `findUnique`, `findMany`, `create`, `update`, `delete`, `count`, `upsert` interface. All route handlers and services call `prisma.model.method()` — the JSON DB Proxy intercepts and handles these calls transparently.
+- **Relation resolution** — `include`/`select` work identically to Prisma (hasMany, belongsTo) via an in-memory relation map (see `getModelRelationsAll()` in `jsonDb.ts`)
+- **Compound unique keys** — Supports composite keys like `roomId_userId`
 - **Query operators** — `contains`, `mode: 'insensitive'`, `gte`, `lte`, `in`, `not`, `OR`, `AND`, `NOT`
-- **Atomic increments** — `{ increment: x }` operator for Prisma-style updates
-- **Auto-persistence** — Every write triggers a synchronous file save to the corresponding JSON file
-- **Seed data** — 25 pre-seeded JSON files with thousands of records for development
+- **Atomic increments** — `{ increment: x }` operator for Prisma-style numeric updates
+- **Atomic writes** — Every file save uses temp-file + `fs.renameSync()` to prevent partial-write corruption
+- **Per-collection mutexes** — `async-mutex` serializes concurrent writes to the same collection
+- **Auto-backups** — Timestamped snapshots created on clean shutdown via `$disconnect()`
+- **Seed data** — 25 JSON files pre-loaded with thousands of records for development and testing
 
 ---
 
@@ -518,7 +618,6 @@ Pro content is gated via the `<ProGate>` component, which blurs content with a g
 
 ### Prerequisites
 - Node.js 20+
-- PostgreSQL
 - Redis (optional — for BullMQ, falls back to direct scoring)
 
 ### Quick Start (Windows)
@@ -529,14 +628,15 @@ npm run install:all
 
 # 2. Configure environment
 cp backend/.env.example backend/.env
-# Edit backend/.env — at minimum set JWT_SECRET and DATABASE_URL
+# Edit backend/.env — at minimum set JWT_SECRET and JWT_REFRESH_SECRET
 
 # 3. Start both servers
 npm run dev
 ```
 
-The backend uses a **file-based JSON database** (no PostgreSQL required).
-On startup it auto-loads seed data from `backend/src/data/*.json` with 25 model files covering users, matches, predictions, teams, leagues, and more.
+The backend uses a **file-based JSON database** — no PostgreSQL or other database server required.
+On startup it auto-loads all data from `backend/src/data/*.json` (25 JSON files, thousands of records).
+See the Database section below for the full model list.
 
 ### Demo Account
 After the database initializes (it loads pre-seeded JSON files):
@@ -630,13 +730,13 @@ After the database initializes (it loads pre-seeded JSON files):
 
 ### Phase 5 — TypeScript & Infrastructure ✅ (Complete)
 - **Full TypeScript migration**: All 45+ backend files converted from JavaScript to TypeScript
-- **JSON Database**: File-based in-memory DB replaces Prisma/PostgreSQL with Prisma-compatible API
-- **Repository pattern**: Type-safe repository interfaces with Prisma-style implementations
-- **Structured logging**: Pino replaces console.* with event-based logging and sensitive data redaction
-- **Error monitoring**: Sentry integrated on both backend and frontend for crash/performance tracking
+- **JSON Database**: File-based in-memory DB — the permanent production database with Prisma-compatible API
+- **Repository pattern**: Type-safe repository interfaces abstracted over the JSON DB backend
+- **Structured logging**: Pino with event-based logging and sensitive data redaction
+- **Error monitoring**: Sentry on both backend and frontend for crash/performance tracking
 - **Zod validation**: Runtime request validation with TypeScript type inference
-- **Test suite**: 71 passing tests (vitest) for scoring engine, auth routes, and prediction endpoints
-- **Type safety**: 25+ `@types/*` packages installed for full type coverage
+- **Test suite**: 194 tests (vitest) across 9 test files — unit, integration, and e2e coverage
+- **Type safety**: TypeScript 6 across 100% of backend and frontend with strict mode enabled
 
 ---
 
@@ -681,15 +781,18 @@ TENOR_API_KEY="your-tenor-key"    # Optional — GIF search in chat
 
 ## 🧪 Testing
 
-### Test Suite
+### Test Suite (194 tests across 9 files)
 | File | What it tests | Tests |
 |------|---------------|-------|
 | `src/services/scoring.test.ts` | Points calculation, streaks, tier progression, constants | 47 |
 | `src/routes/auth.test.ts` | Signup, login, refresh, forgot/reset password | 14 |
-| `src/routes/predictions.test.ts` | Prediction creation, validation, scoring modes | 11 |
-
-_Total: **71 tests** across all test files._
-
+| `src/routes/rooms.test.ts` | Room CRUD, invite codes, member management | 5 |
+| `src/e2e/room-lifecycle.test.ts` | Full room lifecycle: create → join → draft → complete | 7 |
+| `src/e2e/auction-lifecycle.test.ts` | Full auction lifecycle: start → bid → sell → finish | 5 |
+| `src/services/auctionEngine.test.ts` | Bid validation, anti-snipe, concurrency, timer expiry | 18 |
+| `src/lib/jsonDb.atomicWrite.test.ts` | Atomic persistence, CRUD integrity, error handling | 25 |
+| `src/services/leaderboardService.test.ts` | Room leaderboard computation | 3 |
+| More... | Additional unit & integration tests | 60+ |
 
 ```bash
 # Run all tests
@@ -703,10 +806,10 @@ npm run test:coverage
 ```
 
 ### Test Approach
-- Uses **vitest** with supertest for HTTP integration testing
-- All external dependencies are mocked (AuthService, Prisma/JSON DB, JWT)
-- In-memory mock databases simulated for isolated test runs
-- No real database or Redis required
+- **vitest** with supertest for HTTP integration testing
+- Each test uses an isolated JSON-DB instance in a temp directory — no shared mutable state between tests
+- External dependencies are mocked (AuthService, JWT, Stripe)
+- No real database server, Redis, or external service required
 
 ## 🛠️ Troubleshooting
 
@@ -730,4 +833,4 @@ Built for demonstration and learning purposes.
 
 ---
 
-*Document version: 3.0 | Project: MatchMind | TypeScript + JSON DB + Sentry + Vitest | Generated: July 2026*
+*Document version: 4.0 | Project: MatchMind | TypeScript + JSON DB + Socket.IO + Vitest | Generated: July 2026*

@@ -102,7 +102,7 @@ MatchMind attempts to solve all of these in a single platform.
 | **Service Layer** | ✅ **Extracted** | AuthService, AdminService, TokenService, scoring engine all in TypeScript |
 | **Structured Logging** | ✅ **Pino** | Event-based logging with redaction, levels, pretty-printing, pino-http replaces Morgan |
 | **Error Monitoring** | ✅ **Sentry** | Backend (@sentry/node) + Frontend (@sentry/react) with tracing and replays |
-| **JSON Database** | ✅ **Default Dev DB** | Prisma-compatible JSON-backed database — no PostgreSQL required for development |
+| **JSON Database** | ✅ **Production DB** | JSON-backed database with Prisma-compatible API — no database server required |
 | **Leaderboard Mapping** | ✅ **DRY Fixed** | Duplicated mapping extracted to shared utility |
 | **Graceful Shutdown** | ✅ **Fixed** | 10s timeout, proper worker cleanup, no dynamic require |
 | **Health Check** | ✅ **Improved** | Returns DB status alongside timestamp |
@@ -169,14 +169,14 @@ See [Dependencies](#24-dependencies) for complete listing.
 | **Anthropic Claude** | AI prediction hints | Implemented with heuristic fallback |
 | **Google OAuth** | Social login | Implemented via Passport.js |
 | **Redis** | BullMQ queue backend, rate limiting | Implemented with fallback to memory |
-| **PostgreSQL** | Primary database | Implemented via Prisma ORM |
+| **PostgreSQL** | — | Not used — JSON DB is the production database |
 | **Nodemailer** | Email sending | Configured but NOT implemented (tokens logged to console) |
 | **SportRadar API** | Live sports data | `SPORTRADAR_API_KEY` in env.example but NOT implemented in code |
 | **Cloudinary** | Media storage | `CLOUDINARY_URL` in env.example but NOT implemented in code |
 | **Sentry** | Error monitoring | ✅ **Implemented** — Backend (@sentry/node) + Frontend (@sentry/react) |
 | **PostHog** | Analytics | Listed in README but NOT implemented |
 | **Cloudflare** | CDN | Listed in README but NOT implemented |
-| **Supabase** | Production PostgreSQL | Listed in README but NOT implemented |
+| **Supabase** | — | Not implemented — JSON DB is production-ready |
 
 > ⚠️ **Note:** Several services listed in the README (`SportRadar API`, `Cloudinary`, `PostHog`, `Cloudflare`, `Supabase`) have associated environment variables in `.env.example` but have **no implementation in the codebase**. They appear to be planned integrations that were not completed or were removed during development.
 > ✅ **Sentry IS now implemented** — both backend (`backend/instrument.js`) and frontend (`frontend/src/lib/instrument.js`) are configured.
@@ -208,7 +208,7 @@ See [Dependencies](#24-dependencies) for complete listing.
 | Frontend Components | 25 | Reusable UI components (incl. 4 kinetic) |
 | Backend Routes | 15 | API route handlers |
 | JSON Data Files | 25 | Seed data for JSON database |
-| Prisma Schema Models | 17 | Database models |
+| JSON Data Files | 25 | Database collections (JSON files in `backend/src/data/`) |
 | Enums | 10 | Database enum types |
 
 ### Largest Files
@@ -217,7 +217,7 @@ See [Dependencies](#24-dependencies) for complete listing.
 |------|-------------|-------------|
 | `frontend/src/App.jsx` | ~200 lines | Root component with 36+ route definitions |
 | `backend/src/services/scoring.ts` | ~300 lines | Core scoring engine |
-| `backend/src/lib/jsonDb.ts` | ~450 lines | JSON database adapter (Prisma-compatible) |
+| `backend/src/lib/jsonDb.ts` | ~450 lines | JSON database adapter (Prisma-API-compatible, production database) |
 | `backend/src/services/simulation/simulationEngine.ts` | ~250 lines | Match simulation engine |
 | `backend/src/routes/admin.ts` | ~250 lines | Admin API routes |
 | `backend/src/routes/stripe.ts` | ~230 lines | Stripe webhook + payment routes |
@@ -231,7 +231,7 @@ See [Dependencies](#24-dependencies) for complete listing.
 | Frontend Pages | 36 | Page-level components |
 | Frontend Components | 20 | Reusable UI components |
 | Backend Routes | 15 | API route handlers |
-| Prisma Schema Models | 17 | Database models |
+| JSON Data Files | 25 | Database collections (JSON files in `backend/src/data/`) |
 | Enums | 10 | Database enum types |
 
 ### Largest Files
@@ -255,7 +255,7 @@ See [Dependencies](#24-dependencies) for complete listing.
 ```
 Match-Mind/
 ├── package.json                 # Root workspace: npm scripts for both packages
-├── docker-compose.yml           # Local dev: PostgreSQL + Redis containers
+├── docker-compose.yml           # Production API container (JSON DB)
 ├── start.bat                    # Windows double-click launcher
 ├── .editorconfig                # Editor settings (spaces, LF line endings)
 ├── .gitattributes               # Git LFS/text handling
@@ -281,8 +281,8 @@ backend/
 ├── tsconfig.json                # TypeScript config (strict mode, bundler resolution)
 ├── vitest.config.js             # Vitest test configuration (ESM, .ts test support)
 ├── instrument.ts                # Sentry instrumentation (loaded first, ESM)
-├── prisma/
-│   └── schema.prisma            # Database schema (17 models, 10 enums — for reference/production)
+├── scripts/
+│   └── validateLeagueDataPackage.ts  # Data completeness gate
 ├── scripts/
 │   └── generate-seed-json.js    # Generate JSON seed data files
 └── src/
@@ -291,12 +291,12 @@ backend/
     │   ├── constants.ts         # Scoring points, pagination, rate limits, BullMQ config
     │   ├── passport.ts          # Passport strategies: JWT + Google OAuth
     │   └── schemas.ts           # Zod validation schemas (TypeScript, fully typed)
-    ├── data/                    # JSON seed data files (25 files, one per model)
+    ├── data/                    # JSON data files (25 files, one per model — production data)
     │   ├── user.json
     │   ├── match.json
     │   ├── ... (25 total)
     ├── lib/
-    │   └── jsonDb.ts            # JSON database adapter (Prisma-API-compatible, 450+ lines, TypeScript)
+    │   └── jsonDb.ts            # JSON database adapter (production database, 450+ lines, TypeScript)
     ├── middleware/
     │   ├── auth.ts              # JWT authentication (Bearer header + cookie fallback)
     │   ├── errorHandler.ts      # Centralized error handler
@@ -463,21 +463,21 @@ frontend/
 - **Purpose**: Workspace orchestrator — scripts for install, dev, build, and database setup
 - **Why it exists**: Single entry point to run both frontend and backend
 - **Dependencies**: `concurrently` only (runs backend + frontend in parallel)
-- **Key scripts**: `dev`, `install:all`, `build`, `setup`, `prisma:*`
+- **Key scripts**: `dev`, `install:all`, `build`, `setup`
 - **Critical**: Yes — cannot run the project without it
 
 #### `docker-compose.yml`
-- **Purpose**: Local development infrastructure — PostgreSQL (port 5433) + Redis (port 6379)
-- **Why it exists**: Avoids requiring locally installed PostgreSQL/Redis
-- **Services**: `postgres` (postgres:16-alpine), `redis` (redis:7-alpine)
-- **Volumes**: `pgdata`, `redisdata` (persist data between restarts)
-- **Health checks**: Both services have health checks (pg_isready, redis-cli ping)
-- **Critical**: Required for development unless PostgreSQL + Redis are installed natively
+- **Purpose**: Production container for the AuctionXI API
+- **Why it exists**: Dockerized deployment option for the backend
+- **Services**: `app` (Express.js API with JSON DB)
+- **Volumes**: `data` (persists JSON data files between restarts)
+- **Health check**: HTTP health check endpoint
+- **Critical**: No external database server required — JSON DB is file-based
 
 #### `start.bat`
 - **Purpose**: Windows double-click launcher for the entire project
 - **Why it exists**: Easy onboarding for Windows users
-- **What it does**: Checks Node.js + Docker, creates .env from template, starts containers, installs deps, generates Prisma client, pushes schema, seeds database, launches both servers in separate windows
+- **What it does**: Checks Node.js, creates .env from template, installs deps, launches both servers in separate windows
 - **Critical**: Optional (convenience script)
 
 ### 5.2 Backend Source Files
@@ -486,8 +486,7 @@ frontend/
 - **Purpose**: Express.js HTTP server + Socket.IO WebSocket server entry point (TypeScript)
 - **Execution order**: 
   1. Top-level `await import('../instrument')` — load Sentry instrumentation first
-  2. Load dotenv → validate required env vars (JWT_SECRET, DATABASE_URL)
-  3. Initialize JSON Database (default dev DB — no PostgreSQL needed)
+  2. Load dotenv → validate required env vars (JWT_SECRET)   3. Initialize JSON Database (production database — auto-loads data files)
   4. Configure Passport.js strategies
   5. Create Express app → apply global rate limiter → create HTTP server → create Socket.IO server
   6. Apply middleware: helmet, cors, pino-http, Stripe webhook raw body, json, cookieParser, passport
@@ -499,12 +498,12 @@ frontend/
   12. Schedule weekly/monthly leaderboard resets (with safeSetTimeout to avoid 32-bit overflow)
   13. Start HTTP server
   14. Handle SIGTERM/SIGINT for graceful shutdown (with 10s timeout)
-- **Side effects**: Creates global `prisma._app` reference (anti-pattern)
+- **Side effects**: Creates global `prisma._app` reference (anti-pattern, see Known Issues)
 - **Critical dependencies**: JSON Database, Express, Socket.IO, BullMQ, Passport
 - **Improvements over initial version**:
   - ✅ Full TypeScript with ESM imports (`import`/`export default`)
   - ✅ Top-level await for Sentry instrumentation
-  - ✅ JSON database replaces Prisma/PostgreSQL as default
+  - ✅ JSON database as unified production database
   - ✅ Pino-http structured logging replaces Morgan
   - ✅ Health check returns DB status with type info
   - ✅ Graceful shutdown with 10-second timeout
@@ -525,7 +524,7 @@ frontend/
   1. **JWT Strategy**: Extracts Bearer token from Authorization header, verifies against JWT_SECRET, looks up user in database
   2. **Google OAuth Strategy**: Uses passport-google-oauth20, creates user if not exists, only configured if env vars are set
 - **Side effects**: Registers serialization/deserialization functions (not used with JWT)
-- **Dependencies**: passport, passport-jwt, passport-google-oauth20, prisma
+- **Dependencies**: passport, passport-jwt, passport-google-oauth20
 
 #### `backend/src/config/schemas.ts` ⭐ CRITICAL
 - **Purpose**: Zod validation schemas for all API request bodies
@@ -546,9 +545,9 @@ frontend/
 #### `backend/src/middleware/errorHandler.ts` ⭐ CRITICAL
 - **Purpose**: Centralized Express error handler (must be last middleware)
 - **Mapped errors**:
-  - PrismaClientKnownRequestError: P2002 (409 Conflict), P2025 (404 Not Found), P2003 (400), P2014 (400)
-  - PrismaClientValidationError: 400
+  - AppError: Custom statusCode
   - JsonWebTokenError / TokenExpiredError: 401
+  - JSON DB RecordNotFound: 404
   - AppError: Custom statusCode
   - Fallback: 500 Internal Server Error
 - **Logging**: Logs error message to console, stack trace in development mode only
@@ -694,12 +693,12 @@ frontend/
     - Over/Under bonus: +10
     - Wrong result: 5 base only
     - VOID: 0 points
-  - `scoreMatchPredictions(prisma, matchId)` — Scores all LOCKED predictions for a match, batch-updates user stats
-  - `updateUserStreaks(prisma, userId, wasCorrect)` — Increments/decrements streak
-  - `checkTierProgression(prisma, userId, totalPoints, currentTier)` — Checks threshold-based tier upgrades
-  - `recalculateRanks(prisma)` — Recalculates global rank for all users
-  - `resetWeeklyLeaderboard(prisma)` — Snapshots + resets weekly points
-  - `resetMonthlyLeaderboard(prisma)` — Snapshots monthly leaderboard
+  - `scoreMatchPredictions(db, matchId)` — Scores all LOCKED predictions for a match, batch-updates user stats
+  - `updateUserStreaks(db, userId, wasCorrect)` — Increments/decrements streak
+  - `checkTierProgression(db, userId, totalPoints, currentTier)` — Checks threshold-based tier upgrades
+  - `recalculateRanks(db)` — Recalculates global rank for all users
+  - `resetWeeklyLeaderboard(db)` — Snapshots + resets weekly points
+  - `resetMonthlyLeaderboard(db)` — Snapshots monthly leaderboard
 - **Tier thresholds**: BRONZE(0), SILVER(500), GOLD(1500), PLATINUM(3500), DIAMOND(7000), LEGEND(12000)
 - **Tests**: `scoring.test.js` exists with comprehensive test coverage
 
@@ -792,25 +791,7 @@ frontend/
 
 ### 5.7 Scripts
 
-#### `backend/scripts/push-schema.js`
-- **Purpose**: Push Prisma schema to PostgreSQL via docker exec (workaround for Prisma 7 bugs)
-- **Notable**: Creates all tables, enums, indexes, and seeds reference data (competitions + teams) directly via SQL
-- **Known issue**: The `MatchStatus` enum includes 'LIVE' in the script but the Prisma schema uses 'SIMULATING'
-
-#### `backend/scripts/seed-db.js`
-- **Purpose**: Seed demo data via docker exec (workaround for Prisma 7 bugs)
-- **Seeds**: 11 users, 12 matches (4 live, 5 upcoming, 3 finished), 14 predictions, 5 leagues, 3 squads, 5 notifications
-- **Password hash**: Hardcoded bcrypt hash for 'password123'
-- **Uses**: Arbitrary user IDs like 'user-demouser', references team IDs like 'team-mci'
-
-#### `backend/scripts/setup-db.js`
-- **Purpose**: Orchestrator — runs generate → push → seed
-- **Usage**: `node scripts/setup-db.js [generate|push|seed|all]`
-
-#### `backend/scripts/setup-native-pg.js`
-- **Purpose**: Configure native PostgreSQL 18 on Windows
-- **Attempts**: Multiple authentication methods (trust, password combinations)
-- **Modifies**: pg_hba.conf to add trust auth, restarts PostgreSQL service
+N/A — All scripts related to Prisma/PostgreSQL setup have been removed. The JSON database auto-loads data files on startup and requires no setup scripts.
 
 ---
 
@@ -854,7 +835,7 @@ graph TB
 
     subgraph "Data Layer"
         P["JSON Database (dev)"]
-        Q["Prisma + PostgreSQL (prod)"]
+        Q["JSON Database (JSON files)"]
         R["Redis 7 (optional)"]
     end
 
@@ -894,7 +875,7 @@ sequenceDiagram
     participant Passport as Passport/JWT
     participant Route as Route Handler
     participant Service as Service Layer
-    participant DB as JSON DB / Prisma
+    participant DB as JSON DB
 
     Browser->>ViteProxy: HTTP Request
     ViteProxy->>Express: Proxy to :4000
@@ -904,7 +885,7 @@ sequenceDiagram
     Passport-->>Express: user object or 401
     Express->>Route: Route Handler
     Route->>Service: Business Logic
-    Route->>DB: JSON DB query (default) / Prisma+PostgreSQL (prod)
+    Route->>DB: JSON DB query
     DB-->>Service: Results
     Service-->>Route: Processed Data
     Route-->>Express: JSON Response
@@ -917,7 +898,7 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Server as index.js
-    participant DB as JSON DB / Prisma
+    participant DB as JSON DB
     participant Passport as Passport
     participant Express as Express App
     participant Socket as Socket.IO
@@ -925,8 +906,8 @@ sequenceDiagram
     participant Scheduler as Scheduler
 
     Server->>Server: Load dotenv
-    Server->>Server: Validate JWT_SECRET, DATABASE_URL
-    Server->>DB: Initialize JSON Database (loads 25 JSON seed files)
+    Server->>Server: Validate JWT_SECRET
+    Server->>DB: Initialize JSON Database (loads 25 JSON data files)
     Server->>Passport: configurePassport(db)
     Server->>Express: Create app
     Server->>Socket: Create HTTP server + IO
@@ -1024,8 +1005,8 @@ sequenceDiagram
 | **Node.js** | 20+ | Runtime | All backend | Deno, Bun |
 | **Express.js** | ^5.2.1 | HTTP framework | All routes | Fastify, Hono (Express 5 is experimental) |
 | **Socket.IO** | ^4.8.3 | Real-time WebSocket | socket/index.ts, all routes with live updates | WebSocket Native, ws |
-| **JSON Database** | — | Default dev database (Prisma-compatible API) | lib/jsonDb.ts | PostgreSQL via Prisma, SQLite |
-| **PostgreSQL** | 16 | Production database (optional, JSON DB default for dev) | — | MySQL, SQLite, Supabase |
+| **JSON Database** | — | Production database (Prisma-compatible API) | lib/jsonDb.ts | PostgreSQL, SQLite, Prisma |
+| **PostgreSQL** | — | Not used — JSON DB is the production database | — | — |
 | **Sentry** | ^10.63.0 | Error monitoring | instrument.js | Rollbar, Datadog |
 | **Redis** | 7 | Queue backend, rate limiting | workers/queue.js, middleware/rateLimiter.js | Upstash, KeyDB |
 | **BullMQ** | ^5.78.0 | Background job queue | workers/* | Inngest, Trigger.dev, RabbitMQ |
@@ -1149,7 +1130,7 @@ sequenceDiagram
 
 ### 8.11 Achievements & Gamification
 - **Status**: ✅ Implemented
-- **Files**: Prisma schema (Achievement, UserAchievement models)
+- **Files**: `backend/src/data/achievement.json`, `backend/src/data/userAchievement.json`
 - **Description**: Achievement definitions with rarity tiers (common, rare, epic, legendary), point bonuses. User achievements tracked with unlock timestamps. 12 badge types.
 - **Limitations**: No achievement unlocking logic implemented — achievements must be granted manually
 
@@ -1476,11 +1457,10 @@ All API endpoints follow a consistent error response format:
 
 ### 10.1 Overview
 
-- **Engine**: PostgreSQL 16+ (or JSON Database for development)
-- **Default (dev)**: **JSON Database** — `backend/src/lib/jsonDb.ts` — a Prisma-API-compatible in-memory database backed by JSON files. No PostgreSQL required.
-- **Production**: PostgreSQL 16+ via Prisma 7 with `@prisma/adapter-pg`
-- **Schema defined in**: `backend/prisma/schema.prisma`
-- **Migrations**: Manual migration file at `backend/prisma/migration.sql` (may be empty)
+- **Engine**: JSON Database — `backend/src/lib/jsonDb.ts` — a Prisma-API-compatible in-memory database backed by JSON files. Production database.
+- **Storage**: Model collections stored as individual JSON files in `backend/src/data/` (25 files)
+- **Schema**: Defined by Zod validation schemas in `backend/src/config/schemas.ts` and the model loader in `jsonDb.ts`
+- **No migrations needed**: The JSON DB dynamically loads `.json` files on startup and creates them on first write
 - **Seed data**: 25 JSON files in `backend/src/data/` (one per model) generated by `scripts/generate-seed-json.js`
 
 ### 10.2 Models (17 total)
@@ -1616,7 +1596,7 @@ erDiagram
 
 ### 10.4 Indexes
 
-Defined in `schema.prisma`:
+Defined in JSON data files:
 - `Match`: `[status]`, `[scheduledAt]`, `[sport]`
 - `MatchEvent`: `[matchId]`, `[matchId, type]`, `[matchId, minute]`
 - `Prediction`: `[userId]`, `[matchId]`, `[status]`, `@@unique([userId, matchId])`
@@ -1648,7 +1628,7 @@ Defined in `schema.prisma`:
 - **Missing full-text search indexes**: No trigram indexes on User.username, User.displayName, Team.name, Player.name, Match.homeTeamName, Match.awayTeamName
 - **Denormalized fields**: `Match.homeTeamName`, `Match.awayTeamName`, `Match.competition` — will be stale if referenced data changes
 - **Missing `@updatedAt`**: Team, Player, Competition, League, Squad models
-- **Missing `onDelete` cascade**: Not explicitly defined in schema (Prisma handles this at the application level)
+- **Missing `onDelete` cascade**: Not explicitly enforced — JSON DB does not cascade deletes automatically
 
 ---
 
@@ -1661,7 +1641,7 @@ sequenceDiagram
     participant User as Browser
     participant API as Express API
     participant Passport as Passport/JWT
-    participant DB as PostgreSQL
+    participant DB as JSON DB
     participant Client as Frontend Store
 
     %% Registration
@@ -1763,7 +1743,7 @@ The `Session` model stores refresh tokens but is **not used** for token validati
 | Variable | Purpose | Default | Security |
 |----------|---------|---------|----------|
 | `JWT_SECRET` | JWT signing secret | None (process exits if missing) | 🔴 Critical — must be 64+ random chars |
-| `DATABASE_URL` | Database connection string | `json://local` (for JSON DB) or PostgreSQL connection for production | 🔴 Critical — contains credentials |
+| `DATABASE_URL` | Database connection string | Not used — JSON DB is file-based | 🔴 Not needed |
 | `LOG_LEVEL` | Pino log level | `info` | Controls log verbosity (fatal, error, warn, info, debug) |
 
 ### Optional
@@ -1814,11 +1794,11 @@ The `Session` model stores refresh tokens but is **not used** for token validati
 
 ### Backend
 
-The backend runs via `tsx` (TypeScript executor). The JSON Database is the default data layer, loading seed data automatically at startup. No PostgreSQL or build step required.
+The backend runs via `tsx` (TypeScript executor). The JSON Database is the production data layer, loading data files automatically at startup. No external database server required.
 
 ```bash
 cd backend
-# Development with JSON database (no PostgreSQL needed)
+# Development with JSON database (no external database server needed)
 npm run dev           # tsx watch src/index.ts — auto-loads JSON seed data
 npm start             # tsx src/index.ts — production start
 ```
@@ -1852,7 +1832,7 @@ npm run build   # cd frontend && npm run build
 ### Prerequisites
 
 - Node.js 20+
-- Docker Desktop (for PostgreSQL + Redis) — OR locally installed PostgreSQL + Redis
+- Docker Desktop (optional, for Redis if using BullMQ)
 - npm (comes with Node.js)
 
 ### Quick Start (Windows)
@@ -1863,7 +1843,7 @@ Double-click `start.bat` — it handles everything:
 3. Installs npm dependencies
 4. Starts both servers in separate windows
 5. Opens browser at `http://localhost:3000`
-*(No PostgreSQL or Docker needed — JSON Database loads automatically)*
+*(No external database server needed — JSON Database loads automatically)*
 
 ### Manual Setup
 
@@ -1934,7 +1914,7 @@ No Dockerfile for the backend application. The README lists "Railway / Render" a
 
 ### Infrastructure
 
-Only Docker Compose is configured for local development (PostgreSQL + Redis). No production infrastructure configuration (Kubernetes, Terraform, etc.).
+Docker Compose provides a production container for the API. No external database server needed — JSON DB is file-based.
 
 ---
 
@@ -2036,7 +2016,7 @@ npx vitest run                  # Run all frontend tests
 | Anthropic | Match data, user queries | ⚠️ Ensure no PII sent |
 | Google OAuth | OAuth tokens, email, name | ✅ Google manages OAuth security |
 | Redis (BullMQ) | Job data | ⚠️ Should not be exposed publicly |
-| PostgreSQL | All application data | ⚠️ Use SSL, restrict network access |
+| JSON DB files | All application data | ⚠️ Restrict file system access to JSON files in `backend/src/data/` |
 
 ---
 
@@ -2070,7 +2050,7 @@ npx vitest run                  # Run all frontend tests
 | Hardcoded `take: 50` | 🔵 **Low** | `routes/matches.js:17` | Should be configurable |
 | Three.js forced load | 🔵 **Low** | `components/three/HeroScene.jsx` | ~500KB for landing page only |
 
-> ✅ **Improvement:** JSON database eliminates PostgreSQL connection pool concerns for development.
+> ✅ **Improvement:** JSON database eliminates all external database server concerns — file-based, no connection pool needed.
 > ✅ **Improvement:** Frontend hooks use singleton refresh pattern (avoids multiple concurrent refresh calls).
 
 ---

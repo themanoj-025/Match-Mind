@@ -3,8 +3,10 @@ import { authenticateToken } from '../middleware/auth'
 import { validate } from '../middleware/validate'
 import { createCheckoutSchema } from '../config/schemas'
 import asyncHandler from '../middleware/asyncHandler'
+import { withBreaker } from '../middleware/circuitBreaker'
 import logger from '../utils/logger'
 import type { AuthenticatedRequest } from '../middleware/auth'
+import { idempotent } from '../middleware/idempotency'
 
 const router = express.Router()
 
@@ -12,7 +14,7 @@ const router = express.Router()
  * POST /api/stripe/create-checkout
  * Creates a Stripe Checkout Session for Pro subscription
  */
-router.post('/create-checkout', authenticateToken, validate(createCheckoutSchema), asyncHandler(async (req: AuthenticatedRequest, res) => {
+router.post('/create-checkout', idempotent(), authenticateToken, validate(createCheckoutSchema), asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const { plan } = req.body as { plan: string } // 'monthly' | 'annual'
 
@@ -22,37 +24,45 @@ router.post('/create-checkout', authenticateToken, validate(createCheckoutSchema
   // If user already has a Stripe customer, reuse it
   const existingSub = await prisma.subscription.findUnique({ where: { userId: user.id } })
 
-  let stripe: any
-  try {
-    stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
-  } catch {
-    // Stripe not configured — return direct link for testing
-    logger.info({ event: 'stripe.not_configured', userId: req.userId }, 'Stripe API key not configured, returning mock URL')
-    return res.json({
-      url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/profile/me/settings?pro=activated`,
+  // Use circuit breaker for Stripe API calls
+  const session = await withBreaker('stripe', async () => {
+    let stripe: any
+    try {
+      stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
+    } catch {
+      logger.info({ event: 'stripe.not_configured', userId: req.userId }, 'Stripe API key not configured, returning mock URL')
+      return null
+    }
+
+    const priceId = plan === 'annual'
+      ? process.env.STRIPE_PRICE_ANNUAL
+      : process.env.STRIPE_PRICE_MONTHLY
+
+    if (!priceId) {
+      throw new Error('Stripe price ID not configured')
+    }
+
+    const checkoutSession = await stripe.checkout.sessions.create({
+      customer: existingSub?.stripeCustomerId || undefined,
+      customer_email: existingSub ? undefined : user.email,
+      mode: 'subscription',
+      line_items: [{ price: priceId, quantity: 1 }],
+      success_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/profile/me/settings?pro=activated`,
+      cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/pricing?cancelled=true`,
+      metadata: { userId: user.id },
+      ...(existingSub?.stripeCustomerId ? {} : {
+        customer_creation: 'always',
+      }),
+    })
+
+    return checkoutSession
+  })
+
+  if (!session) {
+    return res.status(503).json({
+      error: { code: 'SERVICE_UNAVAILABLE', message: 'Payment service is temporarily unavailable. Please try again later.' },
     })
   }
-
-  const priceId = plan === 'annual'
-    ? process.env.STRIPE_PRICE_ANNUAL
-    : process.env.STRIPE_PRICE_MONTHLY
-
-  if (!priceId) {
-    return res.status(500).json({ error: { code: 'STRIPE_NOT_CONFIGURED', message: 'Stripe price ID not configured' } })
-  }
-
-  const session = await stripe.checkout.sessions.create({
-    customer: existingSub?.stripeCustomerId || undefined,
-    customer_email: existingSub ? undefined : user.email,
-    mode: 'subscription',
-    line_items: [{ price: priceId, quantity: 1 }],
-    success_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/profile/me/settings?pro=activated`,
-    cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/pricing?cancelled=true`,
-    metadata: { userId: user.id },
-    ...(existingSub?.stripeCustomerId ? {} : {
-      customer_creation: 'always',
-    }),
-  })
 
   res.json({ url: session.url })
 }))
