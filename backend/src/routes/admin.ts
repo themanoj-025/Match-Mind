@@ -6,7 +6,7 @@ import { createRepositories } from '../repositories/index'
 import asyncHandler from '../middleware/asyncHandler'
 import logger from '../utils/logger'
 import type { AuthenticatedRequest } from '../middleware/auth'
-import { validateTournamentDraftPool } from '../../scripts/validateDraftPoolLib'
+import { validateTournamentDraftPool } from '../lib/validateDraftPool'
 
 const router = express.Router()
 
@@ -353,8 +353,8 @@ router.post('/settings/draft-mode/:tournamentId/:action', asyncHandler(async (re
   const tournamentId = String(req.params.tournamentId)
   const action = String(req.params.action)
 
-  const dataDir = req.app.get('prisma')?.data?.dataDir || undefined
-  const validationResult = validateTournamentDraftPool(tournamentId, dataDir)
+  // Use default data dir (backend/src/data/) — the lib resolves this automatically
+  const validationResult = validateTournamentDraftPool(tournamentId)
 
   if (action === 'enable') {
     if (!validationResult.passed) {
