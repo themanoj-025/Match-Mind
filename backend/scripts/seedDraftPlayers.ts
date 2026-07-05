@@ -58,6 +58,21 @@ const FIRST_NAMES: Record<string, string[]> = {
   UY: ['Federico','Facundo','Rodrigo','Nahuel','Mathías','Cristian','Nicolás','Santiago','Bruno','Diego','Agustín','Gastón','Maximiliano','Lucas','José','Emiliano','Martín','Pablo','Sergio','Sebastián'],
 }
 
+const WOMEN_FIRST_NAMES: Record<string, string[]> = {
+  GB: ['Mary','Emma','Georgia','Lauren','Bethany','Rachel','Lucy','Millie','Ella','Chloe','Alice','Keira','Niamh','Sophie','Jessica','Lily','Grace','Holly','Freya','Daisy','Maya','Isla','Rose','Ivy'],
+  ES: ['María','Ana','Lucía','Paula','Sandra','Irene','Aitana','Claudia','Patricia','Rosa','Carmen','Marta','Nuria','Elena','Silvia','Lara','Alba','Celia','Raquel','Cristina','Natalia','Laura','Andrea','Sara'],
+  FR: ['Marie','Camille','Julie','Amandine','Wendie','Eugénie','Clara','Delphine','Kenza','Grace','Léa','Sarah','Pauline','Maëlle','Selma','Inès','Elsa','Margaux','Alice','Manon','Chloé','Sakina','Vicki','Louna'],
+  DE: ['Lena','Laura','Alexandra','Svenja','Marina','Sandra','Sara','Linda','Julia','Lea','Merle','Annika','Jule','Isabella','Sophia','Nele','Kim','Amelie','Friederike','Hanna','Kathrin','Janina','Felicitas','Vivien'],
+  US: ['Megan','Alex','Sophia','Mallory','Trinity','Lindsey','Crystal','Rose','Naomi','Alyssa','Julie','Catarina','Ashley','Emily','Abby','Carli','Tobin','Kelley','Samantha','Morgan','Lynn','Casey','Lindsay','Hayley'],
+  BR: ['Marta','Cristiane','Ana','Beatriz','Gabi','Tamires','Debinha','Bia','Andressa','Aline','Letícia','Ludmila','Rafaelle','Rosana','Duda','Geyse','Thais','Kerolyn','Lorena','Antônia','Yasmim','Mônica','Luana','Angelina'],
+  NO: ['Ada','Caroline','Guro','Frida','Maren','Tuva','Lisa','Emilie','Karina','Synne','Ingrid','Cecilie','Maria','Martine','Julie','Andrea','Rikke','Sigrid','Helene','Sara','Thea','Nora','Oda','Sofie'],
+  NL: ['Vivianne','Danique','Jill','Lieke','Merel','Dominique','Damaris','Katja','Sari','Liza','Sanne','Sherida','Lynn','Anouk','Renate','Tessel','Lisanne','Stefanie','Nadine','Ashley','Jonna','Ella','Kayleigh','Esmee'],
+  JP: ['Saki','Mana','Yui','Hikaru','Moeka','Riko','Fuka','Narumi','Miyabi','Tomomi','Kumi','Honoka','Minami','Risa','Miyu','Yuka','Yoshimi','Ami','Mizuho','Aya','Shinobu','Kozue','Moe','Fubuki'],
+  AU: ['Sam','Ellie','Mary','Hayley','Katrina','Alanna','Emily','Clare','Tameka','Teagan','Kyah','Mackenzie','Cortnee','Charlize','Lydia','Kaitlyn','Michelle','Chloe','Sarah','Steph','Amy','Grace','Danielle','Elise'],
+  SE: ['Fridolina','Kosovare','Stina','Lina','Hanna','Filippa','Johanna','Nathalie','Madelene','Olivia','Julia','Rebecca','Emma','Josefine','Loreta','Nilla','Jessica','Sofia','Elin','Mimmi'],
+  NO: ['Ada','Caroline','Guro','Frida','Maren','Tuva','Lisa','Emilie','Karina','Synne','Ingrid','Cecilie','Maria','Martine','Julie','Andrea','Rikke','Sigrid','Helene','Sara'],
+}
+
 const LAST_NAMES: string[] = [
   'Silva','Santos','Rodriguez','García','Martínez','López','González','Fernández','Pérez','Sánchez','Ramírez','Torres','Rivera','Morales','Ortiz','Cruz','Reyes','Gutiérrez','Molina','Ramos','Díaz','Flores','Romero','Alvarez','Castillo','Herrera','Medina','Vargas','Castro','Ojeda',
   'Smith','Johnson','Williams','Brown','Jones','Wilson','Taylor','Davies','Evans','Thomas','Roberts','Walker','Wright','Thompson','White','Hughes','Edwards','Green','Hall','Wood','Harris','Martin','Jackson','Clarke','Turner','Hill','Scott','Adams','Baker','Mitchell',
@@ -75,6 +90,22 @@ const UCL_NATIONALITIES: string[] = [
   'GB','ES','FR','DE','IT','NL','PT','BE','CH','AT','HR','RS','DK','SE','NO','FI','PL','CZ','SK','HU','GR','TR','RU','UA','BR','AR','UY','CO','CL','EC','PE','PY','CA','US','MX','MA','DZ','SN','NG','CI','GH','CM','EG','TN','ZA','IL','JP','KR','AU','NZ','CN',
 ]
 
+const UEL_NATIONALITIES: string[] = [
+  'GB','ES','FR','DE','IT','NL','PT','BE','CH','AT','GR','TR','DK','SE','NO','PL','CZ','HR','RS','HU','SK','SI','RU','UA','IL','BR','AR','UY','CO','EC','PE','MA','DZ','SN','NG','CI','US','CA','JP','KR','AU','NZ',
+]
+
+const AFCON_NATIONALITIES: string[] = [
+  'DZ','AO','BJ','BW','BF','BI','CM','CV','CF','TD','KM','CG','CD','CI','DJ','EG','GQ','ER','SZ','ET','GA','GM','GH','GN','GW','KE','LS','LR','LY','MG','MW','ML','MR','MU','MA','MZ','NA','NE','NG','RW','ST','SN','SC','SL','SO','ZA','SS','SD','TZ','TG','TN','UG','ZM','ZW',
+]
+
+const WWC_NATIONALITIES: string[] = [
+  'GB','ES','FR','DE','IT','NL','NO','SE','DK','CH','BR','AR','CO','JP','AU','US','CA','MX','NG','ZA','CM','GH','MA','TN','JM','KR','NZ','CN','PH','IE','PT','CR','PA','HT','NZ','FI','PL','IS','VE','KP','TH','TP','MY','ID','IN','HK','MO',
+]
+
+const COPA_NATIONALITIES: string[] = [
+  'AR','BO','BR','CL','CO','EC','PY','PE','UY','VE','US','MX','JM','CR','PA','CA','JP','QA','AU','NZ','HT','HN','SV','DO','CW',
+]
+
 const WC_CLUBS: string[] = [
   'Real Madrid','Barcelona','Atlético Madrid','Valencia','Sevilla','Real Sociedad','Athletic Bilbao','Villarreal','Real Betis','Girona','Manchester City','Manchester United','Liverpool','Arsenal','Chelsea','Tottenham','Aston Villa','Newcastle','Brighton','West Ham','Bayern Munich','Borussia Dortmund','Bayer Leverkusen','RB Leipzig','VfB Stuttgart','Eintracht Frankfurt','Inter Milan','AC Milan','Juventus','Napoli','Roma','Lazio','Atalanta','Fiorentina','Paris Saint-Germain','Marseille','Monaco','Lille','Lyon','Nice','Benfica','Porto','Sporting CP','Braga','Ajax','Feyenoord','PSV','Club Brugge','Celtic','Rangers','Shakhtar Donetsk','Dinamo Zagreb','Olympiacos','Fenerbahçe','Galatasaray','Al Hilal','Al Nassr','Inter Miami','LA Galaxy','Cruz Azul','Monterrey','Palmeiras','Flamengo','Boca Juniors','River Plate','UANL','América','Santos Laguna','Mazatlán','León','Atlas','Chivas','Pumas','Puebla','Tijuana','Querétaro','Juárez','Necaxa','Pachuca','Toluca','Atlanta United','NYC FC','LAFC','Seattle Sounders','Austin FC','Portland Timbers','Columbus Crew','Philadelphia Union','Orlando City','Sporting KC',
 ]
@@ -83,6 +114,21 @@ const UCL_CLUBS: string[] = [
   'Real Madrid','Barcelona','Atlético Madrid','Sevilla','Real Sociedad','Athletic Bilbao','Girona','Manchester City','Manchester United','Liverpool','Arsenal','Chelsea','Tottenham','Newcastle','Aston Villa','Bayern Munich','Borussia Dortmund','Bayer Leverkusen','RB Leipzig','Stuttgart','Eintracht Frankfurt','Inter Milan','AC Milan','Juventus','Napoli','Lazio','Atalanta','Paris Saint-Germain','Marseille','Monaco','Lille','Benfica','Porto','Sporting CP','Braga','Feyenoord','PSV','Ajax','Celtic','Rangers','Club Brugge','Shakhtar Donetsk','Dinamo Zagreb','Olympiacos','Galatasaray','Fenerbahçe','Young Boys','Slavia Prague','Sparta Prague','Red Star Belgrade','Malmö','Midtjylland','Copenhagen','Ferencváros','Antwerp','Union Saint-Gilloise','Sturm Graz','Molde','Bodo/Glimt','Qarabag','Ludogorets','Sheriff Tiraspol','Astana','PAOK','Partizan','Legia Warsaw','Maccabi Tel Aviv','HJK Helsinki','Zrinjski','Olimpija Ljubljana','Raków Częstochowa',
 ]
 
+const UEL_CLUBS: string[] = [
+  'Roma','Lazio','Atalanta','Fiorentina','Bologna','Marseille','Nice','Lyon','Lille','Monaco','Real Sociedad','Athletic Bilbao','Villarreal','Real Betis','Eintracht Frankfurt','Hoffenheim','Mainz','Werder Bremen','Freiburg','Wolfsburg','Porto','Benfica','Sporting CP','Braga','Ajax','Feyenoord','PSV','Twente','Rangers','Celtic','Slavia Prague','Sparta Prague','Fenerbahçe','Galatasaray','Besiktas','Union Saint-Gilloise','Gent','Anderlecht','PAOK','Olympiacos','AEK Athens','Dinamo Zagreb','Red Star Belgrade','Partizan','Molde','Bodo/Glimt','Ferencváros','Legia Warsaw','Maccabi Tel Aviv','Qarabag','Ludogorets','Astana','Midtjylland','Copenhagen','Malmö','Elfsborg','Sturm Graz','Austria Vienna','Hearts','Aberdeen','FCSB','Rapid Vienna','Hajduk Split','Osijek','Lugano','Servette','Basel','Young Boys','Panathinaikos','Aris Salonika','Anorthosis','Omonia','Slovan Bratislava','Spartak Trnava','Pyunik','Ararat-Armenia','Dinamo Minsk','Wisła Kraków','Raków Częstochowa',
+]
+
+const AFCON_CLUBS: string[] = [
+  'Al Ahly','Zamalek','Pyramids','Esperance','Étoile du Sahel','Club Africain','Raja Casablanca','Wydad Casablanca','FAR Rabat','Mamelodi Sundowns','Kaizer Chiefs','Orlando Pirates','Simba','Young Africans','TP Mazembe','ASEC Mimosas','Hearts of Oak','Kotoko','Enyimba','Rivers United','JS Kabylie','CR Belouizdad','ESS Sétif','Horoya','Stade Malien','Coton Sport','Al Hilal Omdurman','Al Merrikh','Zesco United','Green Buffaloes','Ferroviário da Beira','USM Alger','MC Alger','ASC Diaraf','Génération Foot','Ahli Tripoli','Al Ahli Benghazi','Saint-Étienne','Lens','Toulouse','Le Havre','Metz','Angers','Brest','Nantes','Montpellier','Reims','Lorient','Auxerre','Al Nassr','Al Hilal','Al Ittihad','Al Shabab','Olympiacos','PAOK','AEK Athens','Panathinaikos','Basaksehir','Trabzonspor','Sivasspor','Fiorentina','Torino','Udinese','Empoli','Lecce','Genoa','Getafe','Osasuna','Celta Vigo','Rayo Vallecano','Mallorca','Las Palmas','Alavés',
+]
+
+const WWC_CLUBS: string[] = [
+  'Lyon','Barcelona','Chelsea','Arsenal','Manchester City','Bayern Munich','Paris Saint-Germain','Wolfsburg','Roma','Juventus','AC Milan','Inter Milan','Real Madrid','Atlético Madrid','Levante','Benfica','Sporting CP','Ajax','Twente','PSV','Rosengård','Hammarby','BK Häcken','Linköping','Brann','Rosenborg','Lillestrøm','Vålerenga','Slavia Prague','Sparta Prague','St. Pölten','Glasgow City','Celtic','Rangers','HB Køge','Nordsjælland','Fleury','Montpellier','Bordeaux','Portland Thorns','OL Reign','San Diego Wave','Angel City','Chicago Red Stars','Houston Dash','Kansas City Current','NJ/NY Gotham','North Carolina Courage','Orlando Pride','Racing Louisville','Washington Spirit','Western United','Melbourne City','Sydney FC','Brisbane Roar','Canberra United','Tokyo Verdy Beleza','Urawa Reds','INAC Kobe','Mynavi Sendai','Hwacheon KSPO','Suwon FC','Alajuelense','Saprissa','Independiente Santa Fe','América de Cali','Corinthians','Palmeiras','Santos','Ferroviária','Internacional','Grêmio','Boca Juniors','River Plate','UAI Urquiza','San Lorenzo','Colo-Colo','Santiago Morning','Universidad de Chile','Maccabi Kiryat Gat','Ramat Hasharon','Hapoel Petah Tikva','Minsk','Dinamo Minsk','Apollon Limassol','PAOK','BIIK Kazygurt','SFK 2000','Spartak Moscow','CSKA Moscow','Zenit','Lokomotiv Moscow',
+]
+
+const COPA_CLUBS: string[] = [
+  'Flamengo','Palmeiras','São Paulo','Santos','Corinthians','Grêmio','Internacional','Cruzeiro','Atlético Mineiro','Fluminense','Botafogo','Vasco da Gama','Bahia','Fortaleza','Athletico Paranaense','Boca Juniors','River Plate','Independiente','Racing Club','San Lorenzo','Vélez Sarsfield','Estudiantes','Newell Old Boys','Rosario Central','Talleres','Defensa y Justicia','Lanús','Nacional','Peñarol','Defensor Sporting','Liverpool Montevideo','Cerro Porteño','Olimpia','Libertad','Colo-Colo','Universidad de Chile','Universidad Católica','Palestino','LDU Quito','Barcelona SC','Independiente del Valle','Emelec','El Nacional','Aucas','Alianza Lima','Universitario','Sporting Cristal','Melgar','Cienciano','Millonarios','América de Cali','Atlético Nacional','Deportivo Cali','Junior','Independiente Medellín','Santa Fe','Deportes Tolima','Once Caldas','Deportivo Pasto','Deportivo Pereira','La Equidad','River Plate Asunción','Guaraní','Nacional Asunción','Sol de América','Sportivo Luqueño','Aurora','Bolívar','The Strongest','Always Ready','Wilstermann','Real Santa Cruz','Fluminense','Grêmio','Internacional','Criciúma','Cuiabá','Juventude','Red Bull Bragantino','Coritiba','Goiás','Sport Recife',
+]
 function pick<T>(arr: T[], exclude?: Set<T>): T {
   const pool = exclude ? arr.filter((x) => !exclude.has(x)) : arr
   return pool[Math.floor(Math.random() * pool.length)]
