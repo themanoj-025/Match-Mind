@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Bell, Search, User, Menu, X, LogIn, Trophy, Swords, Home } from 'lucide-react'
+import { Bell, Search, User, Menu, X, Trophy, Swords, Home } from 'lucide-react'
 import useStore from '../store/useStore'
+import TournamentSwitcher from './TournamentSwitcher'
 
 export default function Navbar() {
   const { isAuthenticated, user, unreadCount, isNavOpen, toggleNav } = useStore()
@@ -62,7 +63,8 @@ export default function Navbar() {
               </Link>
             </div>
 
-            <div className="hidden md:flex items-center gap-6">
+            <div className="hidden md:flex items-center gap-4">
+              <TournamentSwitcher />
               <Link to="/dashboard" className="flex items-center gap-1.5 body text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] transition-colors">
                 <Home size={16} /> Dashboard
               </Link>

@@ -13,6 +13,14 @@ interface StoreState {
   toggleNav: () => void
   closeNav: () => void
 
+  // ── Tournament-scoped data (v2 §3.3 — keyed by tournamentId) ──
+  playersByTournament: Record<string, Player[]>
+  roomsByTournament: Record<string, Room[]>
+  activeTournamentId: string | null
+  setPlayersForTournament: (tournamentId: string, players: Player[]) => void
+  setRoomsForTournament: (tournamentId: string, rooms: Room[]) => void
+  setActiveTournamentId: (id: string | null) => void
+
   // Auction Rooms
   activeRooms: Room[]
   currentAuctionState: AuctionState | null
@@ -79,6 +87,20 @@ const useStore = create<StoreState>((set) => ({
   isNavOpen: false,
   toggleNav: () => set((state) => ({ isNavOpen: !state.isNavOpen })),
   closeNav: () => set({ isNavOpen: false }),
+
+  // ── Tournament-scoped data (v2 §3.3) ─────────────
+  playersByTournament: {},
+  roomsByTournament: {},
+  activeTournamentId: null,
+  setPlayersForTournament: (tournamentId, players) =>
+    set((state) => ({
+      playersByTournament: { ...state.playersByTournament, [tournamentId]: players },
+    })),
+  setRoomsForTournament: (tournamentId, rooms) =>
+    set((state) => ({
+      roomsByTournament: { ...state.roomsByTournament, [tournamentId]: rooms },
+    })),
+  setActiveTournamentId: (id) => set({ activeTournamentId: id }),
 
   // ── Auction Rooms ─────────────────────────────────
   activeRooms: [],

@@ -3,11 +3,7 @@ import { Link } from 'react-router-dom'
 import { ArrowRight, Users, Trophy, Timer, Shield, Star, ChevronDown } from 'lucide-react'
 import { motion, useAnimation, useInView } from 'framer-motion'
 import { gsap } from '../lib/animation/gsap'
-
-const TOURNAMENTS = [
-  { id: 'fifa-wc-2026', name: 'FIFA World Cup 2026', shortName: 'WC26', hosts: 'USA · Canada · Mexico', theme: { primary: '#0B3D91', accent: '#D4AF37' }, icon: '🏆' },
-  { id: 'uefa-ucl-2026-27', name: 'UEFA Champions League 2026/27', shortName: 'UCL', theme: { primary: '#0E1E4A', accent: '#8E44FF' }, icon: '⭐' },
-]
+import { useTournaments } from '../lib/tournaments'
 
 function AnimatedCountUp({ value, suffix = '', duration = 2 }) {
   const ref = useRef(null)
@@ -22,7 +18,17 @@ function AnimatedCountUp({ value, suffix = '', duration = 2 }) {
   return <span ref={ref}>{value}</span>
 }
 
+const TOURNAMENT_ICONS: Record<string, string> = {
+  trophy: '🏆',
+  'star-ball': '⭐',
+  'orange-ball': '⚽',
+  'continent-africa': '🌍',
+  'trophy-women': '🏆',
+  'continent-samerica': '🌎',
+}
+
 export default function LandingPage() {
+  const { data: tournaments } = useTournaments()
   const heroRef = useRef(null)
 
   useEffect(() => {
@@ -68,17 +74,19 @@ export default function LandingPage() {
           </div>
 
           {/* Tournament Cards */}
-          <div className="hero-anim mt-16 grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-            {TOURNAMENTS.map((t) => (
-              <div key={t.id} className="p-6 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--mm-bg-secondary)] hover:shadow-lg transition-all"
-                style={{ borderColor: t.theme.accent + '30' }}
-              >
-                <div className="text-3xl mb-3">{t.icon}</div>
-                <h3 className="text-lg font-bold text-[var(--mm-text-primary)] mb-1">{t.name}</h3>
-                <p className="text-sm text-[var(--mm-text-muted)]">{t.hosts}</p>
-              </div>
-            ))}
-          </div>
+          {tournaments && tournaments.filter(t => t.status === 'LIVE' || t.status === 'ANNOUNCED').length > 0 && (
+            <div className="hero-anim mt-16 grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-3xl mx-auto">
+              {(tournaments).filter(t => t.status === 'LIVE' || t.status === 'ANNOUNCED').map((t) => (
+                <div key={t.id} className="p-6 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--mm-bg-secondary)] hover:shadow-lg transition-all"
+                  style={{ borderColor: t.theme.accent + '30' }}
+                >
+                  <div className="text-3xl mb-3">{TOURNAMENT_ICONS[t.nav.icon] || '⚽'}</div>
+                  <h3 className="text-lg font-bold text-[var(--mm-text-primary)] mb-1">{t.name}</h3>
+                  <p className="text-sm text-[var(--mm-text-muted)]">{t.confederation} · {t.teamCount} teams{t.status === 'ANNOUNCED' ? ' · Coming soon' : ''}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Scroll indicator */}
@@ -92,10 +100,10 @@ export default function LandingPage() {
       <section className="py-20 bg-[var(--mm-bg-secondary)] border-y border-[var(--border-subtle)]">
         <div className="max-w-5xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {[
-            { icon: '⚽', value: 2, suffix: ' Tournaments', label: 'Live' },
+            { icon: '⚽', value: tournaments?.filter(t => t.status === 'LIVE').length || 0, suffix: ' Tournaments', label: 'Live' },
             { icon: '🏃', value: 500, suffix: '+', label: 'Players to Draft' },
             { icon: '👥', value: 1000, suffix: '+', label: 'Active Players' },
-            { icon: '🏆', value: 2, suffix: ' Leagues', label: 'Supported' },
+            { icon: '🏆', value: tournaments?.filter(t => t.status === 'LIVE').length || 0, suffix: ' Leagues', label: 'Supported' },
           ].map((stat) => (
             <div key={stat.label} className="hero-anim">
               <div className="text-3xl mb-2">{stat.icon}</div>

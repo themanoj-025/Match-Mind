@@ -38,6 +38,33 @@ const MessagesPage = lazy(() => import('./pages/MessagesPage'))
 const PricingPage = lazy(() => import('./pages/PricingPage'))
 const SearchPage = lazy(() => import('./pages/SearchPage'))
 const AdminPage = lazy(() => import('./pages/AdminPage'))
+const TournamentGuard = lazy(() => import('./components/TournamentGuard'))
+
+// ─── Tournament-scoped pages ────────────────────────────
+
+function TournamentDashboard() {
+  return <TournamentGuard><DashboardPage /></TournamentGuard>
+}
+
+function TournamentRoomWizard() {
+  return <TournamentGuard requireLive><RoomWizardPage /></TournamentGuard>
+}
+
+function TournamentRoomLobby() {
+  return <TournamentGuard requireLive><RoomLobbyPage /></TournamentGuard>
+}
+
+function TournamentAuctionRoom() {
+  return <TournamentGuard requireLive><AuctionRoomPage /></TournamentGuard>
+}
+
+function TournamentFranchise() {
+  return <TournamentGuard><FranchisePage /></TournamentGuard>
+}
+
+function TournamentLeaderboard() {
+  return <TournamentGuard><LeaderboardPage /></TournamentGuard>
+}
 
 // ─── Page transition wrapper ────────────────────────────
 
@@ -135,12 +162,26 @@ export default function App() {
                 <Route path="/faq" element={<AnimatedRoute><FAQPage /></AnimatedRoute>} />
                 <Route path="/404" element={<AnimatedRoute><NotFoundPage /></AnimatedRoute>} />
                 <Route path="*" element={<AnimatedRoute><NotFoundPage /></AnimatedRoute>} />
+                {/* ── Legacy routes (redirect to /t/:id equivalents) ── */}
                 <Route path="/dashboard" element={<AnimatedRoute><DashboardPage /></AnimatedRoute>} />
                 <Route path="/rooms/new" element={<AnimatedRoute><RoomWizardPage /></AnimatedRoute>} />
                 <Route path="/rooms/:roomId/lobby" element={<AnimatedRoute><RoomLobbyPage /></AnimatedRoute>} />
                 <Route path="/rooms/:roomId/auction" element={<AnimatedRoute><AuctionRoomPage /></AnimatedRoute>} />
                 <Route path="/rooms/:roomId/franchise/:userId" element={<AnimatedRoute><FranchisePage /></AnimatedRoute>} />
                 <Route path="/leaderboard" element={<AnimatedRoute><LeaderboardPage /></AnimatedRoute>} />
+
+                {/* ── Tournament-scoped routes (§3.4) ── */}
+                <Route path="/t/:tournamentId" element={<AnimatedRoute><TournamentDashboard /></AnimatedRoute>} />
+                <Route path="/t/:tournamentId/dashboard" element={<AnimatedRoute><TournamentDashboard /></AnimatedRoute>} />
+                <Route path="/t/:tournamentId/rooms/new" element={<AnimatedRoute><TournamentRoomWizard /></AnimatedRoute>} />
+                <Route path="/t/:tournamentId/rooms/:roomId/lobby" element={<AnimatedRoute><TournamentRoomLobby /></AnimatedRoute>} />
+                <Route path="/t/:tournamentId/rooms/:roomId/auction" element={<AnimatedRoute><TournamentAuctionRoom /></AnimatedRoute>} />
+                <Route path="/t/:tournamentId/rooms/:roomId/franchise/me" element={<AnimatedRoute><TournamentFranchise /></AnimatedRoute>} />
+                <Route path="/t/:tournamentId/rooms/:roomId/franchise/:userId" element={<AnimatedRoute><TournamentFranchise /></AnimatedRoute>} />
+                <Route path="/t/:tournamentId/rooms/:roomId/leaderboard" element={<AnimatedRoute><TournamentLeaderboard /></AnimatedRoute>} />
+                <Route path="/t/:tournamentId/fixtures" element={<AnimatedRoute><TournamentDashboard /></AnimatedRoute>} />
+                <Route path="/t/:tournamentId/fixtures/:fixtureId" element={<AnimatedRoute><MatchCenterPage /></AnimatedRoute>} />
+                <Route path="/t/:tournamentId/players/:playerId" element={<AnimatedRoute><PlayerProfilePage /></AnimatedRoute>} />
                 <Route path="/matches/:matchId" element={<AnimatedRoute><MatchCenterPage /></AnimatedRoute>} />
                 <Route path="/players/:playerId" element={<AnimatedRoute><PlayerProfilePage /></AnimatedRoute>} />
                 <Route path="/profile/:userId" element={<AnimatedRoute><ProfilePage /></AnimatedRoute>} />
