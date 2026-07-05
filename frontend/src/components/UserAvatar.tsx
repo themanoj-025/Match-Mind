@@ -1,7 +1,16 @@
 import React from 'react'
 import { User } from 'lucide-react'
 
-const tierRingColors = {
+interface UserAvatarProps {
+  src?: string
+  name?: string
+  tier?: string
+  isOnline?: boolean
+  size?: 'sm' | 'md' | 'lg' | 'xl'
+  className?: string
+}
+
+const tierRingColors: Record<string, string> = {
   BRONZE: 'ring-amber-700',
   SILVER: 'ring-gray-400',
   GOLD: 'ring-yellow-500',
@@ -10,15 +19,15 @@ const tierRingColors = {
   LEGEND: 'ring-orange-500',
 }
 
-export default function UserAvatar({ src, name, tier, isOnline = false, size = 'md', className = '' }) {
-  const sizeClasses = {
+export default function UserAvatar({ src, name, tier, isOnline = false, size = 'md', className = '' }: UserAvatarProps) {
+  const sizeClasses: Record<string, string> = {
     sm: 'w-7 h-7 text-xs',
     md: 'w-9 h-9 text-sm',
     lg: 'w-12 h-12 text-lg',
     xl: 'w-16 h-16 text-2xl',
   }
 
-  const ringColor = tierRingColors[tier] || 'ring-gray-500'
+  const ringColor = tierRingColors[tier || ''] || 'ring-gray-500'
   const sizeClass = sizeClasses[size] || sizeClasses.md
 
   return (

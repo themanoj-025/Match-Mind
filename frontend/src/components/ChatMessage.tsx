@@ -4,7 +4,27 @@ import TierBadge from './TierBadge'
 
 const reactionEmojis = ['🔥', '😱', '👏', '😤', '⚽', '🏀']
 
-export default function ChatMessage({ message, isOwn, onReact, onReport, onPin }) {
+interface Message {
+  id: string
+  user?: { name?: string; avatar?: string; tier?: string; isPro?: boolean }
+  text?: string
+  gifUrl?: string
+  type?: string
+  timestamp?: string
+  reactions?: Record<string, number>
+  isPinned?: boolean
+  isDeleted?: boolean
+}
+
+interface ChatMessageProps {
+  message: Message
+  isOwn?: boolean
+  onReact?: (id: string, emoji: string) => void
+  onReport?: (id: string) => void
+  onPin?: (id: string) => void
+}
+
+export default function ChatMessage({ message, isOwn, onReact, onReport, onPin }: ChatMessageProps) {
   const { id, user, text, gifUrl, type, timestamp, reactions, isPinned, isDeleted } = message
 
   if (type === 'system') {

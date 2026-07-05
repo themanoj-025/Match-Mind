@@ -1,7 +1,23 @@
 import React from 'react'
 import { User, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 
-const tierColors = {
+interface LeaderboardRowUser {
+  avatar?: string
+  name?: string
+}
+
+interface LeaderboardRowProps {
+  rank: number
+  user: LeaderboardRowUser
+  points: number
+  accuracy?: number
+  streak?: number
+  rankChange?: number
+  isCurrentUser?: boolean
+  tier?: string
+}
+
+const tierColors: Record<string, string> = {
   BRONZE: 'from-amber-700 to-amber-500',
   SILVER: 'from-gray-400 to-gray-200',
   GOLD: 'from-yellow-500 to-yellow-300',
@@ -10,7 +26,7 @@ const tierColors = {
   LEGEND: 'from-orange-500 to-red-500',
 }
 
-export default function LeaderboardRow({ rank, user, points, accuracy, streak, rankChange, isCurrentUser, tier }) {
+export default function LeaderboardRow({ rank, user, points, accuracy, streak, rankChange = 0, isCurrentUser = false, tier }: LeaderboardRowProps) {
   const isPodium = rank <= 3
 
   const RankChangeIcon = rankChange > 0 ? TrendingUp : rankChange < 0 ? TrendingDown : Minus
@@ -29,7 +45,7 @@ export default function LeaderboardRow({ rank, user, points, accuracy, streak, r
         isPodium ? 'font-bold' : 'body text-[var(--mm-text-muted)]'
       }`}>
         {isPodium ? (
-          <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${tierColors[tier] || 'from-gray-500 to-gray-400'} flex items-center justify-center text-xs font-bold text-[var(--mm-text-inverse)]`}>
+          <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${tierColors[tier || ''] || 'from-gray-500 to-gray-400'} flex items-center justify-center text-xs font-bold text-[var(--mm-text-inverse)]`}>
             {rank}
           </div>
         ) : (

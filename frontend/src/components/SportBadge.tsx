@@ -1,10 +1,16 @@
 import React from 'react'
 
-const sportConfig = {
+interface SportBadgeProps {
+  sport: string
+  size?: 'sm' | 'md' | 'lg'
+  showLabel?: boolean
+}
+
+const sportConfig: Record<string, { icon: string; color: string; label: string }> = {
   football: { icon: '⚽', color: 'var(--sport-football)', label: 'Football' },
 }
 
-export default function SportBadge({ sport, size = 'md', showLabel = true }) {
+export default function SportBadge({ sport, size = 'md', showLabel = true }: SportBadgeProps) {
   const config = sportConfig[sport] || { icon: '⚽', color: 'var(--text-muted)', label: sport }
   const sizeClasses = size === 'sm' ? 'text-xs' : size === 'lg' ? 'text-lg' : 'text-sm'
 

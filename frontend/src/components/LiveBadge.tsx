@@ -1,6 +1,11 @@
 import React from 'react'
 
-export default function LiveBadge({ minute, size = 'md' }) {
+interface LiveBadgeProps {
+  minute?: number
+  size?: 'sm' | 'md'
+}
+
+export default function LiveBadge({ minute, size = 'md' }: LiveBadgeProps) {
   return (
     <div className="flex items-center gap-1.5">
       <div className="relative">

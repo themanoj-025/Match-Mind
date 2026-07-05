@@ -1,6 +1,15 @@
+import React from 'react'
 import { motion } from 'framer-motion'
 
-export default function EmptyState({ icon, title, description, action }) {
+interface EmptyStateProps {
+  icon?: React.ReactNode
+  title: string
+  description?: string
+  action?: React.ReactNode
+  illustration?: string
+}
+
+export default function EmptyState({ icon, title, description, action }: EmptyStateProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}

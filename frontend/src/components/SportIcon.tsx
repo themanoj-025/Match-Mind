@@ -1,14 +1,20 @@
 import React from 'react'
 
-const sportIcons = {
+interface SportIconProps {
+  sport: string
+  size?: 'sm' | 'md' | 'lg'
+  className?: string
+}
+
+const sportIcons: Record<string, string> = {
   football: '⚽',
 }
 
-const sportColors = {
+const sportColors: Record<string, string> = {
   football: 'var(--sport-football)',
 }
 
-export default function SportIcon({ sport, size = 'md', className = '' }) {
+export default function SportIcon({ sport, size = 'md', className = '' }: SportIconProps) {
   const icon = sportIcons[sport] || '⚽'
   const sizeClasses = size === 'sm' ? 'text-base' : size === 'lg' ? 'text-3xl' : 'text-xl'
 

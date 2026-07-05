@@ -1,6 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
-import { Trophy, TrendingUp, ChevronRight } from 'lucide-react'
+import { Trophy, TrendingUp } from 'lucide-react'
 import useStore from '../store/useStore'
 
 export default function GamificationStrip() {
@@ -8,8 +7,8 @@ export default function GamificationStrip() {
 
   if (!user) return null
 
-  const totalPoints = user?.totalPoints || 0
-  const roomsActive = user?.roomsActive || 0
+  const totalPoints = (user as { totalPoints?: number }).totalPoints || 0
+  const roomsActive = (user as { roomsActive?: number }).roomsActive || 0
 
   return (
     <div className="bg-[var(--mm-bg-secondary)] border-b border-[var(--border-subtle)] px-4 py-2">
@@ -27,14 +26,6 @@ export default function GamificationStrip() {
             <span className="caption text-[var(--mm-text-muted)] hidden sm:inline">rooms</span>
           </div>
         </div>
-
-        {/* Quick actions */}
-        <Link
-          to="/rooms/new"
-          className="hidden lg:flex items-center gap-1 body font-semibold text-[var(--mm-accent-green)] hover:underline shrink-0"
-        >
-          Create Auction Room <ChevronRight size={14} />
-        </Link>
       </div>
     </div>
   )

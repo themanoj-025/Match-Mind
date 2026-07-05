@@ -2,13 +2,20 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { Sparkles, Lock } from 'lucide-react'
 
+interface ProGateProps {
+  children: React.ReactNode
+  isPro?: boolean
+  showLockIcon?: boolean
+  fallback?: React.ReactNode
+}
+
 /**
  * ProGate — Wraps Pro-only content
  * Free users: children blurred (CSS filter: blur(4px)) + overlay CTA
  * Pro users: children rendered normally
  * Content is NOT removed from DOM for SEO + accessibility
  */
-export default function ProGate({ children, isPro = false, showLockIcon = true, fallback }) {
+export default function ProGate({ children, isPro = false, showLockIcon = true, fallback }: ProGateProps) {
   if (isPro) return <>{children}</>
 
   if (fallback) return <>{fallback}</>
