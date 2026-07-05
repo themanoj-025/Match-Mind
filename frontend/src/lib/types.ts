@@ -1,14 +1,19 @@
-// ─── Tournament ────────────────────────────────────────
-export type TournamentId = 'fifa-wc-2026' | 'uefa-ucl-2026-27'
-
+// ─── Tournament (v2 — open registry, not a closed union) ─
 export interface Tournament {
-  id: TournamentId
+  id: string
   name: string
   shortName: string
-  status: 'UPCOMING' | 'LIVE' | 'COMPLETED'
+  status: 'LIVE' | 'ANNOUNCED' | 'ANNOUNCED_NOT_CONFIRMED'
   confederation: string
-  hosts?: string[]
+  gender: string
+  format: string
+  teamCount: number
+  squadSize: number
+  launchPhase: number
+  dateRange: { start: string | null; end: string | null }
   theme: { primary: string; accent: string }
+  nav: { order: number; icon: string }
+  hosts?: string[]
 }
 
 // ─── User ──────────────────────────────────────────────
@@ -31,7 +36,7 @@ export type Tier = 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM' | 'DIAMOND' | 'LEGE
 // ─── Player (AuctionXI) ────────────────────────────────
 export interface Player {
   id: string
-  tournamentId: TournamentId
+  tournamentId: string
   name: string
   club: string
   nationality: string
@@ -40,10 +45,10 @@ export interface Player {
   photoUrl?: string
 }
 
-// ─── Room (Auction room, replaces League) ──────────────
+// ─── Room (Auction room) ──────────────────────────────
 export interface Room {
   id: string
-  tournamentId: TournamentId
+  tournamentId: string
   hostId: string
   name: string
   inviteCode: string
@@ -61,6 +66,7 @@ export interface RoomMember {
   userId: string
   role: 'host' | 'member'
   remainingBudget: number
+  isReady?: boolean
   user?: { id: string; username: string; displayName: string; avatar: string | null }
 }
 
@@ -101,13 +107,19 @@ export interface RosterEntry {
 // ─── Fixture (real match) ──────────────────────────────
 export interface Fixture {
   id: string
-  tournamentId: TournamentId
-  homeTeam: string
-  awayTeam: string
+  tournamentId: string
+  stage: string
+  round: number | null
+  homeTeamId: string
+  awayTeamId: string
+  homeTeam?: string
+  awayTeam?: string
+  venueId?: string
   homeScore: number | null
   awayScore: number | null
-  status: 'SCHEDULED' | 'LIVE' | 'HALFTIME' | 'COMPLETED'
+  status: 'SCHEDULED' | 'LIVE' | 'HALFTIME' | 'COMPLETED' | 'POSTPONED'
   scheduledAt: string
+  kickoffAt?: string
   playerMatchStats?: PlayerMatchStat[]
 }
 
@@ -183,7 +195,7 @@ export interface LeaderboardEntry {
   tier: Tier
 }
 
-// ─── Squad (friend group) → Franchise ──────────────────
+// ─── Franchise (was Squad) ─────────────────────────────
 export interface Squad {
   id: string
   name: string
