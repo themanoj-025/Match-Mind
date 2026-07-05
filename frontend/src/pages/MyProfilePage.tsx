@@ -5,7 +5,6 @@ import { Settings, Bell, Trophy, Target, TrendingUp, Flame, Star, Shield, Zap, B
 import { motion, AnimatePresence } from 'framer-motion'
 import useStore from '../store/useStore'
 import AchievementBadge from '../components/AchievementBadge'
-import PredictionCard from '../components/PredictionCard'
 import { useMyPredictions, useStripeStatus } from '../hooks/useApi'
 
 const profileTabs = [
@@ -155,12 +154,21 @@ export default function MyProfilePage() {
                 <h3 className="heading-3 mb-4">Prediction History</h3>
                 <div className="grid sm:grid-cols-2 gap-4">
                   {recentPredictions.length > 0 ? recentPredictions.map((pred, i) => (
-                    <PredictionCard
-                      key={pred.id || i}
-                      match={{ homeTeam: pred.match?.homeTeam || `Team ${i}`, awayTeam: pred.match?.awayTeam || `Team ${i + 4}`, competition: pred.match?.competition || 'Premier League', sport: pred.match?.sport || 'football', scheduledAt: pred.match?.scheduledAt || new Date().toISOString() }}
-                      prediction={{ homeGoals: pred.homeGoals, awayGoals: pred.awayGoals }}
-                      result={{ status: pred.status === 'CORRECT' ? 'CORRECT' : 'MISSED', points: pred.pointsEarned || 0 }}
-                    />
+                    <div key={pred.id || i} className="bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-lg)] p-4 border border-[var(--border-subtle)]">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-lg">🎯</span>
+                        <span className="body font-semibold">Prediction #{i + 1}</span>
+                        <span className={`px-2 py-0.5 rounded-[var(--radius-sm)] caption font-semibold ${
+                          pred.status === 'CORRECT' ? 'bg-[var(--mm-accent-green)]/10 text-[var(--mm-accent-green)]' : 'bg-[var(--mm-accent-red)]/10 text-[var(--mm-accent-red)]'
+                        }`}>
+                          {pred.status === 'CORRECT' ? '✅ Correct' : '❌ Missed'}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="caption text-[var(--mm-text-muted)]">Score prediction</span>
+                        <span className="body font-semibold text-[var(--mm-accent-amber)]">+{pred.pointsEarned || 0} pts</span>
+                      </div>
+                    </div>
                   )) : (
                     <div className="col-span-2 text-center py-8 text-[var(--mm-text-muted)]">
                       <p className="body">No predictions yet</p>

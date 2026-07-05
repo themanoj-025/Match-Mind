@@ -3,7 +3,6 @@ import { Helmet } from 'react-helmet-async'
 import { useParams, Link } from 'react-router-dom'
 import { MapPin, Calendar, Users, Trophy, Target, Flame, MessageCircle, MoreHorizontal, ChevronRight, Loader } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import PredictionCard from '../components/PredictionCard'
 import AchievementBadge from '../components/AchievementBadge'
 import { cardStaggerItem } from '../lib/animation/variants'
 import { useUser, useFollowUser, useUnfollowUser, useMyPredictions } from '../hooks/useApi'
@@ -167,11 +166,17 @@ export default function ProfilePage() {
                   <h3 className="heading-3 mb-4">Recent Predictions</h3>
                   <div className="grid sm:grid-cols-2 gap-3">
                     {[1, 2].map((i) => (
-                      <PredictionCard key={i}
-                        match={{ homeTeam: `Manchester City`, awayTeam: `Arsenal`, competition: 'Premier League', sport: 'football', scheduledAt: new Date().toISOString() }}
-                        prediction={{ homeGoals: 2, awayGoals: 1 }}
-                        result={{ status: 'CORRECT', points: 50 }}
-                      />
+                      <div key={i} className="bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-lg)] p-4 border border-[var(--border-subtle)]">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-lg">🎯</span>
+                          <span className="body font-semibold">Match Prediction</span>
+                          <span className="px-2 py-0.5 bg-[var(--mm-accent-green)]/10 text-[var(--mm-accent-green)] rounded-[var(--radius-sm)] caption font-semibold">✅ Correct</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="caption text-[var(--mm-text-muted)]">Manchester City vs Arsenal</span>
+                          <span className="body font-semibold text-[var(--mm-accent-amber)]">+50 pts</span>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>
