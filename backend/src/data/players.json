@@ -87,7 +87,7 @@
     "nationality": "DE",
     "position": "GK",
     "basePrice": 48,
-    "rarityTier": "GOLD"
+    "rarityTier": "SILVER"
   },
   {
     "id": "player-10",
@@ -247,7 +247,7 @@
     "nationality": "MX",
     "position": "GK",
     "basePrice": 48,
-    "rarityTier": "GOLD"
+    "rarityTier": "SILVER"
   },
   {
     "id": "player-26",
@@ -447,7 +447,7 @@
     "nationality": "UY",
     "position": "DEF",
     "basePrice": 37,
-    "rarityTier": "SILVER"
+    "rarityTier": "BRONZE"
   },
   {
     "id": "player-46",
@@ -1347,7 +1347,7 @@
     "nationality": "HU",
     "position": "MID",
     "basePrice": 37,
-    "rarityTier": "SILVER"
+    "rarityTier": "BRONZE"
   },
   {
     "id": "player-136",
@@ -1952,7 +1952,7 @@
     "nationality": "GE",
     "position": "FWD",
     "basePrice": 38,
-    "rarityTier": "SILVER"
+    "rarityTier": "BRONZE"
   },
   {
     "id": "player-196",
@@ -2202,7 +2202,7 @@
     "nationality": "PT",
     "position": "FWD",
     "basePrice": 38,
-    "rarityTier": "SILVER"
+    "rarityTier": "BRONZE"
   },
   {
     "id": "player-221",
@@ -2402,7 +2402,7 @@
     "nationality": "CM",
     "position": "GK",
     "basePrice": 38,
-    "rarityTier": "SILVER"
+    "rarityTier": "BRONZE"
   },
   {
     "id": "player-241",
@@ -2762,7 +2762,7 @@
     "nationality": "GB",
     "position": "DEF",
     "basePrice": 38,
-    "rarityTier": "SILVER"
+    "rarityTier": "BRONZE"
   },
   {
     "id": "player-277",
@@ -2772,7 +2772,7 @@
     "nationality": "UY",
     "position": "DEF",
     "basePrice": 39,
-    "rarityTier": "SILVER"
+    "rarityTier": "BRONZE"
   },
   {
     "id": "player-278",
@@ -2962,7 +2962,7 @@
     "nationality": "UY",
     "position": "DEF",
     "basePrice": 38,
-    "rarityTier": "SILVER"
+    "rarityTier": "BRONZE"
   },
   {
     "id": "player-297",
@@ -4158,7 +4158,7 @@
     "nationality": "FR",
     "position": "FWD",
     "basePrice": 50,
-    "rarityTier": "GOLD"
+    "rarityTier": "SILVER"
   },
   {
     "id": "player-416",
@@ -4641,37 +4641,27 @@
     "rarityTier": "BRONZE"
   },
   {
-    "id": "patch-1",
+    "id": "patch-464",
     "tournamentId": "fifa-wc-2026",
-    "name": "Trevoh Chalobah",
-    "club": "Chelsea",
+    "name": "Jarrad Branthwaite",
+    "club": "Everton",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 48,
-    "rarityTier": "SILVER"
+    "basePrice": 52,
+    "rarityTier": "GOLD"
   },
   {
-    "id": "patch-2",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Maxence Lacroix",
-    "club": "Crystal Palace",
-    "nationality": "FR",
-    "position": "DEF",
-    "basePrice": 48,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "patch-3",
+    "id": "patch-465",
     "tournamentId": "fifa-wc-2026",
     "name": "Ousmane Diomande",
     "club": "Sporting CP",
     "nationality": "CI",
     "position": "DEF",
-    "basePrice": 50,
+    "basePrice": 52,
     "rarityTier": "GOLD"
   },
   {
-    "id": "patch-4",
+    "id": "patch-466",
     "tournamentId": "fifa-wc-2026",
     "name": "Gonçalo Inácio",
     "club": "Sporting CP",
@@ -4681,7 +4671,27 @@
     "rarityTier": "GOLD"
   },
   {
-    "id": "patch-5",
+    "id": "patch-467",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Trevoh Chalobah",
+    "club": "Chelsea",
+    "nationality": "GB",
+    "position": "DEF",
+    "basePrice": 50,
+    "rarityTier": "GOLD"
+  },
+  {
+    "id": "patch-468",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Maxence Lacroix",
+    "club": "Crystal Palace",
+    "nationality": "FR",
+    "position": "DEF",
+    "basePrice": 50,
+    "rarityTier": "GOLD"
+  },
+  {
+    "id": "patch-469",
     "tournamentId": "fifa-wc-2026",
     "name": "Lucas Beraldo",
     "club": "Paris Saint-Germain",
@@ -4691,57 +4701,137 @@
     "rarityTier": "SILVER"
   },
   {
-    "id": "patch-6",
+    "id": "patch-470",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Jan Paul van Hecke",
+    "club": "Brighton",
+    "nationality": "GB",
+    "position": "DEF",
+    "basePrice": 48,
+    "rarityTier": "SILVER"
+  },
+  {
+    "id": "patch-471",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Cristian Romero",
+    "club": "Tottenham",
+    "nationality": "AR",
+    "position": "DEF",
+    "basePrice": 48,
+    "rarityTier": "SILVER"
+  },
+  {
+    "id": "patch-472",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Aymeric Laporte",
+    "club": "Al Nassr",
+    "nationality": "ES",
+    "position": "DEF",
+    "basePrice": 46,
+    "rarityTier": "SILVER"
+  },
+  {
+    "id": "patch-473",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Nico Tagliafico",
+    "club": "Lyon",
+    "nationality": "AR",
+    "position": "DEF",
+    "basePrice": 46,
+    "rarityTier": "SILVER"
+  },
+  {
+    "id": "patch-474",
     "tournamentId": "fifa-wc-2026",
     "name": "Mikkel Damsgaard",
     "club": "Brentford",
     "nationality": "DK",
     "position": "FWD",
+    "basePrice": 50,
+    "rarityTier": "SILVER"
+  },
+  {
+    "id": "patch-475",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Ansu Fati",
+    "club": "Barcelona",
+    "nationality": "ES",
+    "position": "FWD",
     "basePrice": 48,
     "rarityTier": "SILVER"
   },
   {
-    "id": "patch-7",
+    "id": "patch-476",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Fábio Carvalho",
+    "club": "Brentford",
+    "nationality": "PT",
+    "position": "FWD",
+    "basePrice": 46,
+    "rarityTier": "SILVER"
+  },
+  {
+    "id": "patch-477",
     "tournamentId": "fifa-wc-2026",
     "name": "Anatoliy Trubin",
     "club": "Benfica",
     "nationality": "UA",
     "position": "GK",
+    "basePrice": 38,
+    "rarityTier": "BRONZE"
+  },
+  {
+    "id": "patch-478",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Kevin Trapp",
+    "club": "Eintracht Frankfurt",
+    "nationality": "DE",
+    "position": "GK",
     "basePrice": 34,
     "rarityTier": "BRONZE"
   },
   {
-    "id": "patch-8",
+    "id": "patch-479",
     "tournamentId": "fifa-wc-2026",
-    "name": "Michał Karbownik",
-    "club": "PAOK",
-    "nationality": "PL",
+    "name": "Robin Zentner",
+    "club": "Mainz",
+    "nationality": "DE",
     "position": "GK",
     "basePrice": 32,
     "rarityTier": "BRONZE"
   },
   {
-    "id": "patch-9",
+    "id": "patch-480",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Jesper Lindstrøm",
+    "club": "Napoli",
+    "nationality": "DK",
+    "position": "GK",
+    "basePrice": 28,
+    "rarityTier": "BRONZE"
+  },
+  {
+    "id": "patch-481",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "Trevoh Chalobah",
-    "club": "Chelsea",
+    "name": "Jarrad Branthwaite",
+    "club": "Everton",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 50,
-    "rarityTier": "SILVER"
+    "basePrice": 52,
+    "rarityTier": "GOLD"
   },
   {
-    "id": "patch-10",
+    "id": "patch-482",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "Maxence Lacroix",
-    "club": "Crystal Palace",
-    "nationality": "FR",
+    "name": "Ousmane Diomande",
+    "club": "Sporting CP",
+    "nationality": "CI",
     "position": "DEF",
-    "basePrice": 48,
-    "rarityTier": "SILVER"
+    "basePrice": 52,
+    "rarityTier": "GOLD"
   },
   {
-    "id": "patch-11",
+    "id": "patch-483",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Gonçalo Inácio",
     "club": "Sporting CP",
@@ -4751,27 +4841,87 @@
     "rarityTier": "SILVER"
   },
   {
-    "id": "patch-12",
+    "id": "patch-484",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "Ousmane Diomande",
-    "club": "Sporting CP",
-    "nationality": "CI",
+    "name": "Trevoh Chalobah",
+    "club": "Chelsea",
+    "nationality": "GB",
     "position": "DEF",
     "basePrice": 50,
     "rarityTier": "SILVER"
   },
   {
-    "id": "patch-13",
+    "id": "patch-485",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Maxence Lacroix",
+    "club": "Crystal Palace",
+    "nationality": "FR",
+    "position": "DEF",
+    "basePrice": 50,
+    "rarityTier": "SILVER"
+  },
+  {
+    "id": "patch-486",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Lucas Beraldo",
+    "club": "Paris Saint-Germain",
+    "nationality": "BR",
+    "position": "DEF",
+    "basePrice": 48,
+    "rarityTier": "SILVER"
+  },
+  {
+    "id": "patch-487",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Jan Paul van Hecke",
+    "club": "Brighton",
+    "nationality": "GB",
+    "position": "DEF",
+    "basePrice": 48,
+    "rarityTier": "SILVER"
+  },
+  {
+    "id": "patch-488",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Cristian Romero",
+    "club": "Tottenham",
+    "nationality": "AR",
+    "position": "DEF",
+    "basePrice": 48,
+    "rarityTier": "SILVER"
+  },
+  {
+    "id": "patch-489",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Aymeric Laporte",
+    "club": "Al Nassr",
+    "nationality": "ES",
+    "position": "DEF",
+    "basePrice": 46,
+    "rarityTier": "SILVER"
+  },
+  {
+    "id": "patch-490",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Nico Tagliafico",
+    "club": "Lyon",
+    "nationality": "AR",
+    "position": "DEF",
+    "basePrice": 46,
+    "rarityTier": "SILVER"
+  },
+  {
+    "id": "patch-491",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Mikkel Damsgaard",
     "club": "Brentford",
     "nationality": "DK",
     "position": "FWD",
-    "basePrice": 48,
+    "basePrice": 50,
     "rarityTier": "SILVER"
   },
   {
-    "id": "patch-14",
+    "id": "patch-492",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Ansu Fati",
     "club": "Barcelona",
@@ -4781,27 +4931,47 @@
     "rarityTier": "SILVER"
   },
   {
-    "id": "patch-15",
+    "id": "patch-493",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Fábio Carvalho",
     "club": "Brentford",
     "nationality": "PT",
     "position": "FWD",
+    "basePrice": 48,
+    "rarityTier": "SILVER"
+  },
+  {
+    "id": "patch-494",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Amad Diallo",
+    "club": "Manchester United",
+    "nationality": "CI",
+    "position": "FWD",
     "basePrice": 46,
     "rarityTier": "SILVER"
   },
   {
-    "id": "patch-16",
+    "id": "patch-495",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Anatoliy Trubin",
     "club": "Benfica",
     "nationality": "UA",
     "position": "GK",
-    "basePrice": 36,
+    "basePrice": 38,
     "rarityTier": "BRONZE"
   },
   {
-    "id": "patch-17",
+    "id": "patch-496",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Kevin Trapp",
+    "club": "Eintracht Frankfurt",
+    "nationality": "DE",
+    "position": "GK",
+    "basePrice": 34,
+    "rarityTier": "BRONZE"
+  },
+  {
+    "id": "patch-497",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Robin Zentner",
     "club": "Mainz",
@@ -4811,17 +4981,7 @@
     "rarityTier": "BRONZE"
   },
   {
-    "id": "patch-18",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Kevin Trapp",
-    "club": "Eintracht Frankfurt",
-    "nationality": "DE",
-    "position": "GK",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "patch-19",
+    "id": "patch-498",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Jesper Lindstrøm",
     "club": "Napoli",
