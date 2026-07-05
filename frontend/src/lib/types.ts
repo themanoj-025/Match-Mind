@@ -303,6 +303,17 @@ export interface Squad {
 // ─── Admin ─────────────────────────────────────────────
 export interface AdminStats {
   totalUsers: number
+  newUsersThisWeek?: number
+  monthlyActive?: number
+  mauGrowth?: number
+  predictionsToday?: number
+  predGrowth?: number
+  proCount?: number
+  proGrowth?: number
+  revenue?: number
+  revGrowth?: number
+  errorRate?: number
+  errorRateChange?: number
   activeRooms: number
   liveAuctions: number
   proUsers: number
@@ -313,6 +324,8 @@ export interface AdminLogEntry {
   action: string
   adminId: string
   targetId?: string
+  targetType?: string
+  detail?: Record<string, unknown>
   details?: string
   createdAt: string
 }

@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
-import { Users, Trophy, BarChart3, Activity, AlertCircle, DollarSign, TrendingUp, Settings, Flag, MessageSquare, Search, ChevronDown, Trash2, Crown, Loader, Save, X, Edit3, Eye, Calendar, Target, Users2, Shield, Clock, UserX, Repeat, CheckCheck } from 'lucide-react'
+import { Users, Trophy, BarChart3, Activity, AlertCircle, DollarSign, TrendingUp, Settings, Flag, MessageSquare, Search, ChevronDown, Trash2, Crown, Loader, Save, X, Edit3, Eye, Calendar, Target, Users2, Shield, Clock, UserX, Repeat, CheckCheck, Zap, ShieldCheck, RefreshCw } from 'lucide-react'
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, LineChart, Line, AreaChart, Area } from 'recharts'
 import { cardStaggerItem } from '../lib/animation/variants'
-import { useAdminStats, useAdminUsers, useAdminMatches, useAdminReports, useAdminSettings, useTogglePro, useDeleteUser, useUpdateReport, useUpdateMatch, useAdminUserDetail, useAdminActivityLog } from '../hooks/useApi'
+import { useAdminStats, useAdminUsers, useAdminMatches, useAdminReports, useAdminSettings, useTogglePro, useDeleteUser, useUpdateReport, useUpdateMatch, useAdminUserDetail, useAdminActivityLog, useAdminDraftPoolValidation, useAdminDraftIcons, useToggleDraftMode, useToggleIconEligibility, useRevalidateDraftPool } from '../hooks/useApi'
 
 const adminTabs = [
   { id: 'overview', label: 'Overview' },
@@ -13,6 +13,7 @@ const adminTabs = [
   { id: 'reports', label: 'Reports' },
   { id: 'activity', label: 'Activity Log' },
   { id: 'settings', label: 'Settings' },
+  { id: 'draft', label: 'Draft Mode' },
 ]
 
 const kpiData = [
@@ -39,19 +40,320 @@ const sportData = [
 ]
 
 
+// ─── Draft Mode Admin Tab ────────────────────────────────────
+const DRAFT_SUB_TABS = [
+  { id: 'pool', label: 'Pool Validation' },
+  { id: 'icons', label: 'ICON Management' },
+]
+
+const RARITY_COLORS = {
+  BRONZE: '#CD7F32',
+  SILVER: '#C0C0C0',
+  GOLD: '#FFD700',
+  ICON: '#FF6B6B',
+}
+
+function AdminDraftModeTab() {
+  const [subTab, setSubTab] = useState('pool')
+  const [revalidating, setRevalidating] = useState(false)
+
+  const { data: poolData, isLoading: poolLoading } = useAdminDraftPoolValidation()
+  const { data: iconData, isLoading: iconsLoading } = useAdminDraftIcons()
+  const toggleDraftMut = useToggleDraftMode()
+  const toggleIconMut = useToggleIconEligibility()
+  const revalidateMut = useRevalidateDraftPool()
+
+  const tournaments = poolData?.tournaments || []
+  const icons = iconData?.players || []
+  const passedCount = tournaments.filter((t) => t.passed).length
+  const enabledCount = tournaments.filter((t) => t.enabled).length
+
+  const handleToggle = (tournamentId: string, action: 'enable' | 'disable') => {
+    toggleDraftMut.mutate({ tournamentId, action })
+  }
+
+  const handleRevalidate = async () => {
+    setRevalidating(true)
+    try {
+      await revalidateMut.mutateAsync(undefined)
+    } finally {
+      setRevalidating(false)
+    }
+  }
+
+  const handleIconToggle = (playerId: string) => {
+    toggleIconMut.mutate(playerId)
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Summary KPI Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4">
+          <span className="heading-2 text-[var(--mm-accent-green)]">{tournaments.length}</span>
+          <span className="caption text-[var(--mm-text-muted)] block">Tournaments</span>
+        </div>
+        <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4">
+          <span className={`heading-2 ${passedCount === tournaments.length ? 'text-[var(--mm-accent-green)]' : 'text-[var(--mm-accent-red)]'}`}>{passedCount}/{tournaments.length}</span>
+          <span className="caption text-[var(--mm-text-muted)] block">Pools Passed</span>
+        </div>
+        <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4">
+          <span className="heading-2 text-[var(--mm-accent-amber)]">{enabledCount}</span>
+          <span className="caption text-[var(--mm-text-muted)] block">Draft Enabled</span>
+        </div>
+        <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4">
+          <span className="heading-2 text-[var(--mm-accent-purple)]">{icons.length}</span>
+          <span className="caption text-[var(--mm-text-muted)] block">ICON Players</span>
+        </div>
+      </div>
+
+      {/* Sub-tabs */}
+      <div className="flex gap-1 mb-2 bg-[var(--mm-bg-secondary)] rounded-[var(--radius-md)] p-1 border border-[var(--border-subtle)] w-fit">
+        {DRAFT_SUB_TABS.map((tab) => (
+          <button
+            key={tab.id} onClick={() => setSubTab(tab.id)}
+            className={`px-4 py-2 rounded-[var(--radius-sm)] caption whitespace-nowrap transition-all ${
+              subTab === tab.id ? 'bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] font-semibold' : 'text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)]'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* ─── Pool Validation Sub-tab ───────────────────────── */}
+      {subTab === 'pool' && (
+        <>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="heading-3 flex items-center gap-2">
+              <ShieldCheck size={18} className="text-[var(--mm-accent-green)]" />
+              Tournament Pool Validation
+            </h3>
+            <button
+              onClick={handleRevalidate}
+              disabled={revalidating || revalidateMut.isPending}
+              className="flex items-center gap-1.5 px-4 py-2 bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-secondary)] caption font-semibold rounded-[var(--radius-md)] hover:bg-[var(--mm-bg-hover)] transition-all disabled:opacity-50"
+            >
+              <RefreshCw size={14} className={revalidating || revalidateMut.isPending ? 'animate-spin' : ''} />
+              {revalidating ? 'Re-validating...' : 'Re-validate All'}
+            </button>
+          </div>
+
+          {poolLoading ? (
+            <div className="flex items-center justify-center py-12 text-[var(--mm-text-muted)]">
+              <Loader size={20} className="animate-spin mr-2" /> Validating pools...
+            </div>
+          ) : tournaments.length === 0 ? (
+            <div className="text-center py-12 text-[var(--mm-text-muted)]">
+              <Zap size={32} className="mx-auto mb-2 opacity-30" />
+              <p className="body">No tournaments loaded</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {tournaments.map((t) => {
+                const isToggling = toggleDraftMut.isPending && toggleDraftMut.variables?.tournamentId === t.tournamentId
+                return (
+                  <div
+                    key={t.tournamentId}
+                    className={`bg-[var(--mm-bg-secondary)] border rounded-[var(--radius-lg)] p-5 transition-all ${
+                      t.passed ? 'border-[var(--border-subtle)]' : 'border-[var(--mm-accent-red)]/30'
+                    }`}
+                  >
+                    {/* Tournament header */}
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <span className={`w-3 h-3 rounded-full ${t.passed ? 'bg-[var(--mm-accent-green)]' : 'bg-[var(--mm-accent-red)]'}`} />
+                        <div>
+                          <span className="body font-semibold">{t.tournamentName}</span>
+                          <span className="caption text-[var(--mm-text-muted)] ml-2">{t.shortName}</span>
+                        </div>
+                        <span className={`caption px-2 py-0.5 rounded-[var(--radius-sm)] font-medium ${
+                          t.status === 'LIVE' ? 'bg-[var(--mm-accent-green)]/10 text-[var(--mm-accent-green)]' :
+                          t.status === 'ANNOUNCED' ? 'bg-[var(--mm-accent-amber)]/10 text-[var(--mm-accent-amber)]' :
+                          'bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-muted)]'
+                        }`}>{t.status}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="caption text-[var(--mm-text-muted)]">{t.playerCount || 0} players</span>
+                        <span className="caption text-[var(--mm-accent-purple)]">{t.iconCount || 0} ICONs</span>
+                        {/* Enable/Disable toggle */}
+                        <button
+                          onClick={() => handleToggle(t.tournamentId, t.enabled ? 'disable' : 'enable')}
+                          disabled={isToggling || (!t.passed && !t.enabled)}
+                          title={!t.passed && !t.enabled ? 'Pool validation must pass first' : t.enabled ? 'Disable Draft Mode' : 'Enable Draft Mode'}
+                          className={`relative w-11 h-6 rounded-full transition-colors ${
+                            t.enabled ? 'bg-[var(--mm-accent-green)]' : 'bg-[var(--mm-bg-tertiary)]'
+                          } ${!t.passed && !t.enabled ? 'opacity-40 cursor-not-allowed' : ''}`}
+                          role="switch" aria-checked={t.enabled}
+                        >
+                          <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${t.enabled ? 'translate-x-5.5 left-[2px]' : 'translate-x-0.5'}`} />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Errors, warnings, infos */}
+                    {t.errors.length > 0 && (
+                      <div className="mb-2 p-3 bg-[var(--mm-accent-red)]/5 rounded-[var(--radius-md)] border border-[var(--mm-accent-red)]/20">
+                        <span className="caption font-semibold text-[var(--mm-accent-red)] block mb-1">❌ {t.errors.length} Error(s)</span>
+                        {t.errors.map((err, i) => (
+                          <span key={i} className="caption text-[var(--mm-text-secondary)] block ml-3">• {err}</span>
+                        ))}
+                      </div>
+                    )}
+                    {t.warnings.length > 0 && (
+                      <div className="mb-2 p-3 bg-[var(--mm-accent-amber)]/5 rounded-[var(--radius-md)] border border-[var(--mm-accent-amber)]/20">
+                        <span className="caption font-semibold text-[var(--mm-accent-amber)] block mb-1">⚠️ {t.warnings.length} Warning(s)</span>
+                        {t.warnings.map((w, i) => (
+                          <span key={i} className="caption text-[var(--mm-text-secondary)] block ml-3">• {w}</span>
+                        ))}
+                      </div>
+                    )}
+                    {t.infos.length > 0 && (
+                      <div className="p-3 bg-[var(--mm-accent-blue)]/5 rounded-[var(--radius-md)] border border-[var(--mm-accent-blue)]/20">
+                        <span className="caption font-semibold text-[var(--mm-accent-blue)] block mb-1">ℹ️ Info</span>
+                        {t.infos.map((info, i) => (
+                          <span key={i} className="caption text-[var(--mm-text-secondary)] block ml-3">• {info}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ─── ICON Management Sub-tab ───────────────────────── */}
+      {subTab === 'icons' && (
+        <>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="heading-3 flex items-center gap-2">
+              <Crown size={18} className="text-[var(--mm-accent-purple)]" />
+              ICON Player Management
+              <span className="caption text-[var(--mm-text-muted)] font-normal">({icons.length} players)</span>
+            </h3>
+          </div>
+
+          {iconsLoading ? (
+            <div className="flex items-center justify-center py-12 text-[var(--mm-text-muted)]">
+              <Loader size={20} className="animate-spin mr-2" /> Loading ICONs...
+            </div>
+          ) : icons.length === 0 ? (
+            <div className="text-center py-12 text-[var(--mm-text-muted)]">
+              <Crown size={32} className="mx-auto mb-2 opacity-30" />
+              <p className="body">No ICON players found</p>
+              <p className="caption mt-1">Run pool re-validation to compute rarity tiers first.</p>
+            </div>
+          ) : (
+            <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-xl)] overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="border-b border-[var(--border-subtle)]">
+                      <th className="py-3 px-3 caption text-[var(--mm-text-muted)] font-medium">Player</th>
+                      <th className="py-3 px-3 caption text-[var(--mm-text-muted)] font-medium">Tournament</th>
+                      <th className="py-3 px-3 caption text-[var(--mm-text-muted)] font-medium">Position</th>
+                      <th className="py-3 px-3 caption text-[var(--mm-text-muted)] font-medium">Club</th>
+                      <th className="py-3 px-3 caption text-[var(--mm-text-muted)] font-medium">Price</th>
+                      <th className="py-3 px-3 caption text-[var(--mm-text-muted)] font-medium">Rarity</th>
+                      <th className="py-3 px-3 caption text-[var(--mm-text-muted)] font-medium">Eligible</th>
+                      <th className="py-3 px-3 caption text-[var(--mm-text-muted)] font-medium">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {icons.map((p) => {
+                      const isPending = toggleIconMut.isPending && toggleIconMut.variables === p.id
+                      const isIcon = p.rarityTier === 'ICON'
+                      return (
+                        <tr key={p.id} className="border-b border-[var(--border-subtle)] last:border-0 hover:bg-[var(--mm-bg-hover)]/30">
+                          <td className="py-3 px-3">
+                            <div className="flex items-center gap-2">
+                              {p.photoUrl ? (
+                                <img src={p.photoUrl} alt="" className="w-7 h-7 rounded-full object-cover" />
+                              ) : (
+                                <div className="w-7 h-7 rounded-full bg-[var(--mm-bg-tertiary)] flex items-center justify-center text-xs font-bold text-[var(--mm-text-muted)]">
+                                  {p.name.charAt(0)}
+                                </div>
+                              )}
+                              <span className="body">{p.name}</span>
+                            </div>
+                          </td>
+                          <td className="py-3 px-3 caption text-[var(--mm-text-secondary)]">{p.tournamentId}</td>
+                          <td className="py-3 px-3">
+                            <span className={`caption px-2 py-0.5 rounded-[var(--radius-sm)] font-medium ${
+                              p.position === 'GK' ? 'bg-blue-500/10 text-blue-400' :
+                              p.position === 'DEF' ? 'bg-green-500/10 text-green-400' :
+                              p.position === 'MID' ? 'bg-amber-500/10 text-amber-400' :
+                              'bg-red-500/10 text-red-400'
+                            }`}>{p.position}</span>
+                          </td>
+                          <td className="py-3 px-3 body text-[var(--mm-text-secondary)]">{p.club}</td>
+                          <td className="py-3 px-3 body text-[var(--mm-accent-amber)]">${p.basePrice}</td>
+                          <td className="py-3 px-3">
+                            <span className="caption font-bold" style={{ color: (RARITY_COLORS as Record<string, string>)[p.rarityTier] || '#fff' }}>
+                              {p.rarityTier}
+                            </span>
+                          </td>
+                          <td className="py-3 px-3">
+                            {p.isEligibleForIcon ? (
+                              <span className="caption bg-[var(--mm-accent-green)]/10 text-[var(--mm-accent-green)] px-2 py-0.5 rounded-[var(--radius-sm)] font-medium">Yes</span>
+                            ) : (
+                              <span className="caption bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-muted)] px-2 py-0.5 rounded-[var(--radius-sm)]">No</span>
+                            )}
+                          </td>
+                          <td className="py-3 px-3">
+                            <button
+                              onClick={() => handleIconToggle(p.id)}
+                              disabled={isPending}
+                              className={`flex items-center gap-1 px-3 py-1.5 caption font-semibold rounded-[var(--radius-sm)] transition-all ${
+                                isPending ? 'opacity-50 cursor-not-allowed' :
+                                p.isEligibleForIcon
+                                  ? 'bg-[var(--mm-accent-red)]/10 text-[var(--mm-accent-red)] hover:bg-[var(--mm-accent-red)]/20'
+                                  : 'bg-[var(--mm-accent-purple)]/10 text-[var(--mm-accent-purple)] hover:bg-[var(--mm-accent-purple)]/20'
+                              }`}
+                            >
+                              {isPending ? (
+                                <Loader size={12} className="animate-spin" />
+                              ) : p.isEligibleForIcon ? (
+                                <>Demote</>
+                              ) : (
+                                <>Promote</>
+                              )}
+                            </button>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
+
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('overview')
   const [userSearch, setUserSearch] = useState('')
   const [userPage, setUserPage] = useState(1)
   const [reportStatus, setReportStatus] = useState('pending')
   const [matchStatus, setMatchStatus] = useState('')
-  const [editingMatch, setEditingMatch] = useState(null) // { id, homeScore, awayScore, status } | null
-  const [detailUserId, setDetailUserId] = useState(null)
+  const [editingMatch, setEditingMatch] = useState<{
+    id: string
+    homeScore: number | null
+    awayScore: number | null
+    status: string
+  } | null>(null)
+  const [detailUserId, setDetailUserId] = useState<string | null>(null)
 
   // Escape key closes the user detail modal
   React.useEffect(() => {
     if (!detailUserId) return
-    const handleKey = (e) => { if (e.key === 'Escape') setDetailUserId(null) }
+    const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setDetailUserId(null) }
     document.body.style.overflow = 'hidden'
     window.addEventListener('keydown', handleKey)
     return () => {
@@ -61,9 +363,9 @@ export default function AdminPage() {
   }, [detailUserId])
 
   const { data: adminStatsData } = useAdminStats()
-  const { data: adminUsersData, isLoading: usersLoading } = useAdminUsers({ search: userSearch, page: userPage })
-  const { data: adminMatchesData, isLoading: matchesLoading } = useAdminMatches({ status: matchStatus })
-  const { data: adminReportsData, isLoading: reportsLoading } = useAdminReports({ status: reportStatus })
+  const { data: adminUsersData, isLoading: usersLoading } = useAdminUsers()
+  const { data: adminMatchesData, isLoading: matchesLoading } = useAdminMatches()
+  const { data: adminReportsData, isLoading: reportsLoading } = useAdminReports()
   const { data: adminSettingsData } = useAdminSettings()
   const { data: activityLogData, isLoading: activityLoading } = useAdminActivityLog()
 
@@ -71,7 +373,7 @@ export default function AdminPage() {
   const deleteUserMut = useDeleteUser()
   const updateReportMut = useUpdateReport()
   const updateMatchMut = useUpdateMatch()
-  const { data: userDetailData, isLoading: userDetailLoading } = useAdminUserDetail(detailUserId)
+  const { data: userDetailData, isLoading: userDetailLoading } = useAdminUserDetail(detailUserId || undefined)
 
   const users = adminUsersData?.users || []
   const usersTotal = adminUsersData?.total || 0
@@ -433,16 +735,16 @@ export default function AdminPage() {
                                 <input
                                   type="number" min="0" max="99"
                                   className="w-10 h-8 bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-primary)] body text-center rounded-[var(--radius-sm)] border border-[var(--border-subtle)] focus:border-[var(--border-focus)] focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                                  value={editingMatch.homeScore ?? ''}
-                                  onChange={(e) => setEditingMatch(prev => ({ ...prev, homeScore: e.target.value === '' ? null : Number(e.target.value) }))}
+                                  value={editingMatch!.homeScore ?? ''}
+                                  onChange={(e) => setEditingMatch({ ...editingMatch!, homeScore: e.target.value === '' ? null : Number(e.target.value) })}
                                   placeholder="—"
                                 />
                                 <span className="text-[var(--mm-text-muted)]">—</span>
                                 <input
                                   type="number" min="0" max="99"
                                   className="w-10 h-8 bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-primary)] body text-center rounded-[var(--radius-sm)] border border-[var(--border-subtle)] focus:border-[var(--border-focus)] focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                                  value={editingMatch.awayScore ?? ''}
-                                  onChange={(e) => setEditingMatch(prev => ({ ...prev, awayScore: e.target.value === '' ? null : Number(e.target.value) }))}
+                                  value={editingMatch!.awayScore ?? ''}
+                                  onChange={(e) => setEditingMatch({ ...editingMatch!, awayScore: e.target.value === '' ? null : Number(e.target.value) })}
                                   placeholder="—"
                                 />
                               </div>
@@ -459,8 +761,8 @@ export default function AdminPage() {
                             {isEditing ? (
                               <select
                                 className="bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-primary)] body rounded-[var(--radius-sm)] border border-[var(--border-subtle)] focus:border-[var(--border-focus)] focus:outline-none px-2 py-1.5"
-                                value={editingMatch.status}
-                                onChange={(e) => setEditingMatch(prev => ({ ...prev, status: e.target.value }))}
+                                value={editingMatch!.status}
+                                onChange={(e) => setEditingMatch({ ...editingMatch!, status: e.target.value })}
                               >
                                 {['SCHEDULED', 'LIVE', 'HALFTIME', 'FINISHED', 'POSTPONED', 'CANCELLED'].map((s) => (
                                   <option key={s} value={s}>{s}</option>
@@ -488,9 +790,9 @@ export default function AdminPage() {
                                     onClick={() => {
                                       updateMatchMut.mutate({
                                         id: m.id,
-                                        homeScore: editingMatch.homeScore,
-                                        awayScore: editingMatch.awayScore,
-                                        status: editingMatch.status,
+                                        homeScore: editingMatch!.homeScore,
+                                        awayScore: editingMatch!.awayScore,
+                                        status: editingMatch!.status,
                                       })
                                       setEditingMatch(null)
                                     }}
@@ -558,7 +860,7 @@ export default function AdminPage() {
             ) : (
               <div className="space-y-1">
                 {logs.map((log) => {
-                  const actionConfig = {
+                  const actionConfig: Record<string, { icon: typeof Activity; color: string; bg: string; label: string }> = {
                     USER_DELETED: { icon: UserX, color: 'text-[var(--mm-accent-red)]', bg: 'bg-[var(--mm-accent-red)]/10', label: 'User Deleted' },
                     PRO_TOGGLED: { icon: Repeat, color: 'text-[var(--mm-accent-purple)]', bg: 'bg-[var(--mm-accent-purple)]/10', label: 'Pro Toggled' },
                     REPORT_RESOLVED: { icon: CheckCheck, color: 'text-[var(--mm-accent-green)]', bg: 'bg-[var(--mm-accent-green)]/10', label: 'Report Resolved' },
@@ -629,6 +931,9 @@ export default function AdminPage() {
             )}
           </div>
         )}
+
+        {/* Draft Mode Tab */}
+        {activeTab === 'draft' && <AdminDraftModeTab />}
       </div>
 
       {/* User Detail Modal */}

@@ -1,17 +1,17 @@
 # JSON DB ↔ PostgreSQL Migration Strategy
 
-> **Document purpose:** Provide a battle-tested strategy for migrating between AuctionXI's production JSON database and PostgreSQL (or any other SQL database) in either direction. This covers both one-time bulk migrations and incremental adoption via the repository layer.
+> **Document purpose:** Provide a battle-tested strategy for migrating between MatchMind's production JSON database and PostgreSQL (or any other SQL database) in either direction. This covers both one-time bulk migrations and incremental adoption via the repository layer.
 
 ---
 
 ## 1. Context: Two Storage Backends
 
-AuctionXI supports **two database backends** with identical APIs:
+MatchMind supports **two database backends** with identical APIs:
 
 | Backend | Use Case | Location |
 |---------|----------|----------|
-| **JSON DB** (production) | Default for dev, recommended for production up to ~10k concurrent users | `backend/src/lib/jsonDb.ts` → `backend/src/data/*.json` |
-| **PostgreSQL** | Suitable for production at any scale; required for Kubernetes / multi-instance deployments | `docker-compose.yml` (optional) + Prisma schema (reference only) |
+| **JSON DB** (production) | Default for all environments, production database | `backend/src/lib/jsonDb.ts` → `backend/src/data/*.json` |
+| **PostgreSQL** | Suitable for production at scale; required for Kubernetes / multi-instance deployments | `docker-compose.yml` (optional) + Prisma schema (reference only) |
 
 **Key insight:** Both backends implement the same Prisma-compatible query API. The repository layer (`backend/src/repositories/index.ts`) abstracts over whichever backend is active. Routes and services never import a database driver directly — they go through repositories.
 
@@ -43,7 +43,9 @@ AuctionXI supports **two database backends** with identical APIs:
   └───────────────┘        └───────────────┘
 ```
 
-The JSON DB Proxy intercepts calls like `prisma.user.findUnique()` and maps them to in-memory arrays backed by JSON files. PostgreSQL uses Prisma to map the same calls to SQL tables.
+The JSON DB Proxy intercepts calls like `prisma.user.findUnique()` and maps them to in-memory arrays backed by JSON files. PostgreSQL would use Prisma to map the same calls to SQL tables.
+
+> **Current status:** JSON DB is the production database. No PostgreSQL instance is running. The migration path below is prepared but not yet executed.
 
 ---
 
@@ -207,7 +209,7 @@ This produces a `seed.json` that can be loaded via `prisma.initialize(seedData)`
 
 ## 5. Schema Mapping
 
-The JSON DB stores data as arrays of objects in JSON files. PostgreSQL stores the same data as relational tables.
+The JSON DB stores data as arrays of objects in JSON files. PostgreSQL would store the same data as relational tables.
 
 ### 5.1 Field Type Translation
 
@@ -237,11 +239,13 @@ The JSON DB stores data as arrays of objects in JSON files. PostgreSQL stores th
 
 1. **ID format:** JSON DB uses 24-char hex `cuid()` strings. PostgreSQL can store these as `TEXT` or convert to `UUID`. Use `TEXT` to avoid migration friction; convert to `UUID` if desired after migration.
 
-2. **Date handling:** JSON DB stores dates as ISO 8601 strings (`"2026-07-03T10:15:31.672Z"`). Prisma's `DateTime` type expects `Date` objects. The migration script handles this conversion automatically.
+2. **Date handling:** JSON DB stores dates as ISO 8601 strings (`"2026-07-03T10:15:31.672Z"`). Prisma's `DateTime` type expects `Date` objects. A migration script would handle this conversion automatically.
 
 3. **JSON fields:** Fields like `rosterRules`, `bidIncrementRule`, `poolQueue`, `unsoldPlayerIds`, `pointsBreakdown` are stored as `JSONB` in PostgreSQL. Query them with `->>` and `#>>` operators.
 
-4. **Enum fields:** Fields like `status`, `phase`, `role`, `tier`, `gender`, `format` are stored as strings in JSON DB. In PostgreSQL, these became `VARCHAR` — not native enums — to maintain flexibility as the data evolves.
+4. **Enum fields:** Fields like `status`, `phase`, `role`, `tier`, `gender`, `format` are stored as strings in JSON DB. In PostgreSQL, these become `VARCHAR` — not native enums — to maintain flexibility as the data evolves.
+
+> **Note on current data model:** The MatchMind JSON DB includes 25 data files spanning tournaments, auctions, social features, and admin logs. The schema has evolved beyond the original AuctionXI model — any migration to PostgreSQL should audit these files and generate a fresh Prisma schema from the actual JSON file structures.
 
 ---
 
@@ -461,7 +465,29 @@ node scripts/migrate-json-to-postgres.js --dry-run --verbose
 
 ---
 
-## 10. Troubleshooting
+## 10. Current Migration Status
+
+As of the latest codebase state:
+
+| Item | Status |
+|------|--------|
+| **JSON DB** | ✅ **Production database** — 25 model files, fully operational |
+| **PostgreSQL** | ❌ Not running — no Prisma schema maintained |
+| **Migration scripts** | ⚠️ Referenced but **not present** in the codebase |
+| **Repository layer** | ✅ Present (`backend/src/repositories/index.ts`) — abstracts JSON DB |
+| **docker-compose.yml** | ❌ Runs app container only (no PostgreSQL service defined) |
+
+### What would be needed for PostgreSQL migration
+
+1. Generate a Prisma schema from the current JSON data model structure (25 files)
+2. Create migration scripts matching the current data shapes
+3. Add PostgreSQL service to docker-compose.yml
+4. Update the repository layer to support a Prisma-backed implementation
+5. Test thoroughly before switching
+
+---
+
+## 11. Troubleshooting
 
 ### Common Migration Issues
 

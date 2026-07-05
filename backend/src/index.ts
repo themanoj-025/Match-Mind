@@ -117,11 +117,6 @@ app.use(helmet({
 // ─── Rate limiters applied before routes ────────────────────────────
 app.use(globalLimiter)
 
-// ─── CSRF protection (double-submit cookie pattern) ────────────────
-import { csrfProtection } from './middleware/csrf'
-// Apply CSRF protection globally — it skips Bearer token requests and read-only methods
-app.use(csrfProtection)
-
 const httpServer = createServer(app)
 const io = new Server(httpServer, {
   cors: {
@@ -145,6 +140,13 @@ app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }))
 app.use(express.json())
 app.use(cookieParser())
 app.use(passport.initialize())
+
+// ─── CSRF protection (double-submit cookie pattern) ────────────────
+// Applied AFTER cookieParser so req.cookies is available.
+// Skips GET/HEAD/OPTIONS and Bearer token requests automatically.
+// Stripe webhook is exempted via path check inside the middleware.
+import { csrfProtection } from './middleware/csrf'
+app.use(csrfProtection)
 
 // Make prisma accessible
 app.set('prisma', prisma)

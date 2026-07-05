@@ -87,6 +87,11 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction):
     return next()
   }
 
+  // ─── Skip server-to-server webhooks (Stripe) ────────────
+  if (req.path === '/api/stripe/webhook') {
+    return next()
+  }
+
   // ─── Skip API clients using Bearer token ────────────────
   const authHeader = req.headers['authorization']
   if (authHeader && authHeader.startsWith('Bearer ')) {

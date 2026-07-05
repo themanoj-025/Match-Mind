@@ -96,8 +96,9 @@ MatchMind attempts to solve all of these in a single platform.
 
 | Category | Status | Details |
 |----------|--------|---------|
-| **TypeScript Migration** | ✅ **Complete** | All 40+ backend source files converted to `.ts` — routes, middleware, services, workers, socket, workflows, JSON DB, Sentry instrumentation |
-| **Test Coverage** | ✅ **81 Tests Passing** | 4 test files: scoring (47 tests), auth (14 tests), predictions (11 tests), API hooks (9 tests) |
+| **TypeScript Migration** | ✅ **Complete** | Backend: all 40+ source files converted to `.ts`. **Frontend: all 55+ source files now `.ts`/`.tsx`** — pages, components, hooks, store, lib, animation utilities |
+| **CSRF Protection** | ✅ **Implemented** | Double-submit cookie pattern, constant-time comparison, Stripe webhook exemption, Bearer token skip |
+| **Test Coverage** | ✅ **~200+ Tests Passing** | Backend: scoring (47 tests), auth (14 tests), predictions (11 tests), rooms (5 tests), auction engine (18 tests), JSON DB atomic writes (25 tests), leaderboard (3 tests), plus e2e lifecycle tests. Frontend: API hooks (11 tests) |
 | **Repository Pattern** | ✅ **Implemented** | 6 typed repository interfaces with factory pattern, fully adopted |
 | **Service Layer** | ✅ **Extracted** | AuthService, AdminService, TokenService, scoring engine all in TypeScript |
 | **Structured Logging** | ✅ **Pino** | Event-based logging with redaction, levels, pretty-printing, pino-http replaces Morgan |
@@ -151,8 +152,8 @@ See [Project Roadmap](#31-project-roadmap).
 | Language | Where |
 |----------|-------|
 | **TypeScript (ESM)** | **Backend: ALL source files** — routes, middleware, services, workers, socket, workflows, utils, config, lib, repositories (40+ files migrated from .js to .ts) |
-| JavaScript (ESM + JSX) | Frontend (React) — some pages migrating to TSX |
-| TypeScript | Frontend: store/, hooks/, lib/, pages/*.tsx |
+| TypeScript (TSX) | **Frontend: 100% TypeScript** — all pages, components, hooks, store, lib files are `.tsx`/`.ts` |
+| TypeScript | Backend: 100% TypeScript — all routes, middleware, services, workers, socket, workflows, utils, config, lib, repositories |
 | CSS | Frontend (custom design system + kinetic.css) |
 | JSON | Seed data in `backend/src/data/*.json` (25 files)
 | YAML | GitHub Actions workflows, Docker Compose |
@@ -179,7 +180,7 @@ See [Dependencies](#24-dependencies) for complete listing.
 | **Supabase** | — | Not implemented — JSON DB is production-ready |
 
 > ⚠️ **Note:** Several services listed in the README (`SportRadar API`, `Cloudinary`, `PostHog`, `Cloudflare`, `Supabase`) have associated environment variables in `.env.example` but have **no implementation in the codebase**. They appear to be planned integrations that were not completed or were removed during development.
-> ✅ **Sentry IS now implemented** — both backend (`backend/instrument.js`) and frontend (`frontend/src/lib/instrument.js`) are configured.
+> ✅ **Sentry IS now implemented** — both backend (`backend/instrument.ts`) and frontend (`frontend/src/lib/instrument.ts`) are configured.
 
 ---
 
@@ -190,61 +191,39 @@ See [Dependencies](#24-dependencies) for complete listing.
 | **Total Files** | ~140+ (source + config + docs + data) |
 | **Total Directories** | ~35+ |
 | **Backend Source Files** | ~40 files (all TypeScript) |
-| **Frontend Source Files** | ~55 files (36 pages, 25 components, TS mix) |
+| **Frontend Source Files** | ~70 files (44 pages, 48 components, 100% TypeScript) |
 | **Route Files** | 15 (backend, all .ts) |
 | **Middleware Files** | 6 (backend, all .ts) |
 | **Configuration Files** | ~20 |
 | **Documentation Files** | 8 |
-| **Test Files** | 4 (auth.test.ts, predictions.test.ts, scoring.test.ts, useApi.test.ts) |
+| **Test Files** | 10+ (scoring, auth, predictions, rooms, auction engine, JSON DB atomic writes, leaderboard, e2e room lifecycle, e2e auction lifecycle, useApi, fantasy points) |
 | **JSON Data Files** | 25 (seed data for JSON database) |
 | **CI/CD Workflow Files** | 7 (GitHub Actions) |
-| **Script Files** | 4 (backend seed scripts + generate-seed-json) |
+| **Script Files** | 3 (backend: assignPlayerPhotos, validateLeagueDataPackage, backup-data) |
 
 ### Largest Modules (by file count)
 
 | Module | File Count | Description |
 |--------|------------|-------------|
-| Frontend Pages | 36 | Page-level components |
-| Frontend Components | 25 | Reusable UI components (incl. 4 kinetic) |
-| Backend Routes | 15 | API route handlers |
-| JSON Data Files | 25 | Seed data for JSON database |
+| Frontend Pages | 44 | Page-level components (.tsx) |
+| Frontend Components | 48 | Reusable UI components (.tsx, incl. kinetic + three) |
+| Backend Routes | 16 | API route handlers (.ts) |
 | JSON Data Files | 25 | Database collections (JSON files in `backend/src/data/`) |
-| Enums | 10 | Database enum types |
+| Backend Middleware | 10 | Express middleware files (.ts) |
+| Backend Services | 8 | Business logic services (.ts) |
 
 ### Largest Files
 
 | File | Size (est.) | Description |
 |------|-------------|-------------|
-| `frontend/src/App.jsx` | ~200 lines | Root component with 36+ route definitions |
+| `frontend/src/App.tsx` | ~200 lines | Root component with 44+ route definitions |
 | `backend/src/services/scoring.ts` | ~300 lines | Core scoring engine |
 | `backend/src/lib/jsonDb.ts` | ~450 lines | JSON database adapter (Prisma-API-compatible, production database) |
 | `backend/src/services/simulation/simulationEngine.ts` | ~250 lines | Match simulation engine |
 | `backend/src/routes/admin.ts` | ~250 lines | Admin API routes |
 | `backend/src/routes/stripe.ts` | ~230 lines | Stripe webhook + payment routes |
-| `backend/scripts/generate-seed-json.js` | ~300 lines | JSON seed data generator |
+| `backend/scripts/assignPlayerPhotos.ts` | ~200 lines | Player photo URL assignment script |
 | `backend/src/index.ts` | ~220 lines | Server entry point (TypeScript, uses JSON DB) |
-
-### Largest Modules (by file count)
-
-| Module | File Count | Description |
-|--------|------------|-------------|
-| Frontend Pages | 36 | Page-level components |
-| Frontend Components | 20 | Reusable UI components |
-| Backend Routes | 15 | API route handlers |
-| JSON Data Files | 25 | Database collections (JSON files in `backend/src/data/`) |
-| Enums | 10 | Database enum types |
-
-### Largest Files
-
-| File | Size (est.) | Description |
-|------|-------------|-------------|
-| `frontend/src/App.jsx` | ~200 lines | Root component with 36+ route definitions |
-| `backend/src/services/scoring.ts` | ~300 lines | Core scoring engine |
-| `backend/src/services/simulation/simulationEngine.ts` | ~250 lines | Match simulation engine |
-| `backend/src/routes/admin.ts` | ~250 lines | Admin API routes |
-| `backend/src/routes/stripe.ts` | ~230 lines | Stripe webhook + payment routes |
-| `backend/scripts/generate-seed-json.js` | ~300 lines | JSON seed data generator |
-| `backend/src/index.ts` | ~220 lines | Server entry point (TypeScript, JSON DB) |
 
 ---
 
@@ -467,7 +446,7 @@ frontend/
 - **Critical**: Yes — cannot run the project without it
 
 #### `docker-compose.yml`
-- **Purpose**: Production container for the AuctionXI API
+- **Purpose**: Production container for the MatchMind API
 - **Why it exists**: Dockerized deployment option for the backend
 - **Services**: `app` (Express.js API with JSON DB)
 - **Volumes**: `data` (persists JSON data files between restarts)

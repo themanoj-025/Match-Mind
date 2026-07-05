@@ -102,19 +102,39 @@ router.post('/:id/finalize', authenticateToken, requireAdmin, asyncHandler(async
     where: { tournamentId: (await prisma.fixture.findUnique({ where: { id: req.params.id } }))?.tournamentId },
   })
 
+  // ─── Batch-load all players referenced in stats ───────────────
+  const playerIds = [...new Set(stats.map((s: any) => s.playerId))]
+  const allPlayers = await prisma.player.findMany({
+    where: { id: { in: playerIds } },
+    select: { id: true, position: true, name: true },
+  })
+  const playerMap = new Map(allPlayers.map((p: any) => [p.id, p]))
+
+  // ─── Batch-load all rosters for all rooms ────────────────────
+  const roomIds = rooms.map((r: any) => r.id)
+  const allRosters = await prisma.roster.findMany({
+    where: { roomId: { in: roomIds } },
+  })
+  const rostersByRoom = new Map<string, any[]>()
+  for (const roster of allRosters) {
+    const existing = rostersByRoom.get(roster.roomId) || []
+    existing.push(roster)
+    rostersByRoom.set(roster.roomId, existing)
+  }
+
+  // ─── Build player stats map (in-memory, no per-stat DB queries) ─
+  const playerStatsMap: Record<string, any> = {}
+  for (const stat of stats) {
+    const player = playerMap.get(stat.playerId)
+    if (player) {
+      playerStatsMap[stat.playerId] = { stats: stat, position: player.position }
+    }
+  }
+
   let totalEntries = 0
   for (const room of rooms) {
-    const rosters = await prisma.roster.findMany({ where: { roomId: room.id } })
+    const rosters = rostersByRoom.get(room.id) || []
     if (rosters.length === 0) continue
-
-    // Build player stats map
-    const playerStatsMap: Record<string, any> = {}
-    for (const stat of stats) {
-      const player = await prisma.player.findUnique({ where: { id: stat.playerId } })
-      if (player) {
-        playerStatsMap[stat.playerId] = { stats: stat, position: player.position }
-      }
-    }
 
     const fixtureId = req.params.id as string
     const results = await computeFantasyPoints(

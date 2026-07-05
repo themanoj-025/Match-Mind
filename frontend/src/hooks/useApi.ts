@@ -308,19 +308,48 @@ export function useMarkNotificationsRead() {
   })
 }
 
+// ─── Admin API response shapes ────────────────────────────
+interface AdminUsersResponse {
+  users: any[]
+  total: number
+  totalPages: number
+}
+
+interface AdminReportResponse {
+  reports: any[]
+}
+
+interface AdminMatchResponse {
+  matches: any[]
+  total: number
+}
+
+interface AdminSettingsResponse {
+  settings: any[]
+}
+
+interface AdminActivityLogResponse {
+  logs: AdminLogEntry[]
+  total: number
+}
+
+interface AdminUserDetailResponse {
+  user: any
+}
+
 // ─── Admin page stubs (legacy MatchMind admin) ────────────
 export function useAdminReports(_opts?: { status?: string }) {
-  return useQuery({
+  return useQuery<AdminReportResponse>({
     queryKey: ['admin', 'reports', _opts?.status],
-    queryFn: () => fetchJSON('/api/admin/reports'),
+    queryFn: () => fetchJSON<AdminReportResponse>('/api/admin/reports'),
     enabled: false,
   })
 }
 
 export function useAdminMatches(_opts?: { status?: string }) {
-  return useQuery({
+  return useQuery<AdminMatchResponse>({
     queryKey: ['admin', 'matches', _opts?.status],
-    queryFn: () => fetchJSON('/api/admin/matches'),
+    queryFn: () => fetchJSON<AdminMatchResponse>('/api/admin/matches'),
     enabled: false,
   })
 }
@@ -499,26 +528,26 @@ export function useAdminStats() {
 }
 
 export function useAdminUsers() {
-  return useQuery({
+  return useQuery<AdminUsersResponse>({
     queryKey: keys.adminUsers(),
-    queryFn: () => fetchJSON('/api/admin/users', { headers: authedHeaders() }),
+    queryFn: () => fetchJSON<AdminUsersResponse>('/api/admin/users', { headers: authedHeaders() }),
     staleTime: 15000,
   })
 }
 
 export function useAdminActivityLog() {
-  return useQuery<AdminLogEntry[]>({
+  return useQuery<AdminActivityLogResponse>({
     queryKey: ['admin', 'activity-log'],
-    queryFn: () => fetchJSON<AdminLogEntry[]>('/api/admin/activity-log', { headers: authedHeaders() }),
+    queryFn: () => fetchJSON<AdminActivityLogResponse>('/api/admin/activity-log', { headers: authedHeaders() }),
     staleTime: 10000,
     refetchInterval: 30000,
   })
 }
 
 export function useAdminSettings() {
-  return useQuery({
+  return useQuery<AdminSettingsResponse>({
     queryKey: keys.adminSettings(),
-    queryFn: () => fetchJSON('/api/admin/settings', { headers: authedHeaders() }),
+    queryFn: () => fetchJSON<AdminSettingsResponse>('/api/admin/settings', { headers: authedHeaders() }),
     staleTime: 60000,
   })
 }
@@ -554,9 +583,9 @@ export function useDeleteUser() {
 }
 
 export function useAdminUserDetail(id?: string) {
-  return useQuery({
+  return useQuery<AdminUserDetailResponse>({
     queryKey: ['admin', 'users', id],
-    queryFn: () => fetchJSON(`/api/admin/users/${id}`, { headers: authedHeaders() }),
+    queryFn: () => fetchJSON<AdminUserDetailResponse>(`/api/admin/users/${id}`, { headers: authedHeaders() }),
     enabled: !!id,
     staleTime: 15000,
   })
