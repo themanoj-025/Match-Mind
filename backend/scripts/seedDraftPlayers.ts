@@ -158,9 +158,10 @@ const WC_PLAYERS: PlayerTemplate[] = [
   // ── FWD (44) ──
   { name: 'Kylian Mbappé', club: 'Real Madrid', nationality: 'FR', position: 'FWD', basePrice: 85, isEligibleForIcon: true },
   { name: 'Erling Haaland', club: 'Manchester City', nationality: 'NO', position: 'FWD', basePrice: 90, isEligibleForIcon: true },
-  { name: 'Vinícius Jr.', club: 'Real Madrid', nationality: 'BR', position: 'FWD', basePrice: 75 },
-  { name: 'Bukayo Saka', club: 'Arsenal', nationality: 'GB', position: 'FWD', basePrice: 65 },
-  { name: 'Lamine Yamal', club: 'Barcelona', nationality: 'ES', position: 'FWD', basePrice: 70 },
+  { name: 'Vinícius Jr.', club: 'Real Madrid', nationality: 'BR', position: 'FWD', basePrice: 75, isEligibleForIcon: true },
+  { name: 'Bukayo Saka', club: 'Arsenal', nationality: 'GB', position: 'FWD', basePrice: 65, isEligibleForIcon: true },
+  { name: 'Lamine Yamal', club: 'Barcelona', nationality: 'ES', position: 'FWD', basePrice: 70, isEligibleForIcon: true },
+
   { name: 'Antoine Griezmann', club: 'Atlético Madrid', nationality: 'FR', position: 'FWD', basePrice: 50 },
   { name: 'Rodrygo', club: 'Real Madrid', nationality: 'BR', position: 'FWD', basePrice: 55 },
   { name: 'Harry Kane', club: 'Bayern Munich', nationality: 'GB', position: 'FWD', basePrice: 58 },
@@ -329,9 +330,9 @@ const UCL_PLAYERS: PlayerTemplate[] = [
   // ── FWD (44) ──
   { name: 'Kylian Mbappé', club: 'Real Madrid', nationality: 'FR', position: 'FWD', basePrice: 92, isEligibleForIcon: true },
   { name: 'Erling Haaland', club: 'Manchester City', nationality: 'NO', position: 'FWD', basePrice: 95, isEligibleForIcon: true },
-  { name: 'Vinícius Jr.', club: 'Real Madrid', nationality: 'BR', position: 'FWD', basePrice: 80 },
-  { name: 'Harry Kane', club: 'Bayern Munich', nationality: 'GB', position: 'FWD', basePrice: 82 },
-  { name: 'Lamine Yamal', club: 'Barcelona', nationality: 'ES', position: 'FWD', basePrice: 78 },
+  { name: 'Vinícius Jr.', club: 'Real Madrid', nationality: 'BR', position: 'FWD', basePrice: 80, isEligibleForIcon: true },
+  { name: 'Harry Kane', club: 'Bayern Munich', nationality: 'GB', position: 'FWD', basePrice: 82, isEligibleForIcon: true },
+  { name: 'Lamine Yamal', club: 'Barcelona', nationality: 'ES', position: 'FWD', basePrice: 78, isEligibleForIcon: true },
   { name: 'Mohamed Salah', club: 'Liverpool', nationality: 'EG', position: 'FWD', basePrice: 62 },
   { name: 'Bukayo Saka', club: 'Arsenal', nationality: 'GB', position: 'FWD', basePrice: 66 },
   { name: 'Ousmane Dembélé', club: 'Paris Saint-Germain', nationality: 'FR', position: 'FWD', basePrice: 50 },

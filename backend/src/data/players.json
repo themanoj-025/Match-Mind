@@ -1070,7 +1070,8 @@
     "club": "Real Madrid",
     "nationality": "BR",
     "position": "FWD",
-    "basePrice": 75
+    "basePrice": 75,
+    "isEligibleForIcon": true
   },
   {
     "id": "player-120",
@@ -1079,7 +1080,8 @@
     "club": "Arsenal",
     "nationality": "GB",
     "position": "FWD",
-    "basePrice": 65
+    "basePrice": 65,
+    "isEligibleForIcon": true
   },
   {
     "id": "player-121",
@@ -1088,7 +1090,8 @@
     "club": "Barcelona",
     "nationality": "ES",
     "position": "FWD",
-    "basePrice": 70
+    "basePrice": 70,
+    "isEligibleForIcon": true
   },
   {
     "id": "player-122",
@@ -2513,7 +2516,8 @@
     "club": "Real Madrid",
     "nationality": "BR",
     "position": "FWD",
-    "basePrice": 80
+    "basePrice": 80,
+    "isEligibleForIcon": true
   },
   {
     "id": "player-280",
@@ -2522,7 +2526,8 @@
     "club": "Bayern Munich",
     "nationality": "GB",
     "position": "FWD",
-    "basePrice": 82
+    "basePrice": 82,
+    "isEligibleForIcon": true
   },
   {
     "id": "player-281",
@@ -2531,7 +2536,8 @@
     "club": "Barcelona",
     "nationality": "ES",
     "position": "FWD",
-    "basePrice": 78
+    "basePrice": 78,
+    "isEligibleForIcon": true
   },
   {
     "id": "player-282",

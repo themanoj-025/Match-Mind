@@ -76,10 +76,12 @@ function assignRaritiesForTournament(
     const player = sorted[i]
     const percentile = ((i + 1) / total) * 100
 
-    // Find the rarity tier for this percentile
+    // Convert to bottom-up percentile: rank 1 (highest price, percentile=0.625)
+    // becomes bottomPct=99.375, correctly matching ICON (97-100).
+    const bottomPct = 100 - percentile
     let assignedTier = 'BRONZE'
     for (const tier of RARITY_TIERS) {
-      if (percentile <= tier.maxPercentile) {
+      if (bottomPct <= tier.maxPercentile) {
         assignedTier = tier.tier
         break
       }
