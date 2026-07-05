@@ -154,5 +154,17 @@ export const draftPickSchema = z.object({
   pickedPlayerId: z.string().min(1, 'Player ID is required'),
 }).strict()
 
+// ─── Draft Run — Schemas (§2) ───────────────────────────
+
+export const enterRunSchema = z.object({
+  sessionId: z.string().min(1, 'Draft session ID is required'),
+}).strict()
+
+export const getRunStatusSchema = z.object({
+  sessionId: z.string().min(1, 'Draft session ID is required'),
+}).strict()
+
 export type DraftStartInput = z.infer<typeof draftStartSchema>
 export type DraftPickInput = z.infer<typeof draftPickSchema>
+export type EnterRunInput = z.infer<typeof enterRunSchema>
+export type GetRunStatusInput = z.infer<typeof getRunStatusSchema>

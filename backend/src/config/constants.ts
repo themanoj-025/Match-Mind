@@ -99,3 +99,15 @@ export const DRAFT = {
   TICKET_RESET_DAYS: 7,                // rolling window for free ticket reset
 } as const
 
+// ─── Draft Run — Reward Tiers (§2.4) ────────────────────
+export const RUN_REWARD_TIERS = [
+  { id: 'participant', name: 'Participant', description: 'Entered your first Draft Run', badgeColor: '#6B7280', minWins: 0 },
+  { id: 'bronze-run', name: 'Bronze Contender', description: 'Survived 1 matchday', badgeColor: '#CD7F32', minWins: 1 },
+  { id: 'silver-run', name: 'Silver Challenger', description: 'Survived 2 matchdays', badgeColor: '#C0C0C0', minWins: 2 },
+  { id: 'gold-run', name: 'Gold Warrior', description: 'Survived 3 matchdays', badgeColor: '#FFD700', minWins: 3 },
+  { id: 'elite-run', name: 'Elite Tactician', description: 'Survived 4 matchdays', badgeColor: '#8B5CF6', minWins: 4 },
+  { id: 'icon-run', name: 'Draft Icon 🏆', description: 'Full clear — 5 wins!', badgeColor: 'linear-gradient(135deg,#FFD700,#FFFFFF)', minWins: 5 },
+] as const
+
+export type RunRewardTierId = (typeof RUN_REWARD_TIERS)[number]['id']
+
