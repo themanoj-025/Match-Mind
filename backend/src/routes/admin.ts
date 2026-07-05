@@ -401,4 +401,231 @@ router.post('/settings/draft-mode/:tournamentId/:action', asyncHandler(async (re
   }
 }))
 
+// ─── DRAFT MODE ADMIN — Pool Validation ────────────────────
+
+/**
+ * GET /api/admin/draft/pool-validation
+ * Validates Draft Mode readiness for all tournaments in the registry.
+ * Runs the same validation logic as the CLI script.
+ */
+router.get('/draft/pool-validation', asyncHandler(async (_req: AuthenticatedRequest, res) => {
+  const { TOURNAMENTS } = require('../config/tournaments')
+  const results = TOURNAMENTS.map((t: any) => {
+    const result = validateTournamentDraftPool(t.id)
+    return {
+      tournamentId: t.id,
+      tournamentName: t.name,
+      shortName: t.shortName,
+      status: t.status,
+      iconCount: 0, // populated below
+      ...result,
+      enabled: (process.env.DRAFT_ENABLED_TOURNAMENTS || '').split(',').map((s: string) => s.trim()).filter(Boolean).includes(t.id),
+    }
+  })
+
+  // Enrich with icon counts from player data
+  const fs = require('fs')
+  const path = require('path')
+  const playersPath = path.join(__dirname, '..', 'data', 'players.json')
+  if (fs.existsSync(playersPath)) {
+    const allPlayers = JSON.parse(fs.readFileSync(playersPath, 'utf-8'))
+    for (const r of results) {
+      r.iconCount = allPlayers.filter((p: any) => p.tournamentId === r.tournamentId && p.rarityTier === 'ICON').length
+      r.playerCount = allPlayers.filter((p: any) => p.tournamentId === r.tournamentId).length
+    }
+  }
+
+  res.json({ tournaments: results })
+}))
+
+// ─── DRAFT MODE ADMIN — ICON Management ────────────────────
+
+/**
+ * GET /api/admin/draft/icons
+ * Lists all ICON-rarity players across all tournaments.
+ */
+router.get('/draft/icons', asyncHandler(async (_req: AuthenticatedRequest, res) => {
+  const prisma = (await import('../lib/jsonDb')).default || _req.app.get('prisma')
+  // Fall back to reading players.json directly
+  const fs = require('fs')
+  const path = require('path')
+  const playersPath = path.join(__dirname, '..', 'data', 'players.json')
+  if (!fs.existsSync(playersPath)) {
+    return res.json({ players: [] })
+  }
+  const allPlayers = JSON.parse(fs.readFileSync(playersPath, 'utf-8'))
+  const icons = allPlayers
+    .filter((p: any) => p.rarityTier === 'ICON' || p.isEligibleForIcon)
+    .map((p: any) => ({
+      id: p.id,
+      name: p.name,
+      tournamentId: p.tournamentId,
+      position: p.position,
+      club: p.club,
+      nationality: p.nationality,
+      basePrice: p.basePrice,
+      rarityTier: p.rarityTier || 'BRONZE',
+      isEligibleForIcon: p.isEligibleForIcon || false,
+      photoUrl: p.photoUrl,
+    }))
+    .sort((a: any, b: any) => a.tournamentId.localeCompare(b.tournamentId) || b.basePrice - a.basePrice)
+
+  res.json({ players: icons })
+}))
+
+/**
+ * POST /api/admin/draft/icons/:playerId/toggle
+ * Toggle the isEligibleForIcon flag on a player.
+ * After toggling, rarity tiers must be recomputed via revalidate.
+ */
+router.post('/draft/icons/:playerId/toggle', asyncHandler(async (req: AuthenticatedRequest, res) => {
+  const fs = require('fs')
+  const path = require('path')
+  const playersPath = path.join(__dirname, '..', 'data', 'players.json')
+
+  if (!fs.existsSync(playersPath)) {
+    return res.status(404).json({ error: { code: 'PLAYERS_NOT_FOUND', message: 'players.json not found' } })
+  }
+
+  const allPlayers = JSON.parse(fs.readFileSync(playersPath, 'utf-8'))
+  const playerIndex = allPlayers.findIndex((p: any) => p.id === req.params.playerId)
+
+  if (playerIndex === -1) {
+    return res.status(404).json({ error: { code: 'PLAYER_NOT_FOUND', message: 'Player not found in players.json' } })
+  }
+
+  const player = allPlayers[playerIndex]
+  const newValue = !player.isEligibleForIcon
+
+  allPlayers[playerIndex] = {
+    ...player,
+    isEligibleForIcon: newValue,
+  }
+
+  // Write back atomically
+  const tmpPath = playersPath + '.tmp'
+  fs.writeFileSync(tmpPath, JSON.stringify(allPlayers, null, 2), 'utf-8')
+  fs.renameSync(tmpPath, playersPath)
+
+  getAdminService(req).logAction(req.userId!, 'ICON_ELIGIBILITY_TOGGLED', String(req.params.playerId), 'player', {
+    wasEligible: !newValue,
+    nowEligible: newValue,
+  })
+
+  logger.info({
+    event: 'admin.icon_toggled',
+    adminId: req.userId,
+    playerId: req.params.playerId,
+    playerName: player.name,
+    nowEligible: newValue,
+  })
+
+  res.json({
+    success: true,
+    player: {
+      id: player.id,
+      name: player.name,
+      isEligibleForIcon: newValue,
+    },
+  })
+}))
+
+/**
+ * POST /api/admin/draft/revalidate
+ * Re-validates the pool and re-computes rarity tiers for a single tournament or all.
+ * Calls the same logic as computeRarityTiers.ts then validateDraftPool.ts.
+ */
+router.post('/draft/revalidate', asyncHandler(async (req: AuthenticatedRequest, res) => {
+  const tournamentId = req.body.tournamentId as string | undefined
+
+  // 1. Re-compute rarity tiers
+  const { computeRarityForTournament } = require('../lib/validateDraftPool')
+  const fs = require('fs')
+  const path = require('path')
+  const playersPath = path.join(__dirname, '..', 'data', 'players.json')
+
+  if (!fs.existsSync(playersPath)) {
+    return res.status(404).json({ error: { code: 'PLAYERS_NOT_FOUND', message: 'players.json not found' } })
+  }
+
+  // Read players
+  let allPlayers = JSON.parse(fs.readFileSync(playersPath, 'utf-8'))
+  const tournamentIds = tournamentId
+    ? [tournamentId]
+    : [...new Set(allPlayers.map((p: any) => p.tournamentId))]
+
+  // Re-assign rarity tiers
+  // Sort each tournament's players by basePrice descending, assign BRONZE/SILVER/GOLD/ICON per percentiles
+  const RARITY_TIERS_FN = [
+    { tier: 'BRONZE', maxPercentile: 60 },
+    { tier: 'SILVER', maxPercentile: 85 },
+    { tier: 'GOLD', maxPercentile: 97 },
+    { tier: 'ICON', maxPercentile: 100 },
+  ]
+
+  for (const tid of tournamentIds) {
+    const tournamentPlayers = allPlayers.filter((p: any) => p.tournamentId === tid)
+    if (tournamentPlayers.length === 0) continue
+
+    const sorted = [...tournamentPlayers].sort((a: any, b: any) => b.basePrice - a.basePrice)
+    const total = sorted.length
+
+    // Build a map of { playerId: rarityTier }
+    const rarityMap = new Map<string, string>()
+    for (let i = 0; i < total; i++) {
+      const player = sorted[i]
+      const percentile = ((i + 1) / total) * 100
+      const bottomPct = 100 - percentile
+
+      let assignedTier = 'BRONZE'
+      for (const t of RARITY_TIERS_FN) {
+        if (bottomPct <= t.maxPercentile) {
+          assignedTier = t.tier
+          break
+        }
+      }
+
+      // ICON requires isEligibleForIcon flag
+      if (assignedTier === 'ICON' && !player.isEligibleForIcon) {
+        assignedTier = 'GOLD'
+      }
+
+      rarityMap.set(player.id, assignedTier)
+    }
+
+    // Apply to allPlayers
+    allPlayers = allPlayers.map((p: any) =>
+      p.tournamentId === tid && rarityMap.has(p.id)
+        ? { ...p, rarityTier: rarityMap.get(p.id) }
+        : p,
+    )
+  }
+
+  // Write back atomically
+  const tmpPath = playersPath + '.tmp'
+  fs.writeFileSync(tmpPath, JSON.stringify(allPlayers, null, 2), 'utf-8')
+  fs.renameSync(tmpPath, playersPath)
+
+  // 2. Re-validate
+  const results = tournamentIds.map((tid: string) => {
+    const result = validateTournamentDraftPool(tid)
+    return {
+      tournamentId: tid,
+      ...result,
+    }
+  })
+
+  getAdminService(req).logAction(req.userId!, 'DRAFT_POOL_REVALIDATED', '', 'draft', {
+    tournamentIds,
+    allPassed: results.every((r: any) => r.passed),
+  })
+
+  res.json({
+    success: true,
+    message: `Re-validated ${results.length} tournament(s)`,
+    results,
+    allPassed: results.every((r: any) => r.passed),
+  })
+}))
+
 export default router

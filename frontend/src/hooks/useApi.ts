@@ -561,3 +561,101 @@ export function useAdminUserDetail(id?: string) {
     staleTime: 15000,
   })
 }
+
+// ─── Admin Draft Mode ─────────────────────────────────────
+
+export interface DraftPoolValidation {
+  tournamentId: string
+  tournamentName: string
+  shortName: string
+  status: string
+  passed: boolean
+  enabled: boolean
+  iconCount: number
+  playerCount: number
+  errors: string[]
+  warnings: string[]
+  infos: string[]
+}
+
+export interface DraftPoolValidationResponse {
+  tournaments: DraftPoolValidation[]
+}
+
+export function useAdminDraftPoolValidation() {
+  return useQuery<DraftPoolValidationResponse>({
+    queryKey: ['admin', 'draft', 'pool-validation'],
+    queryFn: () => fetchJSON<DraftPoolValidationResponse>('/api/admin/draft/pool-validation', { headers: authedHeaders() }),
+    staleTime: 30000,
+  })
+}
+
+export interface DraftIconPlayer {
+  id: string
+  name: string
+  tournamentId: string
+  position: string
+  club: string
+  nationality: string
+  basePrice: number
+  rarityTier: string
+  isEligibleForIcon: boolean
+  photoUrl?: string
+}
+
+export interface DraftIconsResponse {
+  players: DraftIconPlayer[]
+}
+
+export function useAdminDraftIcons() {
+  return useQuery<DraftIconsResponse>({
+    queryKey: ['admin', 'draft', 'icons'],
+    queryFn: () => fetchJSON<DraftIconsResponse>('/api/admin/draft/icons', { headers: authedHeaders() }),
+    staleTime: 30000,
+  })
+}
+
+export function useToggleDraftMode() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ tournamentId, action }: { tournamentId: string; action: 'enable' | 'disable' }) =>
+      fetchJSON(`/api/admin/settings/draft-mode/${tournamentId}/${action}`, {
+        method: 'POST',
+        headers: authedHeaders(),
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin', 'draft', 'pool-validation'] })
+      qc.invalidateQueries({ queryKey: ['admin', 'settings'] })
+    },
+  })
+}
+
+export function useToggleIconEligibility() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (playerId: string) =>
+      fetchJSON(`/api/admin/draft/icons/${playerId}/toggle`, {
+        method: 'POST',
+        headers: authedHeaders(),
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin', 'draft', 'icons'] })
+    },
+  })
+}
+
+export function useRevalidateDraftPool() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (tournamentId?: string) =>
+      fetchJSON<{ success: boolean; allPassed: boolean; results: any[] }>('/api/admin/draft/revalidate', {
+        method: 'POST',
+        headers: authedHeaders(),
+        body: tournamentId ? JSON.stringify({ tournamentId }) : undefined,
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin', 'draft', 'pool-validation'] })
+      qc.invalidateQueries({ queryKey: ['admin', 'draft', 'icons'] })
+    },
+  })
+}
