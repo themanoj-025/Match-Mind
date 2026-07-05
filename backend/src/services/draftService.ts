@@ -13,7 +13,6 @@
  * No WebSocket dependency — REST + polling/React Query is sufficient for Draft Mode.
  */
 
-import crypto from 'crypto'
 import { DRAFT, RARITY_TIERS } from '../config/constants'
 import type { RarityTierName } from '../config/constants'
 import logger from '../utils/logger'
@@ -507,42 +506,43 @@ export async function getNextRound(
         },
       })
 
-        // Return next round
-        return getNextRound(prisma, sessionId, userId)
-      }
+      // Return next round
+      return getNextRound(prisma, sessionId, userId)
+    }
 
-      // Timer still running — return existing round
-      const allPlayers_for_existing = await prisma.player.findMany({
-        where: { tournamentId: session.tournamentId },
-      })
+    // Timer still running — return existing round
+    const allPlayersForExisting = await prisma.player.findMany({
+      where: { tournamentId: session.tournamentId },
+    })
 
-      const existingPlayers = pickRecord.offeredPlayerIds.map((pid) => {
-        const p = allPlayers_for_existing.find((ap: any) => ap.id === pid)
-        return p
-          ? {
-              id: p.id,
-              name: p.name,
-              position: p.position,
-              club: p.club,
-              nationality: p.nationality,
-              basePrice: p.basePrice,
-              rarityTier: p.rarityTier || 'BRONZE',
-              photoUrl: p.photoUrl,
-            }
-          : null
-      }).filter(Boolean)
+    const existingPlayers = pickRecord.offeredPlayerIds.map((pid) => {
+      const p = allPlayersForExisting.find((ap: any) => ap.id === pid)
+      return p
+        ? {
+            id: p.id,
+            name: p.name,
+            position: p.position,
+            club: p.club,
+            nationality: p.nationality,
+            basePrice: p.basePrice,
+            rarityTier: p.rarityTier || 'BRONZE',
+            photoUrl: p.photoUrl,
+          }
+        : null
+    }).filter(Boolean)
 
-      return {
-        round: {
-          slotIndex: nextSlot,
-          position: pickRecord.position,
-          playerIds: pickRecord.offeredPlayerIds,
-          players: existingPlayers as ChoiceRound['players'],
-          expiresAt: expiresAt.toISOString(),
-        },
-        session,
-        complete: false,
-      }
+    const newExpiresAt = new Date(expiresAtTime).toISOString()
+
+    return {
+      round: {
+        slotIndex: nextSlot,
+        position: pickRecord.position,
+        playerIds: pickRecord.offeredPlayerIds,
+        players: existingPlayers as ChoiceRound['players'],
+        expiresAt: newExpiresAt,
+      },
+      session,
+      complete: false,
     }
   }
 
