@@ -727,72 +727,316 @@ const UCL_PLAYERS: PlayerTemplate[] = [
   ...UCL_FWD,
 ]
 
+// ─── UEFA Europa League 2026/27 (~30 players) ────────────
+
+const UEL_GK = section([
+  { name: 'Mile Svilar', club: 'Roma', nationality: 'RS', position: 'GK', basePrice: 18 },
+  { name: 'Lucas Chevalier', club: 'Lille', nationality: 'FR', position: 'GK', basePrice: 32 },
+  { name: 'Marco Carnesecchi', club: 'Atalanta', nationality: 'IT', position: 'GK', basePrice: 30 },
+  { name: 'Kevin Trapp', club: 'Eintracht Frankfurt', nationality: 'DE', position: 'GK', basePrice: 28 },
+  { name: 'Pau Lopez', club: 'Marseille', nationality: 'ES', position: 'GK', basePrice: 24 },
+  { name: 'Anatoliy Trubin', club: 'Benfica', nationality: 'UA', position: 'GK', basePrice: 34 },
+])
+
+const UEL_DEF = section([
+  { name: 'Mats Hummels', club: 'Roma', nationality: 'DE', position: 'DEF', basePrice: 24 },
+  { name: 'Mario Hermoso', club: 'Roma', nationality: 'ES', position: 'DEF', basePrice: 18 },
+  { name: 'Benjamin Pavard', club: 'Inter Milan', nationality: 'FR', position: 'DEF', basePrice: 34 },
+  { name: 'Edmond Tapsoba', club: 'Bayer Leverkusen', nationality: 'BF', position: 'DEF', basePrice: 28 },
+  { name: 'Jonathan Tah', club: 'Bayer Leverkusen', nationality: 'DE', position: 'DEF', basePrice: 30 },
+  { name: 'Nico Tagliafico', club: 'Lyon', nationality: 'AR', position: 'DEF', basePrice: 22 },
+  { name: 'Jorrel Hato', club: 'Ajax', nationality: 'NL', position: 'DEF', basePrice: 20 },
+  { name: 'David Hancko', club: 'Feyenoord', nationality: 'SK', position: 'DEF', basePrice: 18 },
+  { name: 'Lukas Klostermann', club: 'RB Leipzig', nationality: 'DE', position: 'DEF', basePrice: 20 },
+  { name: 'Willi Orban', club: 'RB Leipzig', nationality: 'HU', position: 'DEF', basePrice: 28 },
+  { name: 'Milan Skriniar', club: 'Paris Saint-Germain', nationality: 'SK', position: 'DEF', basePrice: 30 },
+  { name: 'Alessandro Buongiorno', club: 'Napoli', nationality: 'IT', position: 'DEF', basePrice: 24 },
+])
+
+const UEL_MID = section([
+  { name: 'Henrikh Mkhitaryan', club: 'Inter Milan', nationality: 'AM', position: 'MID', basePrice: 24 },
+  { name: 'Davide Frattesi', club: 'Inter Milan', nationality: 'IT', position: 'MID', basePrice: 28 },
+  { name: 'Granit Xhaka', club: 'Bayer Leverkusen', nationality: 'CH', position: 'MID', basePrice: 26 },
+  { name: 'Exequiel Palacios', club: 'Bayer Leverkusen', nationality: 'AR', position: 'MID', basePrice: 26 },
+  { name: 'Julian Brandt', club: 'Borussia Dortmund', nationality: 'DE', position: 'MID', basePrice: 28 },
+  { name: 'Marcel Sabitzer', club: 'Borussia Dortmund', nationality: 'AT', position: 'MID', basePrice: 24 },
+  { name: 'Scott McTominay', club: 'Napoli', nationality: 'GB', position: 'MID', basePrice: 20 },
+  { name: 'Amadou Onana', club: 'Aston Villa', nationality: 'BE', position: 'MID', basePrice: 22 },
+  { name: 'Jordan Veretout', club: 'Marseille', nationality: 'FR', position: 'MID', basePrice: 18 },
+  { name: 'Pierre-Emile Hojbjerg', club: 'Tottenham', nationality: 'DK', position: 'MID', basePrice: 20 },
+  { name: 'Davy Klaassen', club: 'Inter Milan', nationality: 'NL', position: 'MID', basePrice: 16 },
+  { name: 'Tijjani Reijnders', club: 'AC Milan', nationality: 'NL', position: 'MID', basePrice: 28 },
+])
+
+const UEL_FWD = section([
+  { name: 'Romelu Lukaku', club: 'Napoli', nationality: 'BE', position: 'FWD', basePrice: 34 },
+  { name: 'Tammy Abraham', club: 'AC Milan', nationality: 'GB', position: 'FWD', basePrice: 26 },
+  { name: 'Victor Boniface', club: 'Bayer Leverkusen', nationality: 'NG', position: 'FWD', basePrice: 30 },
+  { name: 'Serhou Guirassy', club: 'Borussia Dortmund', nationality: 'GN', position: 'FWD', basePrice: 32 },
+  { name: 'Donyell Malen', club: 'Borussia Dortmund', nationality: 'NL', position: 'FWD', basePrice: 26 },
+  { name: 'Mason Greenwood', club: 'Marseille', nationality: 'GB', position: 'FWD', basePrice: 28 },
+  { name: 'Ciro Immobile', club: 'Besiktas', nationality: 'IT', position: 'FWD', basePrice: 24 },
+  { name: 'Alvaro Morata', club: 'AC Milan', nationality: 'ES', position: 'FWD', basePrice: 30 },
+  { name: 'Youssef En-Nesyri', club: 'Fenerbahce', nationality: 'MA', position: 'FWD', basePrice: 26 },
+  { name: 'Federico Chiesa', club: 'Liverpool', nationality: 'IT', position: 'FWD', basePrice: 30 },
+])
+
+const UEL_PLAYERS: PlayerTemplate[] = [
+  ...UEL_GK, ...UEL_DEF, ...UEL_MID, ...UEL_FWD,
+]
+
+// ─── CAF Africa Cup of Nations 2027 (~25 players) ─────
+
+const AFCON_GK = section([
+  { name: 'Edouard Mendy', club: 'Al Ahli', nationality: 'SN', position: 'GK', basePrice: 30 },
+  { name: 'Andre Onana', club: 'Manchester United', nationality: 'CM', position: 'GK', basePrice: 38 },
+  { name: 'Yassine Bounou', club: 'Al Hilal', nationality: 'MA', position: 'GK', basePrice: 30 },
+  { name: 'Yahia Fofana', club: 'Angers', nationality: 'CI', position: 'GK', basePrice: 20 },
+  { name: 'Mohamed El Shenawy', club: 'Al Ahly', nationality: 'EG', position: 'GK', basePrice: 26 },
+])
+
+const AFCON_DEF = section([
+  { name: 'Achraf Hakimi', club: 'Paris Saint-Germain', nationality: 'MA', position: 'DEF', basePrice: 42 },
+  { name: 'Edmond Tapsoba', club: 'Bayer Leverkusen', nationality: 'BF', position: 'DEF', basePrice: 28 },
+  { name: 'Odilon Kossounou', club: 'Bayer Leverkusen', nationality: 'CI', position: 'DEF', basePrice: 24 },
+  { name: 'Kalidou Koulibaly', club: 'Al Hilal', nationality: 'SN', position: 'DEF', basePrice: 28 },
+  { name: 'Gleison Bremer', club: 'Juventus', nationality: 'BR', position: 'DEF', basePrice: 32 },
+  { name: 'Josko Gvardiol', club: 'Manchester City', nationality: 'HR', position: 'DEF', basePrice: 42 },
+  { name: 'Nayef Aguerd', club: 'West Ham', nationality: 'MA', position: 'DEF', basePrice: 22 },
+  { name: 'Jean-Clair Todibo', club: 'Nice', nationality: 'FR', position: 'DEF', basePrice: 26 },
+  { name: 'Marcos Senesi', club: 'Bournemouth', nationality: 'AR', position: 'DEF', basePrice: 22 },
+  { name: 'Reece James', club: 'Chelsea', nationality: 'GB', position: 'DEF', basePrice: 26 },
+])
+
+const AFCON_MID = section([
+  { name: 'Mohamed Salah', club: 'Liverpool', nationality: 'EG', position: 'MID', basePrice: 60 },
+  { name: 'Riyad Mahrez', club: 'Al Ahli', nationality: 'DZ', position: 'MID', basePrice: 40 },
+  { name: 'Nicolas Pepe', club: 'Villarreal', nationality: 'CI', position: 'MID', basePrice: 28 },
+  { name: 'Thomas Partey', club: 'Arsenal', nationality: 'GH', position: 'MID', basePrice: 26 },
+  { name: 'Mohammed Kudus', club: 'West Ham', nationality: 'GH', position: 'MID', basePrice: 32 },
+  { name: 'Azzedine Ounahi', club: 'Marseille', nationality: 'MA', position: 'MID', basePrice: 24 },
+  { name: 'Yves Bissouma', club: 'Tottenham', nationality: 'ML', position: 'MID', basePrice: 24 },
+  { name: 'Franck Kessie', club: 'Al Ahli', nationality: 'CI', position: 'MID', basePrice: 28 },
+  { name: 'Ismael Bennacer', club: 'AC Milan', nationality: 'DZ', position: 'MID', basePrice: 26 },
+  { name: 'Pape Matar Sarr', club: 'Tottenham', nationality: 'SN', position: 'MID', basePrice: 28 },
+])
+
+const AFCON_FWD = section([
+  { name: 'Victor Osimhen', club: 'Galatasaray', nationality: 'NG', position: 'FWD', basePrice: 44 },
+  { name: 'Pierre-Emerick Aubameyang', club: 'Al Qadsiah', nationality: 'GA', position: 'FWD', basePrice: 30 },
+  { name: 'Samuel Chukwueze', club: 'AC Milan', nationality: 'NG', position: 'FWD', basePrice: 24 },
+  { name: 'Hakim Ziyech', club: 'Galatasaray', nationality: 'MA', position: 'FWD', basePrice: 26 },
+  { name: 'Sadio Mane', club: 'Al Nassr', nationality: 'SN', position: 'FWD', basePrice: 36 },
+  { name: 'Nicolas Jackson', club: 'Chelsea', nationality: 'SN', position: 'FWD', basePrice: 30 },
+  { name: 'Simon Adingra', club: 'Brighton', nationality: 'CI', position: 'FWD', basePrice: 28 },
+  { name: 'Taiwo Awoniyi', club: 'Nottingham Forest', nationality: 'NG', position: 'FWD', basePrice: 26 },
+  { name: 'Amad Diallo', club: 'Manchester United', nationality: 'CI', position: 'FWD', basePrice: 24 },
+  { name: 'Randal Kolo Muani', club: 'Paris Saint-Germain', nationality: 'FR', position: 'FWD', basePrice: 30 },
+])
+
+const AFCON_PLAYERS: PlayerTemplate[] = [
+  ...AFCON_GK, ...AFCON_DEF, ...AFCON_MID, ...AFCON_FWD,
+]
+
+// ─── FIFA Women's World Cup 2027 (~30 players) ─────────
+
+const WWC_GK = section([
+  { name: 'Mary Earps', club: 'Paris Saint-Germain', nationality: 'GB', position: 'GK', basePrice: 36 },
+  { name: 'Ellie Roebuck', club: 'Barcelona', nationality: 'GB', position: 'GK', basePrice: 30 },
+  { name: 'Alyssa Naeher', club: 'Chicago Red Stars', nationality: 'US', position: 'GK', basePrice: 32 },
+  { name: 'Sandra Panos', club: 'Barcelona', nationality: 'ES', position: 'GK', basePrice: 28 },
+  { name: 'Lena Schuller', club: 'Wolfsburg', nationality: 'NO', position: 'GK', basePrice: 28 },
+  { name: 'Cata Coll', club: 'Barcelona', nationality: 'ES', position: 'GK', basePrice: 26 },
+  { name: 'Lorena', club: 'Gremio', nationality: 'BR', position: 'GK', basePrice: 24 },
+  { name: 'Mackenzie Arnold', club: 'West Ham', nationality: 'AU', position: 'GK', basePrice: 22 },
+])
+
+const WWC_DEF = section([
+  { name: 'Lucy Bronze', club: 'Chelsea', nationality: 'GB', position: 'DEF', basePrice: 28 },
+  { name: 'Irene Paredes', club: 'Barcelona', nationality: 'ES', position: 'DEF', basePrice: 26 },
+  { name: 'Millie Bright', club: 'Chelsea', nationality: 'GB', position: 'DEF', basePrice: 24 },
+  { name: 'Leah Williamson', club: 'Arsenal', nationality: 'GB', position: 'DEF', basePrice: 26 },
+  { name: 'Mapi Leon', club: 'Barcelona', nationality: 'ES', position: 'DEF', basePrice: 24 },
+  { name: 'Selma Bacha', club: 'Lyon', nationality: 'FR', position: 'DEF', basePrice: 22 },
+  { name: 'Naomi Girma', club: 'San Diego Wave', nationality: 'US', position: 'DEF', basePrice: 24 },
+  { name: 'Ellie Carpenter', club: 'Lyon', nationality: 'AU', position: 'DEF', basePrice: 24 },
+  { name: 'Wendie Renard', club: 'Lyon', nationality: 'FR', position: 'DEF', basePrice: 28 },
+  { name: 'Kadeisha Buchanan', club: 'Chelsea', nationality: 'CA', position: 'DEF', basePrice: 20 },
+  { name: 'Ona Batlle', club: 'Barcelona', nationality: 'ES', position: 'DEF', basePrice: 24 },
+  { name: 'Rafaelle Souza', club: 'Corinthians', nationality: 'BR', position: 'DEF', basePrice: 20 },
+])
+
+const WWC_MID = section([
+  { name: 'Alexia Putellas', club: 'Barcelona', nationality: 'ES', position: 'MID', basePrice: 42, isEligibleForIcon: true },
+  { name: 'Aitana Bonmati', club: 'Barcelona', nationality: 'ES', position: 'MID', basePrice: 40, isEligibleForIcon: true },
+  { name: 'Keira Walsh', club: 'Barcelona', nationality: 'GB', position: 'MID', basePrice: 28 },
+  { name: 'Georgia Stanway', club: 'Bayern Munich', nationality: 'GB', position: 'MID', basePrice: 26 },
+  { name: 'Lena Oberdorf', club: 'Wolfsburg', nationality: 'DE', position: 'MID', basePrice: 24 },
+  { name: 'Lindsay Horan', club: 'Lyon', nationality: 'US', position: 'MID', basePrice: 26 },
+  { name: 'Rose Lavelle', club: 'OL Reign', nationality: 'US', position: 'MID', basePrice: 24 },
+  { name: 'Caroline Graham Hansen', club: 'Barcelona', nationality: 'NO', position: 'MID', basePrice: 28 },
+  { name: 'Debinha', club: 'Kansas City Current', nationality: 'BR', position: 'MID', basePrice: 24 },
+  { name: 'Vivianne Miedema', club: 'Manchester City', nationality: 'NL', position: 'MID', basePrice: 30 },
+  { name: 'Sakina Karchaoui', club: 'Paris Saint-Germain', nationality: 'FR', position: 'MID', basePrice: 22 },
+  { name: 'Sara Dabritz', club: 'Lyon', nationality: 'DE', position: 'MID', basePrice: 22 },
+])
+
+const WWC_FWD = section([
+  { name: 'Marta', club: 'Orlando Pride', nationality: 'BR', position: 'FWD', basePrice: 32, isEligibleForIcon: true },
+  { name: 'Sam Kerr', club: 'Chelsea', nationality: 'AU', position: 'FWD', basePrice: 34, isEligibleForIcon: true },
+  { name: 'Ada Hegerberg', club: 'Lyon', nationality: 'NO', position: 'FWD', basePrice: 30, isEligibleForIcon: true },
+  { name: 'Trinity Rodman', club: 'Washington Spirit', nationality: 'US', position: 'FWD', basePrice: 28 },
+  { name: 'Mallory Swanson', club: 'Chicago Red Stars', nationality: 'US', position: 'FWD', basePrice: 26 },
+  { name: 'Salma Paralluelo', club: 'Barcelona', nationality: 'ES', position: 'FWD', basePrice: 28 },
+  { name: 'Guro Reiten', club: 'Chelsea', nationality: 'NO', position: 'FWD', basePrice: 26 },
+  { name: 'Khadija Shaw', club: 'Manchester City', nationality: 'JM', position: 'FWD', basePrice: 26 },
+  { name: 'Fridolina Rolfo', club: 'Barcelona', nationality: 'SE', position: 'FWD', basePrice: 24 },
+  { name: 'Alex Morgan', club: 'San Diego Wave', nationality: 'US', position: 'FWD', basePrice: 24 },
+])
+
+const WWC_PLAYERS: PlayerTemplate[] = [
+  ...WWC_GK, ...WWC_DEF, ...WWC_MID, ...WWC_FWD,
+]
+
+// ─── Copa America 2028 (~25 players) ─────────────────
+
+const COPA_GK = section([
+  { name: 'Emiliano Martinez', club: 'Aston Villa', nationality: 'AR', position: 'GK', basePrice: 52 },
+  { name: 'Alisson Becker', club: 'Liverpool', nationality: 'BR', position: 'GK', basePrice: 68 },
+  { name: 'Ederson', club: 'Manchester City', nationality: 'BR', position: 'GK', basePrice: 62 },
+  { name: 'David Ospina', club: 'Al Nassr', nationality: 'CO', position: 'GK', basePrice: 26 },
+  { name: 'Sergio Rochet', club: 'Internacional', nationality: 'UY', position: 'GK', basePrice: 24 },
+  { name: 'Franco Armani', club: 'River Plate', nationality: 'AR', position: 'GK', basePrice: 22 },
+])
+
+const COPA_DEF = section([
+  { name: 'Cristian Romero', club: 'Tottenham', nationality: 'AR', position: 'DEF', basePrice: 32 },
+  { name: 'Lisandro Martinez', club: 'Manchester United', nationality: 'AR', position: 'DEF', basePrice: 44 },
+  { name: 'Nahuel Molina', club: 'Atletico Madrid', nationality: 'AR', position: 'DEF', basePrice: 28 },
+  { name: 'Ronald Araujo', club: 'Barcelona', nationality: 'UY', position: 'DEF', basePrice: 38 },
+  { name: 'Jose Maria Gimenez', club: 'Atletico Madrid', nationality: 'UY', position: 'DEF', basePrice: 36 },
+  { name: 'Bremer', club: 'Juventus', nationality: 'BR', position: 'DEF', basePrice: 32 },
+  { name: 'Eder Militao', club: 'Real Madrid', nationality: 'BR', position: 'DEF', basePrice: 38 },
+  { name: 'Gabriel Magalhaes', club: 'Arsenal', nationality: 'BR', position: 'DEF', basePrice: 36 },
+  { name: 'Pervis Estupinan', club: 'Brighton', nationality: 'EC', position: 'DEF', basePrice: 22 },
+  { name: 'William Saliba', club: 'Arsenal', nationality: 'FR', position: 'DEF', basePrice: 44 },
+])
+
+const COPA_MID = section([
+  { name: 'Rodrigo De Paul', club: 'Atletico Madrid', nationality: 'AR', position: 'MID', basePrice: 30 },
+  { name: 'Alexis Mac Allister', club: 'Liverpool', nationality: 'AR', position: 'MID', basePrice: 38 },
+  { name: 'Enzo Fernandez', club: 'Chelsea', nationality: 'AR', position: 'MID', basePrice: 40 },
+  { name: 'Federico Valverde', club: 'Real Madrid', nationality: 'UY', position: 'MID', basePrice: 54 },
+  { name: 'Bruno Guimaraes', club: 'Newcastle', nationality: 'BR', position: 'MID', basePrice: 30 },
+  { name: 'Douglas Luiz', club: 'Juventus', nationality: 'BR', position: 'MID', basePrice: 28 },
+  { name: 'Moises Caicedo', club: 'Chelsea', nationality: 'EC', position: 'MID', basePrice: 36 },
+  { name: 'Manuel Ugarte', club: 'Paris Saint-Germain', nationality: 'UY', position: 'MID', basePrice: 24 },
+  { name: 'Luis Diaz', club: 'Liverpool', nationality: 'CO', position: 'MID', basePrice: 36 },
+  { name: 'Gonzalo Montiel', club: 'Sevilla', nationality: 'AR', position: 'MID', basePrice: 22 },
+])
+
+const COPA_FWD = section([
+  { name: 'Lionel Messi', club: 'Inter Miami', nationality: 'AR', position: 'FWD', basePrice: 78, isEligibleForIcon: true },
+  { name: 'Vinicius Jr.', club: 'Real Madrid', nationality: 'BR', position: 'FWD', basePrice: 75, isEligibleForIcon: true },
+  { name: 'Lautaro Martinez', club: 'Inter Milan', nationality: 'AR', position: 'FWD', basePrice: 52 },
+  { name: 'Julian Alvarez', club: 'Atletico Madrid', nationality: 'AR', position: 'FWD', basePrice: 40 },
+  { name: 'Rodrygo', club: 'Real Madrid', nationality: 'BR', position: 'FWD', basePrice: 54 },
+  { name: 'Raphinha', club: 'Barcelona', nationality: 'BR', position: 'FWD', basePrice: 46 },
+  { name: 'Gabriel Martinelli', club: 'Arsenal', nationality: 'BR', position: 'FWD', basePrice: 42 },
+  { name: 'Darwin Nunez', club: 'Liverpool', nationality: 'UY', position: 'FWD', basePrice: 36 },
+  { name: 'Alexis Sanchez', club: 'Udinese', nationality: 'CL', position: 'FWD', basePrice: 24 },
+  { name: 'Eduardo Vargas', club: 'Nacional', nationality: 'CL', position: 'FWD', basePrice: 20 },
+])
+
+const COPA_PLAYERS: PlayerTemplate[] = [
+  ...COPA_GK, ...COPA_DEF, ...COPA_MID, ...COPA_FWD,
+]
+
 // ─── Target sizes (real tournament data) ────────────────
-// FIFA World Cup 2026: 48 teams × 26 players = 1,248
-// UEFA Champions League 2026/27: 32 teams × 25 (List A) = 800
+// FIFA World Cup 2026: 48 teams x 26 players = 1,248
+// UEFA Champions League 2026/27: 32 teams x 25 (List A) = 800
+// UEFA Europa League 2026/27: 36 teams x 25 (List A) = 900
+// CAF Africa Cup of Nations 2027: 24 teams x 27 players = 648
+// FIFA Women's World Cup 2027: 32 teams x 26 players = 832
+// Copa America 2028: 16 teams x 26 players = 416
 
 const WC_TARGET = 1248
 const UCL_TARGET = 800
+const UEL_TARGET = 900
+const AFCON_TARGET = 648
+const WWC_TARGET = 832
+const COPA_TARGET = 416
 
 // ─── Main ───────────────────────────────────────────────
 
 function main() {
   const wcBase = WC_PLAYERS
   const uclBase = UCL_PLAYERS
+  const uelBase = UEL_PLAYERS
+  const afconBase = AFCON_PLAYERS
+  const wwcBase = WWC_PLAYERS
+  const copaBase = COPA_PLAYERS
 
   // Generate filler players to reach target counts
   const wcFillers = generateFillerPlayers(wcBase, WC_TARGET, WC_NATIONALITIES, WC_CLUBS)
   const uclFillers = generateFillerPlayers(uclBase, UCL_TARGET, UCL_NATIONALITIES, UCL_CLUBS)
+  const uelFillers = generateFillerPlayers(uelBase, UEL_TARGET, UEL_NATIONALITIES, UEL_CLUBS)
+  const afconFillers = generateFillerPlayers(afconBase, AFCON_TARGET, AFCON_NATIONALITIES, AFCON_CLUBS)
+  const wwcFillers = generateFillerPlayers(wwcBase, WWC_TARGET, WWC_NATIONALITIES, WWC_CLUBS)
+  const copaFillers = generateFillerPlayers(copaBase, COPA_TARGET, COPA_NATIONALITIES, COPA_CLUBS)
 
   const wcPlayers = [...wcBase, ...wcFillers]
   const uclPlayers = [...uclBase, ...uclFillers]
+  const uelPlayers = [...uelBase, ...uelFillers]
+  const afconPlayers = [...afconBase, ...afconFillers]
+  const wwcPlayers = [...wwcBase, ...wwcFillers]
+  const copaPlayers = [...copaBase, ...copaFillers]
 
   const allPlayers: any[] = []
   let idCounter = 1
 
-  for (const template of wcPlayers) {
-    allPlayers.push({
-      id: `player-${idCounter++}`,
-      tournamentId: 'fifa-wc-2026',
-      ...template,
-    })
+  const tournaments = [
+    { id: 'fifa-wc-2026', players: wcPlayers, base: wcBase, fillers: wcFillers, target: WC_TARGET, label: 'FIFA WC 2026' },
+    { id: 'uefa-ucl-2026-27', players: uclPlayers, base: uclBase, fillers: uclFillers, target: UCL_TARGET, label: 'UCL 2026/27' },
+    { id: 'uefa-uel-2026-27', players: uelPlayers, base: uelBase, fillers: uelFillers, target: UEL_TARGET, label: 'UEL 2026/27' },
+    { id: 'caf-afcon-2027', players: afconPlayers, base: afconBase, fillers: afconFillers, target: AFCON_TARGET, label: 'AFCON 2027' },
+    { id: 'fifa-wwc-2027', players: wwcPlayers, base: wwcBase, fillers: wwcFillers, target: WWC_TARGET, label: 'WWC 2027' },
+    { id: 'conmebol-copa-america-2028', players: copaPlayers, base: copaBase, fillers: copaFillers, target: COPA_TARGET, label: 'COPA 2028' },
+  ]
+
+  for (const t of tournaments) {
+    for (const template of t.players) {
+      allPlayers.push({
+        id: `player-${idCounter++}`,
+        tournamentId: t.id,
+        ...template,
+      })
+    }
   }
 
-  for (const template of uclPlayers) {
-    allPlayers.push({
-      id: `player-${idCounter++}`,
-      tournamentId: 'uefa-ucl-2026-27',
-      ...template,
-    })
+  console.log(`\n=== Player Generation Summary ===`)
+  console.log(`Total players: ${allPlayers.length}\n`)
+
+  for (const t of tournaments) {
+    const count = allPlayers.filter((p) => p.tournamentId === t.id).length
+    const realCount = t.base.length
+    const genCount = t.fillers.length
+    const positions: Record<string, number> = {}
+    for (const p of allPlayers) {
+      if (p.tournamentId === t.id) {
+        positions[p.position] = (positions[p.position] || 0) + 1
+      }
+    }
+    console.log(`  ${t.label}: ${count} players (${realCount} real + ${genCount} generated) — target: ${t.target}`)
+    console.log(`    Positions: GK=${positions.GK ?? 0}, DEF=${positions.DEF ?? 0}, MID=${positions.MID ?? 0}, FWD=${positions.FWD ?? 0}`)
   }
-
-  const wcCount = allPlayers.filter((p) => p.tournamentId === 'fifa-wc-2026').length
-  const uclCount = allPlayers.filter((p) => p.tournamentId === 'uefa-ucl-2026-27').length
-
-  const wcPositions: Record<string, number> = {}
-  const uclPositions: Record<string, number> = {}
-  for (const p of allPlayers) {
-    const dest = p.tournamentId === 'fifa-wc-2026' ? wcPositions : uclPositions
-    dest[p.position] = (dest[p.position] || 0) + 1
-  }
-
-  const wcReal = wcBase.length
-  const uclReal = uclBase.length
-
-  console.log(`📊 Generating ${allPlayers.length} total players...`)
-  console.log(`   FIFA WC 2026: ${wcCount} players (${wcReal} real + ${wcFillers.length} generated) — target: ${WC_TARGET}`)
-  console.log(`   UCL 2026/27: ${uclCount} players (${uclReal} real + ${uclFillers.length} generated) — target: ${UCL_TARGET}`)
-  console.log(`\n  FIFA WC 2026 breakdown:`)
-  for (const [pos, count] of Object.entries(wcPositions)) console.log(`    ${pos}: ${count}`)
-  console.log(`\n  UCL 2026/27 breakdown:`)
-  for (const [pos, count] of Object.entries(uclPositions)) console.log(`    ${pos}: ${count}`)
 
   const outputPath = path.join(DATA_DIR, 'players.json')
   const tmpPath = outputPath + '.tmp'
   if (!fs.existsSync(path.dirname(outputPath))) fs.mkdirSync(path.dirname(outputPath), { recursive: true })
   fs.writeFileSync(tmpPath, JSON.stringify(allPlayers, null, 2), 'utf-8')
   fs.renameSync(tmpPath, outputPath)
-  console.log(`\n✅ ${allPlayers.length} players written to ${outputPath}`)
+  console.log(`\nWritten to ${outputPath}`)
 }
 
 main()
