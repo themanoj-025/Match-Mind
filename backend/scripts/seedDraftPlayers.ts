@@ -147,6 +147,15 @@ const WC_DEF = section([
   { name: 'Jan Paul van Hecke', club: 'Brighton', nationality: 'NL', position: 'DEF', basePrice: 44 },
   { name: 'Joško Gvardiol', club: 'Manchester City', nationality: 'HR', position: 'DEF', basePrice: 48 },
   { name: 'Matías Viña', club: 'Flamengo', nationality: 'UY', position: 'DEF', basePrice: 18 },
+  { name: 'Trevoh Chalobah', club: 'Chelsea', nationality: 'GB', position: 'DEF', basePrice: 52 },
+  { name: 'Ousmane Diomande', club: 'Sporting CP', nationality: 'CI', position: 'DEF', basePrice: 52 },
+  { name: 'Gonçalo Inácio', club: 'Sporting CP', nationality: 'PT', position: 'DEF', basePrice: 50 },
+  { name: 'Jarrad Branthwaite', club: 'Everton', nationality: 'GB', position: 'DEF', basePrice: 50 },
+  { name: 'Maxence Lacroix', club: 'Crystal Palace', nationality: 'FR', position: 'DEF', basePrice: 50 },
+  { name: 'Lucas Beraldo', club: 'Paris Saint-Germain', nationality: 'BR', position: 'DEF', basePrice: 48 },
+  { name: 'Jan Paul van Hecke', club: 'Brighton', nationality: 'GB', position: 'DEF', basePrice: 48 },
+  { name: 'Cristian Romero', club: 'Tottenham', nationality: 'AR', position: 'DEF', basePrice: 48 },
+  { name: 'Nico Tagliafico', club: 'Lyon', nationality: 'AR', position: 'DEF', basePrice: 46 },
   { name: 'Lewis Hall', club: 'Newcastle', nationality: 'GB', position: 'DEF', basePrice: 16 },
   { name: 'Héctor Fort', club: 'Barcelona', nationality: 'ES', position: 'DEF', basePrice: 16 },
   { name: 'Inigo Martínez', club: 'Barcelona', nationality: 'ES', position: 'DEF', basePrice: 24 },
@@ -326,6 +335,10 @@ const UCL_GK = section([
   { name: 'Mark Flekken', club: 'Brentford', nationality: 'NL', position: 'GK', basePrice: 28 },
   { name: 'Alex Meret', club: 'Napoli', nationality: 'IT', position: 'GK', basePrice: 26 },
   { name: 'Mathew Ryan', club: 'AZ Alkmaar', nationality: 'AU', position: 'GK', basePrice: 16 },
+  { name: 'Anatoliy Trubin', club: 'Benfica', nationality: 'UA', position: 'GK', basePrice: 38 },
+  { name: 'Kevin Trapp', club: 'Eintracht Frankfurt', nationality: 'DE', position: 'GK', basePrice: 34 },
+  { name: 'Robin Zentner', club: 'Mainz', nationality: 'DE', position: 'GK', basePrice: 32 },
+  { name: 'Jesper Lindstrøm', club: 'Napoli', nationality: 'DK', position: 'GK', basePrice: 28 },
 ])
 
 const UCL_DEF = section([
@@ -531,6 +544,10 @@ const UCL_FWD = section([
   { name: 'Facundo Pellistri', club: 'Panathinaikos', nationality: 'UY', position: 'FWD', basePrice: 20 },
   { name: 'Antony', club: 'Manchester United', nationality: 'BR', position: 'FWD', basePrice: 22 },
   { name: 'Amad Diallo', club: 'Manchester United', nationality: 'CI', position: 'FWD', basePrice: 24 },
+  { name: 'Mikkel Damsgaard', club: 'Brentford', nationality: 'DK', position: 'FWD', basePrice: 50 },
+  { name: 'Ansu Fati', club: 'Barcelona', nationality: 'ES', position: 'FWD', basePrice: 48 },
+  { name: 'Fábio Carvalho', club: 'Brentford', nationality: 'PT', position: 'FWD', basePrice: 46 },
+  { name: 'Amad Diallo', club: 'Manchester United', nationality: 'CI', position: 'FWD', basePrice: 46 },
 ])
 
 const UCL_PLAYERS: PlayerTemplate[] = [
