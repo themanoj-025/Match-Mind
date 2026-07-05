@@ -37,6 +37,7 @@ export interface DraftRunResult {
   totalTies: number
   status: DraftRunStatus
   rewards: string[]                 // cosmetic reward IDs earned
+  rounds: DraftRunRound[]           // resolved round history (sub-document)
   eliminatedAt: string | null       // date when 3rd loss occurred
   clearedAt: string | null          // date when 5th win occurred
   createdAt: string
@@ -334,7 +335,11 @@ async function resolveNextRound(
   newStatus: DraftRunStatus
   eliminatedAt: string | null
   clearedAt: string | null
-  rewards: string[]  }| null> {
+  rewards: string[]
+  userPoints: number
+  benchmarkPoints: number
+  breakdown: Record<string, number>
+} | null> {
   try {
     // Get player match stats for this fixture
     const playerStats = await prisma.playerMatchStat.findMany({
