@@ -744,7 +744,7 @@ export async function processPick(
   return {
     success: true,
     nextRound: nextResult.round,
-    session: nextResult.session,
+    session: nextResult.session ?? undefined,
     complete: nextResult.complete,
   }
 }
