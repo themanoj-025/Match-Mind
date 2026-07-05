@@ -47,11 +47,13 @@ export interface Player {
   isEligibleForIcon?: boolean  // admin gate (§1.3)
 }
 
-// ─── Draft Mode — Types (§1.9) ─────────────────────────
+// ─── Draft Mode — Types (§1.9, §2) ──────────────────────
 export type DraftSessionStatus = 'DRAFTING' | 'SQUAD_COMPLETE' | 'RUN_IN_PROGRESS' | 'RUN_COMPLETE' | 'ABANDONED'
 export type FormationName = '4-3-3' | '4-4-2' | '4-2-3-1' | '3-5-2' | '5-3-2'
 export type Position = 'GK' | 'DEF' | 'MID' | 'FWD'
-export type RarityTier = 'BRONZE' | 'SILVER' | 'GOLD' | 'ICON'
+export type RarityTierName = 'BRONZE' | 'SILVER' | 'GOLD' | 'ICON'
+export type DraftRunStatus = 'IN_PROGRESS' | 'WAITING_FOR_MATCHDAY' | 'COMPLETE'
+export type RunOutcome = 'WIN' | 'LOSS' | 'TIE'
 
 export interface Formation {
   id: string
@@ -76,20 +78,56 @@ export interface DraftPick {
   slotIndex: number
   position: Position
   offeredPlayerIds: string[]
-  offeredRarities: RarityTier[]
+  offeredRarities: RarityTierName[]
   pickedPlayerId: string | null
   autoPicked: boolean
   pickedAt: string | null
 }
 
-export interface DraftRunRound {
-  round: number
-  fixtureMatchdayId: string
-  opponentDraftSessionId: string | 'BENCHMARK'
-  myScore: number
-  opponentScore: number
-  result: 'WIN' | 'LOSS' | 'DRAW'
-  playedAt: string
+export interface SquadPlayer {
+  playerId: string
+  position: string
+  slotIndex: number
+  isAutoPicked: boolean
+  rarityTier: string
+}
+
+export interface DraftRunResult {
+  id: string
+  draftSessionId: string
+  userId: string
+  tournamentId: string
+  currentRound: number
+  totalWins: number
+  totalLosses: number
+  totalTies: number
+  status: DraftRunStatus
+  rewards: string[]
+  rounds: DraftRunRoundEntry[]
+  eliminatedAt: string | null
+  clearedAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface DraftRunRoundEntry {
+  roundNumber: number
+  matchdayId: string | null
+  matchdayName: string | null
+  outcome: RunOutcome | null
+  userPoints: number
+  benchmarkPoints: number
+  breakdown: Record<string, number>
+}
+
+export interface DraftRunState {
+  result: DraftRunResult
+  rounds: DraftRunRoundEntry[]
+  squad: SquadPlayer[]
+  currentRound: DraftRunRoundEntry | null
+  isEliminated: boolean
+  isFullClear: boolean
+  nextMatchdayLabel: string | null
 }
 
 export interface DraftTicketInfo {

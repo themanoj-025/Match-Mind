@@ -38,6 +38,7 @@ const MessagesPage = lazy(() => import('./pages/MessagesPage'))
 const PricingPage = lazy(() => import('./pages/PricingPage'))
 const SearchPage = lazy(() => import('./pages/SearchPage'))
 const AdminPage = lazy(() => import('./pages/AdminPage'))
+const DraftSessionPage = lazy(() => import('./pages/DraftSessionPage'))
 const TournamentGuard = lazy(() => import('./components/TournamentGuard'))
 
 // ─── Tournament-scoped pages ────────────────────────────
@@ -165,6 +166,9 @@ export default function App() {
                 {/* ── Legacy routes (redirect to /t/:id equivalents) ── */}
                 <Route path="/dashboard" element={<AnimatedRoute><DashboardPage /></AnimatedRoute>} />
                 <Route path="/rooms/new" element={<AnimatedRoute><RoomWizardPage /></AnimatedRoute>} />
+                {/* ── Draft Mode (§1, §2) ── */}
+                <Route path="/draft/new" element={<AnimatedRoute><DraftSessionPage /></AnimatedRoute>} />
+                <Route path="/draft/:sessionId" element={<AnimatedRoute><DraftSessionPage /></AnimatedRoute>} />
                 <Route path="/rooms/:roomId/lobby" element={<AnimatedRoute><RoomLobbyPage /></AnimatedRoute>} />
                 <Route path="/rooms/:roomId/auction" element={<AnimatedRoute><AuctionRoomPage /></AnimatedRoute>} />
                 <Route path="/rooms/:roomId/franchise/:userId" element={<AnimatedRoute><FranchisePage /></AnimatedRoute>} />
