@@ -2,15 +2,17 @@ import { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, Gavel } from 'lucide-react'
-import { TOURNAMENTS, DEFAULT_ROSTER_RULES } from '../lib/tournaments'
+import { useTournaments, DEFAULT_ROSTER_RULES } from '../lib/tournaments'
 
 const STEPS = ['Tournament', 'Budget & Rules', 'Review']
 
 export default function RoomWizardPage() {
   const navigate = useNavigate()
+  const { data: tournaments } = useTournaments()
+  const liveTournaments = (tournaments || []).filter((t) => t.status === 'LIVE')
   const [step, setStep] = useState(0)
   const [name, setName] = useState('')
-  const [tournamentId, setTournamentId] = useState<string>('fifa-wc-2026')
+  const [tournamentId, setTournamentId] = useState<string>('')
   const [totalBudget, setTotalBudget] = useState(500)
   const [rosterRules, setRosterRules] = useState({ ...DEFAULT_ROSTER_RULES })
   const [submitting, setSubmitting] = useState(false)
@@ -70,7 +72,7 @@ export default function RoomWizardPage() {
           <div className="space-y-4">
             <h2 className="heading-2">Choose Tournament</h2>
             <div className="grid gap-3">
-              {TOURNAMENTS.map((t) => (
+              {liveTournaments.map((t) => (
                 <button
                   key={t.id}
                   onClick={() => setTournamentId(t.id)}
@@ -86,7 +88,7 @@ export default function RoomWizardPage() {
                     </div>
                     <div>
                       <h3 className="heading-3">{t.name}</h3>
-                      <p className="caption text-[var(--mm-text-secondary)]">{t.confederation} · {t.hosts?.join(', ') || ''}</p>
+                      <p className="caption text-[var(--mm-text-secondary)]">{t.confederation} · {t.teamCount} teams</p>
                     </div>
                   </div>
                 </button>
@@ -143,7 +145,7 @@ export default function RoomWizardPage() {
             <h2 className="heading-2">Review</h2>
             <div className="bg-[var(--mm-bg-secondary)] rounded-[var(--radius-lg)] p-5 border border-[var(--border-subtle)] space-y-3">
               <div className="flex justify-between"><span className="text-[var(--mm-text-muted)]">Room Name</span><span>{name}</span></div>
-              <div className="flex justify-between"><span className="text-[var(--mm-text-muted)]">Tournament</span><span>{TOURNAMENTS.find(t => t.id === tournamentId)?.name}</span></div>
+              <div className="flex justify-between"><span className="text-[var(--mm-text-muted)]">Tournament</span><span>{liveTournaments.find(t => t.id === tournamentId)?.name}</span></div>
               <div className="flex justify-between"><span className="text-[var(--mm-text-muted)]">Budget</span><span>🪙 ${totalBudget}</span></div>
               <div className="flex justify-between"><span className="text-[var(--mm-text-muted)]">Roster</span><span>{Object.entries(rosterRules).map(([k, v]) => `${k}: ${v}`).join(' · ')}</span></div>
             </div>

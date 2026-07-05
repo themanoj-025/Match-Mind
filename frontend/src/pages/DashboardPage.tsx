@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { Link, useNavigate } from 'react-router-dom'
 import { Plus, Users, Gavel } from 'lucide-react'
-import { TOURNAMENTS } from '../lib/tournaments'
+import { useTournaments } from '../lib/tournaments'
 import TournamentThemeWrapper from '../components/TournamentThemeWrapper'
 
 export default function DashboardPage() {
+  const { data: tournaments } = useTournaments()
+  const liveTournaments = (tournaments || []).filter((t) => t.status === 'LIVE')
   const [activeTournament, setActiveTournament] = useState<string>('all')
   const [rooms, setRooms] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -58,7 +60,7 @@ export default function DashboardPage() {
           >
             All Rooms
           </button>
-          {TOURNAMENTS.map((t) => (
+          {liveTournaments.map((t) => (
             <button
               key={t.id}
               onClick={() => setActiveTournament(t.id)}
@@ -102,8 +104,8 @@ export default function DashboardPage() {
                 key={room.id}
                 className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5 hover:border-[var(--mm-accent-green)]/40 transition-all cursor-pointer group relative overflow-hidden"
                 style={{
-                  '--tournament-primary': room.tournamentId === 'fifa-wc-2026' ? '#0B3D91' : '#0E1E4A',
-                  '--tournament-accent': room.tournamentId === 'fifa-wc-2026' ? '#D4AF37' : '#8E44FF',
+                  '--tournament-primary': tournaments?.find((tr: any) => tr.id === room.tournamentId)?.theme?.primary || '#0B3D91',
+                  '--tournament-accent': tournaments?.find((tr: any) => tr.id === room.tournamentId)?.theme?.accent || '#D4AF37',
                 } as any}
                 onClick={() => {
                   const path = room.status === 'LOBBY'

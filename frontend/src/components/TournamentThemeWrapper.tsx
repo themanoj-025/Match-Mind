@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react'
-import { TOURNAMENTS } from '../lib/tournaments'
+import { useTournaments } from '../lib/tournaments'
 
 interface Props {
   tournamentId?: string
@@ -9,9 +9,7 @@ interface Props {
 
 /**
  * Wraps content with tournament-specific CSS variables for dynamic theming.
- * 
- * FIFA World Cup 2026: deep blue (#0B3D91) + gold (#D4AF37)
- * UEFA Champions League 2026/27: navy (#0E1E4A) + purple (#8E44FF)
+ * Driven by the registry response, not hardcoded color lookups.
  * 
  * Usage:
  *   <TournamentThemeWrapper tournamentId={room.tournamentId}>
@@ -19,7 +17,8 @@ interface Props {
  *   </TournamentThemeWrapper>
  */
 export default function TournamentThemeWrapper({ tournamentId, children, className }: Props) {
-  const tournament = TOURNAMENTS.find((t) => t.id === tournamentId)
+  const { data: tournaments } = useTournaments()
+  const tournament = tournaments?.find((t) => t.id === tournamentId)
   const theme = tournament?.theme
 
   return (
