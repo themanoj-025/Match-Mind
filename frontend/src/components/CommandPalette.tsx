@@ -69,11 +69,6 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
   const inputRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
 
-  // Flatten all items for keyboard navigation
-  const allItems = useMemo(() => {
-    return SECTIONS.flatMap(s => s.items)
-  }, [])
-
   // Filter items based on query
   const filteredSections = useMemo(() => {
     if (!query.trim()) return SECTIONS

@@ -6,7 +6,6 @@ interface EmptyStateProps {
   title: string
   description?: string
   action?: React.ReactNode
-  illustration?: string
 }
 
 export default function EmptyState({ icon, title, description, action }: EmptyStateProps) {

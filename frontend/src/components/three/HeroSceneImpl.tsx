@@ -1,23 +1,11 @@
-/**
- * HeroSceneImpl — Three.js animated particle field
- * MatchMind v3.0 — Landing Page Hero Section
- *
- * Features:
- * - 200 floating particle spheres representing sport icons
- * - Mouse parallax: particles shift opposite to cursor
- * - Gentle rotation + sin-wave Y float animation loop
- * - Absolute positioned, fills parent, pointer-events: none
- * - Respects prefers-reduced-motion
- */
-
 import React, { useRef, useEffect, useCallback } from 'react'
 
 export default function HeroSceneImpl() {
-  const containerRef = useRef(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const mouseRef = useRef({ x: 0, y: 0 })
 
   useEffect(() => {
-    let renderer, scene, camera, particles, animationId
+    let renderer: any, scene: any, camera: any, particles: any, animationId: number | undefined
     const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
     const init = async () => {
@@ -29,20 +17,16 @@ export default function HeroSceneImpl() {
       const width = container.offsetWidth
       const height = container.offsetHeight
 
-      // Renderer
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
       renderer.setSize(width, height)
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
       container.appendChild(renderer.domElement)
 
-      // Scene
       scene = new THREE.Scene()
 
-      // Camera
       camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
       camera.position.z = 15
 
-      // Particles
       const count = 200
       const geometry = new THREE.BufferGeometry()
       const positions = new Float32Array(count * 3)
@@ -62,7 +46,6 @@ export default function HeroSceneImpl() {
       ]
 
       for (let i = 0; i < count; i++) {
-        // Position in a sphere radius 12
         const theta = Math.random() * Math.PI * 2
         const phi = Math.acos(2 * Math.random() - 1)
         const r = 6 + Math.random() * 6
@@ -71,7 +54,6 @@ export default function HeroSceneImpl() {
         positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta)
         positions[i * 3 + 2] = r * Math.cos(phi)
 
-        // Random color from palette
         const color = colorPalette[Math.floor(Math.random() * colorPalette.length)]
         colors[i * 3] = color.r
         colors[i * 3 + 1] = color.g
@@ -85,7 +67,6 @@ export default function HeroSceneImpl() {
       geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
       geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1))
 
-      // Particle material
       const material = new THREE.PointsMaterial({
         size: 0.12,
         vertexColors: true,
@@ -98,34 +79,27 @@ export default function HeroSceneImpl() {
       particles = new THREE.Points(geometry, material)
       scene.add(particles)
 
-      // Store speeds on the userData for animation
       particles.userData = { speeds: Array.from(speeds) }
 
-      // Animation loop
       let time = 0
       const animate = () => {
         animationId = requestAnimationFrame(animate)
         time += 0.005
 
         if (!isReduced) {
-          // Gentle rotation
           particles.rotation.y = time * 0.1
           particles.rotation.x = Math.sin(time * 0.05) * 0.1
 
-          // Mouse parallax — subtle offset
           const mx = (mouseRef.current.x / width) * 2 - 1
           const my = -(mouseRef.current.y / height) * 2 + 1
           particles.rotation.y += mx * 0.01
           particles.rotation.x += my * 0.01
 
-          // Sin-wave Y float on individual particles via position animation
-          const positions = geometry.attributes.position.array
+          const pos = geometry.attributes.position.array
           for (let i = 0; i < count; i++) {
-            // Store original Y in userData if not stored
-            if (!particles.userData.origY) particles.userData.origY = new Float32Array(positions)
-            // Animate back to original with sin wave
+            if (!particles.userData.origY) particles.userData.origY = new Float32Array(pos)
             const origY = particles.userData.origY[i * 3 + 1]
-            positions[i * 3 + 1] = origY + Math.sin(time * speeds[i] + i) * 0.3
+            pos[i * 3 + 1] = origY + Math.sin(time * speeds[i] + i) * 0.3
           }
           geometry.attributes.position.needsUpdate = true
         }
@@ -135,7 +109,6 @@ export default function HeroSceneImpl() {
 
       animate()
 
-      // Resize handler
       const handleResize = () => {
         const w = container.offsetWidth
         const h = container.offsetHeight
@@ -157,7 +130,7 @@ export default function HeroSceneImpl() {
         }
       }
       if (scene) {
-        scene.traverse((obj) => {
+        scene.traverse((obj: any) => {
           if (obj.geometry) obj.geometry.dispose()
           if (obj.material) obj.material.dispose()
         })
@@ -166,8 +139,7 @@ export default function HeroSceneImpl() {
     }
   }, [])
 
-  // Mouse move handler
-  const handleMouseMove = useCallback((e) => {
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
     const rect = containerRef.current?.getBoundingClientRect()
     if (rect) {
       mouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top }
