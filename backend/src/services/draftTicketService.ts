@@ -90,7 +90,7 @@ function checkAndResetTickets(record: TicketRecord, isPro: boolean): TicketRecor
     record.remaining = allowance
     record.lastResetAt = now()
     record.resetsAt = newResetsAt
-    record.sourceLog.push({ reason: 'auto_reset', delta: allowance - record.remaining, at: now() })
+    record.sourceLog.push({ reason: 'auto_reset', delta: allowance, at: now() })
   }
 
   return record
@@ -150,6 +150,16 @@ export async function getTicketBalance(
   isPro: boolean,
 ): Promise<{ remaining: number; resetsAt: string | null; isPro: boolean }> {
   const record = await getOrCreateTicketRecord(prisma, userId, tournamentId, isPro)
+
+  // Persist any auto-reset that happened during getOrCreateTicketRecord
+  await prisma.draftTicket.update({
+    where: { userId_tournamentId: { userId, tournamentId } },
+    data: {
+      remaining: record.remaining,
+      lastResetAt: record.lastResetAt,
+      resetsAt: record.resetsAt,
+    },
+  }).catch(() => {/* record may not exist yet for brand new */})
 
   return {
     remaining: record.remaining,

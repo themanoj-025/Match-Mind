@@ -79,6 +79,7 @@ import searchRoutes from './routes/search'
 import adminRoutes from './routes/admin'
 import stripeRoutes from './routes/stripe'
 import aiRoutes from './routes/ai'
+import draftRoutes from './routes/draft'
 import { setupSocket } from './socket'
 import { globalLimiter, authLimiter, passwordResetLimiter, publicLimiter } from './middleware/rateLimiter'
 import asyncHandler from './middleware/asyncHandler'
@@ -167,6 +168,7 @@ app.use('/api/search', searchRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/stripe', stripeRoutes)
 app.use('/api/ai', aiRoutes)
+app.use('/api/draft', draftRoutes)
 
 // ─── Cache for Sentry health check (avoids dynamic import per request) ─
 let sentryAvailable: boolean | null = null

@@ -490,23 +490,22 @@ export async function getNextRound(
 
   if (pickRecord && pickRecord.pickedPlayerId == null && !pickRecord.autoPicked) {
     // This round was already generated — check if timer expired
-    if (pickRecord.pickedAt) {
-      const pickedAt = new Date(pickRecord.pickedAt)
-      const expiresAt = new Date(pickedAt.getTime() + DRAFT.PICK_TIMER_SECONDS * 1000)
+    const roundCreatedAt = pickRecord.pickedAt ? new Date(pickRecord.pickedAt).getTime() : Date.now()
+    const expiresAtTime = roundCreatedAt + DRAFT.PICK_TIMER_SECONDS * 1000
 
-      if (Date.now() >= expiresAt.getTime()) {
-        // Auto-pick: choose the highest-rarity offered player
-        const highestRarityIdx = findHighestRarityIndex(pickRecord.offeredRarities)
-        const autoPickPlayerId = pickRecord.offeredPlayerIds[highestRarityIdx]
+    if (Date.now() >= expiresAtTime) {
+      // Auto-pick: choose the highest-rarity offered player
+      const highestRarityIdx = findHighestRarityIndex(pickRecord.offeredRarities)
+      const autoPickPlayerId = pickRecord.offeredPlayerIds[highestRarityIdx]
 
-        await prisma.draftPick.update({
-          where: { id: pickRecord.id },
-          data: {
-            pickedPlayerId: autoPickPlayerId,
-            autoPicked: true,
-            pickedAt: new Date().toISOString(),
-          },
-        })
+      await prisma.draftPick.update({
+        where: { id: pickRecord.id },
+        data: {
+          pickedPlayerId: autoPickPlayerId,
+          autoPicked: true,
+          pickedAt: new Date().toISOString(),
+        },
+      })
 
         // Return next round
         return getNextRound(prisma, sessionId, userId)
@@ -647,6 +646,58 @@ export async function processPick(
     return { success: false, error: 'Player was not offered in this round' }
   }
 
+  // Check if the pick timer has expired (anti-cheat: always server-authoritative)
+  if (pick.pickedAt) {
+    const roundCreatedAt = new Date(pick.pickedAt).getTime()
+    const expiresAt = roundCreatedAt + DRAFT.PICK_TIMER_SECONDS * 1000
+    if (Date.now() >= expiresAt) {
+      // Timer expired — auto-pick highest rarity
+      const highestRarityIdx = findHighestRarityIndex(pick.offeredRarities)
+      const autoPickPlayerId = pick.offeredPlayerIds[highestRarityIdx]
+
+      await prisma.draftPick.update({
+        where: { id: pick.id },
+        data: {
+          pickedPlayerId: autoPickPlayerId,
+          autoPicked: true,
+          pickedAt: new Date().toISOString(),
+        },
+      })
+
+      logger.info({
+        event: 'draft.auto_pick_timeout',
+        sessionId,
+        slotIndex,
+        autoPickPlayerId,
+        reason: 'Timer expired before user picked',
+      })
+
+      // Check if all slots are now filled
+      const formationDef = getFormation(session.formation)
+      if (!formationDef) return { success: false, error: 'Invalid formation' }
+
+      const totalSlots = formationDef.slots.reduce((sum, s) => sum + s.count, 0) + formationDef.benchSlots
+      const updatedPicks = await prisma.draftPick.findMany({
+        where: { draftSessionId: sessionId },
+      }) as DraftPick[]
+
+      const filledSlots = updatedPicks.filter((p) => p.pickedPlayerId != null).length
+      const allFilled = filledSlots >= totalSlots
+
+      if (allFilled) {
+        return { success: true, nextRound: null, session: session ?? undefined, complete: true }
+      }
+
+      const nextResult = await getNextRound(prisma, sessionId, userId)
+      return {
+        success: true,
+        nextRound: nextResult.round,
+        session: nextResult.session ?? undefined,
+        complete: nextResult.complete,
+      }
+    }
+  }
+
   // Update the pick record
   await prisma.draftPick.update({
     where: { id: pick.id },
@@ -683,7 +734,7 @@ export async function processPick(
     return {
       success: true,
       nextRound: null,
-      session: { ...session, status: 'DRAFTING' },
+      session: session ?? undefined,
       complete: true,
     }
   }
