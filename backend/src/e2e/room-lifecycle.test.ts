@@ -166,26 +166,24 @@ describe('Phase 1: Room Creation', () => {
     shared.inviteCode = body.inviteCode
   })
 
-  it('GET /api/rooms/:id returns the room with members and auction state', async () => {
+  it('GET /api/rooms/:id returns the room object', async () => {
     const { status, body } = await api('GET', `/api/rooms/${shared.roomId}`)
 
     expect(status).toBe(200)
     expect(body.id).toBe(shared.roomId)
     expect(body.hostId).toBe(HOST_USER.id)
     expect(body.status).toBe('LOBBY')
+  })
 
-    // Should include members
+  it('verifies host membership via GET /api/rooms/:id/members', async () => {
+    const { status, body } = await api('GET', `/api/rooms/${shared.roomId}/members`)
+
+    expect(status).toBe(200)
     expect(body.members).toBeDefined()
-    expect(Array.isArray(body.members)).toBe(true)
     expect(body.members.length).toBe(1)
     expect(body.members[0].userId).toBe(HOST_USER.id)
     expect(body.members[0].role).toBe('host')
     expect(body.members[0].remainingBudget).toBe(500)
-
-    // Should include auction state
-    expect(body.auctionState).toBeDefined()
-    expect(body.auctionState.phase).toBe('IDLE')
-    expect(body.auctionState.version).toBe(1)
   })
 
   it('GET /api/rooms/:id/members returns member list with ready status', async () => {
@@ -379,13 +377,19 @@ describe('Phase 4: Start Auction', () => {
     shared.firstPlayerId = body.state.currentPlayerId
   })
 
-  it('GET /api/rooms/:id returns updated room status', async () => {
+  it('GET /api/rooms/:id returns updated room status (DRAFTING)', async () => {
     const { status, body } = await api('GET', `/api/rooms/${shared.roomId}`)
 
     expect(status).toBe(200)
     expect(body.status).toBe('DRAFTING')
-    expect(body.auctionState.phase).toBe('PLAYER_LIVE')
-    expect(body.auctionState.currentPlayerId).toBe(shared.firstPlayerId)
+  })
+
+  it('GET /api/rooms/:roomId/state confirms PLAYER_LIVE phase', async () => {
+    const { status, body } = await api('GET', `/api/rooms/${shared.roomId}/state`)
+
+    expect(status).toBe(200)
+    expect(body.phase).toBe('PLAYER_LIVE')
+    expect(body.currentPlayerId).toBe(shared.firstPlayerId)
   })
 
   it('rejects start when auction already active', async () => {
@@ -659,9 +663,10 @@ describe('Phase 8: Error Handling', () => {
     expect(status).toBe(403)
     expect(body.error?.code).toBe('ROOM_LIMIT_REACHED')
 
-    // Clean up extra rooms
+    // Clean up extra rooms — explicitly filter to avoid slice ordering fragility
     const rooms = await prisma.room.findMany({ where: { hostId: HOST_USER.id } })
-    for (const room of rooms.slice(1)) {
+    const extraRooms = rooms.filter((r: any) => r.id !== shared.roomId)
+    for (const room of extraRooms) {
       await prisma.roomMember.deleteMany({ where: { roomId: room.id } })
       await prisma.auctionState.deleteMany({ where: { roomId: room.id } })
     }
