@@ -25,6 +25,8 @@ export default function AuctionRoomPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [starredPlayers, setStarredPlayers] = useState<Set<string>>(new Set())
+  const [isPaused, setIsPaused] = useState(false)
+  let bidCounter = 0
 
   // ─── Derived values ────────────────────────────────────
   const currentPlayerId = currentAuctionState?.currentPlayerId
@@ -100,12 +102,12 @@ export default function AuctionRoomPage() {
     } : null)
 
     setBidHistory(h => [{
-      id: `${data.playerId}-${data.timestamp || Date.now()}`,
+      id: `${data.playerId}-${Date.now()}-${++bidCounter}`,
       roomId: roomId || '',
       playerId: data.playerId,
       userId: data.bidderId,
       amount: data.amount,
-      timestamp: data.timestamp || new Date().toISOString(),
+      timestamp: new Date().toISOString(),
       version: data.version,
     }, ...h].slice(0, 50))
   }, [roomId])
@@ -136,14 +138,13 @@ export default function AuctionRoomPage() {
   }, [])
 
   const onAuctionPaused = useCallback(() => {
-    setCurrentAuctionState(prev => prev ? { ...prev, phase: 'IDLE' } : null)
+    setIsPaused(true)
   }, [])
 
-  const onAuctionResumed = useCallback((data: any) => {
-    if (data.state) {
-      setCurrentAuctionState(data.state)
-    }
-  }, [])
+  const onAuctionResumed = useCallback(() => {
+    setIsPaused(false)
+    loadMyRoster()
+  }, [loadMyRoster])
 
   const onBidRejected = useCallback((data: { code: string; message: string }) => {
     setError(data.message || 'Bid rejected')
@@ -259,8 +260,19 @@ export default function AuctionRoomPage() {
             </div>
           )}
 
+          {/* Paused overlay banner */}
+          {isPaused && (
+            <div className="bg-[var(--mm-bg-secondary)] rounded-[var(--radius-xl)] p-8 text-center border-2 border-[var(--mm-accent-amber)] animate-glow-pulse">
+              <div className="text-5xl mb-3">⏸️</div>
+              <h2 className="heading-1 text-[var(--mm-accent-amber)] mb-2">Auction Paused</h2>
+              <p className="body text-[var(--mm-text-secondary)]">
+                The host has paused the auction. It will resume shortly.
+              </p>
+            </div>
+          )}
+
           {/* Player Auction Card (PLAYER_LIVE, SOLD, UNSOLD, FINISHED) */}
-          {currentAuctionState && currentAuctionState.phase !== 'IDLE' && currentPlayer && (
+          {currentAuctionState && currentAuctionState.phase !== 'IDLE' && currentPlayer && !isPaused && (
             <PlayerAuctionCard
               player={currentPlayer}
               auctionState={currentAuctionState}
