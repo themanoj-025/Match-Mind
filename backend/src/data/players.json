@@ -6,8 +6,7 @@
     "club": "Real Madrid",
     "nationality": "BE",
     "position": "GK",
-    "basePrice": 72,
-    "rarityTier": "GOLD"
+    "basePrice": 72
   },
   {
     "id": "player-2",
@@ -16,8 +15,7 @@
     "club": "Liverpool",
     "nationality": "BR",
     "position": "GK",
-    "basePrice": 68,
-    "rarityTier": "GOLD"
+    "basePrice": 68
   },
   {
     "id": "player-3",
@@ -26,8 +24,7 @@
     "club": "Manchester City",
     "nationality": "BR",
     "position": "GK",
-    "basePrice": 62,
-    "rarityTier": "GOLD"
+    "basePrice": 62
   },
   {
     "id": "player-4",
@@ -36,8 +33,7 @@
     "club": "AC Milan",
     "nationality": "FR",
     "position": "GK",
-    "basePrice": 60,
-    "rarityTier": "GOLD"
+    "basePrice": 60
   },
   {
     "id": "player-5",
@@ -46,8 +42,7 @@
     "club": "Paris Saint-Germain",
     "nationality": "IT",
     "position": "GK",
-    "basePrice": 58,
-    "rarityTier": "GOLD"
+    "basePrice": 58
   },
   {
     "id": "player-6",
@@ -56,8 +51,7 @@
     "club": "Barcelona",
     "nationality": "DE",
     "position": "GK",
-    "basePrice": 56,
-    "rarityTier": "GOLD"
+    "basePrice": 56
   },
   {
     "id": "player-7",
@@ -66,8 +60,7 @@
     "club": "Atlético Madrid",
     "nationality": "SI",
     "position": "GK",
-    "basePrice": 54,
-    "rarityTier": "GOLD"
+    "basePrice": 54
   },
   {
     "id": "player-8",
@@ -76,8 +69,7 @@
     "club": "Aston Villa",
     "nationality": "AR",
     "position": "GK",
-    "basePrice": 52,
-    "rarityTier": "GOLD"
+    "basePrice": 52
   },
   {
     "id": "player-9",
@@ -86,8 +78,7 @@
     "club": "Bayern Munich",
     "nationality": "DE",
     "position": "GK",
-    "basePrice": 48,
-    "rarityTier": "SILVER"
+    "basePrice": 48
   },
   {
     "id": "player-10",
@@ -96,8 +87,7 @@
     "club": "Arsenal",
     "nationality": "ES",
     "position": "GK",
-    "basePrice": 46,
-    "rarityTier": "SILVER"
+    "basePrice": 46
   },
   {
     "id": "player-11",
@@ -106,8 +96,7 @@
     "club": "Borussia Dortmund",
     "nationality": "CH",
     "position": "GK",
-    "basePrice": 42,
-    "rarityTier": "SILVER"
+    "basePrice": 42
   },
   {
     "id": "player-12",
@@ -116,8 +105,7 @@
     "club": "FC Porto",
     "nationality": "PT",
     "position": "GK",
-    "basePrice": 40,
-    "rarityTier": "SILVER"
+    "basePrice": 40
   },
   {
     "id": "player-13",
@@ -126,8 +114,7 @@
     "club": "Manchester United",
     "nationality": "CM",
     "position": "GK",
-    "basePrice": 38,
-    "rarityTier": "SILVER"
+    "basePrice": 38
   },
   {
     "id": "player-14",
@@ -136,8 +123,7 @@
     "club": "Athletic Bilbao",
     "nationality": "ES",
     "position": "GK",
-    "basePrice": 36,
-    "rarityTier": "SILVER"
+    "basePrice": 36
   },
   {
     "id": "player-15",
@@ -146,8 +132,7 @@
     "club": "Everton",
     "nationality": "GB",
     "position": "GK",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
     "id": "player-16",
@@ -156,8 +141,7 @@
     "club": "Valencia",
     "nationality": "GE",
     "position": "GK",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
     "id": "player-17",
@@ -166,8 +150,7 @@
     "club": "Al Hilal",
     "nationality": "MA",
     "position": "GK",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
+    "basePrice": 30
   },
   {
     "id": "player-18",
@@ -176,8 +159,7 @@
     "club": "Real Sociedad",
     "nationality": "ES",
     "position": "GK",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
+    "basePrice": 28
   },
   {
     "id": "player-19",
@@ -186,8 +168,7 @@
     "club": "Real Madrid",
     "nationality": "UA",
     "position": "GK",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
+    "basePrice": 26
   },
   {
     "id": "player-20",
@@ -196,8 +177,7 @@
     "club": "Chelsea",
     "nationality": "ES",
     "position": "GK",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
+    "basePrice": 24
   },
   {
     "id": "player-21",
@@ -206,8 +186,7 @@
     "club": "West Ham",
     "nationality": "FR",
     "position": "GK",
-    "basePrice": 20,
-    "rarityTier": "BRONZE"
+    "basePrice": 20
   },
   {
     "id": "player-22",
@@ -216,8 +195,7 @@
     "club": "Brentford",
     "nationality": "NL",
     "position": "GK",
-    "basePrice": 16,
-    "rarityTier": "BRONZE"
+    "basePrice": 16
   },
   {
     "id": "player-23",
@@ -226,8 +204,7 @@
     "club": "Al Qadsiah",
     "nationality": "BE",
     "position": "GK",
-    "basePrice": 14,
-    "rarityTier": "BRONZE"
+    "basePrice": 14
   },
   {
     "id": "player-24",
@@ -236,8 +213,7 @@
     "club": "AZ Alkmaar",
     "nationality": "AU",
     "position": "GK",
-    "basePrice": 10,
-    "rarityTier": "BRONZE"
+    "basePrice": 10
   },
   {
     "id": "player-25",
@@ -246,8 +222,7 @@
     "club": "Santos Laguna",
     "nationality": "MX",
     "position": "GK",
-    "basePrice": 48,
-    "rarityTier": "SILVER"
+    "basePrice": 48
   },
   {
     "id": "player-26",
@@ -256,8 +231,7 @@
     "club": "Salernitana",
     "nationality": "MX",
     "position": "GK",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
     "id": "player-27",
@@ -266,8 +240,7 @@
     "club": "Liverpool",
     "nationality": "IE",
     "position": "GK",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
+    "basePrice": 28
   },
   {
     "id": "player-28",
@@ -276,8 +249,7 @@
     "club": "Lille",
     "nationality": "FR",
     "position": "GK",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
     "id": "player-29",
@@ -286,28 +258,25 @@
     "club": "Atalanta",
     "nationality": "IT",
     "position": "GK",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
+    "basePrice": 30
   },
   {
     "id": "player-30",
     "tournamentId": "fifa-wc-2026",
-    "name": "Michał Míškovský",
-    "club": "Slavia Prague",
-    "nationality": "CZ",
+    "name": "Wojciech Szczęsny",
+    "club": "Barcelona",
+    "nationality": "PL",
     "position": "GK",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
     "id": "player-31",
     "tournamentId": "fifa-wc-2026",
-    "name": "Matvey Safonov",
-    "club": "Paris Saint-Germain",
-    "nationality": "RU",
+    "name": "Guglielmo Vicario",
+    "club": "Tottenham",
+    "nationality": "IT",
     "position": "GK",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
     "id": "player-32",
@@ -316,8 +285,7 @@
     "club": "Fenerbahçe",
     "nationality": "HR",
     "position": "GK",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
+    "basePrice": 30
   },
   {
     "id": "player-33",
@@ -326,5008 +294,3734 @@
     "club": "Lazio",
     "nationality": "IT",
     "position": "GK",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
+    "basePrice": 28
   },
   {
     "id": "player-34",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Wojciech Szczęsny",
-    "club": "Barcelona",
-    "nationality": "PL",
-    "position": "GK",
-    "basePrice": 36,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-35",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Rui Silva",
-    "club": "Real Betis",
-    "nationality": "PT",
-    "position": "GK",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-36",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Guglielmo Vicario",
-    "club": "Tottenham",
-    "nationality": "IT",
-    "position": "GK",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-37",
     "tournamentId": "fifa-wc-2026",
     "name": "Virgil van Dijk",
     "club": "Liverpool",
     "nationality": "NL",
     "position": "DEF",
-    "basePrice": 55,
-    "rarityTier": "GOLD"
+    "basePrice": 55
   },
   {
-    "id": "player-38",
+    "id": "player-35",
     "tournamentId": "fifa-wc-2026",
     "name": "Rúben Dias",
     "club": "Manchester City",
     "nationality": "PT",
     "position": "DEF",
-    "basePrice": 50,
-    "rarityTier": "GOLD"
+    "basePrice": 50
   },
   {
-    "id": "player-39",
+    "id": "player-36",
     "tournamentId": "fifa-wc-2026",
     "name": "William Saliba",
     "club": "Arsenal",
     "nationality": "FR",
     "position": "DEF",
-    "basePrice": 45,
-    "rarityTier": "SILVER"
+    "basePrice": 45
   },
   {
-    "id": "player-40",
+    "id": "player-37",
     "tournamentId": "fifa-wc-2026",
     "name": "Theo Hernández",
     "club": "AC Milan",
     "nationality": "FR",
     "position": "DEF",
-    "basePrice": 40,
-    "rarityTier": "SILVER"
+    "basePrice": 40
   },
   {
-    "id": "player-41",
+    "id": "player-38",
     "tournamentId": "fifa-wc-2026",
     "name": "Achraf Hakimi",
     "club": "Paris Saint-Germain",
     "nationality": "MA",
     "position": "DEF",
-    "basePrice": 42,
-    "rarityTier": "SILVER"
+    "basePrice": 42
   },
   {
-    "id": "player-42",
+    "id": "player-39",
     "tournamentId": "fifa-wc-2026",
     "name": "Antonio Rüdiger",
     "club": "Real Madrid",
     "nationality": "DE",
     "position": "DEF",
-    "basePrice": 44,
-    "rarityTier": "SILVER"
+    "basePrice": 44
   },
   {
-    "id": "player-43",
+    "id": "player-40",
     "tournamentId": "fifa-wc-2026",
     "name": "Jules Koundé",
     "club": "Barcelona",
     "nationality": "FR",
     "position": "DEF",
-    "basePrice": 40,
-    "rarityTier": "SILVER"
+    "basePrice": 40
   },
   {
-    "id": "player-44",
+    "id": "player-41",
     "tournamentId": "fifa-wc-2026",
     "name": "Daniel Carvajal",
     "club": "Real Madrid",
     "nationality": "ES",
     "position": "DEF",
-    "basePrice": 38,
-    "rarityTier": "SILVER"
+    "basePrice": 38
   },
   {
-    "id": "player-45",
+    "id": "player-42",
     "tournamentId": "fifa-wc-2026",
     "name": "Josko Gvardiol",
     "club": "Manchester City",
     "nationality": "HR",
     "position": "DEF",
-    "basePrice": 43,
-    "rarityTier": "SILVER"
+    "basePrice": 43
   },
   {
-    "id": "player-46",
+    "id": "player-43",
     "tournamentId": "fifa-wc-2026",
     "name": "Dayot Upamecano",
     "club": "Bayern Munich",
     "nationality": "FR",
     "position": "DEF",
-    "basePrice": 38,
-    "rarityTier": "SILVER"
+    "basePrice": 38
   },
   {
-    "id": "player-47",
+    "id": "player-44",
     "tournamentId": "fifa-wc-2026",
     "name": "John Stones",
     "club": "Manchester City",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 36,
-    "rarityTier": "SILVER"
+    "basePrice": 36
   },
   {
-    "id": "player-48",
+    "id": "player-45",
     "tournamentId": "fifa-wc-2026",
     "name": "Ronald Araújo",
     "club": "Barcelona",
     "nationality": "UY",
     "position": "DEF",
-    "basePrice": 37,
-    "rarityTier": "SILVER"
+    "basePrice": 37
   },
   {
-    "id": "player-49",
+    "id": "player-46",
     "tournamentId": "fifa-wc-2026",
     "name": "Trent Alexander-Arnold",
     "club": "Liverpool",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 42,
-    "rarityTier": "SILVER"
+    "basePrice": 42
   },
   {
-    "id": "player-50",
+    "id": "player-47",
     "tournamentId": "fifa-wc-2026",
     "name": "Kyle Walker",
     "club": "Manchester City",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
-    "id": "player-51",
+    "id": "player-48",
     "tournamentId": "fifa-wc-2026",
     "name": "Alphonso Davies",
     "club": "Bayern Munich",
     "nationality": "CA",
     "position": "DEF",
-    "basePrice": 39,
-    "rarityTier": "SILVER"
+    "basePrice": 39
   },
   {
-    "id": "player-52",
+    "id": "player-49",
     "tournamentId": "fifa-wc-2026",
     "name": "Gabriel Magalhães",
     "club": "Arsenal",
     "nationality": "BR",
     "position": "DEF",
-    "basePrice": 35,
-    "rarityTier": "BRONZE"
+    "basePrice": 35
   },
   {
-    "id": "player-53",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Matthijs de Ligt",
-    "club": "Manchester United",
-    "nationality": "NL",
-    "position": "DEF",
-    "basePrice": 33,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-54",
+    "id": "player-50",
     "tournamentId": "fifa-wc-2026",
     "name": "Eder Militão",
     "club": "Real Madrid",
     "nationality": "BR",
     "position": "DEF",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
-    "id": "player-55",
+    "id": "player-51",
     "tournamentId": "fifa-wc-2026",
     "name": "Micky van de Ven",
     "club": "Tottenham",
     "nationality": "NL",
     "position": "DEF",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
-    "id": "player-56",
+    "id": "player-52",
     "tournamentId": "fifa-wc-2026",
     "name": "João Cancelo",
     "club": "Barcelona",
     "nationality": "PT",
     "position": "DEF",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
-    "id": "player-57",
+    "id": "player-53",
     "tournamentId": "fifa-wc-2026",
     "name": "Alejandro Balde",
     "club": "Barcelona",
     "nationality": "ES",
     "position": "DEF",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
+    "basePrice": 30
   },
   {
-    "id": "player-58",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Ben Chilwell",
-    "club": "Chelsea",
-    "nationality": "GB",
-    "position": "DEF",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-59",
+    "id": "player-54",
     "tournamentId": "fifa-wc-2026",
     "name": "Nico Schlotterbeck",
     "club": "Borussia Dortmund",
     "nationality": "DE",
     "position": "DEF",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
+    "basePrice": 30
   },
   {
-    "id": "player-60",
+    "id": "player-55",
     "tournamentId": "fifa-wc-2026",
     "name": "Jonathan Tah",
     "club": "Bayer Leverkusen",
     "nationality": "DE",
     "position": "DEF",
-    "basePrice": 29,
-    "rarityTier": "BRONZE"
+    "basePrice": 29
   },
   {
-    "id": "player-61",
+    "id": "player-56",
     "tournamentId": "fifa-wc-2026",
     "name": "Pau Torres",
     "club": "Aston Villa",
     "nationality": "ES",
     "position": "DEF",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
+    "basePrice": 28
   },
   {
-    "id": "player-62",
+    "id": "player-57",
     "tournamentId": "fifa-wc-2026",
     "name": "Jurriën Timber",
     "club": "Arsenal",
     "nationality": "NL",
     "position": "DEF",
-    "basePrice": 27,
-    "rarityTier": "BRONZE"
+    "basePrice": 27
   },
   {
-    "id": "player-63",
+    "id": "player-58",
     "tournamentId": "fifa-wc-2026",
     "name": "Cristian Romero",
     "club": "Tottenham",
     "nationality": "AR",
     "position": "DEF",
-    "basePrice": 31,
-    "rarityTier": "BRONZE"
+    "basePrice": 31
   },
   {
-    "id": "player-64",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Noussair Mazraoui",
-    "club": "Manchester United",
-    "nationality": "MA",
-    "position": "DEF",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-65",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Reece James",
-    "club": "Chelsea",
-    "nationality": "GB",
-    "position": "DEF",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-66",
-    "tournamentId": "fifa-wc-2026",
-    "name": "César Azpilicueta",
-    "club": "Atlético Madrid",
-    "nationality": "ES",
-    "position": "DEF",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-67",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Fikayo Tomori",
-    "club": "AC Milan",
-    "nationality": "GB",
-    "position": "DEF",
-    "basePrice": 25,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-68",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Luke Shaw",
-    "club": "Manchester United",
-    "nationality": "GB",
-    "position": "DEF",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-69",
-    "tournamentId": "fifa-wc-2026",
-    "name": "David Alaba",
-    "club": "Real Madrid",
-    "nationality": "AT",
-    "position": "DEF",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-70",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Kim Min-jae",
-    "club": "Bayern Munich",
-    "nationality": "KR",
-    "position": "DEF",
-    "basePrice": 23,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-71",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Emerson Royal",
-    "club": "Tottenham",
-    "nationality": "BR",
-    "position": "DEF",
-    "basePrice": 18,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-72",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Sergi Cardona",
-    "club": "Las Palmas",
-    "nationality": "ES",
-    "position": "DEF",
-    "basePrice": 12,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-73",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Pervis Estupiñán",
-    "club": "Brighton",
-    "nationality": "EC",
-    "position": "DEF",
-    "basePrice": 20,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-74",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Marc Cucurella",
-    "club": "Chelsea",
-    "nationality": "ES",
-    "position": "DEF",
-    "basePrice": 18,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-75",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Nathan Aké",
-    "club": "Manchester City",
-    "nationality": "NL",
-    "position": "DEF",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-76",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Riccardo Calafiori",
-    "club": "Bologna",
-    "nationality": "IT",
-    "position": "DEF",
-    "basePrice": 16,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-77",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Jarrad Branthwaite",
-    "club": "Everton",
-    "nationality": "GB",
-    "position": "DEF",
-    "basePrice": 14,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-78",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Mario Hermoso",
-    "club": "Roma",
-    "nationality": "ES",
-    "position": "DEF",
-    "basePrice": 15,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-79",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Romain Saïss",
-    "club": "Al Shabab",
-    "nationality": "MA",
-    "position": "DEF",
-    "basePrice": 10,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-80",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Eric Dier",
-    "club": "Bayern Munich",
-    "nationality": "GB",
-    "position": "DEF",
-    "basePrice": 13,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-81",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Marcos Aoás Corrêa (Marquinhos)",
-    "club": "Paris Saint-Germain",
-    "nationality": "BR",
-    "position": "DEF",
-    "basePrice": 56,
-    "rarityTier": "GOLD"
-  },
-  {
-    "id": "player-82",
+    "id": "player-59",
     "tournamentId": "fifa-wc-2026",
     "name": "Lisandro Martínez",
     "club": "Manchester United",
     "nationality": "AR",
     "position": "DEF",
-    "basePrice": 54,
-    "rarityTier": "GOLD"
+    "basePrice": 44
   },
   {
-    "id": "player-83",
+    "id": "player-60",
     "tournamentId": "fifa-wc-2026",
-    "name": "Matthijs de Ligt",
-    "club": "Manchester United",
-    "nationality": "NL",
+    "name": "Marcos Marquinhos",
+    "club": "Paris Saint-Germain",
+    "nationality": "BR",
     "position": "DEF",
-    "basePrice": 52,
-    "rarityTier": "GOLD"
+    "basePrice": 48
   },
   {
-    "id": "player-84",
+    "id": "player-61",
     "tournamentId": "fifa-wc-2026",
     "name": "Andrew Robertson",
     "club": "Liverpool",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 52,
-    "rarityTier": "GOLD"
+    "basePrice": 48
   },
   {
-    "id": "player-85",
+    "id": "player-62",
     "tournamentId": "fifa-wc-2026",
     "name": "Ibrahima Konaté",
     "club": "Liverpool",
     "nationality": "FR",
     "position": "DEF",
-    "basePrice": 50,
-    "rarityTier": "GOLD"
+    "basePrice": 44
   },
   {
-    "id": "player-86",
+    "id": "player-63",
     "tournamentId": "fifa-wc-2026",
     "name": "Kieran Trippier",
     "club": "Newcastle",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 50,
-    "rarityTier": "GOLD"
+    "basePrice": 46
   },
   {
-    "id": "player-87",
+    "id": "player-64",
     "tournamentId": "fifa-wc-2026",
     "name": "Ben White",
     "club": "Arsenal",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 48,
-    "rarityTier": "SILVER"
+    "basePrice": 44
   },
   {
-    "id": "player-88",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Pau Cubarsí",
-    "club": "Barcelona",
-    "nationality": "ES",
-    "position": "DEF",
-    "basePrice": 48,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-89",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Levi Colwill",
-    "club": "Chelsea",
-    "nationality": "GB",
-    "position": "DEF",
-    "basePrice": 48,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-90",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Malo Gusto",
-    "club": "Chelsea",
-    "nationality": "FR",
-    "position": "DEF",
-    "basePrice": 46,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-91",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Pedro Porro",
-    "club": "Tottenham",
-    "nationality": "ES",
-    "position": "DEF",
-    "basePrice": 46,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-92",
+    "id": "player-65",
     "tournamentId": "fifa-wc-2026",
     "name": "Jeremie Frimpong",
     "club": "Bayer Leverkusen",
     "nationality": "NL",
     "position": "DEF",
-    "basePrice": 48,
-    "rarityTier": "SILVER"
+    "basePrice": 44
   },
   {
-    "id": "player-93",
+    "id": "player-66",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Malo Gusto",
+    "club": "Chelsea",
+    "nationality": "FR",
+    "position": "DEF",
+    "basePrice": 42
+  },
+  {
+    "id": "player-67",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Pedro Porro",
+    "club": "Tottenham",
+    "nationality": "ES",
+    "position": "DEF",
+    "basePrice": 42
+  },
+  {
+    "id": "player-68",
     "tournamentId": "fifa-wc-2026",
     "name": "José María Giménez",
     "club": "Atlético Madrid",
     "nationality": "UY",
     "position": "DEF",
-    "basePrice": 44,
-    "rarityTier": "SILVER"
+    "basePrice": 38
   },
   {
-    "id": "player-94",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Nahuel Molina",
-    "club": "Atlético Madrid",
-    "nationality": "AR",
-    "position": "DEF",
-    "basePrice": 40,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-95",
+    "id": "player-69",
     "tournamentId": "fifa-wc-2026",
     "name": "Nuno Mendes",
     "club": "Paris Saint-Germain",
     "nationality": "PT",
     "position": "DEF",
-    "basePrice": 44,
-    "rarityTier": "SILVER"
+    "basePrice": 40
   },
   {
-    "id": "player-96",
+    "id": "player-70",
     "tournamentId": "fifa-wc-2026",
     "name": "Alex Grimaldo",
     "club": "Bayer Leverkusen",
     "nationality": "ES",
     "position": "DEF",
-    "basePrice": 46,
-    "rarityTier": "SILVER"
+    "basePrice": 42
   },
   {
-    "id": "player-97",
+    "id": "player-71",
     "tournamentId": "fifa-wc-2026",
     "name": "Federico Dimarco",
     "club": "Inter Milan",
     "nationality": "IT",
     "position": "DEF",
-    "basePrice": 44,
-    "rarityTier": "SILVER"
+    "basePrice": 40
   },
   {
-    "id": "player-98",
+    "id": "player-72",
     "tournamentId": "fifa-wc-2026",
     "name": "Alessandro Bastoni",
     "club": "Inter Milan",
     "nationality": "IT",
     "position": "DEF",
-    "basePrice": 44,
-    "rarityTier": "SILVER"
+    "basePrice": 42
   },
   {
-    "id": "player-99",
+    "id": "player-73",
     "tournamentId": "fifa-wc-2026",
     "name": "Destiny Udogie",
     "club": "Tottenham",
     "nationality": "IT",
     "position": "DEF",
-    "basePrice": 44,
-    "rarityTier": "SILVER"
+    "basePrice": 40
   },
   {
-    "id": "player-100",
+    "id": "player-74",
     "tournamentId": "fifa-wc-2026",
-    "name": "Jeremie Frimpong",
-    "club": "Bayer Leverkusen",
-    "nationality": "NL",
-    "position": "DEF",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-101",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Alex Grimaldo",
-    "club": "Bayer Leverkusen",
-    "nationality": "ES",
-    "position": "DEF",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-102",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Odilon Kossounou",
-    "club": "Bayer Leverkusen",
-    "nationality": "CI",
-    "position": "DEF",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-103",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Edmond Tapsoba",
-    "club": "Bayer Leverkusen",
-    "nationality": "BF",
-    "position": "DEF",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-104",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Kieran Trippier",
-    "club": "Newcastle",
+    "name": "Reece James",
+    "club": "Chelsea",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 26
   },
   {
-    "id": "player-105",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Sven Botman",
-    "club": "Newcastle",
-    "nationality": "NL",
-    "position": "DEF",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-106",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Lewis Hall",
-    "club": "Newcastle",
-    "nationality": "GB",
-    "position": "DEF",
-    "basePrice": 16,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-107",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Tino Livramento",
-    "club": "Newcastle",
-    "nationality": "GB",
-    "position": "DEF",
-    "basePrice": 20,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-108",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Fabian Schär",
-    "club": "Newcastle",
-    "nationality": "CH",
-    "position": "DEF",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-109",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Pau Cubarsí",
-    "club": "Barcelona",
-    "nationality": "ES",
-    "position": "DEF",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-110",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Héctor Fort",
-    "club": "Barcelona",
-    "nationality": "ES",
-    "position": "DEF",
-    "basePrice": 16,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-111",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Jules Koundé",
-    "club": "Barcelona",
-    "nationality": "FR",
-    "position": "DEF",
-    "basePrice": 40,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-112",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Toni Rüdiger",
-    "club": "Real Madrid",
-    "nationality": "DE",
-    "position": "DEF",
-    "basePrice": 44,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-113",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Ferland Mendy",
-    "club": "Real Madrid",
-    "nationality": "FR",
-    "position": "DEF",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-114",
-    "tournamentId": "fifa-wc-2026",
-    "name": "David Alaba",
-    "club": "Real Madrid",
-    "nationality": "AT",
-    "position": "DEF",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-115",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Lucas Vázquez",
-    "club": "Real Madrid",
-    "nationality": "ES",
-    "position": "DEF",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-116",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Nacho",
-    "club": "Al Qadsiah",
-    "nationality": "ES",
-    "position": "DEF",
-    "basePrice": 18,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-117",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Matías Viña",
-    "club": "Flamengo",
-    "nationality": "UY",
-    "position": "DEF",
-    "basePrice": 18,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-118",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Ronald Araújo",
-    "club": "Barcelona",
-    "nationality": "UY",
-    "position": "DEF",
-    "basePrice": 38,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-119",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Inigo Martínez",
-    "club": "Barcelona",
-    "nationality": "ES",
-    "position": "DEF",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-120",
+    "id": "player-75",
     "tournamentId": "fifa-wc-2026",
     "name": "Levi Colwill",
     "club": "Chelsea",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
-    "id": "player-121",
+    "id": "player-76",
     "tournamentId": "fifa-wc-2026",
-    "name": "Benoît Badiashile",
-    "club": "Chelsea",
-    "nationality": "FR",
+    "name": "Noussair Mazraoui",
+    "club": "Manchester United",
+    "nationality": "MA",
     "position": "DEF",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
+    "basePrice": 24
   },
   {
-    "id": "player-122",
+    "id": "player-77",
     "tournamentId": "fifa-wc-2026",
-    "name": "Malo Gusto",
-    "club": "Chelsea",
-    "nationality": "FR",
+    "name": "Luke Shaw",
+    "club": "Manchester United",
+    "nationality": "GB",
     "position": "DEF",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
+    "basePrice": 24
   },
   {
-    "id": "player-123",
+    "id": "player-78",
     "tournamentId": "fifa-wc-2026",
-    "name": "Pedro Porro",
-    "club": "Tottenham",
+    "name": "Ben Chilwell",
+    "club": "Chelsea",
+    "nationality": "GB",
+    "position": "DEF",
+    "basePrice": 28
+  },
+  {
+    "id": "player-79",
+    "tournamentId": "fifa-wc-2026",
+    "name": "César Azpilicueta",
+    "club": "Atlético Madrid",
     "nationality": "ES",
     "position": "DEF",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
+    "basePrice": 22
   },
   {
-    "id": "player-124",
+    "id": "player-80",
     "tournamentId": "fifa-wc-2026",
-    "name": "Micky van de Ven",
-    "club": "Tottenham",
-    "nationality": "NL",
+    "name": "Fikayo Tomori",
+    "club": "AC Milan",
+    "nationality": "GB",
     "position": "DEF",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 25
   },
   {
-    "id": "player-125",
+    "id": "player-81",
     "tournamentId": "fifa-wc-2026",
-    "name": "Destiny Udogie",
-    "club": "Tottenham",
-    "nationality": "IT",
+    "name": "David Alaba",
+    "club": "Real Madrid",
+    "nationality": "AT",
     "position": "DEF",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
+    "basePrice": 26
   },
   {
-    "id": "player-126",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Joshua Kimmich",
-    "club": "Bayern Munich",
-    "nationality": "DE",
-    "position": "DEF",
-    "basePrice": 38,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-127",
+    "id": "player-82",
     "tournamentId": "fifa-wc-2026",
     "name": "Kim Min-jae",
     "club": "Bayern Munich",
     "nationality": "KR",
     "position": "DEF",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
+    "basePrice": 23
   },
   {
-    "id": "player-128",
+    "id": "player-83",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Pervis Estupiñán",
+    "club": "Brighton",
+    "nationality": "EC",
+    "position": "DEF",
+    "basePrice": 20
+  },
+  {
+    "id": "player-84",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Nathan Aké",
+    "club": "Manchester City",
+    "nationality": "NL",
+    "position": "DEF",
+    "basePrice": 22
+  },
+  {
+    "id": "player-85",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Marc Cucurella",
+    "club": "Chelsea",
+    "nationality": "ES",
+    "position": "DEF",
+    "basePrice": 18
+  },
+  {
+    "id": "player-86",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Emerson Royal",
+    "club": "Tottenham",
+    "nationality": "BR",
+    "position": "DEF",
+    "basePrice": 18
+  },
+  {
+    "id": "player-87",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Jarrad Branthwaite",
+    "club": "Everton",
+    "nationality": "GB",
+    "position": "DEF",
+    "basePrice": 14
+  },
+  {
+    "id": "player-88",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Mario Hermoso",
+    "club": "Roma",
+    "nationality": "ES",
+    "position": "DEF",
+    "basePrice": 15
+  },
+  {
+    "id": "player-89",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Romain Saïss",
+    "club": "Al Shabab",
+    "nationality": "MA",
+    "position": "DEF",
+    "basePrice": 10
+  },
+  {
+    "id": "player-90",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Eric Dier",
+    "club": "Bayern Munich",
+    "nationality": "GB",
+    "position": "DEF",
+    "basePrice": 13
+  },
+  {
+    "id": "player-91",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Sven Botman",
+    "club": "Newcastle",
+    "nationality": "NL",
+    "position": "DEF",
+    "basePrice": 28
+  },
+  {
+    "id": "player-92",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Fabian Schär",
+    "club": "Newcastle",
+    "nationality": "CH",
+    "position": "DEF",
+    "basePrice": 24
+  },
+  {
+    "id": "player-93",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Pau Cubarsí",
+    "club": "Barcelona",
+    "nationality": "ES",
+    "position": "DEF",
+    "basePrice": 30
+  },
+  {
+    "id": "player-94",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Raphaël Varane",
+    "club": "Como",
+    "nationality": "FR",
+    "position": "DEF",
+    "basePrice": 26
+  },
+  {
+    "id": "player-95",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Sergio Ramos",
+    "club": "Sevilla",
+    "nationality": "ES",
+    "position": "DEF",
+    "basePrice": 24
+  },
+  {
+    "id": "player-96",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Jordi Alba",
+    "club": "Inter Miami",
+    "nationality": "ES",
+    "position": "DEF",
+    "basePrice": 22
+  },
+  {
+    "id": "player-97",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Mats Hummels",
+    "club": "Roma",
+    "nationality": "DE",
+    "position": "DEF",
+    "basePrice": 20
+  },
+  {
+    "id": "player-98",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Nahuel Molina",
+    "club": "Atlético Madrid",
+    "nationality": "AR",
+    "position": "DEF",
+    "basePrice": 30
+  },
+  {
+    "id": "player-99",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Riccardo Calafiori",
+    "club": "Bologna",
+    "nationality": "IT",
+    "position": "DEF",
+    "basePrice": 16
+  },
+  {
+    "id": "player-100",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Tino Livramento",
+    "club": "Newcastle",
+    "nationality": "GB",
+    "position": "DEF",
+    "basePrice": 20
+  },
+  {
+    "id": "player-101",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Lewis Hall",
+    "club": "Newcastle",
+    "nationality": "GB",
+    "position": "DEF",
+    "basePrice": 16
+  },
+  {
+    "id": "player-102",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Héctor Fort",
+    "club": "Barcelona",
+    "nationality": "ES",
+    "position": "DEF",
+    "basePrice": 16
+  },
+  {
+    "id": "player-103",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Inigo Martínez",
+    "club": "Barcelona",
+    "nationality": "ES",
+    "position": "DEF",
+    "basePrice": 24
+  },
+  {
+    "id": "player-104",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Benoît Badiashile",
+    "club": "Chelsea",
+    "nationality": "FR",
+    "position": "DEF",
+    "basePrice": 24
+  },
+  {
+    "id": "player-105",
     "tournamentId": "fifa-wc-2026",
     "name": "Konrad Laimer",
     "club": "Bayern Munich",
     "nationality": "AT",
     "position": "DEF",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
+    "basePrice": 22
   },
   {
-    "id": "player-129",
+    "id": "player-106",
     "tournamentId": "fifa-wc-2026",
     "name": "Raphaël Guerreiro",
     "club": "Bayern Munich",
     "nationality": "PT",
     "position": "DEF",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
+    "basePrice": 22
   },
   {
-    "id": "player-130",
+    "id": "player-107",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Edmond Tapsoba",
+    "club": "Bayer Leverkusen",
+    "nationality": "BF",
+    "position": "DEF",
+    "basePrice": 28
+  },
+  {
+    "id": "player-108",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Odilon Kossounou",
+    "club": "Bayer Leverkusen",
+    "nationality": "CI",
+    "position": "DEF",
+    "basePrice": 24
+  },
+  {
+    "id": "player-109",
     "tournamentId": "fifa-wc-2026",
     "name": "Jude Bellingham",
     "club": "Real Madrid",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 80,
-    "rarityTier": "GOLD"
+    "basePrice": 80
   },
   {
-    "id": "player-131",
+    "id": "player-110",
     "tournamentId": "fifa-wc-2026",
     "name": "Rodri",
     "club": "Manchester City",
     "nationality": "ES",
     "position": "MID",
-    "basePrice": 70,
-    "rarityTier": "GOLD"
+    "basePrice": 70
   },
   {
-    "id": "player-132",
+    "id": "player-111",
     "tournamentId": "fifa-wc-2026",
     "name": "Declan Rice",
     "club": "Arsenal",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 55,
-    "rarityTier": "GOLD"
+    "basePrice": 55
   },
   {
-    "id": "player-133",
+    "id": "player-112",
     "tournamentId": "fifa-wc-2026",
     "name": "Phil Foden",
     "club": "Manchester City",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 60,
-    "rarityTier": "GOLD"
+    "basePrice": 60
   },
   {
-    "id": "player-134",
+    "id": "player-113",
     "tournamentId": "fifa-wc-2026",
     "name": "Jamal Musiala",
     "club": "Bayern Munich",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 65,
-    "rarityTier": "GOLD"
+    "basePrice": 65
   },
   {
-    "id": "player-135",
+    "id": "player-114",
     "tournamentId": "fifa-wc-2026",
     "name": "Florian Wirtz",
     "club": "Bayer Leverkusen",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 60,
-    "rarityTier": "GOLD"
+    "basePrice": 60
   },
   {
-    "id": "player-136",
+    "id": "player-115",
     "tournamentId": "fifa-wc-2026",
     "name": "Martin Ødegaard",
     "club": "Arsenal",
     "nationality": "NO",
     "position": "MID",
-    "basePrice": 55,
-    "rarityTier": "GOLD"
+    "basePrice": 55
   },
   {
-    "id": "player-137",
+    "id": "player-116",
     "tournamentId": "fifa-wc-2026",
     "name": "Federico Valverde",
     "club": "Real Madrid",
     "nationality": "UY",
     "position": "MID",
-    "basePrice": 54,
-    "rarityTier": "GOLD"
+    "basePrice": 54
   },
   {
-    "id": "player-138",
+    "id": "player-117",
     "tournamentId": "fifa-wc-2026",
     "name": "Eduardo Camavinga",
     "club": "Real Madrid",
     "nationality": "FR",
     "position": "MID",
-    "basePrice": 48,
-    "rarityTier": "SILVER"
+    "basePrice": 48
   },
   {
-    "id": "player-139",
+    "id": "player-118",
     "tournamentId": "fifa-wc-2026",
     "name": "Aurélien Tchouaméni",
     "club": "Real Madrid",
     "nationality": "FR",
     "position": "MID",
-    "basePrice": 46,
-    "rarityTier": "SILVER"
+    "basePrice": 46
   },
   {
-    "id": "player-140",
+    "id": "player-119",
     "tournamentId": "fifa-wc-2026",
     "name": "Pedri",
     "club": "Barcelona",
     "nationality": "ES",
     "position": "MID",
-    "basePrice": 52,
-    "rarityTier": "GOLD"
+    "basePrice": 52
   },
   {
-    "id": "player-141",
+    "id": "player-120",
     "tournamentId": "fifa-wc-2026",
     "name": "Gavi",
     "club": "Barcelona",
     "nationality": "ES",
     "position": "MID",
-    "basePrice": 48,
-    "rarityTier": "SILVER"
+    "basePrice": 48
   },
   {
-    "id": "player-142",
+    "id": "player-121",
     "tournamentId": "fifa-wc-2026",
     "name": "Ilkay Gündogan",
     "club": "Manchester City",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 42,
-    "rarityTier": "SILVER"
+    "basePrice": 42
   },
   {
-    "id": "player-143",
+    "id": "player-122",
     "tournamentId": "fifa-wc-2026",
     "name": "Kevin De Bruyne",
     "club": "Manchester City",
     "nationality": "BE",
     "position": "MID",
-    "basePrice": 58,
-    "rarityTier": "GOLD"
+    "basePrice": 58
   },
   {
-    "id": "player-144",
+    "id": "player-123",
     "tournamentId": "fifa-wc-2026",
     "name": "Bruno Fernandes",
     "club": "Manchester United",
     "nationality": "PT",
     "position": "MID",
-    "basePrice": 44,
-    "rarityTier": "SILVER"
+    "basePrice": 44
   },
   {
-    "id": "player-145",
+    "id": "player-124",
     "tournamentId": "fifa-wc-2026",
     "name": "Cole Palmer",
     "club": "Chelsea",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 50,
-    "rarityTier": "GOLD"
+    "basePrice": 50
   },
   {
-    "id": "player-146",
+    "id": "player-125",
     "tournamentId": "fifa-wc-2026",
     "name": "James Maddison",
     "club": "Tottenham",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 38,
-    "rarityTier": "SILVER"
+    "basePrice": 38
   },
   {
-    "id": "player-147",
+    "id": "player-126",
     "tournamentId": "fifa-wc-2026",
     "name": "Enzo Fernández",
     "club": "Chelsea",
     "nationality": "AR",
     "position": "MID",
-    "basePrice": 40,
-    "rarityTier": "SILVER"
+    "basePrice": 40
   },
   {
-    "id": "player-148",
+    "id": "player-127",
     "tournamentId": "fifa-wc-2026",
     "name": "Moises Caicedo",
     "club": "Chelsea",
     "nationality": "EC",
     "position": "MID",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
-    "id": "player-149",
+    "id": "player-128",
     "tournamentId": "fifa-wc-2026",
     "name": "Alexis Mac Allister",
     "club": "Liverpool",
     "nationality": "AR",
     "position": "MID",
-    "basePrice": 39,
-    "rarityTier": "SILVER"
+    "basePrice": 39
   },
   {
-    "id": "player-150",
+    "id": "player-129",
     "tournamentId": "fifa-wc-2026",
     "name": "Dominik Szoboszlai",
     "club": "Liverpool",
     "nationality": "HU",
     "position": "MID",
-    "basePrice": 37,
-    "rarityTier": "SILVER"
+    "basePrice": 37
   },
   {
-    "id": "player-151",
+    "id": "player-130",
     "tournamentId": "fifa-wc-2026",
     "name": "Ryan Gravenberch",
     "club": "Liverpool",
     "nationality": "NL",
     "position": "MID",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
+    "basePrice": 30
   },
   {
-    "id": "player-152",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Khadija Shaw",
-    "club": "Manchester City",
-    "nationality": "JM",
-    "position": "MID",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-153",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Mason Mount",
-    "club": "Manchester United",
-    "nationality": "GB",
-    "position": "MID",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-154",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Kobbie Mainoo",
-    "club": "Manchester United",
-    "nationality": "GB",
-    "position": "MID",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-155",
+    "id": "player-131",
     "tournamentId": "fifa-wc-2026",
     "name": "Bernardo Silva",
     "club": "Manchester City",
     "nationality": "PT",
     "position": "MID",
-    "basePrice": 45,
-    "rarityTier": "SILVER"
+    "basePrice": 45
   },
   {
-    "id": "player-156",
+    "id": "player-132",
     "tournamentId": "fifa-wc-2026",
     "name": "Frenkie de Jong",
     "club": "Barcelona",
     "nationality": "NL",
     "position": "MID",
-    "basePrice": 40,
-    "rarityTier": "SILVER"
+    "basePrice": 40
   },
   {
-    "id": "player-157",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Isco",
-    "club": "Real Betis",
-    "nationality": "ES",
-    "position": "MID",
-    "basePrice": 20,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-158",
+    "id": "player-133",
     "tournamentId": "fifa-wc-2026",
     "name": "Dani Olmo",
     "club": "Barcelona",
     "nationality": "ES",
     "position": "MID",
-    "basePrice": 35,
-    "rarityTier": "BRONZE"
+    "basePrice": 35
   },
   {
-    "id": "player-159",
+    "id": "player-134",
     "tournamentId": "fifa-wc-2026",
     "name": "Warren Zaïre-Emery",
     "club": "Paris Saint-Germain",
     "nationality": "FR",
     "position": "MID",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
-    "id": "player-160",
+    "id": "player-135",
     "tournamentId": "fifa-wc-2026",
     "name": "Vitinha",
     "club": "Paris Saint-Germain",
     "nationality": "PT",
     "position": "MID",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
+    "basePrice": 30
   },
   {
-    "id": "player-161",
+    "id": "player-136",
     "tournamentId": "fifa-wc-2026",
     "name": "Hakan Çalhanoğlu",
     "club": "Inter Milan",
     "nationality": "TR",
     "position": "MID",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
-    "id": "player-162",
+    "id": "player-137",
     "tournamentId": "fifa-wc-2026",
     "name": "Nicolo Barella",
     "club": "Inter Milan",
     "nationality": "IT",
     "position": "MID",
-    "basePrice": 35,
-    "rarityTier": "BRONZE"
+    "basePrice": 35
   },
   {
-    "id": "player-163",
+    "id": "player-138",
     "tournamentId": "fifa-wc-2026",
     "name": "Joshua Kimmich",
     "club": "Bayern Munich",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 38,
-    "rarityTier": "SILVER"
+    "basePrice": 38
   },
   {
-    "id": "player-164",
+    "id": "player-139",
     "tournamentId": "fifa-wc-2026",
     "name": "Leon Goretzka",
     "club": "Bayern Munich",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
+    "basePrice": 30
   },
   {
-    "id": "player-165",
+    "id": "player-140",
     "tournamentId": "fifa-wc-2026",
     "name": "Julian Brandt",
     "club": "Borussia Dortmund",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
+    "basePrice": 24
   },
   {
-    "id": "player-166",
+    "id": "player-141",
     "tournamentId": "fifa-wc-2026",
     "name": "Marcel Sabitzer",
     "club": "Borussia Dortmund",
     "nationality": "AT",
     "position": "MID",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
+    "basePrice": 22
   },
   {
-    "id": "player-167",
+    "id": "player-142",
     "tournamentId": "fifa-wc-2026",
     "name": "Exequiel Palacios",
     "club": "Bayer Leverkusen",
     "nationality": "AR",
     "position": "MID",
-    "basePrice": 25,
-    "rarityTier": "BRONZE"
+    "basePrice": 25
   },
   {
-    "id": "player-168",
+    "id": "player-143",
     "tournamentId": "fifa-wc-2026",
     "name": "Granit Xhaka",
     "club": "Bayer Leverkusen",
     "nationality": "CH",
     "position": "MID",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
+    "basePrice": 24
   },
   {
-    "id": "player-169",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Declan McAtee",
-    "club": "Manchester City",
-    "nationality": "GB",
-    "position": "MID",
-    "basePrice": 14,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-170",
+    "id": "player-144",
     "tournamentId": "fifa-wc-2026",
     "name": "Amadou Onana",
     "club": "Aston Villa",
     "nationality": "BE",
     "position": "MID",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
+    "basePrice": 22
   },
   {
-    "id": "player-171",
+    "id": "player-145",
     "tournamentId": "fifa-wc-2026",
     "name": "Youri Tielemans",
     "club": "Aston Villa",
     "nationality": "BE",
     "position": "MID",
-    "basePrice": 20,
-    "rarityTier": "BRONZE"
+    "basePrice": 20
   },
   {
-    "id": "player-172",
+    "id": "player-146",
     "tournamentId": "fifa-wc-2026",
-    "name": "Morgan Rogers",
-    "club": "Aston Villa",
+    "name": "Kobbie Mainoo",
+    "club": "Manchester United",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 16,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
-    "id": "player-173",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Scott McTominay",
-    "club": "Napoli",
-    "nationality": "GB",
-    "position": "MID",
-    "basePrice": 18,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-174",
+    "id": "player-147",
     "tournamentId": "fifa-wc-2026",
     "name": "Sandro Tonali",
     "club": "Newcastle",
     "nationality": "IT",
     "position": "MID",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
+    "basePrice": 28
   },
   {
-    "id": "player-175",
+    "id": "player-148",
     "tournamentId": "fifa-wc-2026",
     "name": "Bruno Guimarães",
     "club": "Newcastle",
     "nationality": "BR",
     "position": "MID",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
+    "basePrice": 30
   },
   {
-    "id": "player-176",
+    "id": "player-149",
     "tournamentId": "fifa-wc-2026",
     "name": "Conor Gallagher",
     "club": "Atlético Madrid",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 20,
-    "rarityTier": "BRONZE"
+    "basePrice": 20
   },
   {
-    "id": "player-177",
+    "id": "player-150",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Scott McTominay",
+    "club": "Napoli",
+    "nationality": "GB",
+    "position": "MID",
+    "basePrice": 18
+  },
+  {
+    "id": "player-151",
     "tournamentId": "fifa-wc-2026",
     "name": "Arda Güler",
     "club": "Real Madrid",
     "nationality": "TR",
     "position": "MID",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
+    "basePrice": 28
   },
   {
-    "id": "player-178",
+    "id": "player-152",
     "tournamentId": "fifa-wc-2026",
     "name": "Luka Modrić",
     "club": "Real Madrid",
     "nationality": "HR",
     "position": "MID",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
+    "basePrice": 30
   },
   {
-    "id": "player-179",
+    "id": "player-153",
     "tournamentId": "fifa-wc-2026",
     "name": "Toni Kroos",
     "club": "Real Madrid",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
+    "basePrice": 30
   },
   {
-    "id": "player-180",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Dani Ceballos",
-    "club": "Real Madrid",
-    "nationality": "ES",
-    "position": "MID",
-    "basePrice": 20,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-181",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Sergio Busquets",
-    "club": "Inter Miami",
-    "nationality": "ES",
-    "position": "MID",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-182",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Gavi",
-    "club": "Barcelona",
-    "nationality": "ES",
-    "position": "MID",
-    "basePrice": 48,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-183",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Fermín López",
-    "club": "Barcelona",
-    "nationality": "ES",
-    "position": "MID",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-184",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Pablo Torre",
-    "club": "Barcelona",
-    "nationality": "ES",
-    "position": "MID",
-    "basePrice": 14,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-185",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Romeo Lavia",
-    "club": "Chelsea",
-    "nationality": "BE",
-    "position": "MID",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-186",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Carney Chukwuemeka",
-    "club": "Chelsea",
-    "nationality": "GB",
-    "position": "MID",
-    "basePrice": 18,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-187",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Kiernan Dewsbury-Hall",
-    "club": "Chelsea",
-    "nationality": "GB",
-    "position": "MID",
-    "basePrice": 20,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-188",
+    "id": "player-154",
     "tournamentId": "fifa-wc-2026",
     "name": "Harvey Elliott",
     "club": "Brighton",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
+    "basePrice": 24
   },
   {
-    "id": "player-189",
+    "id": "player-155",
     "tournamentId": "fifa-wc-2026",
     "name": "Curtis Jones",
     "club": "Liverpool",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
+    "basePrice": 26
   },
   {
-    "id": "player-190",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Wataru Endo",
-    "club": "Liverpool",
-    "nationality": "JP",
-    "position": "MID",
-    "basePrice": 20,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-191",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Thiago",
-    "club": "Liverpool",
-    "nationality": "ES",
-    "position": "MID",
-    "basePrice": 18,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-192",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Bobby Clark",
-    "club": "RB Salzburg",
-    "nationality": "GB",
-    "position": "MID",
-    "basePrice": 12,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-193",
+    "id": "player-156",
     "tournamentId": "fifa-wc-2026",
     "name": "Pape Matar Sarr",
     "club": "Tottenham",
     "nationality": "SN",
     "position": "MID",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
+    "basePrice": 28
   },
   {
-    "id": "player-194",
+    "id": "player-157",
     "tournamentId": "fifa-wc-2026",
     "name": "Yves Bissouma",
     "club": "Tottenham",
     "nationality": "ML",
     "position": "MID",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
+    "basePrice": 24
   },
   {
-    "id": "player-195",
-    "tournamentId": "fifa-wc-2026",
-    "name": "James Milner",
-    "club": "Brighton",
-    "nationality": "GB",
-    "position": "MID",
-    "basePrice": 14,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-196",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Pascal Groß",
-    "club": "Borussia Dortmund",
-    "nationality": "DE",
-    "position": "MID",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-197",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Felix Nmecha",
-    "club": "Borussia Dortmund",
-    "nationality": "DE",
-    "position": "MID",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-198",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Salih Özcan",
-    "club": "Borussia Dortmund",
-    "nationality": "DE",
-    "position": "MID",
-    "basePrice": 18,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-199",
+    "id": "player-158",
     "tournamentId": "fifa-wc-2026",
     "name": "Aleksandar Pavlović",
     "club": "Bayern Munich",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
+    "basePrice": 28
   },
   {
-    "id": "player-200",
+    "id": "player-159",
     "tournamentId": "fifa-wc-2026",
     "name": "João Palhinha",
     "club": "Bayern Munich",
     "nationality": "PT",
     "position": "MID",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
+    "basePrice": 30
   },
   {
-    "id": "player-201",
+    "id": "player-160",
     "tournamentId": "fifa-wc-2026",
-    "name": "Sacha Boey",
-    "club": "Bayern Munich",
-    "nationality": "FR",
+    "name": "Dani Ceballos",
+    "club": "Real Madrid",
+    "nationality": "ES",
     "position": "MID",
-    "basePrice": 18,
-    "rarityTier": "BRONZE"
+    "basePrice": 20
   },
   {
-    "id": "player-202",
+    "id": "player-161",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Sergio Busquets",
+    "club": "Inter Miami",
+    "nationality": "ES",
+    "position": "MID",
+    "basePrice": 22
+  },
+  {
+    "id": "player-162",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Fermín López",
+    "club": "Barcelona",
+    "nationality": "ES",
+    "position": "MID",
+    "basePrice": 28
+  },
+  {
+    "id": "player-163",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Romeo Lavia",
+    "club": "Chelsea",
+    "nationality": "BE",
+    "position": "MID",
+    "basePrice": 24
+  },
+  {
+    "id": "player-164",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Pascal Groß",
+    "club": "Borussia Dortmund",
+    "nationality": "DE",
+    "position": "MID",
+    "basePrice": 26
+  },
+  {
+    "id": "player-165",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Felix Nmecha",
+    "club": "Borussia Dortmund",
+    "nationality": "DE",
+    "position": "MID",
+    "basePrice": 22
+  },
+  {
+    "id": "player-166",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Rodrigo De Paul",
+    "club": "Atlético Madrid",
+    "nationality": "AR",
+    "position": "MID",
+    "basePrice": 30
+  },
+  {
+    "id": "player-167",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Christian Pulisic",
+    "club": "AC Milan",
+    "nationality": "US",
+    "position": "MID",
+    "basePrice": 30
+  },
+  {
+    "id": "player-168",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Tijjani Reijnders",
+    "club": "AC Milan",
+    "nationality": "NL",
+    "position": "MID",
+    "basePrice": 28
+  },
+  {
+    "id": "player-169",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Ismaël Bennacer",
+    "club": "AC Milan",
+    "nationality": "DZ",
+    "position": "MID",
+    "basePrice": 26
+  },
+  {
+    "id": "player-170",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Alejandro Garnacho",
+    "club": "Manchester United",
+    "nationality": "AR",
+    "position": "MID",
+    "basePrice": 34
+  },
+  {
+    "id": "player-171",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Mason Mount",
+    "club": "Manchester United",
+    "nationality": "GB",
+    "position": "MID",
+    "basePrice": 26
+  },
+  {
+    "id": "player-172",
     "tournamentId": "fifa-wc-2026",
     "name": "Kylian Mbappé",
     "club": "Real Madrid",
     "nationality": "FR",
     "position": "FWD",
     "basePrice": 85,
-    "isEligibleForIcon": true,
-    "rarityTier": "ICON"
+    "isEligibleForIcon": true
   },
   {
-    "id": "player-203",
+    "id": "player-173",
     "tournamentId": "fifa-wc-2026",
     "name": "Erling Haaland",
     "club": "Manchester City",
     "nationality": "NO",
     "position": "FWD",
     "basePrice": 90,
-    "isEligibleForIcon": true,
-    "rarityTier": "ICON"
+    "isEligibleForIcon": true
   },
   {
-    "id": "player-204",
+    "id": "player-174",
     "tournamentId": "fifa-wc-2026",
     "name": "Vinícius Jr.",
     "club": "Real Madrid",
     "nationality": "BR",
     "position": "FWD",
     "basePrice": 75,
-    "isEligibleForIcon": true,
-    "rarityTier": "ICON"
+    "isEligibleForIcon": true
   },
   {
-    "id": "player-205",
+    "id": "player-175",
     "tournamentId": "fifa-wc-2026",
     "name": "Bukayo Saka",
     "club": "Arsenal",
     "nationality": "GB",
     "position": "FWD",
     "basePrice": 65,
-    "isEligibleForIcon": true,
-    "rarityTier": "GOLD"
+    "isEligibleForIcon": true
   },
   {
-    "id": "player-206",
+    "id": "player-176",
     "tournamentId": "fifa-wc-2026",
     "name": "Lamine Yamal",
     "club": "Barcelona",
     "nationality": "ES",
     "position": "FWD",
     "basePrice": 70,
-    "isEligibleForIcon": true,
-    "rarityTier": "ICON"
+    "isEligibleForIcon": true
   },
   {
-    "id": "player-207",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Antoine Griezmann",
-    "club": "Atlético Madrid",
-    "nationality": "FR",
-    "position": "FWD",
-    "basePrice": 50,
-    "rarityTier": "GOLD"
-  },
-  {
-    "id": "player-208",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Rodrygo",
-    "club": "Real Madrid",
-    "nationality": "BR",
-    "position": "FWD",
-    "basePrice": 55,
-    "rarityTier": "GOLD"
-  },
-  {
-    "id": "player-209",
+    "id": "player-177",
     "tournamentId": "fifa-wc-2026",
     "name": "Harry Kane",
     "club": "Bayern Munich",
     "nationality": "GB",
     "position": "FWD",
-    "basePrice": 58,
-    "rarityTier": "GOLD"
+    "basePrice": 58
   },
   {
-    "id": "player-210",
+    "id": "player-178",
     "tournamentId": "fifa-wc-2026",
     "name": "Mohamed Salah",
     "club": "Liverpool",
     "nationality": "EG",
     "position": "FWD",
-    "basePrice": 60,
-    "rarityTier": "GOLD"
+    "basePrice": 60
   },
   {
-    "id": "player-211",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Lautaro Martínez",
-    "club": "Inter Milan",
-    "nationality": "AR",
-    "position": "FWD",
-    "basePrice": 52,
-    "rarityTier": "GOLD"
-  },
-  {
-    "id": "player-212",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Ousmane Dembélé",
-    "club": "Paris Saint-Germain",
-    "nationality": "FR",
-    "position": "FWD",
-    "basePrice": 48,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-213",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Raphinha",
-    "club": "Barcelona",
-    "nationality": "BR",
-    "position": "FWD",
-    "basePrice": 45,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-214",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Gabriel Martinelli",
-    "club": "Arsenal",
-    "nationality": "BR",
-    "position": "FWD",
-    "basePrice": 42,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-215",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Marcus Rashford",
-    "club": "Manchester United",
-    "nationality": "GB",
-    "position": "FWD",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-216",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Rasmus Højlund",
-    "club": "Manchester United",
-    "nationality": "DK",
-    "position": "FWD",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-217",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Nicolas Jackson",
-    "club": "Chelsea",
-    "nationality": "SN",
-    "position": "FWD",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-218",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Christopher Nkunku",
-    "club": "Chelsea",
-    "nationality": "FR",
-    "position": "FWD",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-219",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Darwin Núñez",
-    "club": "Liverpool",
-    "nationality": "UY",
-    "position": "FWD",
-    "basePrice": 35,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-220",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Julian Álvarez",
-    "club": "Atlético Madrid",
-    "nationality": "AR",
-    "position": "FWD",
-    "basePrice": 40,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-221",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Victor Osimhen",
-    "club": "Galatasaray",
-    "nationality": "NG",
-    "position": "FWD",
-    "basePrice": 44,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-222",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Kingsley Coman",
-    "club": "Bayern Munich",
-    "nationality": "FR",
-    "position": "FWD",
-    "basePrice": 38,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-223",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Leroy Sané",
-    "club": "Bayern Munich",
-    "nationality": "DE",
-    "position": "FWD",
-    "basePrice": 40,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-224",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Serge Gnabry",
-    "club": "Bayern Munich",
-    "nationality": "DE",
-    "position": "FWD",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-225",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Donyell Malen",
-    "club": "Borussia Dortmund",
-    "nationality": "NL",
-    "position": "FWD",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-226",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Karim Adeyemi",
-    "club": "Borussia Dortmund",
-    "nationality": "DE",
-    "position": "FWD",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-227",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Álvaro Morata",
-    "club": "AC Milan",
-    "nationality": "ES",
-    "position": "FWD",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-228",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Olivier Giroud",
-    "club": "Los Angeles FC",
-    "nationality": "FR",
-    "position": "FWD",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-229",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Cody Gakpo",
-    "club": "Liverpool",
-    "nationality": "NL",
-    "position": "FWD",
-    "basePrice": 33,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-230",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Luis Díaz",
-    "club": "Liverpool",
-    "nationality": "CO",
-    "position": "FWD",
-    "basePrice": 37,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-231",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Raheem Sterling",
-    "club": "Chelsea",
-    "nationality": "GB",
-    "position": "FWD",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-232",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Jérémy Doku",
-    "club": "Manchester City",
-    "nationality": "BE",
-    "position": "FWD",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-233",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Jack Grealish",
-    "club": "Manchester City",
-    "nationality": "GB",
-    "position": "FWD",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-234",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Takefusa Kubo",
-    "club": "Real Sociedad",
-    "nationality": "JP",
-    "position": "FWD",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-235",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Andriy Yarmolenko",
-    "club": "Dynamo Kyiv",
-    "nationality": "UA",
-    "position": "FWD",
-    "basePrice": 12,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-236",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Moussa Diaby",
-    "club": "Aston Villa",
-    "nationality": "FR",
-    "position": "FWD",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-237",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Leon Bailey",
-    "club": "Aston Villa",
-    "nationality": "JM",
-    "position": "FWD",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-238",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Aleksander Mitrović",
-    "club": "Al Hilal",
-    "nationality": "RS",
-    "position": "FWD",
-    "basePrice": 25,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-239",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Richarlison",
-    "club": "Tottenham",
-    "nationality": "BR",
-    "position": "FWD",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-240",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Brennan Johnson",
-    "club": "Tottenham",
-    "nationality": "GB",
-    "position": "FWD",
-    "basePrice": 18,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-241",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Dejan Kulusevski",
-    "club": "Tottenham",
-    "nationality": "SE",
-    "position": "FWD",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-242",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Nico Williams",
-    "club": "Athletic Bilbao",
-    "nationality": "ES",
-    "position": "FWD",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-243",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Samuel Omorodion",
-    "club": "Porto",
-    "nationality": "ES",
-    "position": "FWD",
-    "basePrice": 16,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-244",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Gonçalo Ramos",
-    "club": "Paris Saint-Germain",
-    "nationality": "PT",
-    "position": "FWD",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-245",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Khvicha Kvaratskhelia",
-    "club": "Napoli",
-    "nationality": "GE",
-    "position": "FWD",
-    "basePrice": 38,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-246",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Pedro Neto",
-    "club": "Chelsea",
-    "nationality": "PT",
-    "position": "FWD",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-247",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Mykhailo Mudryk",
-    "club": "Chelsea",
-    "nationality": "UA",
-    "position": "FWD",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-248",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Cole Palmer",
-    "club": "Chelsea",
-    "nationality": "GB",
-    "position": "FWD",
-    "basePrice": 52,
-    "rarityTier": "GOLD"
-  },
-  {
-    "id": "player-249",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Omari Hutchinson",
-    "club": "Ipswich",
-    "nationality": "GB",
-    "position": "FWD",
-    "basePrice": 16,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-250",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Facundo Pellistri",
-    "club": "Panathinaikos",
-    "nationality": "UY",
-    "position": "FWD",
-    "basePrice": 18,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-251",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Amad Diallo",
-    "club": "Manchester United",
-    "nationality": "CI",
-    "position": "FWD",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-252",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Antony",
-    "club": "Manchester United",
-    "nationality": "BR",
-    "position": "FWD",
-    "basePrice": 20,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-253",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Jadon Sancho",
-    "club": "Chelsea",
-    "nationality": "GB",
-    "position": "FWD",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-254",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Kaoru Mitoma",
-    "club": "Brighton",
-    "nationality": "JP",
-    "position": "FWD",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-255",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Simon Adingra",
-    "club": "Brighton",
-    "nationality": "CI",
-    "position": "FWD",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-256",
-    "tournamentId": "fifa-wc-2026",
-    "name": "João Pedro",
-    "club": "Brighton",
-    "nationality": "BR",
-    "position": "FWD",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-257",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Evan Ferguson",
-    "club": "Brighton",
-    "nationality": "IE",
-    "position": "FWD",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-258",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Diogo Jota",
-    "club": "Liverpool",
-    "nationality": "PT",
-    "position": "FWD",
-    "basePrice": 38,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-259",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Darwin Núñez",
-    "club": "Liverpool",
-    "nationality": "UY",
-    "position": "FWD",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-260",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Federico Chiesa",
-    "club": "Liverpool",
-    "nationality": "IT",
-    "position": "FWD",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-261",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Vitinha",
-    "club": "Paris Saint-Germain",
-    "nationality": "PT",
-    "position": "FWD",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-262",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Hugo Ekitiké",
-    "club": "Eintracht Frankfurt",
-    "nationality": "FR",
-    "position": "FWD",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-263",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Mason Greenwood",
-    "club": "Marseille",
-    "nationality": "GB",
-    "position": "FWD",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-264",
+    "id": "player-179",
     "tournamentId": "fifa-wc-2026",
     "name": "Rodrygo",
     "club": "Real Madrid",
     "nationality": "BR",
     "position": "FWD",
-    "basePrice": 55,
-    "rarityTier": "GOLD"
+    "basePrice": 55
   },
   {
-    "id": "player-265",
+    "id": "player-180",
     "tournamentId": "fifa-wc-2026",
     "name": "Lautaro Martínez",
     "club": "Inter Milan",
     "nationality": "AR",
     "position": "FWD",
-    "basePrice": 52,
-    "rarityTier": "GOLD"
+    "basePrice": 52
   },
   {
-    "id": "player-266",
+    "id": "player-181",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Antoine Griezmann",
+    "club": "Atlético Madrid",
+    "nationality": "FR",
+    "position": "FWD",
+    "basePrice": 50
+  },
+  {
+    "id": "player-182",
     "tournamentId": "fifa-wc-2026",
     "name": "Ousmane Dembélé",
     "club": "Paris Saint-Germain",
     "nationality": "FR",
     "position": "FWD",
-    "basePrice": 50,
-    "rarityTier": "GOLD"
+    "basePrice": 48
   },
   {
-    "id": "player-267",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Raphinha",
-    "club": "Barcelona",
-    "nationality": "BR",
-    "position": "FWD",
-    "basePrice": 48,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-268",
+    "id": "player-183",
     "tournamentId": "fifa-wc-2026",
     "name": "Victor Osimhen",
     "club": "Galatasaray",
     "nationality": "NG",
     "position": "FWD",
-    "basePrice": 46,
-    "rarityTier": "SILVER"
+    "basePrice": 44
   },
   {
-    "id": "player-269",
+    "id": "player-184",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Raphinha",
+    "club": "Barcelona",
+    "nationality": "BR",
+    "position": "FWD",
+    "basePrice": 46
+  },
+  {
+    "id": "player-185",
     "tournamentId": "fifa-wc-2026",
     "name": "Gabriel Martinelli",
     "club": "Arsenal",
     "nationality": "BR",
     "position": "FWD",
-    "basePrice": 44,
-    "rarityTier": "SILVER"
+    "basePrice": 42
   },
   {
-    "id": "player-270",
+    "id": "player-186",
     "tournamentId": "fifa-wc-2026",
     "name": "Julian Álvarez",
     "club": "Atlético Madrid",
     "nationality": "AR",
     "position": "FWD",
-    "basePrice": 42,
-    "rarityTier": "SILVER"
+    "basePrice": 40
   },
   {
-    "id": "player-271",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Luis Díaz",
-    "club": "Liverpool",
-    "nationality": "CO",
-    "position": "FWD",
-    "basePrice": 40,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-272",
-    "tournamentId": "fifa-wc-2026",
-    "name": "Diogo Jota",
-    "club": "Liverpool",
-    "nationality": "PT",
-    "position": "FWD",
-    "basePrice": 40,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-273",
+    "id": "player-187",
     "tournamentId": "fifa-wc-2026",
     "name": "Kingsley Coman",
     "club": "Bayern Munich",
     "nationality": "FR",
     "position": "FWD",
-    "basePrice": 42,
-    "rarityTier": "SILVER"
+    "basePrice": 38
   },
   {
-    "id": "player-274",
+    "id": "player-188",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Leroy Sané",
+    "club": "Bayern Munich",
+    "nationality": "DE",
+    "position": "FWD",
+    "basePrice": 40
+  },
+  {
+    "id": "player-189",
     "tournamentId": "fifa-wc-2026",
     "name": "Khvicha Kvaratskhelia",
     "club": "Napoli",
     "nationality": "GE",
     "position": "FWD",
-    "basePrice": 40,
-    "rarityTier": "SILVER"
+    "basePrice": 38
   },
   {
-    "id": "player-275",
+    "id": "player-190",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Luis Díaz",
+    "club": "Liverpool",
+    "nationality": "CO",
+    "position": "FWD",
+    "basePrice": 37
+  },
+  {
+    "id": "player-191",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Marcus Rashford",
+    "club": "Manchester United",
+    "nationality": "GB",
+    "position": "FWD",
+    "basePrice": 36
+  },
+  {
+    "id": "player-192",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Darwin Núñez",
+    "club": "Liverpool",
+    "nationality": "UY",
+    "position": "FWD",
+    "basePrice": 35
+  },
+  {
+    "id": "player-193",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Christopher Nkunku",
+    "club": "Chelsea",
+    "nationality": "FR",
+    "position": "FWD",
+    "basePrice": 34
+  },
+  {
+    "id": "player-194",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Cody Gakpo",
+    "club": "Liverpool",
+    "nationality": "NL",
+    "position": "FWD",
+    "basePrice": 33
+  },
+  {
+    "id": "player-195",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Rasmus Højlund",
+    "club": "Manchester United",
+    "nationality": "DK",
+    "position": "FWD",
+    "basePrice": 32
+  },
+  {
+    "id": "player-196",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Nico Williams",
+    "club": "Athletic Bilbao",
+    "nationality": "ES",
+    "position": "FWD",
+    "basePrice": 32
+  },
+  {
+    "id": "player-197",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Nicolas Jackson",
+    "club": "Chelsea",
+    "nationality": "SN",
+    "position": "FWD",
+    "basePrice": 30
+  },
+  {
+    "id": "player-198",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Jack Grealish",
+    "club": "Manchester City",
+    "nationality": "GB",
+    "position": "FWD",
+    "basePrice": 30
+  },
+  {
+    "id": "player-199",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Álvaro Morata",
+    "club": "AC Milan",
+    "nationality": "ES",
+    "position": "FWD",
+    "basePrice": 30
+  },
+  {
+    "id": "player-200",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Gonçalo Ramos",
+    "club": "Paris Saint-Germain",
+    "nationality": "PT",
+    "position": "FWD",
+    "basePrice": 30
+  },
+  {
+    "id": "player-201",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Karim Adeyemi",
+    "club": "Borussia Dortmund",
+    "nationality": "DE",
+    "position": "FWD",
+    "basePrice": 28
+  },
+  {
+    "id": "player-202",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Raheem Sterling",
+    "club": "Chelsea",
+    "nationality": "GB",
+    "position": "FWD",
+    "basePrice": 28
+  },
+  {
+    "id": "player-203",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Dejan Kulusevski",
+    "club": "Tottenham",
+    "nationality": "SE",
+    "position": "FWD",
+    "basePrice": 28
+  },
+  {
+    "id": "player-204",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Jadon Sancho",
+    "club": "Chelsea",
+    "nationality": "GB",
+    "position": "FWD",
+    "basePrice": 28
+  },
+  {
+    "id": "player-205",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Donyell Malen",
+    "club": "Borussia Dortmund",
+    "nationality": "NL",
+    "position": "FWD",
+    "basePrice": 26
+  },
+  {
+    "id": "player-206",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Aleksander Mitrović",
+    "club": "Al Hilal",
+    "nationality": "RS",
+    "position": "FWD",
+    "basePrice": 25
+  },
+  {
+    "id": "player-207",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Olivier Giroud",
+    "club": "Los Angeles FC",
+    "nationality": "FR",
+    "position": "FWD",
+    "basePrice": 24
+  },
+  {
+    "id": "player-208",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Richarlison",
+    "club": "Tottenham",
+    "nationality": "BR",
+    "position": "FWD",
+    "basePrice": 24
+  },
+  {
+    "id": "player-209",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Hugo Ekitiké",
+    "club": "Eintracht Frankfurt",
+    "nationality": "FR",
+    "position": "FWD",
+    "basePrice": 24
+  },
+  {
+    "id": "player-210",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Takefusa Kubo",
+    "club": "Real Sociedad",
+    "nationality": "JP",
+    "position": "FWD",
+    "basePrice": 22
+  },
+  {
+    "id": "player-211",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Leon Bailey",
+    "club": "Aston Villa",
+    "nationality": "JM",
+    "position": "FWD",
+    "basePrice": 22
+  },
+  {
+    "id": "player-212",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Kaoru Mitoma",
+    "club": "Brighton",
+    "nationality": "JP",
+    "position": "FWD",
+    "basePrice": 34
+  },
+  {
+    "id": "player-213",
+    "tournamentId": "fifa-wc-2026",
+    "name": "João Pedro",
+    "club": "Brighton",
+    "nationality": "BR",
+    "position": "FWD",
+    "basePrice": 32
+  },
+  {
+    "id": "player-214",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Diogo Jota",
+    "club": "Liverpool",
+    "nationality": "PT",
+    "position": "FWD",
+    "basePrice": 38
+  },
+  {
+    "id": "player-215",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Jérémy Doku",
+    "club": "Manchester City",
+    "nationality": "BE",
+    "position": "FWD",
+    "basePrice": 34
+  },
+  {
+    "id": "player-216",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Evan Ferguson",
+    "club": "Brighton",
+    "nationality": "IE",
+    "position": "FWD",
+    "basePrice": 28
+  },
+  {
+    "id": "player-217",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Pedro Neto",
+    "club": "Chelsea",
+    "nationality": "PT",
+    "position": "FWD",
+    "basePrice": 30
+  },
+  {
+    "id": "player-218",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Mason Greenwood",
+    "club": "Marseille",
+    "nationality": "GB",
+    "position": "FWD",
+    "basePrice": 30
+  },
+  {
+    "id": "player-219",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Endrick",
+    "club": "Real Madrid",
+    "nationality": "BR",
+    "position": "FWD",
+    "basePrice": 28
+  },
+  {
+    "id": "player-220",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Khadija Shaw",
+    "club": "Manchester City",
+    "nationality": "JM",
+    "position": "FWD",
+    "basePrice": 28
+  },
+  {
+    "id": "player-221",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Bradley Barcola",
+    "club": "Paris Saint-Germain",
+    "nationality": "FR",
+    "position": "FWD",
+    "basePrice": 34
+  },
+  {
+    "id": "player-222",
+    "tournamentId": "fifa-wc-2026",
+    "name": "Randal Kolo Muani",
+    "club": "Paris Saint-Germain",
+    "nationality": "FR",
+    "position": "FWD",
+    "basePrice": 30
+  },
+  {
+    "id": "player-223",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Thibaut Courtois",
     "club": "Real Madrid",
     "nationality": "BE",
     "position": "GK",
-    "basePrice": 72,
-    "rarityTier": "GOLD"
+    "basePrice": 72
   },
   {
-    "id": "player-276",
+    "id": "player-224",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Alisson Becker",
     "club": "Liverpool",
     "nationality": "BR",
     "position": "GK",
-    "basePrice": 66,
-    "rarityTier": "GOLD"
+    "basePrice": 66
   },
   {
-    "id": "player-277",
+    "id": "player-225",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Ederson",
     "club": "Manchester City",
     "nationality": "BR",
     "position": "GK",
-    "basePrice": 60,
-    "rarityTier": "GOLD"
+    "basePrice": 60
   },
   {
-    "id": "player-278",
+    "id": "player-226",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Mike Maignan",
     "club": "AC Milan",
     "nationality": "FR",
     "position": "GK",
-    "basePrice": 58,
-    "rarityTier": "GOLD"
+    "basePrice": 58
   },
   {
-    "id": "player-279",
+    "id": "player-227",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Gianluigi Donnarumma",
     "club": "Paris Saint-Germain",
     "nationality": "IT",
     "position": "GK",
-    "basePrice": 56,
-    "rarityTier": "GOLD"
+    "basePrice": 56
   },
   {
-    "id": "player-280",
+    "id": "player-228",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Marc-André ter Stegen",
     "club": "Barcelona",
     "nationality": "DE",
     "position": "GK",
-    "basePrice": 54,
-    "rarityTier": "GOLD"
+    "basePrice": 54
   },
   {
-    "id": "player-281",
+    "id": "player-229",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Jan Oblak",
     "club": "Atlético Madrid",
     "nationality": "SI",
     "position": "GK",
-    "basePrice": 52,
-    "rarityTier": "GOLD"
+    "basePrice": 52
   },
   {
-    "id": "player-282",
+    "id": "player-230",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Manuel Neuer",
     "club": "Bayern Munich",
     "nationality": "DE",
     "position": "GK",
-    "basePrice": 50,
-    "rarityTier": "GOLD"
+    "basePrice": 50
   },
   {
-    "id": "player-283",
+    "id": "player-231",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "David Raya",
     "club": "Arsenal",
     "nationality": "ES",
     "position": "GK",
-    "basePrice": 46,
-    "rarityTier": "SILVER"
+    "basePrice": 46
   },
   {
-    "id": "player-284",
+    "id": "player-232",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Gregor Kobel",
     "club": "Borussia Dortmund",
     "nationality": "CH",
     "position": "GK",
-    "basePrice": 42,
-    "rarityTier": "SILVER"
+    "basePrice": 42
   },
   {
-    "id": "player-285",
+    "id": "player-233",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Diogo Costa",
     "club": "FC Porto",
     "nationality": "PT",
     "position": "GK",
-    "basePrice": 40,
-    "rarityTier": "SILVER"
+    "basePrice": 40
   },
   {
-    "id": "player-286",
+    "id": "player-234",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "André Onana",
     "club": "Manchester United",
     "nationality": "CM",
     "position": "GK",
-    "basePrice": 38,
-    "rarityTier": "SILVER"
+    "basePrice": 38
   },
   {
-    "id": "player-287",
+    "id": "player-235",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Unai Simón",
     "club": "Athletic Bilbao",
     "nationality": "ES",
     "position": "GK",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
-    "id": "player-288",
+    "id": "player-236",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Giorgi Mamardashvili",
     "club": "Valencia",
     "nationality": "GE",
     "position": "GK",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
-    "id": "player-289",
+    "id": "player-237",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Yann Sommer",
     "club": "Inter Milan",
     "nationality": "CH",
     "position": "GK",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
-    "id": "player-290",
+    "id": "player-238",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Lukáš Hrádecký",
     "club": "Bayer Leverkusen",
     "nationality": "FI",
     "position": "GK",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
+    "basePrice": 30
   },
   {
-    "id": "player-291",
+    "id": "player-239",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Kepa Arrizabalaga",
     "club": "Bournemouth",
     "nationality": "ES",
     "position": "GK",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
+    "basePrice": 26
   },
   {
-    "id": "player-292",
+    "id": "player-240",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Alex Meret",
     "club": "Napoli",
     "nationality": "IT",
     "position": "GK",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
+    "basePrice": 24
   },
   {
-    "id": "player-293",
+    "id": "player-241",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Rui Patrício",
     "club": "Roma",
     "nationality": "PT",
     "position": "GK",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
+    "basePrice": 22
   },
   {
-    "id": "player-294",
+    "id": "player-242",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Bart Verbruggen",
     "club": "Brighton",
     "nationality": "NL",
     "position": "GK",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
+    "basePrice": 22
   },
   {
-    "id": "player-295",
+    "id": "player-243",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Péter Gulácsi",
     "club": "RB Leipzig",
     "nationality": "HU",
     "position": "GK",
-    "basePrice": 20,
-    "rarityTier": "BRONZE"
+    "basePrice": 20
   },
   {
-    "id": "player-296",
+    "id": "player-244",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Marco Sportiello",
     "club": "AC Milan",
     "nationality": "IT",
     "position": "GK",
-    "basePrice": 18,
-    "rarityTier": "BRONZE"
+    "basePrice": 18
   },
   {
-    "id": "player-297",
+    "id": "player-245",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Alexander Nübel",
     "club": "Stuttgart",
     "nationality": "DE",
     "position": "GK",
-    "basePrice": 16,
-    "rarityTier": "BRONZE"
+    "basePrice": 16
   },
   {
-    "id": "player-298",
+    "id": "player-246",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Mile Svilar",
     "club": "Roma",
     "nationality": "RS",
     "position": "GK",
-    "basePrice": 14,
-    "rarityTier": "BRONZE"
+    "basePrice": 14
   },
   {
-    "id": "player-299",
+    "id": "player-247",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Lucas Chevalier",
     "club": "Lille",
     "nationality": "FR",
     "position": "GK",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
-    "id": "player-300",
+    "id": "player-248",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Marco Carnesecchi",
     "club": "Atalanta",
     "nationality": "IT",
     "position": "GK",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
-    "id": "player-301",
+    "id": "player-249",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Dominik Livaković",
     "club": "Fenerbahçe",
     "nationality": "HR",
     "position": "GK",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
+    "basePrice": 30
   },
   {
-    "id": "player-302",
+    "id": "player-250",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Ivan Provedel",
     "club": "Lazio",
     "nationality": "IT",
     "position": "GK",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
+    "basePrice": 28
   },
   {
-    "id": "player-303",
+    "id": "player-251",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Wojciech Szczęsny",
     "club": "Barcelona",
     "nationality": "PL",
     "position": "GK",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
-    "id": "player-304",
+    "id": "player-252",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Guglielmo Vicario",
     "club": "Tottenham",
     "nationality": "IT",
     "position": "GK",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
-    "id": "player-305",
+    "id": "player-253",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Caoimhín Kelleher",
     "club": "Liverpool",
     "nationality": "IE",
     "position": "GK",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
+    "basePrice": 28
   },
   {
-    "id": "player-306",
+    "id": "player-254",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Michał Míškovský",
+    "club": "Slavia Prague",
+    "nationality": "CZ",
+    "position": "GK",
+    "basePrice": 22
+  },
+  {
+    "id": "player-255",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Matvey Safonov",
+    "club": "Paris Saint-Germain",
+    "nationality": "RU",
+    "position": "GK",
+    "basePrice": 26
+  },
+  {
+    "id": "player-256",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Yassine Bounou",
     "club": "Al Hilal",
     "nationality": "MA",
     "position": "GK",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
+    "basePrice": 30
   },
   {
-    "id": "player-307",
+    "id": "player-257",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Koen Casteels",
     "club": "Al Qadsiah",
     "nationality": "BE",
     "position": "GK",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
+    "basePrice": 26
   },
   {
-    "id": "player-308",
+    "id": "player-258",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "Giorgi Mamardashvili",
-    "club": "Valencia",
-    "nationality": "GE",
+    "name": "Jordan Pickford",
+    "club": "Everton",
+    "nationality": "GB",
     "position": "GK",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
-    "id": "player-309",
+    "id": "player-259",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Virgil van Dijk",
     "club": "Liverpool",
     "nationality": "NL",
     "position": "DEF",
-    "basePrice": 52,
-    "rarityTier": "GOLD"
+    "basePrice": 52
   },
   {
-    "id": "player-310",
+    "id": "player-260",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Rúben Dias",
     "club": "Manchester City",
     "nationality": "PT",
     "position": "DEF",
-    "basePrice": 50,
-    "rarityTier": "GOLD"
+    "basePrice": 50
   },
   {
-    "id": "player-311",
+    "id": "player-261",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "William Saliba",
     "club": "Arsenal",
     "nationality": "FR",
     "position": "DEF",
-    "basePrice": 46,
-    "rarityTier": "SILVER"
+    "basePrice": 46
   },
   {
-    "id": "player-312",
+    "id": "player-262",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Antonio Rüdiger",
     "club": "Real Madrid",
     "nationality": "DE",
     "position": "DEF",
-    "basePrice": 45,
-    "rarityTier": "SILVER"
+    "basePrice": 45
   },
   {
-    "id": "player-313",
+    "id": "player-263",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Jules Koundé",
     "club": "Barcelona",
     "nationality": "FR",
     "position": "DEF",
-    "basePrice": 42,
-    "rarityTier": "SILVER"
+    "basePrice": 42
   },
   {
-    "id": "player-314",
+    "id": "player-264",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Daniel Carvajal",
     "club": "Real Madrid",
     "nationality": "ES",
     "position": "DEF",
-    "basePrice": 40,
-    "rarityTier": "SILVER"
+    "basePrice": 40
   },
   {
-    "id": "player-315",
+    "id": "player-265",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Josko Gvardiol",
     "club": "Manchester City",
     "nationality": "HR",
     "position": "DEF",
-    "basePrice": 44,
-    "rarityTier": "SILVER"
+    "basePrice": 44
   },
   {
-    "id": "player-316",
+    "id": "player-266",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Dayot Upamecano",
     "club": "Bayern Munich",
     "nationality": "FR",
     "position": "DEF",
-    "basePrice": 40,
-    "rarityTier": "SILVER"
+    "basePrice": 40
   },
   {
-    "id": "player-317",
+    "id": "player-267",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "John Stones",
     "club": "Manchester City",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 38,
-    "rarityTier": "SILVER"
+    "basePrice": 38
   },
   {
-    "id": "player-318",
+    "id": "player-268",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Ronald Araújo",
     "club": "Barcelona",
     "nationality": "UY",
     "position": "DEF",
-    "basePrice": 39,
-    "rarityTier": "SILVER"
+    "basePrice": 39
   },
   {
-    "id": "player-319",
+    "id": "player-269",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Trent Alexander-Arnold",
     "club": "Liverpool",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 44,
-    "rarityTier": "SILVER"
+    "basePrice": 44
   },
   {
-    "id": "player-320",
+    "id": "player-270",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "Kyle Walker",
-    "club": "Manchester City",
-    "nationality": "GB",
-    "position": "DEF",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-321",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Alphonso Davies",
-    "club": "Bayern Munich",
-    "nationality": "CA",
-    "position": "DEF",
-    "basePrice": 40,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-322",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Gabriel Magalhães",
-    "club": "Arsenal",
-    "nationality": "BR",
-    "position": "DEF",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-323",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Matthijs de Ligt",
-    "club": "Manchester United",
-    "nationality": "NL",
-    "position": "DEF",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-324",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Eder Militão",
-    "club": "Real Madrid",
-    "nationality": "BR",
-    "position": "DEF",
-    "basePrice": 38,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-325",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Dani Vivian",
-    "club": "Athletic Bilbao",
-    "nationality": "ES",
-    "position": "DEF",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-326",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Robin Le Normand",
-    "club": "Atlético Madrid",
-    "nationality": "FR",
-    "position": "DEF",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-327",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Lucas Hernández",
-    "club": "Paris Saint-Germain",
-    "nationality": "FR",
-    "position": "DEF",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-328",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Nuno Mendes",
-    "club": "Paris Saint-Germain",
-    "nationality": "PT",
-    "position": "DEF",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-329",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Milan Škriniar",
-    "club": "Paris Saint-Germain",
-    "nationality": "SK",
-    "position": "DEF",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-330",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Federico Dimarco",
-    "club": "Inter Milan",
-    "nationality": "IT",
-    "position": "DEF",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-331",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Alessandro Bastoni",
-    "club": "Inter Milan",
-    "nationality": "IT",
-    "position": "DEF",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-332",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Benjamin Pavard",
-    "club": "Inter Milan",
-    "nationality": "FR",
-    "position": "DEF",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-333",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Danilo",
-    "club": "Juventus",
-    "nationality": "BR",
-    "position": "DEF",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-334",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Bremer",
-    "club": "Juventus",
-    "nationality": "BR",
-    "position": "DEF",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-335",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Federico Gatti",
-    "club": "Juventus",
-    "nationality": "IT",
-    "position": "DEF",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-336",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Edmond Tapsoba",
-    "club": "Bayer Leverkusen",
-    "nationality": "BF",
-    "position": "DEF",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-337",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Jonathan Tah",
-    "club": "Bayer Leverkusen",
-    "nationality": "DE",
-    "position": "DEF",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-338",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Josip Stanišić",
-    "club": "Bayern Munich",
-    "nationality": "HR",
-    "position": "DEF",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-339",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Nico Schlotterbeck",
-    "club": "Borussia Dortmund",
-    "nationality": "DE",
-    "position": "DEF",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-340",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Julian Ryerson",
-    "club": "Borussia Dortmund",
-    "nationality": "NO",
-    "position": "DEF",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-341",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Ramy Bensebaini",
-    "club": "Borussia Dortmund",
-    "nationality": "DZ",
-    "position": "DEF",
-    "basePrice": 18,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-342",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Jurriën Timber",
-    "club": "Arsenal",
-    "nationality": "NL",
-    "position": "DEF",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-343",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Ben White",
-    "club": "Arsenal",
-    "nationality": "GB",
-    "position": "DEF",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-344",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Reece James",
-    "club": "Chelsea",
-    "nationality": "GB",
-    "position": "DEF",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-345",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Wesley Fofana",
-    "club": "Chelsea",
-    "nationality": "FR",
-    "position": "DEF",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-346",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Leny Yoro",
-    "club": "Manchester United",
-    "nationality": "FR",
-    "position": "DEF",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-347",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Diogo Dalot",
-    "club": "Manchester United",
-    "nationality": "PT",
-    "position": "DEF",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-348",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Jorrel Hato",
-    "club": "Ajax",
-    "nationality": "NL",
-    "position": "DEF",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-349",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "David Hancko",
-    "club": "Feyenoord",
-    "nationality": "SK",
-    "position": "DEF",
-    "basePrice": 18,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-350",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Stefan de Vrij",
-    "club": "Inter Milan",
-    "nationality": "NL",
-    "position": "DEF",
-    "basePrice": 20,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-351",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Neal Maupay",
-    "club": "Marseille",
-    "nationality": "FR",
-    "position": "DEF",
-    "basePrice": 12,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-352",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Tyler Dibling",
-    "club": "Southampton",
-    "nationality": "GB",
-    "position": "DEF",
-    "basePrice": 14,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-353",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Marcos Aoás Corrêa (Marquinhos)",
+    "name": "Marcos Marquinhos",
     "club": "Paris Saint-Germain",
     "nationality": "BR",
     "position": "DEF",
-    "basePrice": 56,
-    "rarityTier": "GOLD"
+    "basePrice": 52
   },
   {
-    "id": "player-354",
+    "id": "player-271",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Lisandro Martínez",
     "club": "Manchester United",
     "nationality": "AR",
     "position": "DEF",
-    "basePrice": 54,
-    "rarityTier": "GOLD"
+    "basePrice": 50
   },
   {
-    "id": "player-355",
+    "id": "player-272",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Matthijs de Ligt",
     "club": "Manchester United",
     "nationality": "NL",
     "position": "DEF",
-    "basePrice": 52,
-    "rarityTier": "GOLD"
+    "basePrice": 48
   },
   {
-    "id": "player-356",
+    "id": "player-273",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Andrew Robertson",
     "club": "Liverpool",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 50,
-    "rarityTier": "GOLD"
+    "basePrice": 48
   },
   {
-    "id": "player-357",
+    "id": "player-274",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Ibrahima Konaté",
     "club": "Liverpool",
     "nationality": "FR",
     "position": "DEF",
-    "basePrice": 50,
-    "rarityTier": "SILVER"
+    "basePrice": 46
   },
   {
-    "id": "player-358",
+    "id": "player-275",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Kieran Trippier",
     "club": "Newcastle",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 48,
-    "rarityTier": "SILVER"
+    "basePrice": 46
   },
   {
-    "id": "player-359",
+    "id": "player-276",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Ben White",
     "club": "Arsenal",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 48,
-    "rarityTier": "SILVER"
+    "basePrice": 44
   },
   {
-    "id": "player-360",
+    "id": "player-277",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Pau Cubarsí",
     "club": "Barcelona",
     "nationality": "ES",
     "position": "DEF",
-    "basePrice": 48,
-    "rarityTier": "SILVER"
+    "basePrice": 44
   },
   {
-    "id": "player-361",
+    "id": "player-278",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Levi Colwill",
     "club": "Chelsea",
     "nationality": "GB",
     "position": "DEF",
-    "basePrice": 48,
-    "rarityTier": "SILVER"
+    "basePrice": 44
   },
   {
-    "id": "player-362",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Malo Gusto",
-    "club": "Chelsea",
-    "nationality": "FR",
-    "position": "DEF",
-    "basePrice": 46,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-363",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Pedro Porro",
-    "club": "Tottenham",
-    "nationality": "ES",
-    "position": "DEF",
-    "basePrice": 46,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-364",
+    "id": "player-279",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Jeremie Frimpong",
     "club": "Bayer Leverkusen",
     "nationality": "NL",
     "position": "DEF",
-    "basePrice": 48,
-    "rarityTier": "SILVER"
+    "basePrice": 48
   },
   {
-    "id": "player-365",
+    "id": "player-280",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "José María Giménez",
-    "club": "Atlético Madrid",
-    "nationality": "UY",
+    "name": "Malo Gusto",
+    "club": "Chelsea",
+    "nationality": "FR",
     "position": "DEF",
-    "basePrice": 44,
-    "rarityTier": "SILVER"
+    "basePrice": 42
   },
   {
-    "id": "player-366",
+    "id": "player-281",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "Nuno Mendes",
-    "club": "Paris Saint-Germain",
-    "nationality": "PT",
+    "name": "Pedro Porro",
+    "club": "Tottenham",
+    "nationality": "ES",
     "position": "DEF",
-    "basePrice": 46,
-    "rarityTier": "SILVER"
+    "basePrice": 42
   },
   {
-    "id": "player-367",
+    "id": "player-282",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Alex Grimaldo",
     "club": "Bayer Leverkusen",
     "nationality": "ES",
     "position": "DEF",
-    "basePrice": 46,
-    "rarityTier": "SILVER"
+    "basePrice": 44
   },
   {
-    "id": "player-368",
+    "id": "player-283",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Federico Dimarco",
     "club": "Inter Milan",
     "nationality": "IT",
     "position": "DEF",
-    "basePrice": 44,
-    "rarityTier": "SILVER"
+    "basePrice": 40
   },
   {
-    "id": "player-369",
+    "id": "player-284",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Alessandro Bastoni",
     "club": "Inter Milan",
     "nationality": "IT",
     "position": "DEF",
-    "basePrice": 44,
-    "rarityTier": "SILVER"
+    "basePrice": 42
   },
   {
-    "id": "player-370",
+    "id": "player-285",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Destiny Udogie",
     "club": "Tottenham",
     "nationality": "IT",
     "position": "DEF",
-    "basePrice": 44,
-    "rarityTier": "SILVER"
+    "basePrice": 40
   },
   {
-    "id": "player-371",
+    "id": "player-286",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "Jeremie Frimpong",
-    "club": "Bayer Leverkusen",
-    "nationality": "NL",
+    "name": "Nico Schlotterbeck",
+    "club": "Borussia Dortmund",
+    "nationality": "DE",
     "position": "DEF",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
-    "id": "player-372",
+    "id": "player-287",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "Alex Grimaldo",
-    "club": "Bayer Leverkusen",
-    "nationality": "ES",
+    "name": "José María Giménez",
+    "club": "Atlético Madrid",
+    "nationality": "UY",
     "position": "DEF",
-    "basePrice": 38,
-    "rarityTier": "SILVER"
+    "basePrice": 38
   },
   {
-    "id": "player-373",
+    "id": "player-288",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "Kieran Trippier",
-    "club": "Newcastle",
-    "nationality": "GB",
-    "position": "DEF",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-374",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Sven Botman",
-    "club": "Newcastle",
-    "nationality": "NL",
-    "position": "DEF",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-375",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Pau Cubarsí",
-    "club": "Barcelona",
-    "nationality": "ES",
-    "position": "DEF",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-376",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Ferland Mendy",
-    "club": "Real Madrid",
-    "nationality": "FR",
-    "position": "DEF",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-377",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Lucas Vázquez",
-    "club": "Real Madrid",
-    "nationality": "ES",
-    "position": "DEF",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-378",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Levi Colwill",
-    "club": "Chelsea",
-    "nationality": "GB",
-    "position": "DEF",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-379",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Malo Gusto",
-    "club": "Chelsea",
-    "nationality": "FR",
-    "position": "DEF",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-380",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Pedro Porro",
-    "club": "Tottenham",
-    "nationality": "ES",
-    "position": "DEF",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-381",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Destiny Udogie",
-    "club": "Tottenham",
-    "nationality": "IT",
-    "position": "DEF",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-382",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Konrad Laimer",
-    "club": "Bayern Munich",
-    "nationality": "AT",
-    "position": "DEF",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-383",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Raphaël Guerreiro",
-    "club": "Bayern Munich",
+    "name": "Nuno Mendes",
+    "club": "Paris Saint-Germain",
     "nationality": "PT",
     "position": "DEF",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
+    "basePrice": 40
   },
   {
-    "id": "player-384",
+    "id": "player-289",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "Inigo Martínez",
-    "club": "Barcelona",
-    "nationality": "ES",
+    "name": "Kyle Walker",
+    "club": "Manchester City",
+    "nationality": "GB",
     "position": "DEF",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
-    "id": "player-385",
+    "id": "player-290",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Alphonso Davies",
+    "club": "Bayern Munich",
+    "nationality": "CA",
+    "position": "DEF",
+    "basePrice": 40
+  },
+  {
+    "id": "player-291",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Gabriel Magalhães",
+    "club": "Arsenal",
+    "nationality": "BR",
+    "position": "DEF",
+    "basePrice": 36
+  },
+  {
+    "id": "player-292",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Eder Militão",
+    "club": "Real Madrid",
+    "nationality": "BR",
+    "position": "DEF",
+    "basePrice": 38
+  },
+  {
+    "id": "player-293",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Bremer",
+    "club": "Juventus",
+    "nationality": "BR",
+    "position": "DEF",
+    "basePrice": 32
+  },
+  {
+    "id": "player-294",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Jurriën Timber",
+    "club": "Arsenal",
+    "nationality": "NL",
+    "position": "DEF",
+    "basePrice": 28
+  },
+  {
+    "id": "player-295",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Lucas Hernández",
+    "club": "Paris Saint-Germain",
+    "nationality": "FR",
+    "position": "DEF",
+    "basePrice": 32
+  },
+  {
+    "id": "player-296",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Jonathan Tah",
+    "club": "Bayer Leverkusen",
+    "nationality": "DE",
+    "position": "DEF",
+    "basePrice": 30
+  },
+  {
+    "id": "player-297",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Benjamin Pavard",
+    "club": "Inter Milan",
+    "nationality": "FR",
+    "position": "DEF",
+    "basePrice": 30
+  },
+  {
+    "id": "player-298",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Reece James",
+    "club": "Chelsea",
+    "nationality": "GB",
+    "position": "DEF",
+    "basePrice": 26
+  },
+  {
+    "id": "player-299",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Leny Yoro",
+    "club": "Manchester United",
+    "nationality": "FR",
+    "position": "DEF",
+    "basePrice": 28
+  },
+  {
+    "id": "player-300",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Ben White",
+    "club": "Arsenal",
+    "nationality": "GB",
+    "position": "DEF",
+    "basePrice": 28
+  },
+  {
+    "id": "player-301",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Micky van de Ven",
+    "club": "Tottenham",
+    "nationality": "NL",
+    "position": "DEF",
+    "basePrice": 32
+  },
+  {
+    "id": "player-302",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Danilo",
+    "club": "Juventus",
+    "nationality": "BR",
+    "position": "DEF",
+    "basePrice": 26
+  },
+  {
+    "id": "player-303",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Federico Gatti",
+    "club": "Juventus",
+    "nationality": "IT",
+    "position": "DEF",
+    "basePrice": 22
+  },
+  {
+    "id": "player-304",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Edmond Tapsoba",
+    "club": "Bayer Leverkusen",
+    "nationality": "BF",
+    "position": "DEF",
+    "basePrice": 28
+  },
+  {
+    "id": "player-305",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Milan Škriniar",
+    "club": "Paris Saint-Germain",
+    "nationality": "SK",
+    "position": "DEF",
+    "basePrice": 30
+  },
+  {
+    "id": "player-306",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Diogo Dalot",
+    "club": "Manchester United",
+    "nationality": "PT",
+    "position": "DEF",
+    "basePrice": 24
+  },
+  {
+    "id": "player-307",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Wesley Fofana",
+    "club": "Chelsea",
+    "nationality": "FR",
+    "position": "DEF",
+    "basePrice": 24
+  },
+  {
+    "id": "player-308",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Benoît Badiashile",
     "club": "Chelsea",
     "nationality": "FR",
     "position": "DEF",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
+    "basePrice": 24
   },
   {
-    "id": "player-386",
+    "id": "player-309",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Raphaël Varane",
+    "club": "Como",
+    "nationality": "FR",
+    "position": "DEF",
+    "basePrice": 26
+  },
+  {
+    "id": "player-310",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Sergio Ramos",
+    "club": "Sevilla",
+    "nationality": "ES",
+    "position": "DEF",
+    "basePrice": 24
+  },
+  {
+    "id": "player-311",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Jordi Alba",
+    "club": "Inter Miami",
+    "nationality": "ES",
+    "position": "DEF",
+    "basePrice": 22
+  },
+  {
+    "id": "player-312",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Mats Hummels",
+    "club": "Roma",
+    "nationality": "DE",
+    "position": "DEF",
+    "basePrice": 20
+  },
+  {
+    "id": "player-313",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Konrad Laimer",
+    "club": "Bayern Munich",
+    "nationality": "AT",
+    "position": "DEF",
+    "basePrice": 22
+  },
+  {
+    "id": "player-314",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Inigo Martínez",
+    "club": "Barcelona",
+    "nationality": "ES",
+    "position": "DEF",
+    "basePrice": 24
+  },
+  {
+    "id": "player-315",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Raphaël Guerreiro",
+    "club": "Bayern Munich",
+    "nationality": "PT",
+    "position": "DEF",
+    "basePrice": 20
+  },
+  {
+    "id": "player-316",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Sven Botman",
+    "club": "Newcastle",
+    "nationality": "NL",
+    "position": "DEF",
+    "basePrice": 28
+  },
+  {
+    "id": "player-317",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Fabian Schär",
     "club": "Newcastle",
     "nationality": "CH",
     "position": "DEF",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
+    "basePrice": 24
   },
   {
-    "id": "player-387",
+    "id": "player-318",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "Tino Livramento",
-    "club": "Newcastle",
-    "nationality": "GB",
+    "name": "Nahuel Molina",
+    "club": "Atlético Madrid",
+    "nationality": "AR",
     "position": "DEF",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
+    "basePrice": 28
   },
   {
-    "id": "player-388",
+    "id": "player-319",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Jorrel Hato",
+    "club": "Ajax",
+    "nationality": "NL",
+    "position": "DEF",
+    "basePrice": 22
+  },
+  {
+    "id": "player-320",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "David Hancko",
+    "club": "Feyenoord",
+    "nationality": "SK",
+    "position": "DEF",
+    "basePrice": 18
+  },
+  {
+    "id": "player-321",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Stefan de Vrij",
+    "club": "Inter Milan",
+    "nationality": "NL",
+    "position": "DEF",
+    "basePrice": 20
+  },
+  {
+    "id": "player-322",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Gleison Bremer",
+    "club": "Juventus",
+    "nationality": "BR",
+    "position": "DEF",
+    "basePrice": 46
+  },
+  {
+    "id": "player-323",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Willi Orbán",
+    "club": "RB Leipzig",
+    "nationality": "HU",
+    "position": "DEF",
+    "basePrice": 44
+  },
+  {
+    "id": "player-324",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Niklas Süle",
+    "club": "Borussia Dortmund",
+    "nationality": "DE",
+    "position": "DEF",
+    "basePrice": 42
+  },
+  {
+    "id": "player-325",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Piero Hincapié",
+    "club": "Bayer Leverkusen",
+    "nationality": "EC",
+    "position": "DEF",
+    "basePrice": 40
+  },
+  {
+    "id": "player-326",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Waldemar Anton",
+    "club": "Borussia Dortmund",
+    "nationality": "DE",
+    "position": "DEF",
+    "basePrice": 38
+  },
+  {
+    "id": "player-327",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Jude Bellingham",
     "club": "Real Madrid",
     "nationality": "GB",
     "position": "MID",
     "basePrice": 85,
-    "isEligibleForIcon": true,
-    "rarityTier": "ICON"
+    "isEligibleForIcon": true
   },
   {
-    "id": "player-389",
+    "id": "player-328",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Rodri",
     "club": "Manchester City",
     "nationality": "ES",
     "position": "MID",
-    "basePrice": 75,
-    "rarityTier": "GOLD"
+    "basePrice": 75
   },
   {
-    "id": "player-390",
+    "id": "player-329",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Kevin De Bruyne",
     "club": "Manchester City",
     "nationality": "BE",
     "position": "MID",
-    "basePrice": 60,
-    "rarityTier": "GOLD"
+    "basePrice": 60
   },
   {
-    "id": "player-391",
+    "id": "player-330",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Declan Rice",
     "club": "Arsenal",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 58,
-    "rarityTier": "GOLD"
+    "basePrice": 58
   },
   {
-    "id": "player-392",
+    "id": "player-331",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Jamal Musiala",
     "club": "Bayern Munich",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 70,
-    "rarityTier": "GOLD"
+    "basePrice": 70
   },
   {
-    "id": "player-393",
+    "id": "player-332",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Florian Wirtz",
     "club": "Bayer Leverkusen",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 62,
-    "rarityTier": "GOLD"
+    "basePrice": 62
   },
   {
-    "id": "player-394",
+    "id": "player-333",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Federico Valverde",
     "club": "Real Madrid",
     "nationality": "UY",
     "position": "MID",
-    "basePrice": 56,
-    "rarityTier": "GOLD"
+    "basePrice": 56
   },
   {
-    "id": "player-395",
+    "id": "player-334",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Eduardo Camavinga",
     "club": "Real Madrid",
     "nationality": "FR",
     "position": "MID",
-    "basePrice": 50,
-    "rarityTier": "SILVER"
+    "basePrice": 50
   },
   {
-    "id": "player-396",
+    "id": "player-335",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Aurélien Tchouaméni",
     "club": "Real Madrid",
     "nationality": "FR",
     "position": "MID",
-    "basePrice": 48,
-    "rarityTier": "SILVER"
+    "basePrice": 48
   },
   {
-    "id": "player-397",
+    "id": "player-336",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Pedri",
     "club": "Barcelona",
     "nationality": "ES",
     "position": "MID",
-    "basePrice": 54,
-    "rarityTier": "GOLD"
+    "basePrice": 54
   },
   {
-    "id": "player-398",
+    "id": "player-337",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Gavi",
     "club": "Barcelona",
     "nationality": "ES",
     "position": "MID",
-    "basePrice": 50,
-    "rarityTier": "SILVER"
+    "basePrice": 50
   },
   {
-    "id": "player-399",
+    "id": "player-338",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Frenkie de Jong",
     "club": "Barcelona",
     "nationality": "NL",
     "position": "MID",
-    "basePrice": 42,
-    "rarityTier": "SILVER"
+    "basePrice": 42
   },
   {
-    "id": "player-400",
+    "id": "player-339",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Ilkay Gündogan",
     "club": "Manchester City",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 44,
-    "rarityTier": "SILVER"
+    "basePrice": 44
   },
   {
-    "id": "player-401",
+    "id": "player-340",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Phil Foden",
     "club": "Manchester City",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 58,
-    "rarityTier": "GOLD"
+    "basePrice": 58
   },
   {
-    "id": "player-402",
+    "id": "player-341",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Bruno Fernandes",
     "club": "Manchester United",
     "nationality": "PT",
     "position": "MID",
-    "basePrice": 46,
-    "rarityTier": "SILVER"
+    "basePrice": 46
   },
   {
-    "id": "player-403",
+    "id": "player-342",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Kobbie Mainoo",
     "club": "Manchester United",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
-    "id": "player-404",
+    "id": "player-343",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Cole Palmer",
     "club": "Chelsea",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 52,
-    "rarityTier": "GOLD"
+    "basePrice": 52
   },
   {
-    "id": "player-405",
+    "id": "player-344",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Enzo Fernández",
     "club": "Chelsea",
     "nationality": "AR",
     "position": "MID",
-    "basePrice": 42,
-    "rarityTier": "SILVER"
+    "basePrice": 42
   },
   {
-    "id": "player-406",
+    "id": "player-345",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Moises Caicedo",
     "club": "Chelsea",
     "nationality": "EC",
     "position": "MID",
-    "basePrice": 38,
-    "rarityTier": "SILVER"
+    "basePrice": 38
   },
   {
-    "id": "player-407",
+    "id": "player-346",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Alexis Mac Allister",
     "club": "Liverpool",
     "nationality": "AR",
     "position": "MID",
-    "basePrice": 40,
-    "rarityTier": "SILVER"
+    "basePrice": 40
   },
   {
-    "id": "player-408",
+    "id": "player-347",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Dominik Szoboszlai",
     "club": "Liverpool",
     "nationality": "HU",
     "position": "MID",
-    "basePrice": 38,
-    "rarityTier": "SILVER"
+    "basePrice": 38
   },
   {
-    "id": "player-409",
+    "id": "player-348",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Ryan Gravenberch",
     "club": "Liverpool",
     "nationality": "NL",
     "position": "MID",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
-    "id": "player-410",
+    "id": "player-349",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Bernardo Silva",
     "club": "Manchester City",
     "nationality": "PT",
     "position": "MID",
-    "basePrice": 46,
-    "rarityTier": "SILVER"
+    "basePrice": 46
   },
   {
-    "id": "player-411",
+    "id": "player-350",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Martin Ødegaard",
     "club": "Arsenal",
     "nationality": "NO",
     "position": "MID",
-    "basePrice": 52,
-    "rarityTier": "GOLD"
+    "basePrice": 52
   },
   {
-    "id": "player-412",
+    "id": "player-351",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "James Maddison",
     "club": "Tottenham",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
-    "id": "player-413",
+    "id": "player-352",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Joshua Kimmich",
     "club": "Bayern Munich",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 40,
-    "rarityTier": "SILVER"
+    "basePrice": 40
   },
   {
-    "id": "player-414",
+    "id": "player-353",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Leon Goretzka",
     "club": "Bayern Munich",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
-    "id": "player-415",
+    "id": "player-354",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Warren Zaïre-Emery",
     "club": "Paris Saint-Germain",
     "nationality": "FR",
     "position": "MID",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
-    "id": "player-416",
+    "id": "player-355",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Vitinha",
     "club": "Paris Saint-Germain",
     "nationality": "PT",
     "position": "MID",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
-    "id": "player-417",
+    "id": "player-356",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Nicolo Barella",
     "club": "Inter Milan",
     "nationality": "IT",
     "position": "MID",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
-    "id": "player-418",
+    "id": "player-357",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Hakan Çalhanoğlu",
     "club": "Inter Milan",
     "nationality": "TR",
     "position": "MID",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
-    "id": "player-419",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Henrikh Mkhitaryan",
-    "club": "Inter Milan",
-    "nationality": "AM",
-    "position": "MID",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-420",
+    "id": "player-358",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Dani Olmo",
     "club": "Barcelona",
     "nationality": "ES",
     "position": "MID",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
-    "id": "player-421",
+    "id": "player-359",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Fermín López",
     "club": "Barcelona",
     "nationality": "ES",
     "position": "MID",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
+    "basePrice": 28
   },
   {
-    "id": "player-422",
+    "id": "player-360",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Alejandro Garnacho",
     "club": "Manchester United",
     "nationality": "AR",
     "position": "MID",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
-    "id": "player-423",
+    "id": "player-361",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Mason Mount",
     "club": "Manchester United",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
+    "basePrice": 26
   },
   {
-    "id": "player-424",
+    "id": "player-362",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Conor Gallagher",
     "club": "Atlético Madrid",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
+    "basePrice": 22
   },
   {
-    "id": "player-425",
+    "id": "player-363",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Rodrigo De Paul",
     "club": "Atlético Madrid",
     "nationality": "AR",
     "position": "MID",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
+    "basePrice": 30
   },
   {
-    "id": "player-426",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Thomas Lemar",
-    "club": "Atlético Madrid",
-    "nationality": "FR",
-    "position": "MID",
-    "basePrice": 20,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-427",
+    "id": "player-364",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Granit Xhaka",
     "club": "Bayer Leverkusen",
     "nationality": "CH",
     "position": "MID",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
+    "basePrice": 26
   },
   {
-    "id": "player-428",
+    "id": "player-365",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Exequiel Palacios",
     "club": "Bayer Leverkusen",
     "nationality": "AR",
     "position": "MID",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
+    "basePrice": 26
   },
   {
-    "id": "player-429",
+    "id": "player-366",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Julian Brandt",
     "club": "Borussia Dortmund",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
+    "basePrice": 28
   },
   {
-    "id": "player-430",
+    "id": "player-367",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Marcel Sabitzer",
     "club": "Borussia Dortmund",
     "nationality": "AT",
     "position": "MID",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
+    "basePrice": 24
   },
   {
-    "id": "player-431",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Davy Klaassen",
-    "club": "Inter Milan",
-    "nationality": "NL",
-    "position": "MID",
-    "basePrice": 16,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-432",
+    "id": "player-368",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Tijjani Reijnders",
     "club": "AC Milan",
     "nationality": "NL",
     "position": "MID",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
+    "basePrice": 28
   },
   {
-    "id": "player-433",
+    "id": "player-369",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Christian Pulisic",
     "club": "AC Milan",
     "nationality": "US",
     "position": "MID",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
+    "basePrice": 30
   },
   {
-    "id": "player-434",
+    "id": "player-370",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Ismaël Bennacer",
     "club": "AC Milan",
     "nationality": "DZ",
     "position": "MID",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
+    "basePrice": 26
   },
   {
-    "id": "player-435",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Dan Ndoye",
-    "club": "Bologna",
-    "nationality": "CH",
-    "position": "MID",
-    "basePrice": 16,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-436",
+    "id": "player-371",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Luka Modrić",
     "club": "Real Madrid",
     "nationality": "HR",
     "position": "MID",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
-    "id": "player-437",
+    "id": "player-372",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Toni Kroos",
     "club": "Real Madrid",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
-    "id": "player-438",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Dani Ceballos",
-    "club": "Real Madrid",
-    "nationality": "ES",
-    "position": "MID",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-439",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Sergio Busquets",
-    "club": "Inter Miami",
-    "nationality": "ES",
-    "position": "MID",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-440",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Pablo Torre",
-    "club": "Barcelona",
-    "nationality": "ES",
-    "position": "MID",
-    "basePrice": 16,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-441",
+    "id": "player-373",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Romeo Lavia",
     "club": "Chelsea",
     "nationality": "BE",
     "position": "MID",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
+    "basePrice": 26
   },
   {
-    "id": "player-442",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Carney Chukwuemeka",
-    "club": "Chelsea",
-    "nationality": "GB",
-    "position": "MID",
-    "basePrice": 20,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-443",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Kiernan Dewsbury-Hall",
-    "club": "Chelsea",
-    "nationality": "GB",
-    "position": "MID",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-444",
+    "id": "player-374",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Harvey Elliott",
     "club": "Brighton",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
+    "basePrice": 26
   },
   {
-    "id": "player-445",
+    "id": "player-375",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Curtis Jones",
     "club": "Liverpool",
     "nationality": "GB",
     "position": "MID",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
+    "basePrice": 28
   },
   {
-    "id": "player-446",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Wataru Endo",
-    "club": "Liverpool",
-    "nationality": "JP",
-    "position": "MID",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-447",
+    "id": "player-376",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Pape Matar Sarr",
     "club": "Tottenham",
     "nationality": "SN",
     "position": "MID",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
+    "basePrice": 28
   },
   {
-    "id": "player-448",
+    "id": "player-377",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Yves Bissouma",
     "club": "Tottenham",
     "nationality": "ML",
     "position": "MID",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
+    "basePrice": 26
   },
   {
-    "id": "player-449",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Pascal Groß",
-    "club": "Borussia Dortmund",
-    "nationality": "DE",
-    "position": "MID",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-450",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Felix Nmecha",
-    "club": "Borussia Dortmund",
-    "nationality": "DE",
-    "position": "MID",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-451",
+    "id": "player-378",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Aleksandar Pavlović",
     "club": "Bayern Munich",
     "nationality": "DE",
     "position": "MID",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
+    "basePrice": 30
   },
   {
-    "id": "player-452",
+    "id": "player-379",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "João Palhinha",
     "club": "Bayern Munich",
     "nationality": "PT",
     "position": "MID",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
-    "id": "player-453",
+    "id": "player-380",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "James Milner",
-    "club": "Brighton",
-    "nationality": "GB",
+    "name": "Pascal Groß",
+    "club": "Borussia Dortmund",
+    "nationality": "DE",
     "position": "MID",
-    "basePrice": 16,
-    "rarityTier": "BRONZE"
+    "basePrice": 28
   },
   {
-    "id": "player-454",
+    "id": "player-381",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "Thiago",
-    "club": "Liverpool",
+    "name": "Felix Nmecha",
+    "club": "Borussia Dortmund",
+    "nationality": "DE",
+    "position": "MID",
+    "basePrice": 24
+  },
+  {
+    "id": "player-382",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Dani Ceballos",
+    "club": "Real Madrid",
     "nationality": "ES",
     "position": "MID",
-    "basePrice": 20,
-    "rarityTier": "BRONZE"
+    "basePrice": 22
   },
   {
-    "id": "player-455",
+    "id": "player-383",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Sergio Busquets",
+    "club": "Inter Miami",
+    "nationality": "ES",
+    "position": "MID",
+    "basePrice": 22
+  },
+  {
+    "id": "player-384",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Dan Ndoye",
+    "club": "Bologna",
+    "nationality": "CH",
+    "position": "MID",
+    "basePrice": 16
+  },
+  {
+    "id": "player-385",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Davy Klaassen",
+    "club": "Inter Milan",
+    "nationality": "NL",
+    "position": "MID",
+    "basePrice": 16
+  },
+  {
+    "id": "player-386",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Henrikh Mkhitaryan",
+    "club": "Inter Milan",
+    "nationality": "AM",
+    "position": "MID",
+    "basePrice": 24
+  },
+  {
+    "id": "player-387",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Thomas Lemar",
+    "club": "Atlético Madrid",
+    "nationality": "FR",
+    "position": "MID",
+    "basePrice": 20
+  },
+  {
+    "id": "player-388",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Kylian Mbappé",
     "club": "Real Madrid",
     "nationality": "FR",
     "position": "FWD",
     "basePrice": 92,
-    "isEligibleForIcon": true,
-    "rarityTier": "ICON"
+    "isEligibleForIcon": true
   },
   {
-    "id": "player-456",
+    "id": "player-389",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Erling Haaland",
     "club": "Manchester City",
     "nationality": "NO",
     "position": "FWD",
     "basePrice": 95,
-    "isEligibleForIcon": true,
-    "rarityTier": "ICON"
+    "isEligibleForIcon": true
   },
   {
-    "id": "player-457",
+    "id": "player-390",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Vinícius Jr.",
     "club": "Real Madrid",
     "nationality": "BR",
     "position": "FWD",
     "basePrice": 80,
-    "isEligibleForIcon": true,
-    "rarityTier": "ICON"
+    "isEligibleForIcon": true
   },
   {
-    "id": "player-458",
+    "id": "player-391",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Harry Kane",
     "club": "Bayern Munich",
     "nationality": "GB",
     "position": "FWD",
     "basePrice": 82,
-    "isEligibleForIcon": true,
-    "rarityTier": "ICON"
+    "isEligibleForIcon": true
   },
   {
-    "id": "player-459",
+    "id": "player-392",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Lamine Yamal",
     "club": "Barcelona",
     "nationality": "ES",
     "position": "FWD",
     "basePrice": 78,
-    "isEligibleForIcon": true,
-    "rarityTier": "ICON"
+    "isEligibleForIcon": true
   },
   {
-    "id": "player-460",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Mohamed Salah",
-    "club": "Liverpool",
-    "nationality": "EG",
-    "position": "FWD",
-    "basePrice": 62,
-    "rarityTier": "GOLD"
-  },
-  {
-    "id": "player-461",
+    "id": "player-393",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Bukayo Saka",
     "club": "Arsenal",
     "nationality": "GB",
     "position": "FWD",
-    "basePrice": 66,
-    "rarityTier": "GOLD"
+    "basePrice": 66
   },
   {
-    "id": "player-462",
+    "id": "player-394",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "Ousmane Dembélé",
-    "club": "Paris Saint-Germain",
-    "nationality": "FR",
+    "name": "Mohamed Salah",
+    "club": "Liverpool",
+    "nationality": "EG",
     "position": "FWD",
-    "basePrice": 50,
-    "rarityTier": "SILVER"
+    "basePrice": 62
   },
   {
-    "id": "player-463",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Raphinha",
-    "club": "Barcelona",
-    "nationality": "BR",
-    "position": "FWD",
-    "basePrice": 48,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-464",
+    "id": "player-395",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Rodrygo",
     "club": "Real Madrid",
     "nationality": "BR",
     "position": "FWD",
-    "basePrice": 56,
-    "rarityTier": "GOLD"
+    "basePrice": 56
   },
   {
-    "id": "player-465",
+    "id": "player-396",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Lautaro Martínez",
     "club": "Inter Milan",
     "nationality": "AR",
     "position": "FWD",
-    "basePrice": 54,
-    "rarityTier": "GOLD"
+    "basePrice": 54
   },
   {
-    "id": "player-466",
+    "id": "player-397",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Ousmane Dembélé",
+    "club": "Paris Saint-Germain",
+    "nationality": "FR",
+    "position": "FWD",
+    "basePrice": 52
+  },
+  {
+    "id": "player-398",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Antoine Griezmann",
+    "club": "Atlético Madrid",
+    "nationality": "FR",
+    "position": "FWD",
+    "basePrice": 50
+  },
+  {
+    "id": "player-399",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Raphinha",
+    "club": "Barcelona",
+    "nationality": "BR",
+    "position": "FWD",
+    "basePrice": 48
+  },
+  {
+    "id": "player-400",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Victor Osimhen",
+    "club": "Galatasaray",
+    "nationality": "NG",
+    "position": "FWD",
+    "basePrice": 46
+  },
+  {
+    "id": "player-401",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Gabriel Martinelli",
+    "club": "Arsenal",
+    "nationality": "BR",
+    "position": "FWD",
+    "basePrice": 44
+  },
+  {
+    "id": "player-402",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Julian Álvarez",
+    "club": "Atlético Madrid",
+    "nationality": "AR",
+    "position": "FWD",
+    "basePrice": 42
+  },
+  {
+    "id": "player-403",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Kingsley Coman",
+    "club": "Bayern Munich",
+    "nationality": "FR",
+    "position": "FWD",
+    "basePrice": 42
+  },
+  {
+    "id": "player-404",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Leroy Sané",
+    "club": "Bayern Munich",
+    "nationality": "DE",
+    "position": "FWD",
+    "basePrice": 42
+  },
+  {
+    "id": "player-405",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Diogo Jota",
+    "club": "Liverpool",
+    "nationality": "PT",
+    "position": "FWD",
+    "basePrice": 40
+  },
+  {
+    "id": "player-406",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Khvicha Kvaratskhelia",
+    "club": "Napoli",
+    "nationality": "GE",
+    "position": "FWD",
+    "basePrice": 40
+  },
+  {
+    "id": "player-407",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Marcus Rashford",
     "club": "Manchester United",
     "nationality": "GB",
     "position": "FWD",
-    "basePrice": 38,
-    "rarityTier": "SILVER"
+    "basePrice": 38
   },
   {
-    "id": "player-467",
+    "id": "player-408",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Luis Díaz",
+    "club": "Liverpool",
+    "nationality": "CO",
+    "position": "FWD",
+    "basePrice": 38
+  },
+  {
+    "id": "player-409",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Christopher Nkunku",
     "club": "Chelsea",
     "nationality": "FR",
     "position": "FWD",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
-    "id": "player-468",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Nicolas Jackson",
-    "club": "Chelsea",
-    "nationality": "SN",
-    "position": "FWD",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-469",
+    "id": "player-410",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Darwin Núñez",
     "club": "Liverpool",
     "nationality": "UY",
     "position": "FWD",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
-    "id": "player-470",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Luis Díaz",
-    "club": "Liverpool",
-    "nationality": "CO",
-    "position": "FWD",
-    "basePrice": 38,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-471",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Cody Gakpo",
-    "club": "Liverpool",
-    "nationality": "NL",
-    "position": "FWD",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-472",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Gabriel Martinelli",
-    "club": "Arsenal",
-    "nationality": "BR",
-    "position": "FWD",
-    "basePrice": 42,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-473",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Kingsley Coman",
-    "club": "Bayern Munich",
-    "nationality": "FR",
-    "position": "FWD",
-    "basePrice": 40,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-474",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Leroy Sané",
-    "club": "Bayern Munich",
-    "nationality": "DE",
-    "position": "FWD",
-    "basePrice": 42,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-475",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Serge Gnabry",
-    "club": "Bayern Munich",
-    "nationality": "DE",
-    "position": "FWD",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-476",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Donyell Malen",
-    "club": "Borussia Dortmund",
-    "nationality": "NL",
-    "position": "FWD",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-477",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Karim Adeyemi",
-    "club": "Borussia Dortmund",
-    "nationality": "DE",
-    "position": "FWD",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-478",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Julian Álvarez",
-    "club": "Atlético Madrid",
-    "nationality": "AR",
-    "position": "FWD",
-    "basePrice": 42,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-479",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Antoine Griezmann",
-    "club": "Atlético Madrid",
-    "nationality": "FR",
-    "position": "FWD",
-    "basePrice": 48,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-480",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Victor Osimhen",
-    "club": "Galatasaray",
-    "nationality": "NG",
-    "position": "FWD",
-    "basePrice": 46,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-481",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Khvicha Kvaratskhelia",
-    "club": "Napoli",
-    "nationality": "GE",
-    "position": "FWD",
-    "basePrice": 40,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-482",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Raheem Sterling",
-    "club": "Chelsea",
-    "nationality": "GB",
-    "position": "FWD",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-483",
+    "id": "player-411",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Jérémy Doku",
     "club": "Manchester City",
     "nationality": "BE",
     "position": "FWD",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
-    "id": "player-484",
+    "id": "player-412",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "Jack Grealish",
-    "club": "Manchester City",
-    "nationality": "GB",
+    "name": "Cody Gakpo",
+    "club": "Liverpool",
+    "nationality": "NL",
     "position": "FWD",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
-    "id": "player-485",
+    "id": "player-413",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Nico Williams",
     "club": "Athletic Bilbao",
     "nationality": "ES",
     "position": "FWD",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
-    "id": "player-486",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Álvaro Morata",
-    "club": "AC Milan",
-    "nationality": "ES",
-    "position": "FWD",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-487",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Samuel Chukwueze",
-    "club": "AC Milan",
-    "nationality": "NG",
-    "position": "FWD",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-488",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Christian Pulisic",
-    "club": "AC Milan",
-    "nationality": "US",
-    "position": "FWD",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-489",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Noah Okafor",
-    "club": "AC Milan",
-    "nationality": "CH",
-    "position": "FWD",
-    "basePrice": 20,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-490",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Dejan Kulusevski",
-    "club": "Tottenham",
-    "nationality": "SE",
-    "position": "FWD",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-491",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Brennan Johnson",
-    "club": "Tottenham",
-    "nationality": "GB",
-    "position": "FWD",
-    "basePrice": 20,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-492",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Gonçalo Ramos",
-    "club": "Paris Saint-Germain",
-    "nationality": "PT",
-    "position": "FWD",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-493",
+    "id": "player-414",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Bradley Barcola",
     "club": "Paris Saint-Germain",
     "nationality": "FR",
     "position": "FWD",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
-    "id": "player-494",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Randal Kolo Muani",
-    "club": "Paris Saint-Germain",
-    "nationality": "FR",
-    "position": "FWD",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-495",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Mathys Tel",
-    "club": "Bayern Munich",
-    "nationality": "FR",
-    "position": "FWD",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-496",
+    "id": "player-415",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Michael Olise",
     "club": "Bayern Munich",
     "nationality": "FR",
     "position": "FWD",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
-    "id": "player-497",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Jamie Bynoe-Gittens",
-    "club": "Borussia Dortmund",
-    "nationality": "GB",
-    "position": "FWD",
-    "basePrice": 18,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-498",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Endrick",
-    "club": "Real Madrid",
-    "nationality": "BR",
-    "position": "FWD",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-499",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Pedro Neto",
-    "club": "Chelsea",
-    "nationality": "PT",
-    "position": "FWD",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-500",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Mykhailo Mudryk",
-    "club": "Chelsea",
-    "nationality": "UA",
-    "position": "FWD",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-501",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Cole Palmer",
-    "club": "Chelsea",
-    "nationality": "GB",
-    "position": "FWD",
-    "basePrice": 54,
-    "rarityTier": "GOLD"
-  },
-  {
-    "id": "player-502",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Amad Diallo",
-    "club": "Manchester United",
-    "nationality": "CI",
-    "position": "FWD",
-    "basePrice": 24,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-503",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Jadon Sancho",
-    "club": "Chelsea",
-    "nationality": "GB",
-    "position": "FWD",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-504",
+    "id": "player-416",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Kaoru Mitoma",
     "club": "Brighton",
     "nationality": "JP",
     "position": "FWD",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 36
   },
   {
-    "id": "player-505",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Simon Adingra",
-    "club": "Brighton",
-    "nationality": "CI",
-    "position": "FWD",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-506",
+    "id": "player-417",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "João Pedro",
     "club": "Brighton",
     "nationality": "BR",
     "position": "FWD",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 34
   },
   {
-    "id": "player-507",
+    "id": "player-418",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "Evan Ferguson",
-    "club": "Brighton",
-    "nationality": "IE",
+    "name": "Nicolas Jackson",
+    "club": "Chelsea",
+    "nationality": "SN",
     "position": "FWD",
-    "basePrice": 30,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
-    "id": "player-508",
+    "id": "player-419",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "Diogo Jota",
-    "club": "Liverpool",
+    "name": "Jack Grealish",
+    "club": "Manchester City",
+    "nationality": "GB",
+    "position": "FWD",
+    "basePrice": 32
+  },
+  {
+    "id": "player-420",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Álvaro Morata",
+    "club": "AC Milan",
+    "nationality": "ES",
+    "position": "FWD",
+    "basePrice": 32
+  },
+  {
+    "id": "player-421",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Gonçalo Ramos",
+    "club": "Paris Saint-Germain",
     "nationality": "PT",
     "position": "FWD",
-    "basePrice": 40,
-    "rarityTier": "SILVER"
+    "basePrice": 32
   },
   {
-    "id": "player-509",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Federico Chiesa",
-    "club": "Liverpool",
-    "nationality": "IT",
-    "position": "FWD",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-510",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Hugo Ekitiké",
-    "club": "Eintracht Frankfurt",
-    "nationality": "FR",
-    "position": "FWD",
-    "basePrice": 26,
-    "rarityTier": "BRONZE"
-  },
-  {
-    "id": "player-511",
+    "id": "player-422",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Mason Greenwood",
     "club": "Marseille",
     "nationality": "GB",
     "position": "FWD",
-    "basePrice": 32,
-    "rarityTier": "BRONZE"
+    "basePrice": 32
   },
   {
-    "id": "player-512",
+    "id": "player-423",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "Facundo Pellistri",
-    "club": "Panathinaikos",
-    "nationality": "UY",
+    "name": "Randal Kolo Muani",
+    "club": "Paris Saint-Germain",
+    "nationality": "FR",
     "position": "FWD",
-    "basePrice": 20,
-    "rarityTier": "BRONZE"
+    "basePrice": 30
   },
   {
-    "id": "player-513",
+    "id": "player-424",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "Antony",
-    "club": "Manchester United",
-    "nationality": "BR",
+    "name": "Evan Ferguson",
+    "club": "Brighton",
+    "nationality": "IE",
     "position": "FWD",
-    "basePrice": 22,
-    "rarityTier": "BRONZE"
+    "basePrice": 30
   },
   {
-    "id": "player-514",
+    "id": "player-425",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "Samuel Omorodion",
-    "club": "Porto",
-    "nationality": "ES",
+    "name": "Dejan Kulusevski",
+    "club": "Tottenham",
+    "nationality": "SE",
     "position": "FWD",
-    "basePrice": 18,
-    "rarityTier": "BRONZE"
+    "basePrice": 30
   },
   {
-    "id": "player-515",
+    "id": "player-426",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "Jamie Bynoe-Gittens",
-    "club": "Borussia Dortmund",
+    "name": "Jadon Sancho",
+    "club": "Chelsea",
     "nationality": "GB",
     "position": "FWD",
-    "basePrice": 20,
-    "rarityTier": "BRONZE"
+    "basePrice": 30
   },
   {
-    "id": "player-516",
+    "id": "player-427",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Pedro Neto",
+    "club": "Chelsea",
+    "nationality": "PT",
+    "position": "FWD",
+    "basePrice": 30
+  },
+  {
+    "id": "player-428",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Karim Adeyemi",
+    "club": "Borussia Dortmund",
+    "nationality": "DE",
+    "position": "FWD",
+    "basePrice": 28
+  },
+  {
+    "id": "player-429",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Raheem Sterling",
+    "club": "Chelsea",
+    "nationality": "GB",
+    "position": "FWD",
+    "basePrice": 28
+  },
+  {
+    "id": "player-430",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Endrick",
+    "club": "Real Madrid",
+    "nationality": "BR",
+    "position": "FWD",
+    "basePrice": 28
+  },
+  {
+    "id": "player-431",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Donyell Malen",
+    "club": "Borussia Dortmund",
+    "nationality": "NL",
+    "position": "FWD",
+    "basePrice": 28
+  },
+  {
+    "id": "player-432",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Mykhailo Mudryk",
+    "club": "Chelsea",
+    "nationality": "UA",
+    "position": "FWD",
+    "basePrice": 28
+  },
+  {
+    "id": "player-433",
     "tournamentId": "uefa-ucl-2026-27",
     "name": "Mathys Tel",
     "club": "Bayern Munich",
     "nationality": "FR",
     "position": "FWD",
-    "basePrice": 28,
-    "rarityTier": "BRONZE"
+    "basePrice": 26
   },
   {
-    "id": "player-517",
+    "id": "player-434",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "Michael Olise",
-    "club": "Bayern Munich",
+    "name": "Hugo Ekitiké",
+    "club": "Eintracht Frankfurt",
     "nationality": "FR",
     "position": "FWD",
-    "basePrice": 34,
-    "rarityTier": "BRONZE"
+    "basePrice": 26
   },
   {
-    "id": "player-518",
+    "id": "player-435",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "Rodrygo",
-    "club": "Real Madrid",
+    "name": "Richarlison",
+    "club": "Tottenham",
     "nationality": "BR",
     "position": "FWD",
-    "basePrice": 56,
-    "rarityTier": "GOLD"
+    "basePrice": 24
   },
   {
-    "id": "player-519",
+    "id": "player-436",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "Lautaro Martínez",
-    "club": "Inter Milan",
-    "nationality": "AR",
-    "position": "FWD",
-    "basePrice": 54,
-    "rarityTier": "GOLD"
-  },
-  {
-    "id": "player-520",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Ousmane Dembélé",
-    "club": "Paris Saint-Germain",
-    "nationality": "FR",
-    "position": "FWD",
-    "basePrice": 52,
-    "rarityTier": "GOLD"
-  },
-  {
-    "id": "player-521",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Raphinha",
-    "club": "Barcelona",
-    "nationality": "BR",
-    "position": "FWD",
-    "basePrice": 50,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-522",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Victor Osimhen",
-    "club": "Galatasaray",
-    "nationality": "NG",
-    "position": "FWD",
-    "basePrice": 48,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-523",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Gabriel Martinelli",
-    "club": "Arsenal",
-    "nationality": "BR",
-    "position": "FWD",
-    "basePrice": 46,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-524",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Julian Álvarez",
-    "club": "Atlético Madrid",
-    "nationality": "AR",
-    "position": "FWD",
-    "basePrice": 44,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-525",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Luis Díaz",
-    "club": "Liverpool",
-    "nationality": "CO",
-    "position": "FWD",
-    "basePrice": 42,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-526",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Diogo Jota",
-    "club": "Liverpool",
-    "nationality": "PT",
-    "position": "FWD",
-    "basePrice": 42,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-527",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Kingsley Coman",
-    "club": "Bayern Munich",
-    "nationality": "FR",
-    "position": "FWD",
-    "basePrice": 44,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-528",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Khvicha Kvaratskhelia",
-    "club": "Napoli",
-    "nationality": "GE",
-    "position": "FWD",
-    "basePrice": 42,
-    "rarityTier": "SILVER"
-  },
-  {
-    "id": "player-529",
-    "tournamentId": "uefa-ucl-2026-27",
-    "name": "Marcus Rashford",
-    "club": "Manchester United",
+    "name": "Brennan Johnson",
+    "club": "Tottenham",
     "nationality": "GB",
     "position": "FWD",
-    "basePrice": 40,
-    "rarityTier": "SILVER"
+    "basePrice": 20
   },
   {
-    "id": "player-530",
+    "id": "player-437",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "Antoine Griezmann",
-    "club": "Atlético Madrid",
-    "nationality": "FR",
+    "name": "Samuel Chukwueze",
+    "club": "AC Milan",
+    "nationality": "NG",
     "position": "FWD",
-    "basePrice": 50,
-    "rarityTier": "SILVER"
+    "basePrice": 24
   },
   {
-    "id": "player-531",
+    "id": "player-438",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "Leroy Sané",
+    "name": "Noah Okafor",
+    "club": "AC Milan",
+    "nationality": "CH",
+    "position": "FWD",
+    "basePrice": 20
+  },
+  {
+    "id": "player-439",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Simon Adingra",
+    "club": "Brighton",
+    "nationality": "CI",
+    "position": "FWD",
+    "basePrice": 28
+  },
+  {
+    "id": "player-440",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Federico Chiesa",
+    "club": "Liverpool",
+    "nationality": "IT",
+    "position": "FWD",
+    "basePrice": 30
+  },
+  {
+    "id": "player-441",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Serge Gnabry",
     "club": "Bayern Munich",
     "nationality": "DE",
     "position": "FWD",
-    "basePrice": 44,
-    "rarityTier": "SILVER"
+    "basePrice": 34
   },
   {
-    "id": "player-532",
+    "id": "player-442",
     "tournamentId": "uefa-ucl-2026-27",
-    "name": "João Pedro",
-    "club": "Brighton",
+    "name": "Samuel Omorodion",
+    "club": "Porto",
+    "nationality": "ES",
+    "position": "FWD",
+    "basePrice": 18
+  },
+  {
+    "id": "player-443",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Jamie Bynoe-Gittens",
+    "club": "Borussia Dortmund",
+    "nationality": "GB",
+    "position": "FWD",
+    "basePrice": 20
+  },
+  {
+    "id": "player-444",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Facundo Pellistri",
+    "club": "Panathinaikos",
+    "nationality": "UY",
+    "position": "FWD",
+    "basePrice": 20
+  },
+  {
+    "id": "player-445",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Antony",
+    "club": "Manchester United",
     "nationality": "BR",
     "position": "FWD",
-    "basePrice": 36,
-    "rarityTier": "BRONZE"
+    "basePrice": 22
+  },
+  {
+    "id": "player-446",
+    "tournamentId": "uefa-ucl-2026-27",
+    "name": "Amad Diallo",
+    "club": "Manchester United",
+    "nationality": "CI",
+    "position": "FWD",
+    "basePrice": 24
   }
 ]

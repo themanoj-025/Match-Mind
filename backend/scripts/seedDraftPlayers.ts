@@ -5,7 +5,7 @@
  * (fifa-wc-2026 and uefa-ucl-2026-27) to ensure the Draft Mode
  * seeding gate passes (§6.3).
  *
- * Creates ~160 players per tournament with realistic name, club,
+ * Creates ~280 players per tournament with realistic name, club,
  * nationality, position, and basePrice distributions so rarity tiers
  * are populated correctly.
  *
@@ -20,8 +20,6 @@ import path from 'path'
 
 const DATA_DIR = path.join(__dirname, '..', 'src', 'data')
 
-// ─── Player Templates ────────────────────────────────────
-
 interface PlayerTemplate {
   name: string
   club: string
@@ -31,9 +29,15 @@ interface PlayerTemplate {
   isEligibleForIcon?: boolean
 }
 
-// FIFA World Cup 2026 — 48 teams, ~160 players
-const WC_PLAYERS: PlayerTemplate[] = [
-  // ── GK (24) ──
+// ─── Helper to build sections ──────────────────────────
+
+function section(entries: PlayerTemplate[]): PlayerTemplate[] {
+  return entries
+}
+
+// ─── FIFA World Cup 2026 (~275 players) ─────────────────
+
+const WC_GK = section([
   { name: 'Thibaut Courtois', club: 'Real Madrid', nationality: 'BE', position: 'GK', basePrice: 72 },
   { name: 'Alisson Becker', club: 'Liverpool', nationality: 'BR', position: 'GK', basePrice: 68 },
   { name: 'Ederson', club: 'Manchester City', nationality: 'BR', position: 'GK', basePrice: 62 },
@@ -58,21 +62,18 @@ const WC_PLAYERS: PlayerTemplate[] = [
   { name: 'Mark Flekken', club: 'Brentford', nationality: 'NL', position: 'GK', basePrice: 16 },
   { name: 'Koen Casteels', club: 'Al Qadsiah', nationality: 'BE', position: 'GK', basePrice: 14 },
   { name: 'Mathew Ryan', club: 'AZ Alkmaar', nationality: 'AU', position: 'GK', basePrice: 10 },
-  // ── Extra GKs for Draft Mode pool depth ──
   { name: 'Carlos Acevedo', club: 'Santos Laguna', nationality: 'MX', position: 'GK', basePrice: 48 },
   { name: 'Guillermo Ochoa', club: 'Salernitana', nationality: 'MX', position: 'GK', basePrice: 34 },
   { name: 'Caoimhín Kelleher', club: 'Liverpool', nationality: 'IE', position: 'GK', basePrice: 28 },
   { name: 'Lucas Chevalier', club: 'Lille', nationality: 'FR', position: 'GK', basePrice: 32 },
   { name: 'Marco Carnesecchi', club: 'Atalanta', nationality: 'IT', position: 'GK', basePrice: 30 },
-  { name: 'Michał Míškovský', club: 'Slavia Prague', nationality: 'CZ', position: 'GK', basePrice: 22 },
-  { name: 'Matvey Safonov', club: 'Paris Saint-Germain', nationality: 'RU', position: 'GK', basePrice: 26 },
+  { name: 'Wojciech Szczęsny', club: 'Barcelona', nationality: 'PL', position: 'GK', basePrice: 36 },
+  { name: 'Guglielmo Vicario', club: 'Tottenham', nationality: 'IT', position: 'GK', basePrice: 32 },
   { name: 'Dominik Livaković', club: 'Fenerbahçe', nationality: 'HR', position: 'GK', basePrice: 30 },
   { name: 'Ivan Provedel', club: 'Lazio', nationality: 'IT', position: 'GK', basePrice: 28 },
-  { name: 'Wojciech Szczęsny', club: 'Barcelona', nationality: 'PL', position: 'GK', basePrice: 36 },
-  { name: 'Rui Silva', club: 'Real Betis', nationality: 'PT', position: 'GK', basePrice: 22 },
-  { name: 'Guglielmo Vicario', club: 'Tottenham', nationality: 'IT', position: 'GK', basePrice: 32 },
+])
 
-  // ── DEF (44) ──
+const WC_DEF = section([
   { name: 'Virgil van Dijk', club: 'Liverpool', nationality: 'NL', position: 'DEF', basePrice: 55 },
   { name: 'Rúben Dias', club: 'Manchester City', nationality: 'PT', position: 'DEF', basePrice: 50 },
   { name: 'William Saliba', club: 'Arsenal', nationality: 'FR', position: 'DEF', basePrice: 45 },
@@ -89,87 +90,68 @@ const WC_PLAYERS: PlayerTemplate[] = [
   { name: 'Kyle Walker', club: 'Manchester City', nationality: 'GB', position: 'DEF', basePrice: 34 },
   { name: 'Alphonso Davies', club: 'Bayern Munich', nationality: 'CA', position: 'DEF', basePrice: 39 },
   { name: 'Gabriel Magalhães', club: 'Arsenal', nationality: 'BR', position: 'DEF', basePrice: 35 },
-  { name: 'Matthijs de Ligt', club: 'Manchester United', nationality: 'NL', position: 'DEF', basePrice: 33 },
   { name: 'Eder Militão', club: 'Real Madrid', nationality: 'BR', position: 'DEF', basePrice: 36 },
   { name: 'Micky van de Ven', club: 'Tottenham', nationality: 'NL', position: 'DEF', basePrice: 32 },
   { name: 'João Cancelo', club: 'Barcelona', nationality: 'PT', position: 'DEF', basePrice: 34 },
   { name: 'Alejandro Balde', club: 'Barcelona', nationality: 'ES', position: 'DEF', basePrice: 30 },
-  { name: 'Ben Chilwell', club: 'Chelsea', nationality: 'GB', position: 'DEF', basePrice: 28 },
   { name: 'Nico Schlotterbeck', club: 'Borussia Dortmund', nationality: 'DE', position: 'DEF', basePrice: 30 },
   { name: 'Jonathan Tah', club: 'Bayer Leverkusen', nationality: 'DE', position: 'DEF', basePrice: 29 },
   { name: 'Pau Torres', club: 'Aston Villa', nationality: 'ES', position: 'DEF', basePrice: 28 },
   { name: 'Jurriën Timber', club: 'Arsenal', nationality: 'NL', position: 'DEF', basePrice: 27 },
   { name: 'Cristian Romero', club: 'Tottenham', nationality: 'AR', position: 'DEF', basePrice: 31 },
-  { name: 'Noussair Mazraoui', club: 'Manchester United', nationality: 'MA', position: 'DEF', basePrice: 24 },
+  { name: 'Lisandro Martínez', club: 'Manchester United', nationality: 'AR', position: 'DEF', basePrice: 44 },
+  { name: 'Marcos Marquinhos', club: 'Paris Saint-Germain', nationality: 'BR', position: 'DEF', basePrice: 48 },
+  { name: 'Andrew Robertson', club: 'Liverpool', nationality: 'GB', position: 'DEF', basePrice: 48 },
+  { name: 'Ibrahima Konaté', club: 'Liverpool', nationality: 'FR', position: 'DEF', basePrice: 44 },
+  { name: 'Kieran Trippier', club: 'Newcastle', nationality: 'GB', position: 'DEF', basePrice: 46 },
+  { name: 'Ben White', club: 'Arsenal', nationality: 'GB', position: 'DEF', basePrice: 44 },
+  { name: 'Jeremie Frimpong', club: 'Bayer Leverkusen', nationality: 'NL', position: 'DEF', basePrice: 44 },
+  { name: 'Malo Gusto', club: 'Chelsea', nationality: 'FR', position: 'DEF', basePrice: 42 },
+  { name: 'Pedro Porro', club: 'Tottenham', nationality: 'ES', position: 'DEF', basePrice: 42 },
+  { name: 'José María Giménez', club: 'Atlético Madrid', nationality: 'UY', position: 'DEF', basePrice: 38 },
+  { name: 'Nuno Mendes', club: 'Paris Saint-Germain', nationality: 'PT', position: 'DEF', basePrice: 40 },
+  { name: 'Alex Grimaldo', club: 'Bayer Leverkusen', nationality: 'ES', position: 'DEF', basePrice: 42 },
+  { name: 'Federico Dimarco', club: 'Inter Milan', nationality: 'IT', position: 'DEF', basePrice: 40 },
+  { name: 'Alessandro Bastoni', club: 'Inter Milan', nationality: 'IT', position: 'DEF', basePrice: 42 },
+  { name: 'Destiny Udogie', club: 'Tottenham', nationality: 'IT', position: 'DEF', basePrice: 40 },
   { name: 'Reece James', club: 'Chelsea', nationality: 'GB', position: 'DEF', basePrice: 26 },
+  { name: 'Levi Colwill', club: 'Chelsea', nationality: 'GB', position: 'DEF', basePrice: 34 },
+  { name: 'Noussair Mazraoui', club: 'Manchester United', nationality: 'MA', position: 'DEF', basePrice: 24 },
+  { name: 'Luke Shaw', club: 'Manchester United', nationality: 'GB', position: 'DEF', basePrice: 24 },
+  { name: 'Ben Chilwell', club: 'Chelsea', nationality: 'GB', position: 'DEF', basePrice: 28 },
   { name: 'César Azpilicueta', club: 'Atlético Madrid', nationality: 'ES', position: 'DEF', basePrice: 22 },
   { name: 'Fikayo Tomori', club: 'AC Milan', nationality: 'GB', position: 'DEF', basePrice: 25 },
-  { name: 'Luke Shaw', club: 'Manchester United', nationality: 'GB', position: 'DEF', basePrice: 24 },
   { name: 'David Alaba', club: 'Real Madrid', nationality: 'AT', position: 'DEF', basePrice: 26 },
   { name: 'Kim Min-jae', club: 'Bayern Munich', nationality: 'KR', position: 'DEF', basePrice: 23 },
-  { name: 'Emerson Royal', club: 'Tottenham', nationality: 'BR', position: 'DEF', basePrice: 18 },
-  { name: 'Sergi Cardona', club: 'Las Palmas', nationality: 'ES', position: 'DEF', basePrice: 12 },
   { name: 'Pervis Estupiñán', club: 'Brighton', nationality: 'EC', position: 'DEF', basePrice: 20 },
-  { name: 'Marc Cucurella', club: 'Chelsea', nationality: 'ES', position: 'DEF', basePrice: 18 },
   { name: 'Nathan Aké', club: 'Manchester City', nationality: 'NL', position: 'DEF', basePrice: 22 },
-  { name: 'Riccardo Calafiori', club: 'Bologna', nationality: 'IT', position: 'DEF', basePrice: 16 },
+  { name: 'Marc Cucurella', club: 'Chelsea', nationality: 'ES', position: 'DEF', basePrice: 18 },
+  { name: 'Emerson Royal', club: 'Tottenham', nationality: 'BR', position: 'DEF', basePrice: 18 },
   { name: 'Jarrad Branthwaite', club: 'Everton', nationality: 'GB', position: 'DEF', basePrice: 14 },
   { name: 'Mario Hermoso', club: 'Roma', nationality: 'ES', position: 'DEF', basePrice: 15 },
   { name: 'Romain Saïss', club: 'Al Shabab', nationality: 'MA', position: 'DEF', basePrice: 10 },
   { name: 'Eric Dier', club: 'Bayern Munich', nationality: 'GB', position: 'DEF', basePrice: 13 },
-  // ── Extra high-price DEFs for GOLD tier depth ──
-  { name: 'Marcos Aoás Corrêa (Marquinhos)', club: 'Paris Saint-Germain', nationality: 'BR', position: 'DEF', basePrice: 56 },
-  { name: 'Lisandro Martínez', club: 'Manchester United', nationality: 'AR', position: 'DEF', basePrice: 54 },
-  { name: 'Matthijs de Ligt', club: 'Manchester United', nationality: 'NL', position: 'DEF', basePrice: 52 },
-  { name: 'Andrew Robertson', club: 'Liverpool', nationality: 'GB', position: 'DEF', basePrice: 52 },
-  { name: 'Ibrahima Konaté', club: 'Liverpool', nationality: 'FR', position: 'DEF', basePrice: 50 },
-  { name: 'Kieran Trippier', club: 'Newcastle', nationality: 'GB', position: 'DEF', basePrice: 50 },
-  { name: 'Ben White', club: 'Arsenal', nationality: 'GB', position: 'DEF', basePrice: 48 },
-  { name: 'Pau Cubarsí', club: 'Barcelona', nationality: 'ES', position: 'DEF', basePrice: 48 },
-  { name: 'Levi Colwill', club: 'Chelsea', nationality: 'GB', position: 'DEF', basePrice: 48 },
-  { name: 'Malo Gusto', club: 'Chelsea', nationality: 'FR', position: 'DEF', basePrice: 46 },
-  { name: 'Pedro Porro', club: 'Tottenham', nationality: 'ES', position: 'DEF', basePrice: 46 },
-  { name: 'Jeremie Frimpong', club: 'Bayer Leverkusen', nationality: 'NL', position: 'DEF', basePrice: 48 },
-  { name: 'José María Giménez', club: 'Atlético Madrid', nationality: 'UY', position: 'DEF', basePrice: 44 },
-  { name: 'Nahuel Molina', club: 'Atlético Madrid', nationality: 'AR', position: 'DEF', basePrice: 40 },
-  { name: 'Nuno Mendes', club: 'Paris Saint-Germain', nationality: 'PT', position: 'DEF', basePrice: 44 },
-  { name: 'Alex Grimaldo', club: 'Bayer Leverkusen', nationality: 'ES', position: 'DEF', basePrice: 46 },
-  { name: 'Federico Dimarco', club: 'Inter Milan', nationality: 'IT', position: 'DEF', basePrice: 44 },
-  { name: 'Alessandro Bastoni', club: 'Inter Milan', nationality: 'IT', position: 'DEF', basePrice: 44 },
-  { name: 'Destiny Udogie', club: 'Tottenham', nationality: 'IT', position: 'DEF', basePrice: 44 },
-  // ── Extra DEFs for Draft Mode pool depth ──
-  { name: 'Jeremie Frimpong', club: 'Bayer Leverkusen', nationality: 'NL', position: 'DEF', basePrice: 34 },
-  { name: 'Alex Grimaldo', club: 'Bayer Leverkusen', nationality: 'ES', position: 'DEF', basePrice: 36 },
-  { name: 'Odilon Kossounou', club: 'Bayer Leverkusen', nationality: 'CI', position: 'DEF', basePrice: 24 },
-  { name: 'Edmond Tapsoba', club: 'Bayer Leverkusen', nationality: 'BF', position: 'DEF', basePrice: 30 },
-  { name: 'Kieran Trippier', club: 'Newcastle', nationality: 'GB', position: 'DEF', basePrice: 32 },
   { name: 'Sven Botman', club: 'Newcastle', nationality: 'NL', position: 'DEF', basePrice: 28 },
-  { name: 'Lewis Hall', club: 'Newcastle', nationality: 'GB', position: 'DEF', basePrice: 16 },
-  { name: 'Tino Livramento', club: 'Newcastle', nationality: 'GB', position: 'DEF', basePrice: 20 },
   { name: 'Fabian Schär', club: 'Newcastle', nationality: 'CH', position: 'DEF', basePrice: 24 },
-  { name: 'Pau Cubarsí', club: 'Barcelona', nationality: 'ES', position: 'DEF', basePrice: 28 },
+  { name: 'Pau Cubarsí', club: 'Barcelona', nationality: 'ES', position: 'DEF', basePrice: 30 },
+  { name: 'Raphaël Varane', club: 'Como', nationality: 'FR', position: 'DEF', basePrice: 26 },
+  { name: 'Sergio Ramos', club: 'Sevilla', nationality: 'ES', position: 'DEF', basePrice: 24 },
+  { name: 'Jordi Alba', club: 'Inter Miami', nationality: 'ES', position: 'DEF', basePrice: 22 },
+  { name: 'Mats Hummels', club: 'Roma', nationality: 'DE', position: 'DEF', basePrice: 20 },
+  { name: 'Nahuel Molina', club: 'Atlético Madrid', nationality: 'AR', position: 'DEF', basePrice: 30 },
+  { name: 'Riccardo Calafiori', club: 'Bologna', nationality: 'IT', position: 'DEF', basePrice: 16 },
+  { name: 'Tino Livramento', club: 'Newcastle', nationality: 'GB', position: 'DEF', basePrice: 20 },
+  { name: 'Lewis Hall', club: 'Newcastle', nationality: 'GB', position: 'DEF', basePrice: 16 },
   { name: 'Héctor Fort', club: 'Barcelona', nationality: 'ES', position: 'DEF', basePrice: 16 },
-  { name: 'Jules Koundé', club: 'Barcelona', nationality: 'FR', position: 'DEF', basePrice: 40 },
-  { name: 'Toni Rüdiger', club: 'Real Madrid', nationality: 'DE', position: 'DEF', basePrice: 44 },
-  { name: 'Ferland Mendy', club: 'Real Madrid', nationality: 'FR', position: 'DEF', basePrice: 28 },
-  { name: 'David Alaba', club: 'Real Madrid', nationality: 'AT', position: 'DEF', basePrice: 26 },
-  { name: 'Lucas Vázquez', club: 'Real Madrid', nationality: 'ES', position: 'DEF', basePrice: 22 },
-  { name: 'Nacho', club: 'Al Qadsiah', nationality: 'ES', position: 'DEF', basePrice: 18 },
-  { name: 'Matías Viña', club: 'Flamengo', nationality: 'UY', position: 'DEF', basePrice: 18 },
-  { name: 'Ronald Araújo', club: 'Barcelona', nationality: 'UY', position: 'DEF', basePrice: 38 },
   { name: 'Inigo Martínez', club: 'Barcelona', nationality: 'ES', position: 'DEF', basePrice: 24 },
-  { name: 'Levi Colwill', club: 'Chelsea', nationality: 'GB', position: 'DEF', basePrice: 28 },
   { name: 'Benoît Badiashile', club: 'Chelsea', nationality: 'FR', position: 'DEF', basePrice: 24 },
-  { name: 'Malo Gusto', club: 'Chelsea', nationality: 'FR', position: 'DEF', basePrice: 26 },
-  { name: 'Pedro Porro', club: 'Tottenham', nationality: 'ES', position: 'DEF', basePrice: 30 },
-  { name: 'Micky van de Ven', club: 'Tottenham', nationality: 'NL', position: 'DEF', basePrice: 32 },
-  { name: 'Destiny Udogie', club: 'Tottenham', nationality: 'IT', position: 'DEF', basePrice: 28 },
-  { name: 'Joshua Kimmich', club: 'Bayern Munich', nationality: 'DE', position: 'DEF', basePrice: 38 },
-  { name: 'Kim Min-jae', club: 'Bayern Munich', nationality: 'KR', position: 'DEF', basePrice: 26 },
   { name: 'Konrad Laimer', club: 'Bayern Munich', nationality: 'AT', position: 'DEF', basePrice: 22 },
   { name: 'Raphaël Guerreiro', club: 'Bayern Munich', nationality: 'PT', position: 'DEF', basePrice: 22 },
+  { name: 'Edmond Tapsoba', club: 'Bayer Leverkusen', nationality: 'BF', position: 'DEF', basePrice: 28 },
+  { name: 'Odilon Kossounou', club: 'Bayer Leverkusen', nationality: 'CI', position: 'DEF', basePrice: 24 },
+])
 
-  // ── MID (48) ──
+const WC_MID = section([
   { name: 'Jude Bellingham', club: 'Real Madrid', nationality: 'GB', position: 'MID', basePrice: 80 },
   { name: 'Rodri', club: 'Manchester City', nationality: 'ES', position: 'MID', basePrice: 70 },
   { name: 'Declan Rice', club: 'Arsenal', nationality: 'GB', position: 'MID', basePrice: 55 },
@@ -192,12 +174,8 @@ const WC_PLAYERS: PlayerTemplate[] = [
   { name: 'Alexis Mac Allister', club: 'Liverpool', nationality: 'AR', position: 'MID', basePrice: 39 },
   { name: 'Dominik Szoboszlai', club: 'Liverpool', nationality: 'HU', position: 'MID', basePrice: 37 },
   { name: 'Ryan Gravenberch', club: 'Liverpool', nationality: 'NL', position: 'MID', basePrice: 30 },
-  { name: 'Khadija Shaw', club: 'Manchester City', nationality: 'JM', position: 'MID', basePrice: 28 },
-  { name: 'Mason Mount', club: 'Manchester United', nationality: 'GB', position: 'MID', basePrice: 26 },
-  { name: 'Kobbie Mainoo', club: 'Manchester United', nationality: 'GB', position: 'MID', basePrice: 34 },
   { name: 'Bernardo Silva', club: 'Manchester City', nationality: 'PT', position: 'MID', basePrice: 45 },
   { name: 'Frenkie de Jong', club: 'Barcelona', nationality: 'NL', position: 'MID', basePrice: 40 },
-  { name: 'Isco', club: 'Real Betis', nationality: 'ES', position: 'MID', basePrice: 20 },
   { name: 'Dani Olmo', club: 'Barcelona', nationality: 'ES', position: 'MID', basePrice: 35 },
   { name: 'Warren Zaïre-Emery', club: 'Paris Saint-Germain', nationality: 'FR', position: 'MID', basePrice: 32 },
   { name: 'Vitinha', club: 'Paris Saint-Germain', nationality: 'PT', position: 'MID', basePrice: 30 },
@@ -209,123 +187,100 @@ const WC_PLAYERS: PlayerTemplate[] = [
   { name: 'Marcel Sabitzer', club: 'Borussia Dortmund', nationality: 'AT', position: 'MID', basePrice: 22 },
   { name: 'Exequiel Palacios', club: 'Bayer Leverkusen', nationality: 'AR', position: 'MID', basePrice: 25 },
   { name: 'Granit Xhaka', club: 'Bayer Leverkusen', nationality: 'CH', position: 'MID', basePrice: 24 },
-  { name: 'Declan McAtee', club: 'Manchester City', nationality: 'GB', position: 'MID', basePrice: 14 },
   { name: 'Amadou Onana', club: 'Aston Villa', nationality: 'BE', position: 'MID', basePrice: 22 },
   { name: 'Youri Tielemans', club: 'Aston Villa', nationality: 'BE', position: 'MID', basePrice: 20 },
-  { name: 'Morgan Rogers', club: 'Aston Villa', nationality: 'GB', position: 'MID', basePrice: 16 },
-  { name: 'Scott McTominay', club: 'Napoli', nationality: 'GB', position: 'MID', basePrice: 18 },
+  { name: 'Kobbie Mainoo', club: 'Manchester United', nationality: 'GB', position: 'MID', basePrice: 34 },
   { name: 'Sandro Tonali', club: 'Newcastle', nationality: 'IT', position: 'MID', basePrice: 28 },
   { name: 'Bruno Guimarães', club: 'Newcastle', nationality: 'BR', position: 'MID', basePrice: 30 },
   { name: 'Conor Gallagher', club: 'Atlético Madrid', nationality: 'GB', position: 'MID', basePrice: 20 },
+  { name: 'Scott McTominay', club: 'Napoli', nationality: 'GB', position: 'MID', basePrice: 18 },
   { name: 'Arda Güler', club: 'Real Madrid', nationality: 'TR', position: 'MID', basePrice: 28 },
-  // ── Extra MIDs for Draft Mode pool depth ──
   { name: 'Luka Modrić', club: 'Real Madrid', nationality: 'HR', position: 'MID', basePrice: 30 },
   { name: 'Toni Kroos', club: 'Real Madrid', nationality: 'DE', position: 'MID', basePrice: 30 },
-  { name: 'Dani Ceballos', club: 'Real Madrid', nationality: 'ES', position: 'MID', basePrice: 20 },
-  { name: 'Sergio Busquets', club: 'Inter Miami', nationality: 'ES', position: 'MID', basePrice: 22 },
-  { name: 'Gavi', club: 'Barcelona', nationality: 'ES', position: 'MID', basePrice: 48 },
-  { name: 'Fermín López', club: 'Barcelona', nationality: 'ES', position: 'MID', basePrice: 28 },
-  { name: 'Pablo Torre', club: 'Barcelona', nationality: 'ES', position: 'MID', basePrice: 14 },
-  { name: 'Romeo Lavia', club: 'Chelsea', nationality: 'BE', position: 'MID', basePrice: 24 },
-  { name: 'Carney Chukwuemeka', club: 'Chelsea', nationality: 'GB', position: 'MID', basePrice: 18 },
-  { name: 'Kiernan Dewsbury-Hall', club: 'Chelsea', nationality: 'GB', position: 'MID', basePrice: 20 },
   { name: 'Harvey Elliott', club: 'Brighton', nationality: 'GB', position: 'MID', basePrice: 24 },
   { name: 'Curtis Jones', club: 'Liverpool', nationality: 'GB', position: 'MID', basePrice: 26 },
-  { name: 'Wataru Endo', club: 'Liverpool', nationality: 'JP', position: 'MID', basePrice: 20 },
-  { name: 'Thiago', club: 'Liverpool', nationality: 'ES', position: 'MID', basePrice: 18 },
-  { name: 'Bobby Clark', club: 'RB Salzburg', nationality: 'GB', position: 'MID', basePrice: 12 },
   { name: 'Pape Matar Sarr', club: 'Tottenham', nationality: 'SN', position: 'MID', basePrice: 28 },
   { name: 'Yves Bissouma', club: 'Tottenham', nationality: 'ML', position: 'MID', basePrice: 24 },
-  { name: 'James Milner', club: 'Brighton', nationality: 'GB', position: 'MID', basePrice: 14 },
-  { name: 'Pascal Groß', club: 'Borussia Dortmund', nationality: 'DE', position: 'MID', basePrice: 26 },
-  { name: 'Felix Nmecha', club: 'Borussia Dortmund', nationality: 'DE', position: 'MID', basePrice: 22 },
-  { name: 'Salih Özcan', club: 'Borussia Dortmund', nationality: 'DE', position: 'MID', basePrice: 18 },
   { name: 'Aleksandar Pavlović', club: 'Bayern Munich', nationality: 'DE', position: 'MID', basePrice: 28 },
   { name: 'João Palhinha', club: 'Bayern Munich', nationality: 'PT', position: 'MID', basePrice: 30 },
-  { name: 'Sacha Boey', club: 'Bayern Munich', nationality: 'FR', position: 'MID', basePrice: 18 },
+  { name: 'Dani Ceballos', club: 'Real Madrid', nationality: 'ES', position: 'MID', basePrice: 20 },
+  { name: 'Sergio Busquets', club: 'Inter Miami', nationality: 'ES', position: 'MID', basePrice: 22 },
+  { name: 'Fermín López', club: 'Barcelona', nationality: 'ES', position: 'MID', basePrice: 28 },
+  { name: 'Romeo Lavia', club: 'Chelsea', nationality: 'BE', position: 'MID', basePrice: 24 },
+  { name: 'Pascal Groß', club: 'Borussia Dortmund', nationality: 'DE', position: 'MID', basePrice: 26 },
+  { name: 'Felix Nmecha', club: 'Borussia Dortmund', nationality: 'DE', position: 'MID', basePrice: 22 },
+  { name: 'Rodrigo De Paul', club: 'Atlético Madrid', nationality: 'AR', position: 'MID', basePrice: 30 },
+  { name: 'Christian Pulisic', club: 'AC Milan', nationality: 'US', position: 'MID', basePrice: 30 },
+  { name: 'Tijjani Reijnders', club: 'AC Milan', nationality: 'NL', position: 'MID', basePrice: 28 },
+  { name: 'Ismaël Bennacer', club: 'AC Milan', nationality: 'DZ', position: 'MID', basePrice: 26 },
+  { name: 'Alejandro Garnacho', club: 'Manchester United', nationality: 'AR', position: 'MID', basePrice: 34 },
+  { name: 'Mason Mount', club: 'Manchester United', nationality: 'GB', position: 'MID', basePrice: 26 },
+])
 
-  // ── FWD (44) ──
+const WC_FWD = section([
   { name: 'Kylian Mbappé', club: 'Real Madrid', nationality: 'FR', position: 'FWD', basePrice: 85, isEligibleForIcon: true },
   { name: 'Erling Haaland', club: 'Manchester City', nationality: 'NO', position: 'FWD', basePrice: 90, isEligibleForIcon: true },
   { name: 'Vinícius Jr.', club: 'Real Madrid', nationality: 'BR', position: 'FWD', basePrice: 75, isEligibleForIcon: true },
   { name: 'Bukayo Saka', club: 'Arsenal', nationality: 'GB', position: 'FWD', basePrice: 65, isEligibleForIcon: true },
   { name: 'Lamine Yamal', club: 'Barcelona', nationality: 'ES', position: 'FWD', basePrice: 70, isEligibleForIcon: true },
-
-  { name: 'Antoine Griezmann', club: 'Atlético Madrid', nationality: 'FR', position: 'FWD', basePrice: 50 },
-  { name: 'Rodrygo', club: 'Real Madrid', nationality: 'BR', position: 'FWD', basePrice: 55 },
   { name: 'Harry Kane', club: 'Bayern Munich', nationality: 'GB', position: 'FWD', basePrice: 58 },
   { name: 'Mohamed Salah', club: 'Liverpool', nationality: 'EG', position: 'FWD', basePrice: 60 },
-  { name: 'Lautaro Martínez', club: 'Inter Milan', nationality: 'AR', position: 'FWD', basePrice: 52 },
-  { name: 'Ousmane Dembélé', club: 'Paris Saint-Germain', nationality: 'FR', position: 'FWD', basePrice: 48 },
-  { name: 'Raphinha', club: 'Barcelona', nationality: 'BR', position: 'FWD', basePrice: 45 },
-  { name: 'Gabriel Martinelli', club: 'Arsenal', nationality: 'BR', position: 'FWD', basePrice: 42 },
-  { name: 'Marcus Rashford', club: 'Manchester United', nationality: 'GB', position: 'FWD', basePrice: 36 },
-  { name: 'Rasmus Højlund', club: 'Manchester United', nationality: 'DK', position: 'FWD', basePrice: 32 },
-  { name: 'Nicolas Jackson', club: 'Chelsea', nationality: 'SN', position: 'FWD', basePrice: 30 },
-  { name: 'Christopher Nkunku', club: 'Chelsea', nationality: 'FR', position: 'FWD', basePrice: 34 },
-  { name: 'Darwin Núñez', club: 'Liverpool', nationality: 'UY', position: 'FWD', basePrice: 35 },
-  { name: 'Julian Álvarez', club: 'Atlético Madrid', nationality: 'AR', position: 'FWD', basePrice: 40 },
-  { name: 'Victor Osimhen', club: 'Galatasaray', nationality: 'NG', position: 'FWD', basePrice: 44 },
-  { name: 'Kingsley Coman', club: 'Bayern Munich', nationality: 'FR', position: 'FWD', basePrice: 38 },
-  { name: 'Leroy Sané', club: 'Bayern Munich', nationality: 'DE', position: 'FWD', basePrice: 40 },
-  { name: 'Serge Gnabry', club: 'Bayern Munich', nationality: 'DE', position: 'FWD', basePrice: 32 },
-  { name: 'Donyell Malen', club: 'Borussia Dortmund', nationality: 'NL', position: 'FWD', basePrice: 26 },
-  { name: 'Karim Adeyemi', club: 'Borussia Dortmund', nationality: 'DE', position: 'FWD', basePrice: 28 },
-  { name: 'Álvaro Morata', club: 'AC Milan', nationality: 'ES', position: 'FWD', basePrice: 30 },
-  { name: 'Olivier Giroud', club: 'Los Angeles FC', nationality: 'FR', position: 'FWD', basePrice: 24 },
-  { name: 'Cody Gakpo', club: 'Liverpool', nationality: 'NL', position: 'FWD', basePrice: 33 },
-  { name: 'Luis Díaz', club: 'Liverpool', nationality: 'CO', position: 'FWD', basePrice: 37 },
-  { name: 'Raheem Sterling', club: 'Chelsea', nationality: 'GB', position: 'FWD', basePrice: 28 },
-  { name: 'Jérémy Doku', club: 'Manchester City', nationality: 'BE', position: 'FWD', basePrice: 34 },
-  { name: 'Jack Grealish', club: 'Manchester City', nationality: 'GB', position: 'FWD', basePrice: 30 },
-  { name: 'Takefusa Kubo', club: 'Real Sociedad', nationality: 'JP', position: 'FWD', basePrice: 22 },
-  { name: 'Andriy Yarmolenko', club: 'Dynamo Kyiv', nationality: 'UA', position: 'FWD', basePrice: 12 },
-  { name: 'Moussa Diaby', club: 'Aston Villa', nationality: 'FR', position: 'FWD', basePrice: 26 },
-  { name: 'Leon Bailey', club: 'Aston Villa', nationality: 'JM', position: 'FWD', basePrice: 22 },
-  { name: 'Aleksander Mitrović', club: 'Al Hilal', nationality: 'RS', position: 'FWD', basePrice: 25 },
-  { name: 'Richarlison', club: 'Tottenham', nationality: 'BR', position: 'FWD', basePrice: 24 },
-  { name: 'Brennan Johnson', club: 'Tottenham', nationality: 'GB', position: 'FWD', basePrice: 18 },
-  { name: 'Dejan Kulusevski', club: 'Tottenham', nationality: 'SE', position: 'FWD', basePrice: 28 },
-  { name: 'Nico Williams', club: 'Athletic Bilbao', nationality: 'ES', position: 'FWD', basePrice: 32 },
-  { name: 'Samuel Omorodion', club: 'Porto', nationality: 'ES', position: 'FWD', basePrice: 16 },
-  { name: 'Gonçalo Ramos', club: 'Paris Saint-Germain', nationality: 'PT', position: 'FWD', basePrice: 30 },
-  { name: 'Khvicha Kvaratskhelia', club: 'Napoli', nationality: 'GE', position: 'FWD', basePrice: 38 },
-  // ── Extra FWDs for Draft Mode pool depth ──
-  { name: 'Pedro Neto', club: 'Chelsea', nationality: 'PT', position: 'FWD', basePrice: 30 },
-  { name: 'Mykhailo Mudryk', club: 'Chelsea', nationality: 'UA', position: 'FWD', basePrice: 26 },
-  { name: 'Cole Palmer', club: 'Chelsea', nationality: 'GB', position: 'FWD', basePrice: 52 },
-  { name: 'Omari Hutchinson', club: 'Ipswich', nationality: 'GB', position: 'FWD', basePrice: 16 },
-  { name: 'Facundo Pellistri', club: 'Panathinaikos', nationality: 'UY', position: 'FWD', basePrice: 18 },
-  { name: 'Amad Diallo', club: 'Manchester United', nationality: 'CI', position: 'FWD', basePrice: 22 },
-  { name: 'Antony', club: 'Manchester United', nationality: 'BR', position: 'FWD', basePrice: 20 },
-  { name: 'Jadon Sancho', club: 'Chelsea', nationality: 'GB', position: 'FWD', basePrice: 28 },
-  { name: 'Kaoru Mitoma', club: 'Brighton', nationality: 'JP', position: 'FWD', basePrice: 34 },
-  { name: 'Simon Adingra', club: 'Brighton', nationality: 'CI', position: 'FWD', basePrice: 26 },
-  { name: 'João Pedro', club: 'Brighton', nationality: 'BR', position: 'FWD', basePrice: 32 },
-  { name: 'Evan Ferguson', club: 'Brighton', nationality: 'IE', position: 'FWD', basePrice: 28 },
-  { name: 'Diogo Jota', club: 'Liverpool', nationality: 'PT', position: 'FWD', basePrice: 38 },
-  { name: 'Darwin Núñez', club: 'Liverpool', nationality: 'UY', position: 'FWD', basePrice: 36 },
-  { name: 'Federico Chiesa', club: 'Liverpool', nationality: 'IT', position: 'FWD', basePrice: 30 },
-  { name: 'Vitinha', club: 'Paris Saint-Germain', nationality: 'PT', position: 'FWD', basePrice: 22 },
-  { name: 'Hugo Ekitiké', club: 'Eintracht Frankfurt', nationality: 'FR', position: 'FWD', basePrice: 24 },
-  { name: 'Mason Greenwood', club: 'Marseille', nationality: 'GB', position: 'FWD', basePrice: 30 },
-  // ── Extra FWDs for GOLD tier depth ──
   { name: 'Rodrygo', club: 'Real Madrid', nationality: 'BR', position: 'FWD', basePrice: 55 },
   { name: 'Lautaro Martínez', club: 'Inter Milan', nationality: 'AR', position: 'FWD', basePrice: 52 },
-  { name: 'Ousmane Dembélé', club: 'Paris Saint-Germain', nationality: 'FR', position: 'FWD', basePrice: 50 },
-  { name: 'Raphinha', club: 'Barcelona', nationality: 'BR', position: 'FWD', basePrice: 48 },
-  { name: 'Victor Osimhen', club: 'Galatasaray', nationality: 'NG', position: 'FWD', basePrice: 46 },
-  { name: 'Gabriel Martinelli', club: 'Arsenal', nationality: 'BR', position: 'FWD', basePrice: 44 },
-  { name: 'Julian Álvarez', club: 'Atlético Madrid', nationality: 'AR', position: 'FWD', basePrice: 42 },
-  { name: 'Luis Díaz', club: 'Liverpool', nationality: 'CO', position: 'FWD', basePrice: 40 },
-  { name: 'Diogo Jota', club: 'Liverpool', nationality: 'PT', position: 'FWD', basePrice: 40 },
-  { name: 'Kingsley Coman', club: 'Bayern Munich', nationality: 'FR', position: 'FWD', basePrice: 42 },
-  { name: 'Khvicha Kvaratskhelia', club: 'Napoli', nationality: 'GE', position: 'FWD', basePrice: 40 },
+  { name: 'Antoine Griezmann', club: 'Atlético Madrid', nationality: 'FR', position: 'FWD', basePrice: 50 },
+  { name: 'Ousmane Dembélé', club: 'Paris Saint-Germain', nationality: 'FR', position: 'FWD', basePrice: 48 },
+  { name: 'Victor Osimhen', club: 'Galatasaray', nationality: 'NG', position: 'FWD', basePrice: 44 },
+  { name: 'Raphinha', club: 'Barcelona', nationality: 'BR', position: 'FWD', basePrice: 46 },
+  { name: 'Gabriel Martinelli', club: 'Arsenal', nationality: 'BR', position: 'FWD', basePrice: 42 },
+  { name: 'Julian Álvarez', club: 'Atlético Madrid', nationality: 'AR', position: 'FWD', basePrice: 40 },
+  { name: 'Kingsley Coman', club: 'Bayern Munich', nationality: 'FR', position: 'FWD', basePrice: 38 },
+  { name: 'Leroy Sané', club: 'Bayern Munich', nationality: 'DE', position: 'FWD', basePrice: 40 },
+  { name: 'Khvicha Kvaratskhelia', club: 'Napoli', nationality: 'GE', position: 'FWD', basePrice: 38 },
+  { name: 'Luis Díaz', club: 'Liverpool', nationality: 'CO', position: 'FWD', basePrice: 37 },
+  { name: 'Marcus Rashford', club: 'Manchester United', nationality: 'GB', position: 'FWD', basePrice: 36 },
+  { name: 'Darwin Núñez', club: 'Liverpool', nationality: 'UY', position: 'FWD', basePrice: 35 },
+  { name: 'Christopher Nkunku', club: 'Chelsea', nationality: 'FR', position: 'FWD', basePrice: 34 },
+  { name: 'Cody Gakpo', club: 'Liverpool', nationality: 'NL', position: 'FWD', basePrice: 33 },
+  { name: 'Rasmus Højlund', club: 'Manchester United', nationality: 'DK', position: 'FWD', basePrice: 32 },
+  { name: 'Nico Williams', club: 'Athletic Bilbao', nationality: 'ES', position: 'FWD', basePrice: 32 },
+  { name: 'Nicolas Jackson', club: 'Chelsea', nationality: 'SN', position: 'FWD', basePrice: 30 },
+  { name: 'Jack Grealish', club: 'Manchester City', nationality: 'GB', position: 'FWD', basePrice: 30 },
+  { name: 'Álvaro Morata', club: 'AC Milan', nationality: 'ES', position: 'FWD', basePrice: 30 },
+  { name: 'Gonçalo Ramos', club: 'Paris Saint-Germain', nationality: 'PT', position: 'FWD', basePrice: 30 },
+  { name: 'Karim Adeyemi', club: 'Borussia Dortmund', nationality: 'DE', position: 'FWD', basePrice: 28 },
+  { name: 'Raheem Sterling', club: 'Chelsea', nationality: 'GB', position: 'FWD', basePrice: 28 },
+  { name: 'Dejan Kulusevski', club: 'Tottenham', nationality: 'SE', position: 'FWD', basePrice: 28 },
+  { name: 'Jadon Sancho', club: 'Chelsea', nationality: 'GB', position: 'FWD', basePrice: 28 },
+  { name: 'Donyell Malen', club: 'Borussia Dortmund', nationality: 'NL', position: 'FWD', basePrice: 26 },
+  { name: 'Aleksander Mitrović', club: 'Al Hilal', nationality: 'RS', position: 'FWD', basePrice: 25 },
+  { name: 'Olivier Giroud', club: 'Los Angeles FC', nationality: 'FR', position: 'FWD', basePrice: 24 },
+  { name: 'Richarlison', club: 'Tottenham', nationality: 'BR', position: 'FWD', basePrice: 24 },
+  { name: 'Hugo Ekitiké', club: 'Eintracht Frankfurt', nationality: 'FR', position: 'FWD', basePrice: 24 },
+  { name: 'Takefusa Kubo', club: 'Real Sociedad', nationality: 'JP', position: 'FWD', basePrice: 22 },
+  { name: 'Leon Bailey', club: 'Aston Villa', nationality: 'JM', position: 'FWD', basePrice: 22 },
+  { name: 'Kaoru Mitoma', club: 'Brighton', nationality: 'JP', position: 'FWD', basePrice: 34 },
+  { name: 'João Pedro', club: 'Brighton', nationality: 'BR', position: 'FWD', basePrice: 32 },
+  { name: 'Diogo Jota', club: 'Liverpool', nationality: 'PT', position: 'FWD', basePrice: 38 },
+  { name: 'Jérémy Doku', club: 'Manchester City', nationality: 'BE', position: 'FWD', basePrice: 34 },
+  { name: 'Evan Ferguson', club: 'Brighton', nationality: 'IE', position: 'FWD', basePrice: 28 },
+  { name: 'Pedro Neto', club: 'Chelsea', nationality: 'PT', position: 'FWD', basePrice: 30 },
+  { name: 'Mason Greenwood', club: 'Marseille', nationality: 'GB', position: 'FWD', basePrice: 30 },
+  { name: 'Endrick', club: 'Real Madrid', nationality: 'BR', position: 'FWD', basePrice: 28 },
+  { name: 'Khadija Shaw', club: 'Manchester City', nationality: 'JM', position: 'FWD', basePrice: 28 },
+  { name: 'Bradley Barcola', club: 'Paris Saint-Germain', nationality: 'FR', position: 'FWD', basePrice: 34 },
+  { name: 'Randal Kolo Muani', club: 'Paris Saint-Germain', nationality: 'FR', position: 'FWD', basePrice: 30 },
+])
+
+const WC_PLAYERS: PlayerTemplate[] = [
+  ...WC_GK,
+  ...WC_DEF,
+  ...WC_MID,
+  ...WC_FWD,
 ]
 
-// UEFA Champions League 2026/27 — 36 teams, ~160 players
-const UCL_PLAYERS: PlayerTemplate[] = [
-  // ── GK (24) ──
+// ─── UEFA Champions League 2026/27 (~280 players) ──────
+
+const UCL_GK = section([
   { name: 'Thibaut Courtois', club: 'Real Madrid', nationality: 'BE', position: 'GK', basePrice: 72 },
   { name: 'Alisson Becker', club: 'Liverpool', nationality: 'BR', position: 'GK', basePrice: 66 },
   { name: 'Ederson', club: 'Manchester City', nationality: 'BR', position: 'GK', basePrice: 60 },
@@ -350,7 +305,6 @@ const UCL_PLAYERS: PlayerTemplate[] = [
   { name: 'Marco Sportiello', club: 'AC Milan', nationality: 'IT', position: 'GK', basePrice: 18 },
   { name: 'Alexander Nübel', club: 'Stuttgart', nationality: 'DE', position: 'GK', basePrice: 16 },
   { name: 'Mile Svilar', club: 'Roma', nationality: 'RS', position: 'GK', basePrice: 14 },
-  // ── Extra GKs for Draft Mode pool depth ──
   { name: 'Lucas Chevalier', club: 'Lille', nationality: 'FR', position: 'GK', basePrice: 34 },
   { name: 'Marco Carnesecchi', club: 'Atalanta', nationality: 'IT', position: 'GK', basePrice: 32 },
   { name: 'Dominik Livaković', club: 'Fenerbahçe', nationality: 'HR', position: 'GK', basePrice: 30 },
@@ -358,11 +312,14 @@ const UCL_PLAYERS: PlayerTemplate[] = [
   { name: 'Wojciech Szczęsny', club: 'Barcelona', nationality: 'PL', position: 'GK', basePrice: 36 },
   { name: 'Guglielmo Vicario', club: 'Tottenham', nationality: 'IT', position: 'GK', basePrice: 32 },
   { name: 'Caoimhín Kelleher', club: 'Liverpool', nationality: 'IE', position: 'GK', basePrice: 28 },
+  { name: 'Michał Míškovský', club: 'Slavia Prague', nationality: 'CZ', position: 'GK', basePrice: 22 },
+  { name: 'Matvey Safonov', club: 'Paris Saint-Germain', nationality: 'RU', position: 'GK', basePrice: 26 },
   { name: 'Yassine Bounou', club: 'Al Hilal', nationality: 'MA', position: 'GK', basePrice: 30 },
   { name: 'Koen Casteels', club: 'Al Qadsiah', nationality: 'BE', position: 'GK', basePrice: 26 },
-  { name: 'Giorgi Mamardashvili', club: 'Valencia', nationality: 'GE', position: 'GK', basePrice: 34 },
+  { name: 'Jordan Pickford', club: 'Everton', nationality: 'GB', position: 'GK', basePrice: 34 },
+])
 
-  // ── DEF (44) ──
+const UCL_DEF = section([
   { name: 'Virgil van Dijk', club: 'Liverpool', nationality: 'NL', position: 'DEF', basePrice: 52 },
   { name: 'Rúben Dias', club: 'Manchester City', nationality: 'PT', position: 'DEF', basePrice: 50 },
   { name: 'William Saliba', club: 'Arsenal', nationality: 'FR', position: 'DEF', basePrice: 46 },
@@ -374,78 +331,66 @@ const UCL_PLAYERS: PlayerTemplate[] = [
   { name: 'John Stones', club: 'Manchester City', nationality: 'GB', position: 'DEF', basePrice: 38 },
   { name: 'Ronald Araújo', club: 'Barcelona', nationality: 'UY', position: 'DEF', basePrice: 39 },
   { name: 'Trent Alexander-Arnold', club: 'Liverpool', nationality: 'GB', position: 'DEF', basePrice: 44 },
+  { name: 'Marcos Marquinhos', club: 'Paris Saint-Germain', nationality: 'BR', position: 'DEF', basePrice: 52 },
+  { name: 'Lisandro Martínez', club: 'Manchester United', nationality: 'AR', position: 'DEF', basePrice: 50 },
+  { name: 'Matthijs de Ligt', club: 'Manchester United', nationality: 'NL', position: 'DEF', basePrice: 48 },
+  { name: 'Andrew Robertson', club: 'Liverpool', nationality: 'GB', position: 'DEF', basePrice: 48 },
+  { name: 'Ibrahima Konaté', club: 'Liverpool', nationality: 'FR', position: 'DEF', basePrice: 46 },
+  { name: 'Kieran Trippier', club: 'Newcastle', nationality: 'GB', position: 'DEF', basePrice: 46 },
+  { name: 'Ben White', club: 'Arsenal', nationality: 'GB', position: 'DEF', basePrice: 44 },
+  { name: 'Pau Cubarsí', club: 'Barcelona', nationality: 'ES', position: 'DEF', basePrice: 44 },
+  { name: 'Levi Colwill', club: 'Chelsea', nationality: 'GB', position: 'DEF', basePrice: 44 },
+  { name: 'Jeremie Frimpong', club: 'Bayer Leverkusen', nationality: 'NL', position: 'DEF', basePrice: 48 },
+  { name: 'Malo Gusto', club: 'Chelsea', nationality: 'FR', position: 'DEF', basePrice: 42 },
+  { name: 'Pedro Porro', club: 'Tottenham', nationality: 'ES', position: 'DEF', basePrice: 42 },
+  { name: 'Alex Grimaldo', club: 'Bayer Leverkusen', nationality: 'ES', position: 'DEF', basePrice: 44 },
+  { name: 'Federico Dimarco', club: 'Inter Milan', nationality: 'IT', position: 'DEF', basePrice: 40 },
+  { name: 'Alessandro Bastoni', club: 'Inter Milan', nationality: 'IT', position: 'DEF', basePrice: 42 },
+  { name: 'Destiny Udogie', club: 'Tottenham', nationality: 'IT', position: 'DEF', basePrice: 40 },
+  { name: 'Nico Schlotterbeck', club: 'Borussia Dortmund', nationality: 'DE', position: 'DEF', basePrice: 32 },
+  { name: 'José María Giménez', club: 'Atlético Madrid', nationality: 'UY', position: 'DEF', basePrice: 38 },
+  { name: 'Nuno Mendes', club: 'Paris Saint-Germain', nationality: 'PT', position: 'DEF', basePrice: 40 },
   { name: 'Kyle Walker', club: 'Manchester City', nationality: 'GB', position: 'DEF', basePrice: 34 },
   { name: 'Alphonso Davies', club: 'Bayern Munich', nationality: 'CA', position: 'DEF', basePrice: 40 },
   { name: 'Gabriel Magalhães', club: 'Arsenal', nationality: 'BR', position: 'DEF', basePrice: 36 },
-  { name: 'Matthijs de Ligt', club: 'Manchester United', nationality: 'NL', position: 'DEF', basePrice: 34 },
   { name: 'Eder Militão', club: 'Real Madrid', nationality: 'BR', position: 'DEF', basePrice: 38 },
-  { name: 'Dani Vivian', club: 'Athletic Bilbao', nationality: 'ES', position: 'DEF', basePrice: 26 },
-  { name: 'Robin Le Normand', club: 'Atlético Madrid', nationality: 'FR', position: 'DEF', basePrice: 28 },
-  { name: 'Lucas Hernández', club: 'Paris Saint-Germain', nationality: 'FR', position: 'DEF', basePrice: 32 },
-  { name: 'Nuno Mendes', club: 'Paris Saint-Germain', nationality: 'PT', position: 'DEF', basePrice: 30 },
-  { name: 'Milan Škriniar', club: 'Paris Saint-Germain', nationality: 'SK', position: 'DEF', basePrice: 30 },
-  { name: 'Federico Dimarco', club: 'Inter Milan', nationality: 'IT', position: 'DEF', basePrice: 32 },
-  { name: 'Alessandro Bastoni', club: 'Inter Milan', nationality: 'IT', position: 'DEF', basePrice: 34 },
-  { name: 'Benjamin Pavard', club: 'Inter Milan', nationality: 'FR', position: 'DEF', basePrice: 30 },
-  { name: 'Danilo', club: 'Juventus', nationality: 'BR', position: 'DEF', basePrice: 26 },
   { name: 'Bremer', club: 'Juventus', nationality: 'BR', position: 'DEF', basePrice: 32 },
+  { name: 'Jurriën Timber', club: 'Arsenal', nationality: 'NL', position: 'DEF', basePrice: 28 },
+  { name: 'Lucas Hernández', club: 'Paris Saint-Germain', nationality: 'FR', position: 'DEF', basePrice: 32 },
+  { name: 'Jonathan Tah', club: 'Bayer Leverkusen', nationality: 'DE', position: 'DEF', basePrice: 30 },
+  { name: 'Benjamin Pavard', club: 'Inter Milan', nationality: 'FR', position: 'DEF', basePrice: 30 },
+  { name: 'Reece James', club: 'Chelsea', nationality: 'GB', position: 'DEF', basePrice: 26 },
+  { name: 'Leny Yoro', club: 'Manchester United', nationality: 'FR', position: 'DEF', basePrice: 28 },
+  { name: 'Ben White', club: 'Arsenal', nationality: 'GB', position: 'DEF', basePrice: 28 },
+  { name: 'Micky van de Ven', club: 'Tottenham', nationality: 'NL', position: 'DEF', basePrice: 32 },
+  { name: 'Danilo', club: 'Juventus', nationality: 'BR', position: 'DEF', basePrice: 26 },
   { name: 'Federico Gatti', club: 'Juventus', nationality: 'IT', position: 'DEF', basePrice: 22 },
   { name: 'Edmond Tapsoba', club: 'Bayer Leverkusen', nationality: 'BF', position: 'DEF', basePrice: 28 },
-  { name: 'Jonathan Tah', club: 'Bayer Leverkusen', nationality: 'DE', position: 'DEF', basePrice: 30 },
-  { name: 'Josip Stanišić', club: 'Bayern Munich', nationality: 'HR', position: 'DEF', basePrice: 24 },
-  { name: 'Nico Schlotterbeck', club: 'Borussia Dortmund', nationality: 'DE', position: 'DEF', basePrice: 32 },
-  { name: 'Julian Ryerson', club: 'Borussia Dortmund', nationality: 'NO', position: 'DEF', basePrice: 22 },
-  { name: 'Ramy Bensebaini', club: 'Borussia Dortmund', nationality: 'DZ', position: 'DEF', basePrice: 18 },
-  { name: 'Jurriën Timber', club: 'Arsenal', nationality: 'NL', position: 'DEF', basePrice: 28 },
-  { name: 'Ben White', club: 'Arsenal', nationality: 'GB', position: 'DEF', basePrice: 30 },
-  { name: 'Reece James', club: 'Chelsea', nationality: 'GB', position: 'DEF', basePrice: 26 },
-  { name: 'Wesley Fofana', club: 'Chelsea', nationality: 'FR', position: 'DEF', basePrice: 24 },
-  { name: 'Leny Yoro', club: 'Manchester United', nationality: 'FR', position: 'DEF', basePrice: 28 },
+  { name: 'Milan Škriniar', club: 'Paris Saint-Germain', nationality: 'SK', position: 'DEF', basePrice: 30 },
   { name: 'Diogo Dalot', club: 'Manchester United', nationality: 'PT', position: 'DEF', basePrice: 24 },
+  { name: 'Wesley Fofana', club: 'Chelsea', nationality: 'FR', position: 'DEF', basePrice: 24 },
+  { name: 'Benoît Badiashile', club: 'Chelsea', nationality: 'FR', position: 'DEF', basePrice: 24 },
+  { name: 'Raphaël Varane', club: 'Como', nationality: 'FR', position: 'DEF', basePrice: 26 },
+  { name: 'Sergio Ramos', club: 'Sevilla', nationality: 'ES', position: 'DEF', basePrice: 24 },
+  { name: 'Jordi Alba', club: 'Inter Miami', nationality: 'ES', position: 'DEF', basePrice: 22 },
+  { name: 'Mats Hummels', club: 'Roma', nationality: 'DE', position: 'DEF', basePrice: 20 },
+  { name: 'Konrad Laimer', club: 'Bayern Munich', nationality: 'AT', position: 'DEF', basePrice: 22 },
+  { name: 'Inigo Martínez', club: 'Barcelona', nationality: 'ES', position: 'DEF', basePrice: 24 },
+  { name: 'Raphaël Guerreiro', club: 'Bayern Munich', nationality: 'PT', position: 'DEF', basePrice: 20 },
+  { name: 'Sven Botman', club: 'Newcastle', nationality: 'NL', position: 'DEF', basePrice: 28 },
+  { name: 'Fabian Schär', club: 'Newcastle', nationality: 'CH', position: 'DEF', basePrice: 24 },
+  { name: 'Nahuel Molina', club: 'Atlético Madrid', nationality: 'AR', position: 'DEF', basePrice: 28 },
   { name: 'Jorrel Hato', club: 'Ajax', nationality: 'NL', position: 'DEF', basePrice: 22 },
   { name: 'David Hancko', club: 'Feyenoord', nationality: 'SK', position: 'DEF', basePrice: 18 },
   { name: 'Stefan de Vrij', club: 'Inter Milan', nationality: 'NL', position: 'DEF', basePrice: 20 },
-  { name: 'Neal Maupay', club: 'Marseille', nationality: 'FR', position: 'DEF', basePrice: 12 },
-  { name: 'Tyler Dibling', club: 'Southampton', nationality: 'GB', position: 'DEF', basePrice: 14 },
-  // ── Extra high-price DEFs for GOLD tier depth ──
-  { name: 'Marcos Aoás Corrêa (Marquinhos)', club: 'Paris Saint-Germain', nationality: 'BR', position: 'DEF', basePrice: 56 },
-  { name: 'Lisandro Martínez', club: 'Manchester United', nationality: 'AR', position: 'DEF', basePrice: 54 },
-  { name: 'Matthijs de Ligt', club: 'Manchester United', nationality: 'NL', position: 'DEF', basePrice: 52 },
-  { name: 'Andrew Robertson', club: 'Liverpool', nationality: 'GB', position: 'DEF', basePrice: 50 },
-  { name: 'Ibrahima Konaté', club: 'Liverpool', nationality: 'FR', position: 'DEF', basePrice: 50 },
-  { name: 'Kieran Trippier', club: 'Newcastle', nationality: 'GB', position: 'DEF', basePrice: 48 },
-  { name: 'Ben White', club: 'Arsenal', nationality: 'GB', position: 'DEF', basePrice: 48 },
-  { name: 'Pau Cubarsí', club: 'Barcelona', nationality: 'ES', position: 'DEF', basePrice: 48 },
-  { name: 'Levi Colwill', club: 'Chelsea', nationality: 'GB', position: 'DEF', basePrice: 48 },
-  { name: 'Malo Gusto', club: 'Chelsea', nationality: 'FR', position: 'DEF', basePrice: 46 },
-  { name: 'Pedro Porro', club: 'Tottenham', nationality: 'ES', position: 'DEF', basePrice: 46 },
-  { name: 'Jeremie Frimpong', club: 'Bayer Leverkusen', nationality: 'NL', position: 'DEF', basePrice: 48 },
-  { name: 'José María Giménez', club: 'Atlético Madrid', nationality: 'UY', position: 'DEF', basePrice: 44 },
-  { name: 'Nuno Mendes', club: 'Paris Saint-Germain', nationality: 'PT', position: 'DEF', basePrice: 46 },
-  { name: 'Alex Grimaldo', club: 'Bayer Leverkusen', nationality: 'ES', position: 'DEF', basePrice: 46 },
-  { name: 'Federico Dimarco', club: 'Inter Milan', nationality: 'IT', position: 'DEF', basePrice: 44 },
-  { name: 'Alessandro Bastoni', club: 'Inter Milan', nationality: 'IT', position: 'DEF', basePrice: 44 },
-  { name: 'Destiny Udogie', club: 'Tottenham', nationality: 'IT', position: 'DEF', basePrice: 44 },
-  // ── Extra DEFs for Draft Mode pool depth ──
-  { name: 'Jeremie Frimpong', club: 'Bayer Leverkusen', nationality: 'NL', position: 'DEF', basePrice: 36 },
-  { name: 'Alex Grimaldo', club: 'Bayer Leverkusen', nationality: 'ES', position: 'DEF', basePrice: 38 },
-  { name: 'Kieran Trippier', club: 'Newcastle', nationality: 'GB', position: 'DEF', basePrice: 34 },
-  { name: 'Sven Botman', club: 'Newcastle', nationality: 'NL', position: 'DEF', basePrice: 28 },
-  { name: 'Pau Cubarsí', club: 'Barcelona', nationality: 'ES', position: 'DEF', basePrice: 30 },
-  { name: 'Ferland Mendy', club: 'Real Madrid', nationality: 'FR', position: 'DEF', basePrice: 30 },
-  { name: 'Lucas Vázquez', club: 'Real Madrid', nationality: 'ES', position: 'DEF', basePrice: 24 },
-  { name: 'Levi Colwill', club: 'Chelsea', nationality: 'GB', position: 'DEF', basePrice: 30 },
-  { name: 'Malo Gusto', club: 'Chelsea', nationality: 'FR', position: 'DEF', basePrice: 28 },
-  { name: 'Pedro Porro', club: 'Tottenham', nationality: 'ES', position: 'DEF', basePrice: 32 },
-  { name: 'Destiny Udogie', club: 'Tottenham', nationality: 'IT', position: 'DEF', basePrice: 30 },
-  { name: 'Konrad Laimer', club: 'Bayern Munich', nationality: 'AT', position: 'DEF', basePrice: 24 },
-  { name: 'Raphaël Guerreiro', club: 'Bayern Munich', nationality: 'PT', position: 'DEF', basePrice: 22 },
-  { name: 'Inigo Martínez', club: 'Barcelona', nationality: 'ES', position: 'DEF', basePrice: 26 },
-  { name: 'Benoît Badiashile', club: 'Chelsea', nationality: 'FR', position: 'DEF', basePrice: 26 },
-  { name: 'Fabian Schär', club: 'Newcastle', nationality: 'CH', position: 'DEF', basePrice: 26 },
-  { name: 'Tino Livramento', club: 'Newcastle', nationality: 'GB', position: 'DEF', basePrice: 22 },
+  { name: 'Gleison Bremer', club: 'Juventus', nationality: 'BR', position: 'DEF', basePrice: 46 },
+  { name: 'Willi Orbán', club: 'RB Leipzig', nationality: 'HU', position: 'DEF', basePrice: 44 },
+  { name: 'Niklas Süle', club: 'Borussia Dortmund', nationality: 'DE', position: 'DEF', basePrice: 42 },
+  { name: 'Piero Hincapié', club: 'Bayer Leverkusen', nationality: 'EC', position: 'DEF', basePrice: 40 },
+  { name: 'Waldemar Anton', club: 'Borussia Dortmund', nationality: 'DE', position: 'DEF', basePrice: 38 },
+])
 
-  // ── MID (48) ──
+const UCL_MID = section([
   { name: 'Jude Bellingham', club: 'Real Madrid', nationality: 'GB', position: 'MID', basePrice: 85, isEligibleForIcon: true },
   { name: 'Rodri', club: 'Manchester City', nationality: 'ES', position: 'MID', basePrice: 75 },
   { name: 'Kevin De Bruyne', club: 'Manchester City', nationality: 'BE', position: 'MID', basePrice: 60 },
@@ -477,195 +422,155 @@ const UCL_PLAYERS: PlayerTemplate[] = [
   { name: 'Vitinha', club: 'Paris Saint-Germain', nationality: 'PT', position: 'MID', basePrice: 32 },
   { name: 'Nicolo Barella', club: 'Inter Milan', nationality: 'IT', position: 'MID', basePrice: 36 },
   { name: 'Hakan Çalhanoğlu', club: 'Inter Milan', nationality: 'TR', position: 'MID', basePrice: 34 },
-  { name: 'Henrikh Mkhitaryan', club: 'Inter Milan', nationality: 'AM', position: 'MID', basePrice: 24 },
   { name: 'Dani Olmo', club: 'Barcelona', nationality: 'ES', position: 'MID', basePrice: 36 },
   { name: 'Fermín López', club: 'Barcelona', nationality: 'ES', position: 'MID', basePrice: 28 },
   { name: 'Alejandro Garnacho', club: 'Manchester United', nationality: 'AR', position: 'MID', basePrice: 34 },
   { name: 'Mason Mount', club: 'Manchester United', nationality: 'GB', position: 'MID', basePrice: 26 },
   { name: 'Conor Gallagher', club: 'Atlético Madrid', nationality: 'GB', position: 'MID', basePrice: 22 },
   { name: 'Rodrigo De Paul', club: 'Atlético Madrid', nationality: 'AR', position: 'MID', basePrice: 30 },
-  { name: 'Thomas Lemar', club: 'Atlético Madrid', nationality: 'FR', position: 'MID', basePrice: 20 },
   { name: 'Granit Xhaka', club: 'Bayer Leverkusen', nationality: 'CH', position: 'MID', basePrice: 26 },
   { name: 'Exequiel Palacios', club: 'Bayer Leverkusen', nationality: 'AR', position: 'MID', basePrice: 26 },
   { name: 'Julian Brandt', club: 'Borussia Dortmund', nationality: 'DE', position: 'MID', basePrice: 28 },
   { name: 'Marcel Sabitzer', club: 'Borussia Dortmund', nationality: 'AT', position: 'MID', basePrice: 24 },
-  { name: 'Davy Klaassen', club: 'Inter Milan', nationality: 'NL', position: 'MID', basePrice: 16 },
   { name: 'Tijjani Reijnders', club: 'AC Milan', nationality: 'NL', position: 'MID', basePrice: 28 },
   { name: 'Christian Pulisic', club: 'AC Milan', nationality: 'US', position: 'MID', basePrice: 30 },
   { name: 'Ismaël Bennacer', club: 'AC Milan', nationality: 'DZ', position: 'MID', basePrice: 26 },
-  { name: 'Dan Ndoye', club: 'Bologna', nationality: 'CH', position: 'MID', basePrice: 16 },
-  // ── Extra MIDs for Draft Mode pool depth ──
   { name: 'Luka Modrić', club: 'Real Madrid', nationality: 'HR', position: 'MID', basePrice: 32 },
   { name: 'Toni Kroos', club: 'Real Madrid', nationality: 'DE', position: 'MID', basePrice: 32 },
-  { name: 'Dani Ceballos', club: 'Real Madrid', nationality: 'ES', position: 'MID', basePrice: 22 },
-  { name: 'Sergio Busquets', club: 'Inter Miami', nationality: 'ES', position: 'MID', basePrice: 24 },
-  { name: 'Pablo Torre', club: 'Barcelona', nationality: 'ES', position: 'MID', basePrice: 16 },
   { name: 'Romeo Lavia', club: 'Chelsea', nationality: 'BE', position: 'MID', basePrice: 26 },
-  { name: 'Carney Chukwuemeka', club: 'Chelsea', nationality: 'GB', position: 'MID', basePrice: 20 },
-  { name: 'Kiernan Dewsbury-Hall', club: 'Chelsea', nationality: 'GB', position: 'MID', basePrice: 22 },
   { name: 'Harvey Elliott', club: 'Brighton', nationality: 'GB', position: 'MID', basePrice: 26 },
   { name: 'Curtis Jones', club: 'Liverpool', nationality: 'GB', position: 'MID', basePrice: 28 },
-  { name: 'Wataru Endo', club: 'Liverpool', nationality: 'JP', position: 'MID', basePrice: 22 },
   { name: 'Pape Matar Sarr', club: 'Tottenham', nationality: 'SN', position: 'MID', basePrice: 28 },
   { name: 'Yves Bissouma', club: 'Tottenham', nationality: 'ML', position: 'MID', basePrice: 26 },
-  { name: 'Pascal Groß', club: 'Borussia Dortmund', nationality: 'DE', position: 'MID', basePrice: 28 },
-  { name: 'Felix Nmecha', club: 'Borussia Dortmund', nationality: 'DE', position: 'MID', basePrice: 24 },
   { name: 'Aleksandar Pavlović', club: 'Bayern Munich', nationality: 'DE', position: 'MID', basePrice: 30 },
   { name: 'João Palhinha', club: 'Bayern Munich', nationality: 'PT', position: 'MID', basePrice: 32 },
-  { name: 'James Milner', club: 'Brighton', nationality: 'GB', position: 'MID', basePrice: 16 },
-  { name: 'Thiago', club: 'Liverpool', nationality: 'ES', position: 'MID', basePrice: 20 },
+  { name: 'Pascal Groß', club: 'Borussia Dortmund', nationality: 'DE', position: 'MID', basePrice: 28 },
+  { name: 'Felix Nmecha', club: 'Borussia Dortmund', nationality: 'DE', position: 'MID', basePrice: 24 },
+  { name: 'Dani Ceballos', club: 'Real Madrid', nationality: 'ES', position: 'MID', basePrice: 22 },
+  { name: 'Sergio Busquets', club: 'Inter Miami', nationality: 'ES', position: 'MID', basePrice: 22 },
+  { name: 'Dan Ndoye', club: 'Bologna', nationality: 'CH', position: 'MID', basePrice: 16 },
+  { name: 'Davy Klaassen', club: 'Inter Milan', nationality: 'NL', position: 'MID', basePrice: 16 },
+  { name: 'Henrikh Mkhitaryan', club: 'Inter Milan', nationality: 'AM', position: 'MID', basePrice: 24 },
+  { name: 'Thomas Lemar', club: 'Atlético Madrid', nationality: 'FR', position: 'MID', basePrice: 20 },
+])
 
-  // ── FWD (44) ──
+const UCL_FWD = section([
   { name: 'Kylian Mbappé', club: 'Real Madrid', nationality: 'FR', position: 'FWD', basePrice: 92, isEligibleForIcon: true },
   { name: 'Erling Haaland', club: 'Manchester City', nationality: 'NO', position: 'FWD', basePrice: 95, isEligibleForIcon: true },
   { name: 'Vinícius Jr.', club: 'Real Madrid', nationality: 'BR', position: 'FWD', basePrice: 80, isEligibleForIcon: true },
   { name: 'Harry Kane', club: 'Bayern Munich', nationality: 'GB', position: 'FWD', basePrice: 82, isEligibleForIcon: true },
   { name: 'Lamine Yamal', club: 'Barcelona', nationality: 'ES', position: 'FWD', basePrice: 78, isEligibleForIcon: true },
-  { name: 'Mohamed Salah', club: 'Liverpool', nationality: 'EG', position: 'FWD', basePrice: 62 },
   { name: 'Bukayo Saka', club: 'Arsenal', nationality: 'GB', position: 'FWD', basePrice: 66 },
-  { name: 'Ousmane Dembélé', club: 'Paris Saint-Germain', nationality: 'FR', position: 'FWD', basePrice: 50 },
-  { name: 'Raphinha', club: 'Barcelona', nationality: 'BR', position: 'FWD', basePrice: 48 },
-  { name: 'Rodrygo', club: 'Real Madrid', nationality: 'BR', position: 'FWD', basePrice: 56 },
-  { name: 'Lautaro Martínez', club: 'Inter Milan', nationality: 'AR', position: 'FWD', basePrice: 54 },
-  { name: 'Marcus Rashford', club: 'Manchester United', nationality: 'GB', position: 'FWD', basePrice: 38 },
-  { name: 'Christopher Nkunku', club: 'Chelsea', nationality: 'FR', position: 'FWD', basePrice: 36 },
-  { name: 'Nicolas Jackson', club: 'Chelsea', nationality: 'SN', position: 'FWD', basePrice: 32 },
-  { name: 'Darwin Núñez', club: 'Liverpool', nationality: 'UY', position: 'FWD', basePrice: 36 },
-  { name: 'Luis Díaz', club: 'Liverpool', nationality: 'CO', position: 'FWD', basePrice: 38 },
-  { name: 'Cody Gakpo', club: 'Liverpool', nationality: 'NL', position: 'FWD', basePrice: 34 },
-  { name: 'Gabriel Martinelli', club: 'Arsenal', nationality: 'BR', position: 'FWD', basePrice: 42 },
-  { name: 'Kingsley Coman', club: 'Bayern Munich', nationality: 'FR', position: 'FWD', basePrice: 40 },
-  { name: 'Leroy Sané', club: 'Bayern Munich', nationality: 'DE', position: 'FWD', basePrice: 42 },
-  { name: 'Serge Gnabry', club: 'Bayern Munich', nationality: 'DE', position: 'FWD', basePrice: 34 },
-  { name: 'Donyell Malen', club: 'Borussia Dortmund', nationality: 'NL', position: 'FWD', basePrice: 28 },
-  { name: 'Karim Adeyemi', club: 'Borussia Dortmund', nationality: 'DE', position: 'FWD', basePrice: 30 },
-  { name: 'Julian Álvarez', club: 'Atlético Madrid', nationality: 'AR', position: 'FWD', basePrice: 42 },
-  { name: 'Antoine Griezmann', club: 'Atlético Madrid', nationality: 'FR', position: 'FWD', basePrice: 48 },
-  { name: 'Victor Osimhen', club: 'Galatasaray', nationality: 'NG', position: 'FWD', basePrice: 46 },
-  { name: 'Khvicha Kvaratskhelia', club: 'Napoli', nationality: 'GE', position: 'FWD', basePrice: 40 },
-  { name: 'Raheem Sterling', club: 'Chelsea', nationality: 'GB', position: 'FWD', basePrice: 28 },
-  { name: 'Jérémy Doku', club: 'Manchester City', nationality: 'BE', position: 'FWD', basePrice: 36 },
-  { name: 'Jack Grealish', club: 'Manchester City', nationality: 'GB', position: 'FWD', basePrice: 32 },
-  { name: 'Nico Williams', club: 'Athletic Bilbao', nationality: 'ES', position: 'FWD', basePrice: 34 },
-  { name: 'Álvaro Morata', club: 'AC Milan', nationality: 'ES', position: 'FWD', basePrice: 32 },
-  { name: 'Samuel Chukwueze', club: 'AC Milan', nationality: 'NG', position: 'FWD', basePrice: 24 },
-  { name: 'Christian Pulisic', club: 'AC Milan', nationality: 'US', position: 'FWD', basePrice: 28 },
-  { name: 'Noah Okafor', club: 'AC Milan', nationality: 'CH', position: 'FWD', basePrice: 20 },
-  { name: 'Dejan Kulusevski', club: 'Tottenham', nationality: 'SE', position: 'FWD', basePrice: 30 },
-  { name: 'Brennan Johnson', club: 'Tottenham', nationality: 'GB', position: 'FWD', basePrice: 20 },
-  { name: 'Gonçalo Ramos', club: 'Paris Saint-Germain', nationality: 'PT', position: 'FWD', basePrice: 32 },
-  { name: 'Bradley Barcola', club: 'Paris Saint-Germain', nationality: 'FR', position: 'FWD', basePrice: 34 },
-  { name: 'Randal Kolo Muani', club: 'Paris Saint-Germain', nationality: 'FR', position: 'FWD', basePrice: 30 },
-  { name: 'Mathys Tel', club: 'Bayern Munich', nationality: 'FR', position: 'FWD', basePrice: 26 },
-  { name: 'Michael Olise', club: 'Bayern Munich', nationality: 'FR', position: 'FWD', basePrice: 32 },
-  { name: 'Jamie Bynoe-Gittens', club: 'Borussia Dortmund', nationality: 'GB', position: 'FWD', basePrice: 18 },
-  { name: 'Endrick', club: 'Real Madrid', nationality: 'BR', position: 'FWD', basePrice: 28 },
-  // ── Extra FWDs for Draft Mode pool depth ──
-  { name: 'Pedro Neto', club: 'Chelsea', nationality: 'PT', position: 'FWD', basePrice: 32 },
-  { name: 'Mykhailo Mudryk', club: 'Chelsea', nationality: 'UA', position: 'FWD', basePrice: 28 },
-  { name: 'Cole Palmer', club: 'Chelsea', nationality: 'GB', position: 'FWD', basePrice: 54 },
-  { name: 'Amad Diallo', club: 'Manchester United', nationality: 'CI', position: 'FWD', basePrice: 24 },
-  { name: 'Jadon Sancho', club: 'Chelsea', nationality: 'GB', position: 'FWD', basePrice: 30 },
-  { name: 'Kaoru Mitoma', club: 'Brighton', nationality: 'JP', position: 'FWD', basePrice: 36 },
-  { name: 'Simon Adingra', club: 'Brighton', nationality: 'CI', position: 'FWD', basePrice: 28 },
-  { name: 'João Pedro', club: 'Brighton', nationality: 'BR', position: 'FWD', basePrice: 34 },
-  { name: 'Evan Ferguson', club: 'Brighton', nationality: 'IE', position: 'FWD', basePrice: 30 },
-  { name: 'Diogo Jota', club: 'Liverpool', nationality: 'PT', position: 'FWD', basePrice: 40 },
-  { name: 'Federico Chiesa', club: 'Liverpool', nationality: 'IT', position: 'FWD', basePrice: 32 },
-  { name: 'Hugo Ekitiké', club: 'Eintracht Frankfurt', nationality: 'FR', position: 'FWD', basePrice: 26 },
-  { name: 'Mason Greenwood', club: 'Marseille', nationality: 'GB', position: 'FWD', basePrice: 32 },
-  { name: 'Facundo Pellistri', club: 'Panathinaikos', nationality: 'UY', position: 'FWD', basePrice: 20 },
-  { name: 'Antony', club: 'Manchester United', nationality: 'BR', position: 'FWD', basePrice: 22 },
-  { name: 'Samuel Omorodion', club: 'Porto', nationality: 'ES', position: 'FWD', basePrice: 18 },
-  { name: 'Jamie Bynoe-Gittens', club: 'Borussia Dortmund', nationality: 'GB', position: 'FWD', basePrice: 20 },
-  { name: 'Mathys Tel', club: 'Bayern Munich', nationality: 'FR', position: 'FWD', basePrice: 28 },
-  { name: 'Michael Olise', club: 'Bayern Munich', nationality: 'FR', position: 'FWD', basePrice: 34 },
-  // ── Extra FWDs for GOLD tier depth ──
+  { name: 'Mohamed Salah', club: 'Liverpool', nationality: 'EG', position: 'FWD', basePrice: 62 },
   { name: 'Rodrygo', club: 'Real Madrid', nationality: 'BR', position: 'FWD', basePrice: 56 },
   { name: 'Lautaro Martínez', club: 'Inter Milan', nationality: 'AR', position: 'FWD', basePrice: 54 },
   { name: 'Ousmane Dembélé', club: 'Paris Saint-Germain', nationality: 'FR', position: 'FWD', basePrice: 52 },
-  { name: 'Raphinha', club: 'Barcelona', nationality: 'BR', position: 'FWD', basePrice: 50 },
-  { name: 'Victor Osimhen', club: 'Galatasaray', nationality: 'NG', position: 'FWD', basePrice: 48 },
-  { name: 'Gabriel Martinelli', club: 'Arsenal', nationality: 'BR', position: 'FWD', basePrice: 46 },
-  { name: 'Julian Álvarez', club: 'Atlético Madrid', nationality: 'AR', position: 'FWD', basePrice: 44 },
-  { name: 'Luis Díaz', club: 'Liverpool', nationality: 'CO', position: 'FWD', basePrice: 42 },
-  { name: 'Diogo Jota', club: 'Liverpool', nationality: 'PT', position: 'FWD', basePrice: 42 },
-  { name: 'Kingsley Coman', club: 'Bayern Munich', nationality: 'FR', position: 'FWD', basePrice: 44 },
-  { name: 'Khvicha Kvaratskhelia', club: 'Napoli', nationality: 'GE', position: 'FWD', basePrice: 42 },
-  { name: 'Marcus Rashford', club: 'Manchester United', nationality: 'GB', position: 'FWD', basePrice: 40 },
   { name: 'Antoine Griezmann', club: 'Atlético Madrid', nationality: 'FR', position: 'FWD', basePrice: 50 },
-  { name: 'Leroy Sané', club: 'Bayern Munich', nationality: 'DE', position: 'FWD', basePrice: 44 },
-  { name: 'João Pedro', club: 'Brighton', nationality: 'BR', position: 'FWD', basePrice: 36 },
+  { name: 'Raphinha', club: 'Barcelona', nationality: 'BR', position: 'FWD', basePrice: 48 },
+  { name: 'Victor Osimhen', club: 'Galatasaray', nationality: 'NG', position: 'FWD', basePrice: 46 },
+  { name: 'Gabriel Martinelli', club: 'Arsenal', nationality: 'BR', position: 'FWD', basePrice: 44 },
+  { name: 'Julian Álvarez', club: 'Atlético Madrid', nationality: 'AR', position: 'FWD', basePrice: 42 },
+  { name: 'Kingsley Coman', club: 'Bayern Munich', nationality: 'FR', position: 'FWD', basePrice: 42 },
+  { name: 'Leroy Sané', club: 'Bayern Munich', nationality: 'DE', position: 'FWD', basePrice: 42 },
+  { name: 'Diogo Jota', club: 'Liverpool', nationality: 'PT', position: 'FWD', basePrice: 40 },
+  { name: 'Khvicha Kvaratskhelia', club: 'Napoli', nationality: 'GE', position: 'FWD', basePrice: 40 },
+  { name: 'Marcus Rashford', club: 'Manchester United', nationality: 'GB', position: 'FWD', basePrice: 38 },
+  { name: 'Luis Díaz', club: 'Liverpool', nationality: 'CO', position: 'FWD', basePrice: 38 },
+  { name: 'Christopher Nkunku', club: 'Chelsea', nationality: 'FR', position: 'FWD', basePrice: 36 },
+  { name: 'Darwin Núñez', club: 'Liverpool', nationality: 'UY', position: 'FWD', basePrice: 36 },
+  { name: 'Jérémy Doku', club: 'Manchester City', nationality: 'BE', position: 'FWD', basePrice: 36 },
+  { name: 'Cody Gakpo', club: 'Liverpool', nationality: 'NL', position: 'FWD', basePrice: 34 },
+  { name: 'Nico Williams', club: 'Athletic Bilbao', nationality: 'ES', position: 'FWD', basePrice: 34 },
+  { name: 'Bradley Barcola', club: 'Paris Saint-Germain', nationality: 'FR', position: 'FWD', basePrice: 34 },
+  { name: 'Michael Olise', club: 'Bayern Munich', nationality: 'FR', position: 'FWD', basePrice: 34 },
+  { name: 'Kaoru Mitoma', club: 'Brighton', nationality: 'JP', position: 'FWD', basePrice: 36 },
+  { name: 'João Pedro', club: 'Brighton', nationality: 'BR', position: 'FWD', basePrice: 34 },
+  { name: 'Nicolas Jackson', club: 'Chelsea', nationality: 'SN', position: 'FWD', basePrice: 32 },
+  { name: 'Jack Grealish', club: 'Manchester City', nationality: 'GB', position: 'FWD', basePrice: 32 },
+  { name: 'Álvaro Morata', club: 'AC Milan', nationality: 'ES', position: 'FWD', basePrice: 32 },
+  { name: 'Gonçalo Ramos', club: 'Paris Saint-Germain', nationality: 'PT', position: 'FWD', basePrice: 32 },
+  { name: 'Mason Greenwood', club: 'Marseille', nationality: 'GB', position: 'FWD', basePrice: 32 },
+  { name: 'Randal Kolo Muani', club: 'Paris Saint-Germain', nationality: 'FR', position: 'FWD', basePrice: 30 },
+  { name: 'Evan Ferguson', club: 'Brighton', nationality: 'IE', position: 'FWD', basePrice: 30 },
+  { name: 'Dejan Kulusevski', club: 'Tottenham', nationality: 'SE', position: 'FWD', basePrice: 30 },
+  { name: 'Jadon Sancho', club: 'Chelsea', nationality: 'GB', position: 'FWD', basePrice: 30 },
+  { name: 'Pedro Neto', club: 'Chelsea', nationality: 'PT', position: 'FWD', basePrice: 30 },
+  { name: 'Karim Adeyemi', club: 'Borussia Dortmund', nationality: 'DE', position: 'FWD', basePrice: 28 },
+  { name: 'Raheem Sterling', club: 'Chelsea', nationality: 'GB', position: 'FWD', basePrice: 28 },
+  { name: 'Endrick', club: 'Real Madrid', nationality: 'BR', position: 'FWD', basePrice: 28 },
+  { name: 'Donyell Malen', club: 'Borussia Dortmund', nationality: 'NL', position: 'FWD', basePrice: 28 },
+  { name: 'Mykhailo Mudryk', club: 'Chelsea', nationality: 'UA', position: 'FWD', basePrice: 28 },
+  { name: 'Mathys Tel', club: 'Bayern Munich', nationality: 'FR', position: 'FWD', basePrice: 26 },
+  { name: 'Hugo Ekitiké', club: 'Eintracht Frankfurt', nationality: 'FR', position: 'FWD', basePrice: 26 },
+  { name: 'Richarlison', club: 'Tottenham', nationality: 'BR', position: 'FWD', basePrice: 24 },
+  { name: 'Brennan Johnson', club: 'Tottenham', nationality: 'GB', position: 'FWD', basePrice: 20 },
+  { name: 'Samuel Chukwueze', club: 'AC Milan', nationality: 'NG', position: 'FWD', basePrice: 24 },
+  { name: 'Noah Okafor', club: 'AC Milan', nationality: 'CH', position: 'FWD', basePrice: 20 },
+  { name: 'Simon Adingra', club: 'Brighton', nationality: 'CI', position: 'FWD', basePrice: 28 },
+  { name: 'Federico Chiesa', club: 'Liverpool', nationality: 'IT', position: 'FWD', basePrice: 30 },
+  { name: 'Serge Gnabry', club: 'Bayern Munich', nationality: 'DE', position: 'FWD', basePrice: 34 },
+  { name: 'Samuel Omorodion', club: 'Porto', nationality: 'ES', position: 'FWD', basePrice: 18 },
+  { name: 'Jamie Bynoe-Gittens', club: 'Borussia Dortmund', nationality: 'GB', position: 'FWD', basePrice: 20 },
+  { name: 'Facundo Pellistri', club: 'Panathinaikos', nationality: 'UY', position: 'FWD', basePrice: 20 },
+  { name: 'Antony', club: 'Manchester United', nationality: 'BR', position: 'FWD', basePrice: 22 },
+  { name: 'Amad Diallo', club: 'Manchester United', nationality: 'CI', position: 'FWD', basePrice: 24 },
+])
+
+const UCL_PLAYERS: PlayerTemplate[] = [
+  ...UCL_GK,
+  ...UCL_DEF,
+  ...UCL_MID,
+  ...UCL_FWD,
 ]
 
 // ─── Main ───────────────────────────────────────────────
 
-function generatePlayers(): any[] {
-  const players: any[] = []
+function main() {
+  const wcPlayers = WC_PLAYERS
+  const uclPlayers = UCL_PLAYERS
+  const allPlayers: any[] = []
   let idCounter = 1
 
-  // Add WC players
-  for (const template of WC_PLAYERS) {
-    players.push({
+  for (const template of wcPlayers) {
+    allPlayers.push({
       id: `player-${idCounter++}`,
       tournamentId: 'fifa-wc-2026',
       ...template,
     })
   }
 
-  // Add UCL players
-  for (const template of UCL_PLAYERS) {
-    players.push({
+  for (const template of uclPlayers) {
+    allPlayers.push({
       id: `player-${idCounter++}`,
       tournamentId: 'uefa-ucl-2026-27',
       ...template,
     })
   }
 
-  return players
-}
+  const wcCount = allPlayers.filter((p) => p.tournamentId === 'fifa-wc-2026').length
+  const uclCount = allPlayers.filter((p) => p.tournamentId === 'uefa-ucl-2026-27').length
 
-function main() {
-  const players = generatePlayers()
-
-  const wcCount = players.filter((p) => p.tournamentId === 'fifa-wc-2026').length
-  const uclCount = players.filter((p) => p.tournamentId === 'uefa-ucl-2026-27').length
-
-  console.log(`📊 Generating ${players.length} total players...`)
-  console.log(`   FIFA WC 2026: ${wcCount} players`)
-  console.log(`   UCL 2026/27: ${uclCount} players`)
-
-  // Position breakdown per tournament
   const wcPositions: Record<string, number> = {}
   const uclPositions: Record<string, number> = {}
-  for (const p of players) {
+  for (const p of allPlayers) {
     const dest = p.tournamentId === 'fifa-wc-2026' ? wcPositions : uclPositions
     dest[p.position] = (dest[p.position] || 0) + 1
   }
 
+  console.log(`📊 Generating ${allPlayers.length} total players...`)
+  console.log(`   FIFA WC 2026: ${wcCount} players`)
+  console.log(`   UCL 2026/27: ${uclCount} players`)
   console.log(`\n  FIFA WC 2026 breakdown:`)
-  for (const [pos, count] of Object.entries(wcPositions)) {
-    console.log(`    ${pos}: ${count}`)
-  }
-
+  for (const [pos, count] of Object.entries(wcPositions)) console.log(`    ${pos}: ${count}`)
   console.log(`\n  UCL 2026/27 breakdown:`)
-  for (const [pos, count] of Object.entries(uclPositions)) {
-    console.log(`    ${pos}: ${count}`)
-  }
+  for (const [pos, count] of Object.entries(uclPositions)) console.log(`    ${pos}: ${count}`)
 
-  // Write file
   const outputPath = path.join(DATA_DIR, 'players.json')
-  atomicWrite(outputPath, players)
-
-  console.log(`\n✅ ${players.length} players written to ${outputPath}`)
-}
-
-function atomicWrite(filePath: string, data: any): void {
-  const tmpPath = filePath + '.tmp'
-  const dir = path.dirname(filePath)
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
-  fs.writeFileSync(tmpPath, JSON.stringify(data, null, 2), 'utf-8')
-  fs.renameSync(tmpPath, filePath)
+  const tmpPath = outputPath + '.tmp'
+  if (!fs.existsSync(path.dirname(outputPath))) fs.mkdirSync(path.dirname(outputPath), { recursive: true })
+  fs.writeFileSync(tmpPath, JSON.stringify(allPlayers, null, 2), 'utf-8')
+  fs.renameSync(tmpPath, outputPath)
+  console.log(`\n✅ ${allPlayers.length} players written to ${outputPath}`)
 }
 
 main()
