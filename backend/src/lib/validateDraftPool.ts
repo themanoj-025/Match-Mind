@@ -17,7 +17,7 @@ import path from 'path'
 const DEFAULT_DATA_DIR = path.resolve(__dirname, '..', 'data')
 const POSITIONS = ['GK', 'DEF', 'MID', 'FWD'] as const
 const RARITY_TIERS = ['BRONZE', 'SILVER', 'GOLD', 'ICON'] as const
-const MIN_PLAYERS_PER_POSITION_RARITY = 8
+const MIN_PLAYERS_PER_POSITION_RARITY = 4
 const ICON_MIN_PER_POSITION = 1
 
 export interface ValidationResult {
