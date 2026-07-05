@@ -1,6 +1,6 @@
-import React, { lazy, Suspense, useEffect, useState } from 'react'
+import React, { lazy, Suspense, useEffect, useState, useCallback } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, type Variants } from 'framer-motion'
 import Navbar from './components/Navbar'
 import BottomNav from './components/BottomNav'
 import LiveTicker from './components/LiveTicker'
@@ -10,6 +10,8 @@ import PremiumLoadingScreen from './components/PremiumLoadingScreen'
 import GamificationStrip from './components/GamificationStrip'
 import QuickChatFeed from './components/QuickChatFeed'
 import useStore from './store/useStore'
+
+// ─── Lazy-loaded pages ──────────────────────────────────
 
 const LandingPage = lazy(() => import('./pages/LandingPage'))
 const LoginPage = lazy(() => import('./pages/LoginPage'))
@@ -37,14 +39,15 @@ const PricingPage = lazy(() => import('./pages/PricingPage'))
 const SearchPage = lazy(() => import('./pages/SearchPage'))
 const AdminPage = lazy(() => import('./pages/AdminPage'))
 
-// ── Page transition wrapper ────────────────────────────
-const pageVariants = {
+// ─── Page transition wrapper ────────────────────────────
+
+const pageVariants: Variants = {
   initial: { opacity: 0, y: 8 },
   animate: { opacity: 1, y: 0, transition: { duration: 0.2, ease: 'easeOut' } },
   exit: { opacity: 0, y: -8, transition: { duration: 0.15, ease: 'easeIn' } },
 }
 
-function AnimatedRoute({ children }) {
+function AnimatedRoute({ children }: { children: React.ReactNode }) {
   return (
     <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
       {children}
@@ -52,7 +55,7 @@ function AnimatedRoute({ children }) {
   )
 }
 
-const LoadingFallback = () => (
+const LoadingFallback: React.FC = () => (
   <div className="flex items-center justify-center min-h-[60vh]">
     <div className="flex flex-col items-center gap-4">
       <div className="w-10 h-10 border-2 border-[var(--mm-accent-green)] border-t-transparent rounded-full animate-spin" />
@@ -60,6 +63,8 @@ const LoadingFallback = () => (
     </div>
   </div>
 )
+
+// ─── App ────────────────────────────────────────────────
 
 export default function App() {
   const setIsMobile = useStore((s) => s.setIsMobile)
@@ -77,19 +82,20 @@ export default function App() {
   }, [setIsMobile])
 
   // ⌘K / Ctrl+K toggle
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault()
-        setCmdOpen((prev) => !prev)
-      }
-      if (e.key === 'Escape' && cmdOpen) {
-        setCmdOpen(false)
-      }
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault()
+      setCmdOpen((prev) => !prev)
     }
+    if (e.key === 'Escape') {
+      setCmdOpen(false)
+    }
+  }, [])
+
+  useEffect(() => {
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [cmdOpen])
+  }, [handleKeyDown])
 
   // Turn off initial loading after first route resolves
   useEffect(() => {
