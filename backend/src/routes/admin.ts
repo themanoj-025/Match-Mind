@@ -183,72 +183,58 @@ router.post('/users/:id/toggle-pro', asyncHandler(async (req: AuthenticatedReque
   res.json({ user: updated })
 }))
 
-// ─── MATCH MANAGEMENT ────────────────────────────────────
+// ─── FIXTURE MANAGEMENT ─────────────────────────────────
 
 /**
- * GET /api/admin/matches
- * List all matches with pagination
+ * GET /api/admin/fixtures
+ * List all fixtures with pagination
  */
-router.get('/matches', asyncHandler(async (req: AuthenticatedRequest, res) => {
+router.get('/fixtures', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const page = parseInt(req.query.page as string) || 1
   const limit = parseInt(req.query.limit as string) || 20
-  const status = req.query.status as string | undefined
+  const tournamentId = req.query.tournamentId as string | undefined
 
-  const where = status ? { status } : {}
+  const where: Record<string, any> = {}
+  if (tournamentId) where.tournamentId = tournamentId
 
-  const [matches, total] = await Promise.all([
-    prisma.match.findMany({
+  const [fixtures, total] = await Promise.all([
+    prisma.fixture.findMany({
       where,
-      select: {
-        id: true,
-        sport: true,
-        homeTeamName: true,
-        awayTeamName: true,
-        homeScore: true,
-        awayScore: true,
-        status: true,
-        scheduledAt: true,
-        competition: true,
-        _count: { select: {} },
-      },
       orderBy: { scheduledAt: 'desc' },
       skip: (page - 1) * limit,
       take: limit,
     }),
-    prisma.match.count({ where }),
+    prisma.fixture.count({ where }),
   ])
 
-  res.json({ matches, total, page, totalPages: Math.ceil(total / limit) })
+  res.json({ fixtures, total, page, totalPages: Math.ceil(total / limit) })
 }))
 
 /**
- * PATCH /api/admin/matches/:id
- * Update match details (score, status)
+ * PATCH /api/admin/fixtures/:id
+ * Update fixture details (score, status)
  */
-router.patch('/matches/:id', asyncHandler(async (req: AuthenticatedRequest, res) => {
+router.patch('/fixtures/:id', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
-  const { homeScore, awayScore, status, minute } = req.body as {
+  const { homeScore, awayScore, status } = req.body as {
     homeScore?: number
     awayScore?: number
     status?: string
-    minute?: number
   }
 
   const data: Record<string, any> = {}
   if (homeScore !== undefined) data.homeScore = homeScore
   if (awayScore !== undefined) data.awayScore = awayScore
   if (status) data.status = status
-  if (minute !== undefined) data.minute = minute
 
-  const match = await prisma.match.update({
+  const fixture = await prisma.fixture.update({
     where: { id: req.params.id },
     data,
-    select: { id: true, homeTeamName: true, awayTeamName: true, homeScore: true, awayScore: true, status: true },
   })
 
-  getAdminService(req).logAction(req.userId!, 'MATCH_UPDATED', String(req.params.id), 'match', { ...data })
-  res.json({ match })
+  getAdminService(req).logAction(req.userId!, 'FIXTURE_UPDATED', String(req.params.id), 'fixture', { ...data })
+  res.json({ fixture })
 }))
 
 // ─── REPORTS ─────────────────────────────────────────────

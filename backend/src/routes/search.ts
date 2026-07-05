@@ -1,20 +1,26 @@
+/**
+ * Search Routes — AuctionXI
+ *
+ * Scoped to users and football players only.
+ * Teams and matches removed (single-sport platform with fixture-based system).
+ */
+
 import express from 'express'
 import asyncHandler from '../middleware/asyncHandler'
 
 const router = express.Router()
 
-// GET /api/search?q= — search across users, teams, players, and matches
+// GET /api/search?q= — search users and players
 router.get('/', asyncHandler(async (req, res) => {
   const prisma = req.app.get('prisma')
   const { q } = req.query as { q?: string }
   if (!q || q.trim().length < 2) {
-    return res.json({ users: [], teams: [], players: [], matches: [] })
+    return res.json({ users: [], players: [] })
   }
 
   const query = q.trim()
 
-  // Run searches in parallel
-  const [users, teams, players, matches] = await Promise.all([
+  const [users, players] = await Promise.all([
     prisma.user.findMany({
       where: {
         OR: [
@@ -28,37 +34,17 @@ router.get('/', asyncHandler(async (req, res) => {
         displayName: true,
         avatar: true,
         tier: true,
-        totalPoints: true,
-        predAccuracy: true,
       },
-      take: 10,
-    }),
-
-    prisma.team.findMany({
-      where: { name: { contains: query, mode: 'insensitive' } },
       take: 10,
     }),
 
     prisma.player.findMany({
       where: { name: { contains: query, mode: 'insensitive' } },
-      include: { team: { select: { id: true, name: true } } },
-      take: 10,
-    }),
-
-    prisma.match.findMany({
-      where: {
-        OR: [
-          { homeTeamName: { contains: query, mode: 'insensitive' } },
-          { awayTeamName: { contains: query, mode: 'insensitive' } },
-          { competition: { contains: query, mode: 'insensitive' } },
-        ],
-      },
-      orderBy: { scheduledAt: 'desc' },
       take: 10,
     }),
   ])
 
-  res.json({ users, teams, players, matches })
+  res.json({ users, players })
 }))
 
 export default router

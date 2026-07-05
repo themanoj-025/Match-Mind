@@ -1,33 +1,38 @@
+/**
+ * Player Routes — AuctionXI
+ *
+ * Football-specific players scoped to tournamentId.
+ * Removed multi-sport sport filter from MatchMind.
+ */
+
 import express from 'express'
 import asyncHandler from '../middleware/asyncHandler'
 
 const router = express.Router()
 
-// GET /api/players — list players (optional sport filter)
+// GET /api/players — list players for a tournament (football only)
 router.get('/', asyncHandler(async (req, res) => {
   const prisma = req.app.get('prisma')
-  const { sport } = req.query as { sport?: string }
+  const { tournamentId } = req.query as { tournamentId?: string }
+
   const where: Record<string, any> = {}
-  if (sport && sport !== 'all') where.sport = sport.toUpperCase()
+  if (tournamentId) where.tournamentId = tournamentId
+
   const players = await prisma.player.findMany({
     where,
-    include: { team: { select: { id: true, name: true, logo: true, sport: true } } },
     orderBy: { name: 'asc' },
-    take: 50,
+    take: 100,
   })
   res.json(players)
 }))
 
-// GET /api/players/:id — player details with team info
+// GET /api/players/:id — player details
 router.get('/:id', asyncHandler(async (req, res) => {
   const prisma = req.app.get('prisma')
-  const player = await prisma.player.findUnique({
-    where: { id: req.params.id },
-    include: {
-      team: { select: { id: true, name: true, logo: true, sport: true } },
-    },
-  })
-  if (!player) return res.status(404).json({ error: { code: 'PLAYER_NOT_FOUND', message: 'Player not found' } })
+  const player = await prisma.player.findUnique({ where: { id: req.params.id } })
+  if (!player) {
+    return res.status(404).json({ error: { code: 'PLAYER_NOT_FOUND', message: 'Player not found' } })
+  }
   res.json(player)
 }))
 

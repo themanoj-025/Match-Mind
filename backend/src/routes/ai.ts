@@ -1,3 +1,14 @@
+/**
+ * AI Auction Advisor — AuctionXI
+ *
+ * Claude-powered draft strategy hints for Pro users.
+ * Analyzes a franchise's current roster + remaining budget + remaining pool
+ * and suggests undervalued targets.
+ *
+ * Security: Requires authentication + Pro check + rate limiting.
+ * Does NOT repeat MatchMind's unauthenticated-AI-endpoint mistake.
+ */
+
 import express from 'express'
 import { authenticateToken } from '../middleware/auth'
 import { aiPredictionLimiter } from '../middleware/rateLimiter'
@@ -7,80 +18,96 @@ import type { AuthenticatedRequest } from '../middleware/auth'
 
 const router = express.Router()
 
-interface Match {
-  id: string
-  homeTeamName: string
-  awayTeamName: string
-  sport: string
-  competition: string
-  homeScore?: number | null
-  awayScore?: number | null
-  status?: string
-  events?: Array<{ type: string; minute: number; scorer?: string }>
-}
-
 /**
- * POST /api/ai/predict/:matchId
- * Returns AI-powered prediction for a match
+ * POST /api/ai/auction-advice
+ * Returns AI-powered draft strategy advice for a room/user
+ * Pro-gated: only Pro users can access this.
  */
-router.post('/predict/:matchId', authenticateToken, aiPredictionLimiter, asyncHandler(async (req: AuthenticatedRequest, res) => {
+router.post('/auction-advice', authenticateToken, aiPredictionLimiter, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
-  const match: Match | null = await prisma.match.findUnique({ where: { id: req.params.matchId } })
-  if (!match) return res.status(404).json({ error: { code: 'MATCH_NOT_FOUND', message: 'Match not found' } })
+  const { roomId } = req.body as { roomId: string }
 
-  const isPro = req.userId ? await checkProStatus(prisma, req.userId) : false
+  if (!roomId) {
+    return res.status(400).json({ error: { code: 'MISSING_ROOM_ID', message: 'roomId is required' } })
+  }
 
+  // Verify room membership
+  const member = await prisma.roomMember.findUnique({
+    where: { roomId_userId: { roomId, userId: req.userId } },
+  })
+  if (!member) {
+    return res.status(403).json({ error: { code: 'NOT_MEMBER', message: 'You are not a member of this room' } })
+  }
+
+  // Pro check
+  const isPro = await checkProStatus(prisma, req.userId!)
   if (!isPro) {
     return res.json({
       isProFeature: true,
-      homeGoals: null,
-      awayGoals: null,
-      confidence: null,
-      reasoning: null,
-      message: 'AI predictions are a Pro feature. Upgrade to unlock.',
+      advice: null,
+      message: 'AI Auction Advisor is a Pro feature. Upgrade to unlock.',
     })
   }
 
-  // Try Anthropic SDK if configured
-  let anthropicResult: any = null
-  if (process.env.ANTHROPIC_API_KEY) {
-    try {
-      anthropicResult = await getAnthropicPrediction(match)
-    } catch (err: any) {
-      logger.error({ event: 'ai.anthropic_error', matchId: match.id, err: err.message }, 'Anthropic API error')
+  const room = await prisma.room.findUnique({ where: { id: roomId } })
+  if (!room) {
+    return res.status(404).json({ error: { code: 'ROOM_NOT_FOUND', message: 'Room not found' } })
+  }
+
+  // Gather context for the AI
+  const roster = await prisma.roster.findMany({
+    where: { roomId, userId: req.userId },
+    include: { player: { select: { id: true, name: true, position: true, basePrice: true, club: true } } },
+  })
+
+  const auctionState = await prisma.auctionState.findUnique({ where: { roomId } })
+  const remainingPlayers = auctionState?.poolQueue || []
+  const unsoldPlayers = auctionState?.unsoldPlayerIds || []
+
+  // Get remaining pool player details
+  const poolPlayerIds = [...remainingPlayers, ...unsoldPlayers]
+  const poolPlayers = poolPlayerIds.length > 0
+    ? await prisma.player.findMany({ where: { id: { in: poolPlayerIds } } })
+    : []
+
+  const rosterPositions: Record<string, number> = { GK: 0, DEF: 0, MID: 0, FWD: 0 }
+  for (const entry of roster) {
+    if (entry.player?.position) {
+      rosterPositions[entry.player.position]++
     }
   }
 
-  if (anthropicResult) {
+  const positionNeeds: Record<string, number> = {}
+  for (const [pos, limit] of Object.entries(room.rosterRules)) {
+    if (pos === 'total') continue
+    const filled = rosterPositions[pos] || 0
+    const need = (limit as number) - filled
+    if (need > 0) positionNeeds[pos] = need
+  }
+
+  // Try Anthropic SDK if configured
+  let advice: any = null
+  if (process.env.ANTHROPIC_API_KEY) {
+    try {
+      advice = await getAnthropicAdvice(roster, member.remainingBudget, positionNeeds, poolPlayers, room.rosterRules)
+    } catch (err: any) {
+      logger.error({ event: 'ai.anthropic_advice_error', roomId, err: err.message }, 'Anthropic API error')
+    }
+  }
+
+  if (advice) {
     return res.json({
       isProFeature: false,
-      ...anthropicResult,
+      advice,
     })
   }
 
-  // Smart heuristic prediction
-  const prediction = generatePrediction(match)
+  // Fallback heuristic advice
+  advice = generateHeuristicAdvice(roster, member.remainingBudget, positionNeeds, poolPlayers)
   res.json({
     isProFeature: false,
-    ...prediction,
+    advice,
   })
-}))
-
-/**
- * POST /api/ai/summary/:matchId
- * Generates AI match summary after match completes
- */
-router.post('/summary/:matchId', authenticateToken, aiPredictionLimiter, asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
-  const match: any = await prisma.match.findUnique({
-    where: { id: req.params.matchId },
-    include: { events: { orderBy: { minute: 'asc' } } },
-  })
-  if (!match) return res.status(404).json({ error: { code: 'MATCH_NOT_FOUND', message: 'Match not found' } })
-  if (match.status !== 'FINISHED') return res.status(400).json({ error: { code: 'MATCH_NOT_FINISHED', message: 'Match not yet finished' } })
-
-  const summary = generateMatchSummary(match)
-  res.json({ summary })
 }))
 
 async function checkProStatus(prisma: any, userId: string): Promise<boolean> {
@@ -94,77 +121,97 @@ async function checkProStatus(prisma: any, userId: string): Promise<boolean> {
   return true
 }
 
-async function getAnthropicPrediction(match: Match): Promise<any> {
+async function getAnthropicAdvice(
+  roster: any[],
+  remainingBudget: number,
+  positionNeeds: Record<string, number>,
+  poolPlayers: any[],
+  rosterRules: any,
+): Promise<any> {
   const Anthropic = require('@anthropic-ai/sdk')
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
+  const currentRoster = roster.map((r: any) =>
+    `${r.player?.name} (${r.player?.position}, purchased for $${r.soldPrice})`
+  ).join('\n')
+
+  const availablePlayers = poolPlayers.map((p: any) =>
+    `${p.name} (${p.position}, base price $${p.basePrice}) - ${p.club}`
+  ).join('\n')
+
   const msg = await anthropic.messages.create({
     model: 'claude-3-haiku-20240307',
-    max_tokens: 200,
+    max_tokens: 500,
     messages: [{
       role: 'user',
-      content: `You are a sports prediction AI. Given this match data, predict the exact score and provide reasoning in exactly this JSON format:
+      content: `You are an auction draft advisor for fantasy football (soccer). Analyze this franchise's current roster and remaining budget. Provide draft strategy advice in exactly this JSON format:
 {
-  "homeGoals": <number>,
-  "awayGoals": <number>,
-  "confidence": <number between 50-95>,
-  "reasoning": "<2-3 sentence explanation>"
+  "summary": "<1-2 sentence overall strategy>",
+  "positionNeeds": "<which positions need filling>",
+  "targets": ["<player name>", "<player name>"] // Top 3-5 suggested targets from the available pool
+  "budgetAdvice": "<how to allocate remaining budget>",
+  "warning": "<any risks like overpaying for a position>"
 }
-Match: ${match.homeTeamName} vs ${match.awayTeamName}
-Sport: ${match.sport}
-Competition: ${match.competition}
-Home team recent form: unknown
-Away team recent form: unknown
+
+Current Roster:\n${currentRoster || 'Empty - no players yet'}
+
+Remaining Budget: $${remainingBudget}
+
+Position Needs: ${JSON.stringify(positionNeeds)}
+
+Available Players in Pool:\n${availablePlayers || 'No remaining players'}
+
+Roster Rules: ${JSON.stringify(rosterRules)}
+
 Only respond with valid JSON, no other text.`,
     }],
   })
 
   try {
     const text = (msg.content[0] as any)?.text || '{}'
-    const parsed = JSON.parse(text)
-    return {
-      homeGoals: parsed.homeGoals || 1,
-      awayGoals: parsed.awayGoals || 1,
-      confidence: parsed.confidence || 65,
-      reasoning: parsed.reasoning || 'Based on recent form and historical data.',
-    }
+    return JSON.parse(text)
   } catch {
     return null
   }
 }
 
-function generatePrediction(match: Match): { homeGoals: number; awayGoals: number; confidence: number; reasoning: string } {
-  const totalGoals = 1 + Math.floor(Math.random() * 3)
-  const homeWinProb = 0.45 + Math.random() * 0.2
-  const homeGoals = Math.round(totalGoals * homeWinProb)
-  const awayGoals = Math.max(0, totalGoals - homeGoals)
-  const confidence = 55 + Math.floor(Math.random() * 25)
+function generateHeuristicAdvice(
+  roster: any[],
+  remainingBudget: number,
+  positionNeeds: Record<string, number>,
+  poolPlayers: any[],
+): any {
+  const totalNeeds = Object.values(positionNeeds).reduce((a: number, b: number) => a + b, 0)
+  const budgetPerSlot = totalNeeds > 0 ? Math.floor(remainingBudget / totalNeeds) : remainingBudget
 
-  const reasons = [
-    `${match.homeTeamName} have strong home form this season, averaging 2.1 goals per game at their stadium. ${match.awayTeamName} have conceded an average of 1.8 goals away from home.`,
-    `${match.awayTeamName} have been inconsistent on the road, while ${match.homeTeamName} have won 3 of their last 5 home matches. Head-to-head favors the home side.`,
-    `Recent form suggests a close contest. ${match.homeTeamName} have the edge playing at home, but ${match.awayTeamName} have shown resilience in away fixtures this campaign.`,
-  ]
+  // Sort pool players by value (basePrice vs position scarcity)
+  const positionScarcity: Record<string, number> = { GK: 3, DEF: 4, MID: 4, FWD: 5 }
+  const scored = poolPlayers.map((p: any) => ({
+    ...p,
+    score: (positionScarcity[p.position] || 3) * p.basePrice > 0
+      ? (positionScarcity[p.position] || 3) / (p.basePrice || 50)
+      : 0,
+  })).sort((a: any, b: any) => b.score - a.score)
+
+  const targets = scored.slice(0, 5).map((p: any) => p.name)
+
+  const positionSummary = Object.entries(positionNeeds)
+    .map(([pos, count]) => `${count}x ${pos}`)
+    .join(', ')
 
   return {
-    homeGoals: Math.max(0, Math.min(5, homeGoals)),
-    awayGoals: Math.max(0, Math.min(5, awayGoals)),
-    confidence,
-    reasoning: reasons[Math.floor(Math.random() * reasons.length)],
+    summary: totalNeeds > 0
+      ? `You need ${totalNeeds} more players. Focus on ${positionSummary}.`
+      : 'Your roster is complete! Consider upgrading existing positions if budget allows.',
+    positionNeeds,
+    targets,
+    budgetAdvice: totalNeeds > 0
+      ? `Try to keep average spend under $${budgetPerSlot} per remaining slot.`
+      : 'Budget no longer a concern for minimum roster requirements.',
+    warning: remainingBudget < budgetPerSlot * totalNeeds
+      ? 'Budget is tight — focus on base-price players to fill mandatory slots.'
+      : 'Budget is sufficient for remaining needs.',
   }
-}
-
-function generateMatchSummary(match: any): string {
-  const homeScore = match.homeScore || 0
-  const awayScore = match.awayScore || 0
-  const winner = homeScore > awayScore ? match.homeTeamName : awayScore > homeScore ? match.awayTeamName : 'Draw'
-  const goalEvents = (match.events || []).filter((e: any) => e.type === 'GOAL')
-
-  if (winner === 'Draw') {
-    return `${match.homeTeamName} and ${match.awayTeamName} played out a ${homeScore}-${awayScore} draw in the ${match.competition}. ${goalEvents.length > 0 ? `Goals from ${goalEvents.map((e: any) => e.scorer || 'unknown').join(', ')}.` : 'Neither side could find the breakthrough.'} Both teams had chances but had to settle for a point each.`
-  }
-
-  return `${match.homeTeamName} defeated ${match.awayTeamName} ${homeScore}-${awayScore} in the ${match.competition}. ${goalEvents.length > 0 ? `Goals from ${goalEvents.map((e: any) => e.scorer || 'unknown').join(', ')}.` : ''} A dominant performance from ${winner}, who controlled the game from start to finish.`
 }
 
 export default router
