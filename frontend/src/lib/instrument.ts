@@ -2,7 +2,7 @@
  * Sentry Instrumentation — MatchMind Frontend
  *
  * Initializes Sentry for error monitoring in the React app.
- * Must be imported before any other module in main.jsx.
+ * Must be imported before any other module in main.tsx.
  */
 
 import * as Sentry from '@sentry/react'
@@ -23,7 +23,7 @@ Sentry.init({
   // No PII beyond user ID
   beforeSend(event) {
     if (event.user) {
-      event.user = { id: event.user.id }
+      event.user = { id: String(event.user.id) }
     }
     return event
   },
