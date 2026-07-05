@@ -570,7 +570,6 @@ export class JsonDatabase {
       'draftRewardsCatalog',
       'playerRarityCache',
       'roomTemplate',
-      'draftRunRound',
     ]
 
     for (const name of modelNames) {

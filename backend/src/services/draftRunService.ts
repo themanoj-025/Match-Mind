@@ -103,6 +103,7 @@ export async function enterRun(
       totalTies: 0,
       status: 'WAITING_FOR_MATCHDAY',
       rewards: ['participant'],
+      rounds: [],
       eliminatedAt: null,
       clearedAt: null,
       createdAt: now,

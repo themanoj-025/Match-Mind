@@ -21,7 +21,7 @@ import express from 'express'
 import { authenticateToken } from '../middleware/auth'
 import { validate } from '../middleware/validate'
 import asyncHandler from '../middleware/asyncHandler'
-import { draftStartSchema, draftPickSchema, enterRunSchema } from '../config/schemas'
+import { draftStartSchema, draftPickSchema } from '../config/schemas'
 import type { AuthenticatedRequest } from '../middleware/auth'
 import {
   startDraft,
@@ -304,7 +304,6 @@ router.post(
 
 router.post(
   '/:sessionId/enter-run',
-  validate(enterRunSchema),
   asyncHandler(async (req: AuthenticatedRequest, res) => {
     const prisma = req.app.get('prisma')
     const result = await enterRun(prisma, req.params.sessionId as string, req.userId!)
@@ -332,7 +331,6 @@ router.post(
 
 router.get(
   '/:sessionId/run-status',
-  validate(enterRunSchema),
   asyncHandler(async (req: AuthenticatedRequest, res) => {
     const prisma = req.app.get('prisma')
     const result = await getRunStatus(prisma, req.params.sessionId as string, req.userId!)
@@ -352,7 +350,6 @@ router.get(
 
 router.post(
   '/:sessionId/resolve-matchday',
-  validate(enterRunSchema),
   asyncHandler(async (req: AuthenticatedRequest, res) => {
     const prisma = req.app.get('prisma')
     const result = await resolveNextMatchday(prisma, req.params.sessionId as string, req.userId!)
