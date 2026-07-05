@@ -35,6 +35,134 @@ function section(entries: PlayerTemplate[]): PlayerTemplate[] {
   return entries
 }
 
+// ─── Realistic player generator ────────────────────────
+//
+// Generates fictional but realistic-looking players to fill up
+// to real tournament squad sizes:
+//   FIFA WC 2026: 48 teams × 26 players = 1,248
+//   UCL 2026/27:  32 teams × 25 players (List A) = 800
+//
+// Position distribution per squad: GK~3, DEF~9, MID~8, FWD~6
+
+// First names by region
+const FIRST_NAMES: Record<string, string[]> = {
+  GB: ['Jack','Harry','Oliver','James','William','Thomas','George','Henry','Daniel','Samuel','Charlie','Joseph','David','Ryan','Luke','Ben','Tom','Chris','Adam','Alex','Max','Lewis','Jamie','Callum','Sam','Liam','Noah','Ethan','Mason','Lucas'],
+  ES: ['Santiago','Mateo','Alejandro','Pablo','David','Javier','Carlos','Miguel','Rafael','Daniel','Manuel','Antonio','José','Francisco','Jorge','Luis','Marco','Alvaro','Sergio','Adrian','Isco','Diego','Andres','Victor','Hugo'],
+  FR: ['Lucas','Hugo','Raphaël','Antoine','Mathieu','Alexandre','Pierre','Nicolas','Maxime','Clement','Baptiste','Julien','Florian','Quentin','Romain','Theo','Moussa','Yacine','Karim','Adrien'],
+  DE: ['Lukas','Felix','Leon','Maximilian','Jonas','Niklas','Finn','Tim','Paul','Erik','Julian','Benedikt','Marco','Timo','Florian','Marcel','Kai','Lars','Sven','Robin','Jan'],
+  IT: ['Lorenzo','Alessandro','Andrea','Matteo','Marco','Francesco','Riccardo','Federico','Giovanni','Antonio','Luca','Simone','Davide','Nicola','Giuseppe','Fabio','Paolo','Michele','Stefano','Gianluigi'],
+  NL: ['Daan','Sem','Lars','Tim','Jesse','Sven','Niels','Wout','Dirk','Koen','Bram','Thijs','Rens','Thomas','Martijn','Stefan','Bart','Jasper','Quinten','Gijs'],
+  PT: ['João','Miguel','Francisco','Gonçalo','Diogo','Rui','Bernardo','Tiago','André','Pedro','Rafael','Nuno','Ricardo','Bruno','Vítor','Hugo','Daniel','David','Martim','Tomás'],
+  BR: ['Lucas','Gabriel','Rafael','Pedro','Felipe','Matheus','Gustavo','João','Caio','Vinicius','Bruno','Diego','Thiago','Igor','Carlos','Eduardo','André','Ricardo','Marcos','Paulo'],
+  AR: ['Lautaro','Julián','Nahuel','Lucas','Exequiel','Rodrigo','Nicolás','Leandro','Pablo','Gonzalo','Juan','Emiliano','Facundo','Thiago','Cristian','Alejandro','Matías','Franco','Guido','Marcos'],
+  UY: ['Federico','Facundo','Rodrigo','Nahuel','Mathías','Cristian','Nicolás','Santiago','Bruno','Diego','Agustín','Gastón','Maximiliano','Lucas','José','Emiliano','Martín','Pablo','Sergio','Sebastián'],
+}
+
+const LAST_NAMES: string[] = [
+  'Silva','Santos','Rodriguez','García','Martínez','López','González','Fernández','Pérez','Sánchez','Ramírez','Torres','Rivera','Morales','Ortiz','Cruz','Reyes','Gutiérrez','Molina','Ramos','Díaz','Flores','Romero','Alvarez','Castillo','Herrera','Medina','Vargas','Castro','Ojeda',
+  'Smith','Johnson','Williams','Brown','Jones','Wilson','Taylor','Davies','Evans','Thomas','Roberts','Walker','Wright','Thompson','White','Hughes','Edwards','Green','Hall','Wood','Harris','Martin','Jackson','Clarke','Turner','Hill','Scott','Adams','Baker','Mitchell',
+  'Müller','Schmidt','Schneider','Fischer','Weber','Wagner','Becker','Hoffmann','Schäfer','Koch','Bauer','Richter','Klein','Wolf','Schröder','Neumann','Schwarz','Zimmermann','Braun','Krüger','Hofmann','Hartmann','Lange','Schmitt','Werner','Schmitz','Krause','Meier','Lehmann','Schulze',
+  'Bianchi','Rizzo','Conti','Marino','Greco','Barbieri','Fontana','Rinaldi','Caruso','Moretti','Ferrari','Costa','Rossi','Esposito','Gallo','Mancini','Lombardi','Pellegrini','Fabbri','Martini','Grassi','Parisi','Testa','Bellini','Guerra','Villa','Ferrara','Carbone','Mariani','Basile',
+  'Lefèvre','Moreau','Fournier','Girard','André','Mercier','DuPont','Lambert','Bonnet','François','Martinez','Legrand','Garnier','Faure','Rousseau','Blanc','Guerin','Muller','Henry','Roussel','Mathieu','Chevalier','Dupuis','Gauthier','Colin','Lemaire','Roger','Picard','Renard','Baron',
+  'Berg','Bakker','van Dijk','de Jong','Visser','Smit','Meijer','de Boer','Mulder','Koster','Bos','Vos','Hofman','Hendriks','van der Heijden','Groot','Peters','Dekker','Blom','Willemsen','Evers','Kuiper','de Wit','Veenstra','Schaap','van der Wal','van der Meer','de Graaf','Koning','Prins',
+]
+
+const WC_NATIONALITIES: string[] = [
+  'AR','AU','AT','BE','BR','CM','CA','CL','CO','HR','CZ','DK','EC','EG','GB','FR','DE','GH','GR','IE','IL','IT','CI','JM','JP','KR','MA','MX','NL','NG','NO','PA','PY','PE','PL','PT','QA','SN','RS','SK','SI','ZA','ES','SE','CH','TN','UA','UY','US','UZ',
+]
+
+const UCL_NATIONALITIES: string[] = [
+  'GB','ES','FR','DE','IT','NL','PT','BE','CH','AT','HR','RS','DK','SE','NO','FI','PL','CZ','SK','HU','GR','TR','RU','UA','BR','AR','UY','CO','CL','EC','PE','PY','CA','US','MX','MA','DZ','SN','NG','CI','GH','CM','EG','TN','ZA','IL','JP','KR','AU','NZ','CN',
+]
+
+const WC_CLUBS: string[] = [
+  'Real Madrid','Barcelona','Atlético Madrid','Valencia','Sevilla','Real Sociedad','Athletic Bilbao','Villarreal','Real Betis','Girona','Manchester City','Manchester United','Liverpool','Arsenal','Chelsea','Tottenham','Aston Villa','Newcastle','Brighton','West Ham','Bayern Munich','Borussia Dortmund','Bayer Leverkusen','RB Leipzig','VfB Stuttgart','Eintracht Frankfurt','Inter Milan','AC Milan','Juventus','Napoli','Roma','Lazio','Atalanta','Fiorentina','Paris Saint-Germain','Marseille','Monaco','Lille','Lyon','Nice','Benfica','Porto','Sporting CP','Braga','Ajax','Feyenoord','PSV','Club Brugge','Celtic','Rangers','Shakhtar Donetsk','Dinamo Zagreb','Olympiacos','Fenerbahçe','Galatasaray','Al Hilal','Al Nassr','Inter Miami','LA Galaxy','Cruz Azul','Monterrey','Palmeiras','Flamengo','Boca Juniors','River Plate','UANL','América','Santos Laguna','Mazatlán','León','Atlas','Chivas','Pumas','Puebla','Tijuana','Querétaro','Juárez','Necaxa','Pachuca','Toluca','Atlanta United','NYC FC','LAFC','Seattle Sounders','Austin FC','Portland Timbers','Columbus Crew','Philadelphia Union','Orlando City','Sporting KC',
+]
+
+const UCL_CLUBS: string[] = [
+  'Real Madrid','Barcelona','Atlético Madrid','Sevilla','Real Sociedad','Athletic Bilbao','Girona','Manchester City','Manchester United','Liverpool','Arsenal','Chelsea','Tottenham','Newcastle','Aston Villa','Bayern Munich','Borussia Dortmund','Bayer Leverkusen','RB Leipzig','Stuttgart','Eintracht Frankfurt','Inter Milan','AC Milan','Juventus','Napoli','Lazio','Atalanta','Paris Saint-Germain','Marseille','Monaco','Lille','Benfica','Porto','Sporting CP','Braga','Feyenoord','PSV','Ajax','Celtic','Rangers','Club Brugge','Shakhtar Donetsk','Dinamo Zagreb','Olympiacos','Galatasaray','Fenerbahçe','Young Boys','Slavia Prague','Sparta Prague','Red Star Belgrade','Malmö','Midtjylland','Copenhagen','Ferencváros','Antwerp','Union Saint-Gilloise','Sturm Graz','Molde','Bodo/Glimt','Qarabag','Ludogorets','Sheriff Tiraspol','Astana','PAOK','Partizan','Legia Warsaw','Maccabi Tel Aviv','HJK Helsinki','Zrinjski','Olimpija Ljubljana','Raków Częstochowa',
+]
+
+function pick<T>(arr: T[], exclude?: Set<T>): T {
+  const pool = exclude ? arr.filter((x) => !exclude.has(x)) : arr
+  return pool[Math.floor(Math.random() * pool.length)]
+}
+
+// Generate first name based on nationality (fallback to a generic list)
+function firstName(nationality: string): string {
+  const names = FIRST_NAMES[nationality]
+  if (names) return names[Math.floor(Math.random() * names.length)]
+  const allNames = Object.values(FIRST_NAMES).flat()
+  return allNames[Math.floor(Math.random() * allNames.length)]
+}
+
+function generateFillerPlayers(
+  existing: PlayerTemplate[],
+  targetCount: number,
+  nationalities: string[],
+  clubs: string[],
+): PlayerTemplate[] {
+  if (existing.length >= targetCount) return []
+
+  const fillers: PlayerTemplate[] = []
+  const existingNames = new Set(existing.map((p) => p.name))
+  const usedNames = new Set<string>()
+  const needed = targetCount - existing.length
+
+  // Position distribution: GK~12%, DEF~34%, MID~30%, FWD~24%
+  const posTargets = {
+    GK: Math.round(needed * 0.12),
+    DEF: Math.round(needed * 0.34),
+    MID: Math.round(needed * 0.30),
+    FWD: Math.round(needed * 0.24),
+  }
+
+  // Price tiers per position (ensure good distribution)
+  // We need a mix of low/med/high prices so rarity tiers compute correctly
+  const positionPriceRanges: Record<string, [number, number][]> = {
+    GK: [[8, 20], [22, 35], [36, 50], [52, 68]],
+    DEF: [[8, 18], [20, 30], [32, 44], [46, 55]],
+    MID: [[8, 18], [20, 30], [32, 44], [46, 65]],
+    FWD: [[8, 18], [20, 30], [32, 44], [46, 70]],
+  }
+
+  // Shuffle nationalities array for better distribution
+  const shuffledNat = [...nationalities].sort(() => Math.random() - 0.5)
+
+  for (const [pos, count] of Object.entries(posTargets) as [string, number][]) {
+    const ranges = positionPriceRanges[pos]
+    for (let i = 0; i < count; i++) {
+      // Pick nationality with round-robin distribution
+      const nat = shuffledNat[i % shuffledNat.length]
+      const club = pick(clubs)
+
+      // Generate unique name
+      let name = ''
+      for (let attempt = 0; attempt < 50; attempt++) {
+        const first = firstName(nat)
+        const last = pick(LAST_NAMES)
+        const candidate = `${first} ${last}`
+        if (!existingNames.has(candidate) && !usedNames.has(candidate)) {
+          name = candidate
+          usedNames.add(candidate)
+          break
+        }
+      }
+      if (!name) continue // Skip if we can't find a unique name
+
+      // Distribute prices across the 4 buckets (roughly 25% each)
+      const bucketIdx = i % 4
+      const [minP, maxP] = ranges[bucketIdx]
+      const price = minP + Math.round(Math.random() * (maxP - minP))
+
+      fillers.push({ name, club, nationality: nat, position: pos as 'GK' | 'DEF' | 'MID' | 'FWD', basePrice: price })
+    }
+  }
+
+  // Shuffle for variety
+  return fillers.sort(() => Math.random() - 0.5)
+}
+
 // ─── FIFA World Cup 2026 (~275 players) ─────────────────
 
 const WC_GK = section([
@@ -557,11 +685,26 @@ const UCL_PLAYERS: PlayerTemplate[] = [
   ...UCL_FWD,
 ]
 
+// ─── Target sizes (real tournament data) ────────────────
+// FIFA World Cup 2026: 48 teams × 26 players = 1,248
+// UEFA Champions League 2026/27: 32 teams × 25 (List A) = 800
+
+const WC_TARGET = 1248
+const UCL_TARGET = 800
+
 // ─── Main ───────────────────────────────────────────────
 
 function main() {
-  const wcPlayers = WC_PLAYERS
-  const uclPlayers = UCL_PLAYERS
+  const wcBase = WC_PLAYERS
+  const uclBase = UCL_PLAYERS
+
+  // Generate filler players to reach target counts
+  const wcFillers = generateFillerPlayers(wcBase, WC_TARGET, WC_NATIONALITIES, WC_CLUBS)
+  const uclFillers = generateFillerPlayers(uclBase, UCL_TARGET, UCL_NATIONALITIES, UCL_CLUBS)
+
+  const wcPlayers = [...wcBase, ...wcFillers]
+  const uclPlayers = [...uclBase, ...uclFillers]
+
   const allPlayers: any[] = []
   let idCounter = 1
 
@@ -591,9 +734,12 @@ function main() {
     dest[p.position] = (dest[p.position] || 0) + 1
   }
 
+  const wcReal = wcBase.length
+  const uclReal = uclBase.length
+
   console.log(`📊 Generating ${allPlayers.length} total players...`)
-  console.log(`   FIFA WC 2026: ${wcCount} players`)
-  console.log(`   UCL 2026/27: ${uclCount} players`)
+  console.log(`   FIFA WC 2026: ${wcCount} players (${wcReal} real + ${wcFillers.length} generated) — target: ${WC_TARGET}`)
+  console.log(`   UCL 2026/27: ${uclCount} players (${uclReal} real + ${uclFillers.length} generated) — target: ${UCL_TARGET}`)
   console.log(`\n  FIFA WC 2026 breakdown:`)
   for (const [pos, count] of Object.entries(wcPositions)) console.log(`    ${pos}: ${count}`)
   console.log(`\n  UCL 2026/27 breakdown:`)

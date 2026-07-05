@@ -6,13 +6,12 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { fetchJSON, authedHeaders, keys as baseKeys } from './useApi'
+import { fetchJSON, authedHeaders } from './useApi'
 import type {
   DraftSession,
   DraftPick,
   Player,
   Formation,
-  FormationName,
   DraftTicketInfo,
   DraftRunResult,
   DraftRunRoundEntry,

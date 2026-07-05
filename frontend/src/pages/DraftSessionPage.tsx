@@ -125,6 +125,11 @@ export default function DraftSessionPage() {
   const [selectedFormation, setSelectedFormation] = useState<string | null>(null)
   const [showFormationPicker, setShowFormationPicker] = useState(false)
 
+  // ── Determine default tournament for start-draft flow ──
+  const { data: tournaments } = useTournaments()
+  const liveTournaments = (tournaments || []).filter((t: any) => t.status === 'LIVE')
+  const defaultTournamentId = liveTournaments[0]?.id
+
   // If no sessionId, show start-draft flow
   if (!sessionId) {
     return (
@@ -134,8 +139,8 @@ export default function DraftSessionPage() {
         onSelectFormation={setSelectedFormation}
         onStart={() => {
           if (!selectedFormation) return
-          // Find tournament from the first available one
-          const tournamentId = new URLSearchParams(window.location.search).get('tournamentId')
+          // Read tournamentId from URL params, or fall back to first live tournament
+          const tournamentId = new URLSearchParams(window.location.search).get('tournamentId') || defaultTournamentId
           if (!tournamentId) return
           startDraft.mutate(
             { tournamentId, formation: selectedFormation },
@@ -358,7 +363,12 @@ export default function DraftSessionPage() {
                 {/* Show roster in complete state too */}
                 <RosterPreview
                   formationName={session.formation}
-                  slots={nextRound?.round ? [] : formations?.find((f) => f.id === session.formation)?.slots || []}
+                  slots={formations?.find((f) => f.id === session.formation)?.slots || [
+                    { position: 'GK', count: 1 },
+                    { position: 'DEF', count: 4 },
+                    { position: 'MID', count: 4 },
+                    { position: 'FWD', count: 2 },
+                  ]}
                   benchSlots={formations?.find((f) => f.id === session.formation)?.benchSlots || 7}
                   picks={picks.map((p) => ({
                     ...p,

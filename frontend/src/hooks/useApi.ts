@@ -83,7 +83,7 @@ export async function fetchJSON<T = unknown>(url: string, options: RequestInit =
   return res.json() as Promise<T>
 }
 
-function authedHeaders(): Record<string, string> {
+export function authedHeaders(): Record<string, string> {
   const token =
     typeof document !== 'undefined'
       ? document.cookie
