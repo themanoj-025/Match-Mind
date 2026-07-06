@@ -9,6 +9,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import type { IUserRepository } from '../repositories/types'
 import logger from '../utils/logger'
+import { sendVerificationEmail, sendPasswordResetEmail } from './emailService'
 
 // ─── Token Generation ─────────────────────────────────
 
@@ -57,7 +58,8 @@ export async function getTokenVersion(userId: string, prisma: any): Promise<numb
       select: { tokenVersion: true },
     })
     return user?.tokenVersion ?? 0
-  } catch {
+  } catch (err) {
+    logger.error({ event: 'auth.token_version_error', userId, err: String(err) }, 'Failed to get token version — denying access')
     return 0
   }
 }
@@ -143,13 +145,13 @@ export class AuthService {
       displayName: username,
     })
 
-    // Generate verification token (logged for now, email sending TBD)
+    // Generate and send verification email
     const verificationToken = jwt.sign(
       { userId: user.id, purpose: 'email-verification' },
       process.env.JWT_SECRET!,
       { expiresIn: '24h' }
     )
-    logger.info({ event: 'auth.signup', userId: user.id }, `Signup: verification token generated for ${email}`)
+    await sendVerificationEmail(email, verificationToken)
 
     const tokenVersion = await getTokenVersion(user.id, this.deps.userRepository)
     const tokens = generateTokens(user.id, tokenVersion)
@@ -231,14 +233,18 @@ export class AuthService {
    * Generate a password reset token for a user.
    */
   async generatePasswordResetToken(email: string): Promise<void> {
+    if (!process.env.JWT_RESET_SECRET) {
+      logger.error({ event: 'auth.password_reset_secret_missing' }, 'JWT_RESET_SECRET not configured — cannot generate reset tokens')
+      return
+    }
     const user = await this.deps.userRepository.findByEmail(email)
     if (user) {
       const resetToken = jwt.sign(
         { userId: user.id, purpose: 'password-reset' },
-        process.env.JWT_RESET_SECRET || process.env.JWT_SECRET!,
+        process.env.JWT_RESET_SECRET,
         { expiresIn: '1h' }
       )
-      logger.info({ event: 'auth.password_reset_token', userId: user.id }, `Password reset token generated for ${email}`)
+      await sendPasswordResetEmail(email, resetToken)
     }
     // Always return success to prevent email enumeration
   }

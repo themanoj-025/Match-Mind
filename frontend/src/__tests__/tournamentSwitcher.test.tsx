@@ -1,5 +1,5 @@
 /**
- * tournamentSwitcher.test.tsx — AuctionXI v2 §8
+ * tournamentSwitcher.test.tsx — MatchMind v2 §8
  *
  * Tests:
  * - Renders correct set of pills/dropdown based on mocked registry response

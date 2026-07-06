@@ -355,14 +355,28 @@ export function useAdminMatches(_opts?: { status?: string }) {
 }
 
 export function useUpdateReport() {
+  const qc = useQueryClient()
   return useMutation({
-    mutationFn: (_data: any) => Promise.resolve({}),
+    mutationFn: ({ id, status }: { id: string; status: string }) =>
+      fetchJSON(`/api/admin/reports/${id}`, {
+        method: 'PATCH',
+        headers: authedHeaders(),
+        body: JSON.stringify({ status }),
+      }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'reports'] }),
   })
 }
 
 export function useUpdateMatch() {
+  const qc = useQueryClient()
   return useMutation({
-    mutationFn: (_data: any) => Promise.resolve({}),
+    mutationFn: ({ id, data }: { id: string; data: { homeScore?: number; awayScore?: number; status?: string } }) =>
+      fetchJSON(`/api/admin/fixtures/${id}`, {
+        method: 'PATCH',
+        headers: authedHeaders(),
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'matches'] }),
   })
 }
 
@@ -445,8 +459,18 @@ export function useMatchTimeline(_id?: string) {
 }
 
 export function useCreatePrediction() {
+  const qc = useQueryClient()
   return useMutation({
-    mutationFn: (_data: any) => Promise.resolve({}),
+    mutationFn: (data: { matchId: string; homeGoals: number; awayGoals: number; btts?: boolean; totalGoalsOU?: string; totalGoalsLine?: number }) =>
+      fetchJSON('/api/predictions', {
+        method: 'POST',
+        headers: authedHeaders(),
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['predictions'] })
+      qc.invalidateQueries({ queryKey: ['fixtures'] })
+    },
   })
 }
 

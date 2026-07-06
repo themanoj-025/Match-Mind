@@ -1,12 +1,11 @@
 /**
- * AI Auction Advisor — AuctionXI
+ * AI Auction Advisor — MatchMind
  *
  * Claude-powered draft strategy hints for Pro users.
  * Analyzes a franchise's current roster + remaining budget + remaining pool
  * and suggests undervalued targets.
  *
  * Security: Requires authentication + Pro check + rate limiting.
- * Does NOT repeat MatchMind's unauthenticated-AI-endpoint mistake.
  */
 
 import express from 'express'

@@ -1,5 +1,5 @@
 /**
- * Draft Run Service — AuctionXI v4 §2
+ * Draft Run Service — MatchMind v4 §2
  *
  * Post-draft competitive phase: takes a committed squad through matchday
  * rounds where fantasy points are compared against a benchmark. Tracks

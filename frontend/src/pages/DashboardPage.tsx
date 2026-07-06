@@ -43,7 +43,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen pt-16 pb-20">
       <Helmet>
-        <title>Dashboard — AuctionXI</title>
+        <title>Dashboard — MatchMind</title>
       </Helmet>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* ── Draft Mode Hero Section ── */}

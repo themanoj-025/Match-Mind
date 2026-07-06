@@ -1,5 +1,5 @@
 /**
- * Tournament Configuration — AuctionXI v2
+ * Tournament Configuration — MatchMind v2
  *
  * Loads tournament metadata from tournamentRegistry.json,
  * validates it with Zod at boot, and exposes typed accessors.

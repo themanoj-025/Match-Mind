@@ -1,5 +1,5 @@
 /**
- * Draft Run Service Tests — AuctionXI v4 §2
+ * Draft Run Service Tests — MatchMind v4 §2
  *
  * Tests the post-draft competitive phase:
  * - enterRun() — session validation, duplicate detection

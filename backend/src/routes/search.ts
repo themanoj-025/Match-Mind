@@ -1,5 +1,5 @@
 /**
- * Search Routes — AuctionXI
+ * Search Routes — MatchMind
  *
  * Scoped to users and football players only.
  * Teams and matches removed (single-sport platform with fixture-based system).

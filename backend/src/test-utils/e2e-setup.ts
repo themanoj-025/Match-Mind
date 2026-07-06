@@ -1,5 +1,5 @@
 /**
- * E2E Test Setup — AuctionXI
+ * E2E Test Setup — MatchMind
  *
  * Creates an Express app + JSON database in a temp directory for integration tests.
  * Used by supertest to test full API flows without starting the server.
@@ -16,7 +16,7 @@ import { createJsonDatabase } from '../lib/jsonDb'
 // ── Helpers ──────────────────────────────────────────────
 
 export function createTempDir(): string {
-  const dir = path.join(os.tmpdir(), 'auctionxi-e2e-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6))
+  const dir = path.join(os.tmpdir(), 'matchmind-e2e-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6))
   fs.mkdirSync(dir, { recursive: true })
   return dir
 }
@@ -31,7 +31,7 @@ export function createTestUser(overrides: Record<string, any> = {}) {
   return {
     id: 'test-user-1',
     username: 'testuser',
-    email: 'test@auctionxi.com',
+    email: 'test@matchmind.gg',
     displayName: 'Test User',
     password: '$2a$10$testhashedpassword', // bcrypt hash of "password123"
     tier: 'BRONZE',

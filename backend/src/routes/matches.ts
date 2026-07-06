@@ -1,5 +1,5 @@
 /**
- * Match Routes — AuctionXI (Replacement)
+ * Match Routes — MatchMind (Replacement)
  *
  * MatchMind's old multi-sport match/prediction system is removed.
  * Auctions use the fixture-based system (routes/fixtures.ts).

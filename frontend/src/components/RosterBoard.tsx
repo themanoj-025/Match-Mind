@@ -1,5 +1,5 @@
 /**
- * RosterBoard — AuctionXI
+ * RosterBoard — MatchMind
  *
  * Position-grouped grid (GK/DEF/MID/FWD) that displays the user's drafted roster
  * with captain (C) and vice-captain (VC) badges.

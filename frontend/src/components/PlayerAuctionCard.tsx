@@ -1,5 +1,5 @@
 /**
- * PlayerAuctionCard — AuctionXI
+ * PlayerAuctionCard — MatchMind
  *
  * Displays the player currently under the hammer in the live auction.
  * Shows photo/avatar, name, club, nationality, position, base price,

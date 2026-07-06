@@ -108,7 +108,7 @@ router.post('/:id/finalize', authenticateToken, requireAdmin, asyncHandler(async
     where: { id: { in: playerIds } },
     select: { id: true, position: true, name: true },
   })
-  const playerMap = new Map(allPlayers.map((p: any) => [p.id, p]))
+  const playerMap = new Map<string, { id: string; position: string; name: string }>(allPlayers.map((p: any) => [p.id, p]))
 
   // ─── Batch-load all rosters for all rooms ────────────────────
   const roomIds = rooms.map((r: any) => r.id)

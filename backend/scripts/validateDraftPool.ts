@@ -1,5 +1,5 @@
 /**
- * validateDraftPool.ts — AuctionXI v4 §6.3
+ * validateDraftPool.ts — MatchMind v4 §6.3
  *
  * CLI entry point for Draft Mode pool validation.
  * Delegates to the shared library in src/lib/ so that both

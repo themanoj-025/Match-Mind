@@ -1,5 +1,5 @@
 /**
- * TournamentGuard — AuctionXI v2 §3.4
+ * TournamentGuard — MatchMind v2 §3.4
  *
  * Route guard that checks the tournamentId param against the live registry:
  * - Unknown ID → 404

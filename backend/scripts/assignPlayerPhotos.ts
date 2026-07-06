@@ -1,5 +1,5 @@
 /**
- * assignPlayerPhotos.ts — AuctionXI v4
+ * assignPlayerPhotos.ts — MatchMind v4
  *
  * Assigns deterministic photoUrl values to all players using ui-avatars.com.
  * Each player gets a consistent URL based on their name and position:

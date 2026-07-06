@@ -185,7 +185,7 @@ export default function DraftSessionPage() {
   return (
     <div className="min-h-screen pt-16 pb-20">
       <Helmet>
-        <title>{isDrafting ? 'Drafting' : isSquadComplete ? 'Squad Complete' : 'Draft Run'} — AuctionXI</title>
+        <title>{isDrafting ? 'Drafting' : isSquadComplete ? 'Squad Complete' : 'Draft Run'} — MatchMind</title>
       </Helmet>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -456,7 +456,7 @@ function StartDraftFlow({
     <div className="min-h-screen pt-16 pb-20 flex items-center justify-center">
       <div className="max-w-lg w-full mx-auto px-4">
         <Helmet>
-          <title>Start Draft — AuctionXI</title>
+          <title>Start Draft — MatchMind</title>
         </Helmet>
 
         <div className="text-center mb-8">

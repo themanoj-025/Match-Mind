@@ -1,5 +1,5 @@
 /**
- * JSON Database Atomic Write Tests — AuctionXI
+ * JSON Database Atomic Write Tests — MatchMind
  *
  * Tests the core persistence reliability of the JSON database:
  * - Temp-file + rename atomicity (partial-write prevention)
@@ -15,7 +15,7 @@ import path from 'path'
 import os from 'os'
 import { createJsonDatabase } from './jsonDb'
 
-const TEST_DIR = path.join(os.tmpdir(), 'auctionxi-atomic-test-' + Date.now())
+const TEST_DIR = path.join(os.tmpdir(), 'matchmind-atomic-test-' + Date.now())
 
 function makeTestDb(): any {
   return createJsonDatabase(TEST_DIR)

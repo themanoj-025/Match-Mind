@@ -1,5 +1,5 @@
 /**
- * Room Lifecycle Integration Tests — AuctionXI
+ * Room Lifecycle Integration Tests — MatchMind
  *
  * Tests the full lifecycle:
  * 1. Create room → validate invite code, host membership, auction state

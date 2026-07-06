@@ -1,5 +1,5 @@
 /**
- * Player Routes — AuctionXI
+ * Player Routes — MatchMind
  *
  * Football-specific players scoped to tournamentId.
  * Removed multi-sport sport filter from MatchMind.

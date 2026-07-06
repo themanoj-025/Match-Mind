@@ -1,5 +1,5 @@
 /**
- * Draft Mode Routes — AuctionXI v4 §1.10, §2
+ * Draft Mode Routes — MatchMind v4 §1.10, §2
  *
  * REST endpoints for the Draft Mode feature.
  * No WebSocket required (Draft Mode is asynchronous/solo by nature).

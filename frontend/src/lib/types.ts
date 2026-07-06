@@ -33,7 +33,7 @@ export interface User {
 
 export type Tier = 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM' | 'DIAMOND' | 'LEGEND'
 
-// ─── Player (AuctionXI) ────────────────────────────────
+// ─── Player (MatchMind) ─────────────────────────────────
 export interface Player {
   id: string
   tournamentId: string

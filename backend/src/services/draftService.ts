@@ -1,5 +1,5 @@
 /**
- * Draft Service — AuctionXI v4 §1
+ * Draft Service — MatchMind v4 §1
  *
  * Core business logic for the Draft Mode:
  * - Start a draft (consume ticket, create session)

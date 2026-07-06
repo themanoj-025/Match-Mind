@@ -1,5 +1,5 @@
 /**
- * routing.segmentation.test.tsx — AuctionXI v2 §8
+ * routing.segmentation.test.tsx — MatchMind v2 §8
  *
  * Tests:
  * - Navigating between /t/:a/... and /t/:b/... correctly clears filters

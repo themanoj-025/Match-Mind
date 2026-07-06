@@ -1,5 +1,5 @@
 /**
- * AuctionActivityFeed — AuctionXI
+ * AuctionActivityFeed — MatchMind
  *
  * Virtualized scrolling bid log with ARIA live region announcements.
  * Shows the latest bid activity with player names, amounts, and timestamps.

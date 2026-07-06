@@ -1,5 +1,5 @@
 /**
- * BidButton — AuctionXI
+ * BidButton — MatchMind
  *
  * Large, thumb-friendly bid button that shows the next minimum bid.
  * Disables client-side as a hint when budget/roster rule would be violated.

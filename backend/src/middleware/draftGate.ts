@@ -1,5 +1,5 @@
 /**
- * draftGate.ts — AuctionXI v4 §6.4
+ * draftGate.ts — MatchMind v4 §6.4
  *
  * Middleware that gates Draft Mode endpoints behind the per-tournament
  * feature flag. Draft Mode is only available for tournaments that have

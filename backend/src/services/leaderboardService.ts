@@ -1,5 +1,5 @@
 /**
- * Leaderboard Service — AuctionXI
+ * Leaderboard Service — MatchMind
  *
  * Leaderboard is a **derived view** from the append-only fantasyPointsLedger.
  * There is exactly one aggregation function, unit-tested, called from one place.

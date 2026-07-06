@@ -192,7 +192,7 @@ export default function AuctionRoomPage() {
 
   return (
     <TournamentThemeWrapper tournamentId={room?.tournamentId} className="min-h-screen pt-16 pb-20">
-      <Helmet><title>{room?.name || 'Auction'} — AuctionXI</title></Helmet>
+      <Helmet><title>{room?.name || 'Auction'} — MatchMind</title></Helmet>
 
       {/* ── Top bar ─────────────────────────────────────── */}
       <div className="bg-[var(--mm-bg-secondary)] border-b border-[var(--border-subtle)] sticky top-16 z-30">

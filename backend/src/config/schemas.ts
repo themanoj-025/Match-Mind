@@ -1,5 +1,5 @@
 /**
- * Zod validation schemas for AuctionXI API.
+ * Zod validation schemas for MatchMind API.
  * All POST / PATCH / PUT route bodies are defined here.
  */
 

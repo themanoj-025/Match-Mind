@@ -19,7 +19,7 @@ import { requestId } from './middleware/requestId'
 // ─── Validate required environment variables ──────────────────────────
 import logger from './utils/logger'
 
-const REQUIRED_ENV_VARS = ['JWT_SECRET', 'JWT_REFRESH_SECRET']
+const REQUIRED_ENV_VARS = ['JWT_SECRET', 'JWT_REFRESH_SECRET', 'JWT_RESET_SECRET']
 for (const envVar of REQUIRED_ENV_VARS) {
   if (!process.env[envVar]) {
     logger.fatal({ event: 'startup.env_missing', envVar }, `Required environment variable ${envVar} is not set.`)
@@ -27,15 +27,27 @@ for (const envVar of REQUIRED_ENV_VARS) {
   }
 }
 
-// In production, JWT_RESET_SECRET must be distinct from JWT_SECRET
-if (process.env.NODE_ENV === 'production') {
-  if (!process.env.JWT_RESET_SECRET) {
-    logger.fatal({ event: 'startup.env_missing' }, 'JWT_RESET_SECRET is required in production mode')
-    process.exit(1)
+// Verify all JWT secrets are distinct — fail fast on identical secrets
+const jwtSecrets = {
+  JWT_SECRET: process.env.JWT_SECRET!,
+  JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET!,
+  JWT_RESET_SECRET: process.env.JWT_RESET_SECRET!,
+}
+
+const secretKeys = Object.keys(jwtSecrets)
+for (let i = 0; i < secretKeys.length; i++) {
+  for (let j = i + 1; j < secretKeys.length; j++) {
+    if (jwtSecrets[secretKeys[i] as keyof typeof jwtSecrets] === jwtSecrets[secretKeys[j] as keyof typeof jwtSecrets]) {
+      logger.fatal(
+        { event: 'startup.identical_secrets', secrets: [secretKeys[i], secretKeys[j]] },
+        `JWT secrets ${secretKeys[i]} and ${secretKeys[j]} are identical. They must be distinct.`
+      )
+      process.exit(1)
+    }
   }
 }
 
-// Initialize JSON Database (AuctionXI production database)
+// Initialize JSON Database (MatchMind production database)
 const prisma = createJsonDatabase()
 let dbInitialized = false
 
@@ -43,7 +55,7 @@ async function initDatabase(): Promise<void> {
   try {
     await prisma.initialize()
     dbInitialized = true
-    logger.info({ event: 'database.initialized', dbType: 'json-file' }, 'AuctionXI JSON Database initialized')
+    logger.info({ event: 'database.initialized', dbType: 'json-file' }, 'MatchMind JSON Database initialized')
 
     // Log record counts per model
     const counts: Record<string, number> = {}
@@ -92,7 +104,19 @@ app.use(requestId)
 // ─── Response compression ───────────────────────────────────
 app.use(compression())
 
-// ─── Security headers (Helmet with explicit CSP) ─────────────────
+// ─── CORS must be first so preflight OPTIONS requests are handled before any other middleware ───
+const corsMiddleware = cors({ origin: process.env.FRONTEND_URL || 'http://localhost:3000', credentials: true })
+app.use(corsMiddleware)
+
+const httpServer = createServer(app)
+const io = new Server(httpServer, {
+  cors: {
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    credentials: true,
+  },
+})
+
+// ─── Security headers (Helmet with explicit CSP) — after CORS ──────
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -114,18 +138,19 @@ app.use(helmet({
   },
 }))
 
-// ─── Rate limiters applied before routes ────────────────────────────
-app.use(globalLimiter)
-
-const httpServer = createServer(app)
-const io = new Server(httpServer, {
-  cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    credentials: true,
-  },
+// ─── HTTPS redirect — before routes, before rate limiter, after CORS/Helmet ──
+app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const proto = (req.headers['x-forwarded-proto'] as string) || ''
+  if (proto === 'http' || proto.startsWith('http,')) {
+    res.redirect(301, `https://${req.headers.host}${req.url}`)
+  } else {
+    next()
+  }
 })
 
-app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:3000', credentials: true }))
+// ─── Rate limiters — before pino-http to reduce noise ──────────────
+app.use(globalLimiter)
+
 app.use(pinoHttp({
   logger,
   // Include request ID in all pino-http log lines
@@ -172,22 +197,6 @@ app.use('/api/stripe', stripeRoutes)
 app.use('/api/ai', aiRoutes)
 app.use('/api/draft', draftRoutes)
 
-// ─── Cache for Sentry health check (avoids dynamic import per request) ─
-let sentryAvailable: boolean | null = null
-if (process.env.SENTRY_DSN) {
-  import('../instrument').then(m => { sentryAvailable = !!m.default }).catch(() => { sentryAvailable = false })
-}
-
-// HTTP → HTTPS redirect middleware
-app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
-  const proto = (req.headers['x-forwarded-proto'] as string) || ''
-  if (proto === 'http' || proto.startsWith('http,')) {
-    res.redirect(301, `https://${req.headers.host}${req.url}`)
-  } else {
-    next()
-  }
-})
-
 // Health check (before error handler, with public rate limiter)
 app.get('/api/health', publicLimiter, async (req: express.Request, res: express.Response) => {
   const checks: Record<string, any> = {
@@ -207,13 +216,6 @@ app.get('/api/health', publicLimiter, async (req: express.Request, res: express.
     checks.checks.database.status = 'degraded'
     checks.checks.database.error = 'data directory not writable'
     checks.status = 'degraded'
-  }
-
-  // Check Sentry connectivity (cached at startup)
-  if (process.env.SENTRY_DSN) {
-    checks.checks.sentry = {
-      status: sentryAvailable === null ? 'pending' : sentryAvailable ? 'ok' : 'degraded',
-    }
   }
 
   // Return 503 if degraded
@@ -347,7 +349,7 @@ const PORT = parseInt(process.env.PORT || '4000', 10)
 // Start database then server
 initDatabase().then(() => {
   httpServer.listen(PORT, () => {
-    logger.info({ event: 'server.start', port: PORT, env: process.env.NODE_ENV || 'development' }, `AuctionXI API server running on port ${PORT}`)
+    logger.info({ event: 'server.start', port: PORT, env: process.env.NODE_ENV || 'development' }, `MatchMind API server running on port ${PORT}`)
   })
   // Start auction timer expiry check
   startAuctionTimer()
@@ -373,7 +375,7 @@ const shutdown = async (signal: string): Promise<void> => {
 
     // 2. Persist JSON database (creates shutdown backup)
     await prisma.$disconnect()
-    logger.info({ event: 'server.db_closed' }, 'AuctionXI Database persisted and closed')
+    logger.info({ event: 'server.db_closed' }, 'MatchMind Database persisted and closed')
   } catch (err: any) {
     logger.error({ event: 'server.shutdown_error', err: err.message }, 'Error during graceful shutdown')
   }

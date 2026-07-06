@@ -1,5 +1,5 @@
 /**
- * JSON Database Adapter — AuctionXI (Production)
+ * JSON Database Adapter — MatchMind (Production)
  *
  * In-memory database backed by JSON files. Permanent production database.
  * API-compatible with a subset of PrismaClient (findMany, findUnique, create,
@@ -553,7 +553,7 @@ export class JsonDatabase {
       fs.mkdirSync(this.backupDir, { recursive: true })
     }
 
-    // AuctionXI model names
+    // MatchMind model names
     const modelNames = [
       'user', 'tournament', 'player',
       'room', 'roomMember', 'bid', 'roster', 'auctionState',

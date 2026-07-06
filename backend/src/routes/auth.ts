@@ -107,7 +107,7 @@ router.post('/reset-password', validate(resetPasswordSchema), asyncHandler(async
 
   let decoded: { userId: string; purpose: string }
   try {
-    decoded = jwt.verify(token, process.env.JWT_RESET_SECRET || process.env.JWT_SECRET!) as any
+    decoded = jwt.verify(token, process.env.JWT_RESET_SECRET!) as any
   } catch (err) {
     return res.status(400).json({
       error: { code: 'INVALID_TOKEN', message: 'Reset token is invalid or expired' },

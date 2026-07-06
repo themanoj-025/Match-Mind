@@ -149,6 +149,18 @@ vi.mock('../services/authService', () => {
         refreshToken: jwtMod.sign({ userId }, process.env.JWT_REFRESH_SECRET, { expiresIn: '30d' }),
       }
     },
+    revokeTokens: async (userId: string, prisma: any) => {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { tokenVersion: true },
+      })
+      const newVersion = (user?.tokenVersion ?? 0) + 1
+      await prisma.user.update({
+        where: { id: userId },
+        data: { tokenVersion: newVersion },
+      })
+      return newVersion
+    },
   }
 })
 
@@ -526,6 +538,31 @@ describe('Auth Routes', () => {
         .send({ token: 'invalid-token', password: 'NewPassword456!' })
 
       expect(res.status).toBe(400)
+    })
+
+    it('rejects reset token forged with JWT_SECRET (not JWT_RESET_SECRET)', async () => {
+      const prisma = createMockPrisma()
+      const app = await createTestApp(prisma)
+
+      const user = await prisma.user.create({
+        data: { username: 'forgetest', email: 'forge@example.com' },
+      })
+      expect(user).toBeDefined()
+
+      // Forge a reset token using JWT_SECRET instead of JWT_RESET_SECRET
+      const forgedToken = jwt.sign(
+        { userId: user.id, purpose: 'password-reset' },
+        process.env.JWT_SECRET!,  // Wrong secret — should be JWT_RESET_SECRET
+        { expiresIn: '1h' }
+      )
+
+      const res = await request(app)
+        .post('/api/auth/reset-password')
+        .send({ token: forgedToken, password: 'NewPassword456!' })
+
+      // Must be rejected because the token was signed with wrong secret
+      expect(res.status).toBe(400)
+      expect(res.body.error.code).toBe('INVALID_TOKEN')
     })
   })
 })

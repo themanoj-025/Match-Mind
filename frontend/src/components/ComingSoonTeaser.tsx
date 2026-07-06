@@ -1,5 +1,5 @@
 /**
- * ComingSoonTeaser — AuctionXI v2 §3.5
+ * ComingSoonTeaser — MatchMind v2 §3.5
  *
  * Hero section for ANNOUNCED tournaments showing tournament branding,
  * countdown timer, and "Notify me" button.

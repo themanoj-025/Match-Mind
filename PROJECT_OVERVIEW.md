@@ -119,7 +119,6 @@ See [Known Issues](#28-known-issues) and [Technical Debt](#29-technical-debt) fo
 - No CI/CD pipeline configured
 - No production deployment configuration
 - No automated achievement unlocking logic
-- Chat messages in store grow unbounded
 
 ### Future Vision
 
@@ -127,8 +126,8 @@ See [Project Roadmap](#31-project-roadmap).
 
 ### Document Version
 
-> **Document updated:** July 4, 2026 — reflects Phase 5 engineering improvements.
-> **Previous version:** July 3, 2026 — documented pre-migration state.
+> **Document updated:** July 6, 2026 — reflects Phase 1+2 engineering improvements (identity rename, JWT hardening, chat cap, coverage thresholds, docs alignment).
+> **Previous version:** July 4, 2026 — documented Phase 5 improvements with stale route references.
 
 ---
 
@@ -288,22 +287,23 @@ backend/
     │   └── index.ts             # JSON DB-backed implementations + factory
     ├── routes/
     │   ├── auth.ts              # Signup, login, logout, Google OAuth, token refresh, forgot/reset password, verify email
-    │   ├── auth.test.ts         # ⭐ Auth route tests (14 test cases, supertest, async import)
-    │   ├── predictions.ts       # Create prediction, list mine, list by match, score predictions
-    │   ├── predictions.test.ts  # ⭐ Prediction route tests (11 test cases, supertest)
-    │   ├── leaderboard.ts       # Global, weekly, sport-specific, friends, history snapshots
-    │   ├── users.ts             # Profile, update, follow/unfollow, notifications, username check
-    │   ├── leagues.ts           # CRUD leagues, join by invite code, leaderboard
-    │   ├── squads.ts            # CRUD squads, invite members
-    │   ├── highlights.ts        # Match highlights from goal events
-    │   ├── ai.ts                # AI prediction hints (Pro-gated), AI match summaries
+    │   ├── auth.test.ts         # ⭐ Auth route tests (14+ test cases, supertest)
+    │   ├── tournaments.ts       # Tournament CRUD, list by status/confederation
+    │   ├── players.ts           # List players, player details, tournament scoping
+    │   ├── rooms.ts             # Room CRUD, join/leave, invite codes
+    │   ├── rooms.test.ts        # ⭐ Room lifecycle tests
+    │   ├── auction.ts           # Auction state management, start/stop/pause, player queue
+    │   ├── franchises.ts        # Franchise roster management, captain/VC assignment
+    │   ├── fixtures.ts          # Fixture list/details, player stats entry, finalization
+    │   ├── leaderboard.ts       # Room leaderboard, global rankings, fantasy points
+    │   ├── users.ts             # Profile, update, follow/unfollow, notifications
+    │   ├── search.ts            # Global search: users, rooms, players, tournaments
+    │   ├── messages.ts          # Conversations list, direct messages CRUD, mark read
+    │   ├── matches.ts           # Match list/details (read-only, routes to fixtures)
+    │   ├── ai.ts                # AI auction advisor (Pro-gated, Claude-powered hints)
     │   ├── stripe.ts            # Checkout session, webhook, billing portal, subscription status
-    │   ├── admin.ts             # Dashboard stats, user/matches/reports CRUD, activity log, settings
-    │   ├── teams.ts             # List teams, team profile with standings + recent matches
-    │   ├── players.ts           # List players, player details
-    │   ├── search.ts            # Global search: users, teams, players, matches
-    │   ├── simulation.ts        # Start match simulation (async + sync), simulation status
-    │   └── messages.ts          # Conversations list, direct messages CRUD, mark read
+    │   ├── admin.ts             # Dashboard stats, user/fixture/reports CRUD, activity log, settings, draft mode
+    │   └── draft.ts             # Draft mode: sessions, picks, ticket management, squad composition
     ├── services/
     │   ├── scoring.ts           # Core scoring engine: calculatePredictionPoints, scoreMatchPredictions, streaks, tiers, leaderboard management
     │   ├── scoring.test.ts      # ⭐ Unit tests for calculatePredictionPoints (47 test cases)
@@ -507,7 +507,7 @@ frontend/
 
 #### `backend/src/config/schemas.ts` ⭐ CRITICAL
 - **Purpose**: Zod validation schemas for all API request bodies
-- **17 schemas** covering: auth (signup, login, forgot/reset password, verify email), predictions, matches, leagues, squads, users, Stripe, messages, AI, admin
+- **17 schemas** covering: auth (signup, login, forgot/reset password, verify email), rooms, auctions, roster, matches, users, Stripe, messages, AI, admin, draft
 - **Design patterns**: Uses `.strict()` on most schemas to reject unknown fields
 - **Dependencies**: zod
 - **Known issues**:
@@ -536,7 +536,7 @@ frontend/
 - **Purpose**: Rate limiting with Redis backing and memory store fallback
 - **Limiters**: auth (5/15min), password reset (3/hour), prediction (30/min), global (100/min)
 - **Redis integration**: Uses `rate-limit-redis` store if available, falls back to Express's built-in memory store
-- **Known issue**: Redis store initialization failure is silently caught with no warning log
+- **Known issue**: Fallback to in-memory store when Redis is unavailable (warns on failure)
 
 #### `backend/src/middleware/requireAdmin.ts`
 - **Purpose**: Admin role verification middleware
@@ -562,12 +562,11 @@ frontend/
   - Signup: Creates user with bcrypt (12 rounds), generates email verification token (TODO: email sending), returns JWT
   - Login: Validates credentials, returns JWT + httpOnly cookies
   - Google OAuth: Passport.js authentication, redirects to frontend
-  - Password reset: Uses JWT token with 1h expiry, falls back to JWT_SECRET if JWT_RESET_SECRET is not set
+  - Password reset: Uses JWT token with 1h expiry, signed with JWT_RESET_SECRET (mandatory, must be distinct from other secrets)
   - Forgot password: Always returns success (prevents email enumeration) ✅
 - **Known issues**:
   - Email verification token is logged to console but never sent
   - Password reset tokens not stored in DB — can't invalidate individual tokens
-  - JWT_RESET_SECRET falls back to JWT_SECRET (security concern)
 
 #### `backend/src/routes/matches.ts` ⭐ CRITICAL
 - **Endpoints**: `GET /`, `GET /:id`, `GET /:id/stats`, `GET /:id/lineups`, `GET /:id/h2h`, `POST /:id/finish`, `GET /:id/timeline`
@@ -579,56 +578,61 @@ frontend/
 - **Finish match**: Admin-only, calls `finalizeMatch` workflow, emits Socket.IO events
 - **Known issue**: Hardcoded formation '4-3-3' for all lineups
 
-#### `backend/src/routes/predictions.ts` ⭐ CRITICAL
-- **Endpoints**: `POST /`, `GET /mine`, `GET /match/:matchId`, `POST /score/:matchId`, `PATCH /:id/score`
-- **Validation**: Matches must be SCHEDULED to predict, unique per user per match (composite key)
-- **Rate limiting**: 30/min/user via `predictionLimiter`
-- **Scoring**: Can be triggered manually via `POST /score/:matchId` with mode=queue/direct/auto
+#### `backend/src/routes/tournaments.ts`
+- **Endpoints**: `GET /`, `GET /:id`, `GET /:id/players`
+- **Description**: Tournaments (e.g., FIFA World Cup 2026, UEFA Champions League) with configurable themes and status tracking.
+
+#### `backend/src/routes/rooms.ts` ⭐ CRITICAL
+- **Endpoints**: `POST /` (create), `GET /mine`, `GET /:id`, `POST /:id/join`, `POST /:id/leave`
+- **Description**: Auction room management. Rooms are the core unit of gameplay — each room hosts an auction draft for a tournament.
+- **Features**: Invite codes, member management, budget configuration, roster rules
+
+#### `backend/src/routes/auction.ts` ⭐ CRITICAL
+- **Endpoints**: `GET /:roomId/auction/state`, `POST /:roomId/auction/start`, `POST /:roomId/auction/pause`, `POST /:roomId/auction/resume`, `POST /:roomId/auction/end`
+- **Description**: Auction state machine — manages the bidding flow, player queue, timer, and phase transitions (IDLE → NOMINATION → BIDDING → SOLD/UNSOLD → NEXT → FINISHED).
+
+#### `backend/src/routes/franchises.ts`
+- **Endpoints**: `GET /:roomId/franchises/me`, `GET /:roomId/franchises/:userId`, `PATCH /:roomId/franchises/me/captain`
+- **Description**: Franchise (roster) management — view lineup, assign captain/vice-captain.
+
+#### `backend/src/routes/fixtures.ts` ⭐ CRITICAL
+- **Endpoints**: `GET /`, `GET /:id`, `GET /:id/player-stats`, `POST /:id/player-stats`, `POST /:id/finalize`
+- **Description**: Fixture (match) management with player match stats entry and fantasy points computation.
+- **Fantasy Scoring**: `POST /:id/finalize` triggers fantasy points computation via `computeFantasyPoints()`, persists to `fantasyPointsLedger`, and emits real-time socket events.
 
 #### `backend/src/routes/leaderboard.ts`
-- **Endpoints**: `GET /global`, `GET /sport/:sport`, `GET /weekly`, `GET /history/:period`, `GET /friends`
-- **Note**: The leaderboard routes contain **duplicated mapping code** 5 times:
-  ```javascript
-  users.map((u, i) => ({ ...u, rank: i + 1, name: u.displayName || u.username, points: u.totalPoints, accuracy: u.predAccuracy, streak: u.streakCurrent }))
-  ```
-- **Known issue**: `/friends` endpoint does NOT filter by friends — returns all users
+- **Endpoints**: `GET /global`, `GET /weekly`, `GET /:roomId`, `GET /history/:period`
+- **Description**: Room-specific leaderboards derived from fantasy points ledger. Global all-time and weekly snapshots.
+
+#### `backend/src/routes/draft.ts` ⭐ CRITICAL
+- **Endpoints**: `POST /sessions`, `GET /sessions/:id`, `POST /sessions/:id/pick`, `POST /sessions/:id/complete`
+- **Description**: Draft Mode — a separate game mode where players draft from a pool of players in rounds. Includes ticket system, rarity tiers (BRONZE/SILVER/GOLD/ICON), and squad composition rules.
+
+
 
 #### `backend/src/routes/users.ts`
 - **Endpoints**: `GET /check-username`, `GET /:id`, `PATCH /me`, `POST /:id/follow`, `DELETE /:id/follow`, `GET /me/notifications`, `PATCH /me/notifications/read`
-- **Known issue**: `favouriteSports` and `favouriteTeams` are accepted in the request body but silently ignored in the update handler
 
 #### `backend/src/routes/admin.ts` ⭐ CRITICAL
-- **Endpoints**: `GET /stats`, `GET /users`, `GET /users/:id`, `PATCH /users/:id`, `DELETE /users/:id`, `POST /users/:id/toggle-pro`, `GET /matches`, `PATCH /matches/:id`, `GET /reports`, `PATCH /reports/:id`, `GET /activity-log`, `GET /settings`
+- **Endpoints**: `GET /stats`, `GET /users`, `GET /users/:id`, `PATCH /users/:id`, `DELETE /users/:id`, `POST /users/:id/toggle-pro`, `GET /fixtures`, `PATCH /fixtures/:id`, `GET /reports`, `PATCH /reports/:id`, `GET /activity-log`, `GET /settings`, `POST /settings/draft-mode/:id/:action`, `GET /draft/pool-validation`, `GET /draft/icons`, `POST /draft/revalidate`
 - **All routes require admin auth** (authenticateToken + requireAdmin)
 - **AdminLog**: All destructive actions logged to AdminLog table
-- **User deletion**: Cascade deletes all user data (no soft-delete, no confirmation)
-- **Known issue**: sportsDistribution in `/stats` is hardcoded:
-  ```javascript
-  sportDistribution: [
-    { name: 'Football', value: 45 },
-    // ... hardcoded values
-  ]
-  ```
+- **Draft Mode Admin**: Pool validation, icon eligibility toggling, rarity re-computation
 
-#### `backend/src/routes/leagues.ts`
-- **Endpoints**: `POST /` (create), `GET /mine`, `GET /:id`, `POST /:id/join`, `GET /:id/leaderboard`
-- **Invite codes**: Generated via UUID v4 (8 chars, uppercase)
-- **Auto-join**: Creator automatically joins as first member with rank 1
+#### `backend/src/routes/players.ts`
+- **Endpoints**: `GET /`, `GET /:id`
+- **Description**: Player catalog with tournament scoping, position, club info, base price for auctions.
 
-#### `backend/src/routes/squads.ts`
-- **Endpoints**: `POST /` (create), `GET /mine`, `GET /:id`, `POST /:id/members/invite`
-- **Roles**: Creator gets 'owner', invited users get 'member'
-
-#### `backend/src/routes/highlights.ts`
-- **Endpoints**: `GET /`
-- **Known issue**: **N+1 query** — fetches matches, then loops through each to fetch goal events individually
+#### `backend/src/routes/search.ts`
+- **Endpoints**: `GET /?q=`
+- **Searches**: Users (username, displayName), Rooms (name), Players (name), Tournaments (name)
 
 #### `backend/src/routes/ai.ts` ⭐ CRITICAL
-- **Endpoints**: `POST /predict/:matchId`, `POST /summary/:matchId`
+- **Endpoints**: `POST /auction-advice`
 - **AI provider**: Anthropic Claude 3 Haiku (when ANTHROPIC_API_KEY is set)
-- **Fallback**: Smart heuristic prediction (randomized) when API key is missing
-- **Pro gating**: Checks if user has active Pro subscription
-- **⚠️ SECURITY**: The predict endpoint uses `optionalAuth` — unauthenticated users can trigger Anthropic API calls, costing money
+- **Fallback**: Deterministic heuristic advice (budget analysis, position scarcity scoring)
+- **Pro gating**: Requires authentication + active Pro subscription
+- **⚠️ Security**: Pro-gated — unauthenticated traffic cannot trigger API calls
 
 #### `backend/src/routes/stripe.ts` ⭐ CRITICAL
 - **Endpoints**: `POST /create-checkout`, `POST /webhook`, `POST /create-portal-session`, `GET /status`
@@ -636,28 +640,16 @@ frontend/
 - **Webhook**: Uses raw body before express.json() ✅
 - **Mock mode**: When STRIPE_SECRET_KEY is not set, returns a mock URL for testing
 
-#### `backend/src/routes/teams.ts`
-- **Endpoints**: `GET /`, `GET /:id`
-- **Team profile**: Includes players, standings, recent matches, computed form (W/L/D from last 5)
-
-#### `backend/src/routes/players.ts`
-- **Endpoints**: `GET /`, `GET /:id`
-
-#### `backend/src/routes/search.ts`
-- **Endpoints**: `GET /?q=`
-- **Searches**: Users (username, displayName), Teams (name), Players (name), Matches (home/away team, competition)
-- **All searches use**: `{ contains: query, mode: 'insensitive' }` — full text search without trigram indexes
-
-#### `backend/src/routes/simulation.ts`
-- **Endpoints**: `POST /:id/start-simulation`, `POST /:id/start-simulation-sync`, `GET /:id/simulation-status`
-- **Requires**: Admin auth
-- **Implementation**: Runs `runSimulation()` which loads teams, runs the engine, persists events with compressed clock delays, emits Socket.IO events, and auto-triggers scoring on finish
-- **Known issue**: No locking mechanism — parallel simulations can run on the same match
+#### `backend/src/routes/messages.ts`
 
 #### `backend/src/routes/messages.ts`
 - **Endpoints**: `GET /conversations`, `GET /:userId`, `POST /:userId`, `PATCH /read/:userId`
 - **DM room IDs**: Deterministic (`dm:{sortedUserId1}:{sortedUserId2}`)
 - **Real-time**: Emits `DM_MESSAGE` via Socket.IO to both users' personal rooms
+
+#### `backend/src/routes/search.ts`
+- **Endpoints**: `GET /?q=`
+- **Searches**: Users (username, displayName), Rooms (name), Players (name), Tournaments (name)
 
 ### 5.4 Backend Service Files
 
@@ -757,7 +749,7 @@ frontend/
 - **Purpose**: Zustand global state store
 - **State slices**: Auth (user, isAuthenticated), UI (isNavOpen), Live Matches (scores, status updates), Chat Messages (per-room), Viewer Counts, Notifications, Predictions, Leaderboard, Viewport (isMobile), Loading States, Error States
 - **Design patterns**: Immutable updates via `set()`, computed values where needed
-- **Known issue**: Chat messages grow unbounded — no limit on stored messages per room
+- **Known issue**: Chat capped at 500 messages per room with FIFO eviction
 
 #### `frontend/src/hooks/useApi.js` ⭐ CRITICAL
 - **Purpose**: React Query hooks for all API interactions
@@ -766,7 +758,7 @@ frontend/
   - Helper `fetchJSON()` with credentials: 'include' for cookies
   - Helper `authedHeaders()` reads accessToken from cookies
   - Optimistic updates for follow/unfollow with rollback
-- **Missing**: No loading/error state exposure on mutation hooks, no automatic token refresh
+- **Missing**: No loading/error state exposure on mutation hooks
 
 ### 5.7 Scripts
 
@@ -1055,17 +1047,17 @@ sequenceDiagram
 - **Description**: Email/password signup and login with bcrypt hashing, Google OAuth via Passport.js, JWT access tokens (15min) + refresh tokens (30 days), httpOnly cookie-based auth with Authorization header fallback
 - **Limitations**: No email sending (verification tokens logged to console), no 2FA, no CSRF protection, no token revocation
 
-### 8.2 Match Management
+### 8.2 Auction Rooms
 - **Status**: ✅ Implemented
-- **Files**: `backend/src/routes/matches.ts`, `backend/src/routes/simulation.ts`
-- **Description**: List/filter matches by sport/date/status, match details with stats, lineups, H2H history, timeline. Admin can finalize matches manually.
-- **Dependencies**: Competition, Team, Match, MatchEvent models
+- **Files**: `backend/src/routes/rooms.ts`, `backend/src/routes/auction.ts`, `backend/src/socket/index.ts`
+- **Description**: Real-time auction rooms where users draft players via blind/English auction. Host controls (start, pause, resume, force-sold). Timer-managed bidding with anti-sniping. Socket.IO real-time state sync.
+- **Dependencies**: Room, RoomMember, AuctionState, Bid, Roster, Player models
 
-### 8.3 Match Simulation Engine
+### 8.3 Fantasy Football Scoring Engine
 - **Status**: ✅ Implemented
-- **Files**: `backend/src/services/simulation/simulationEngine.ts`, `backend/src/services/simulation/simulationRunner.ts`, `backend/src/routes/simulation.ts`
-- **Description**: Deterministic match simulation using Poisson-distributed goal timing, seeded PRNG (Mulberry32), card events, possession tracking, substitution windows. Runs on compressed clock with Socket.IO real-time event streaming.
-- **Limitations**: Requires admin to trigger, no scheduling/auto-trigger
+- **Files**: `backend/src/services/fantasyPoints.ts`, `backend/src/routes/fixtures.ts`, `backend/src/services/leaderboardService.ts`
+- **Description**: Fantasy football points computation for player match stats (goals, assists, clean sheets, saves, cards). Captain ×2 / Vice-Captain ×1.5 with auto-fallback. Position-dependent scoring (FWD/MID/DEF/GK). Computed on fixture finalization.
+- **Dependencies**: PlayerMatchStats, Roster, FantasyPointsLedger models
 
 ### 8.4 Prediction Scoring Engine
 - **Status**: ✅ Implemented
@@ -1091,10 +1083,10 @@ sequenceDiagram
 - **Description**: Global (all-time), weekly, sport-specific, friends, and archived history leaderboards. Weekly points reset every Monday (snapshot archived first), monthly snapshots on 1st.
 - **Known issue**: Friends leaderboard returns ALL users, not filtered by follow relationships
 
-### 8.8 Leagues & Squads
+### 8.8 Draft Mode
 - **Status**: ✅ Implemented
-- **Files**: `backend/src/routes/leagues.ts`, `backend/src/routes/squads.ts`
-- **Description**: Private/public leagues with invite codes, per-league leaderboards. Friend groups (squads) with member roles.
+- **Files**: `backend/src/routes/draft.ts`
+- **Description**: Draft mode where players pick from a pool in rounds. Ticket-based system with rarity tiers (BRONZE/SILVER/GOLD/ICON) and squad composition rules.
 
 ### 8.9 Chat & Direct Messages
 - **Status**: ✅ Implemented
@@ -1113,10 +1105,10 @@ sequenceDiagram
 - **Description**: Achievement definitions with rarity tiers (common, rare, epic, legendary), point bonuses. User achievements tracked with unlock timestamps. 12 badge types.
 - **Limitations**: No achievement unlocking logic implemented — achievements must be granted manually
 
-### 8.12 AI Predictions
+### 8.12 AI Auction Advisor
 - **Status**: ✅ Implemented
 - **Files**: `backend/src/routes/ai.ts`
-- **Description**: Anthropic Claude-powered prediction hints for Pro subscribers. Falls back to heuristic predictions (randomized with home advantage bias). AI match summaries generated from event data.
+- **Description**: Anthropic Claude-powered auction advice for Pro subscribers. Recommends bidding strategy, budget analysis, and position scarcity scoring. Falls back to deterministic heuristic advice when API key is missing.
 - **Security**: Pro-gated — checks user's active subscription before processing
 
 ### 8.13 Stripe Subscriptions (Pro Tier)
@@ -1134,7 +1126,7 @@ sequenceDiagram
 ### 8.15 Global Search
 - **Status**: ✅ Implemented
 - **Files**: `backend/src/routes/search.ts`
-- **Description**: Full-text search across users, teams, players, and matches using case-insensitive contains queries.
+- **Description**: Full-text search across users, rooms, players, and tournaments using case-insensitive contains queries.
 - **Performance**: No trigram indexes — full table scans on all 4 tables
 
 ### 8.16 Design System & Animations
@@ -1166,42 +1158,65 @@ sequenceDiagram
 | POST | `/api/auth/verify-email` | — | — | Verify email with token |
 | POST | `/api/auth/resend-verification` | — | — | Resend verification email (TODO) |
 
-### 9.2 Matches
+### 9.2 Tournaments
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/api/matches` | — | List matches (filters: sport, date, status) |
-| GET | `/api/matches/:id` | — | Match details |
-| GET | `/api/matches/:id/stats` | — | Match statistics from events |
-| GET | `/api/matches/:id/lineups` | — | Starting lineups (max 11 from Player pool) |
-| GET | `/api/matches/:id/h2h` | — | Head-to-head history |
-| GET | `/api/matches/:id/timeline` | — | Match event timeline |
-| POST | `/api/matches/:id/finish` | Admin | Finalize match + trigger scoring |
-| POST | `/api/matches/:id/start-simulation` | Admin | Start async simulation |
-| POST | `/api/matches/:id/start-simulation-sync` | Admin | Start sync simulation (blocks) |
-| GET | `/api/matches/:id/simulation-status` | — | Current simulation state |
+| GET | `/api/tournaments` | — | List tournaments (filters: status, confederation) |
+| GET | `/api/tournaments/:id` | — | Tournament details with theme config |
+| GET | `/api/tournaments/:id/players` | — | Players scoped to a tournament |
 
-### 9.3 Predictions
-
-| Method | Endpoint | Auth | Rate Limit | Description |
-|--------|----------|------|------------|-------------|
-| POST | `/api/predictions` | ✓ | 30/min | Create prediction (matchId, homeGoals, awayGoals) |
-| GET | `/api/predictions/mine` | ✓ | — | My prediction history |
-| GET | `/api/predictions/match/:matchId` | — | — | All predictions for a match |
-| POST | `/api/predictions/score/:matchId` | ✓ | — | Manual scoring trigger (mode=queue/direct/auto) |
-| PATCH | `/api/predictions/:id/score` | — | — | Score a single prediction |
-
-### 9.4 Leaderboard
+### 9.3 Rooms & Auctions
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/api/leaderboard/global` | — | Global all-time (top 100) |
-| GET | `/api/leaderboard/weekly` | — | Weekly points (top 100) |
-| GET | `/api/leaderboard/sport/:sport` | — | Per-sport leaderboard (top 100) |
-| GET | `/api/leaderboard/friends` | — | Friends leaderboard (⚠️ returns all users) |
+| POST | `/api/rooms` | ✓ | Create auction room (tournamentId, name, budget, roster rules) |
+| GET | `/api/rooms/mine` | ✓ | List my rooms |
+| GET | `/api/rooms/:id` | — | Room details with members |
+| POST | `/api/rooms/:id/join` | ✓ | Join room via invite code |
+| POST | `/api/rooms/:id/leave` | ✓ | Leave a room |
+| GET | `/api/rooms/:id/auction/state` | ✓ | Get current auction state |
+| POST | `/api/rooms/:id/auction/start` | Host | Start auction for a room |
+| POST | `/api/rooms/:id/auction/pause` | Host | Pause auction timer |
+| POST | `/api/rooms/:id/auction/resume` | Host | Resume auction timer |
+| POST | `/api/rooms/:id/auction/end` | Host | End auction (marks as COMPLETED) |
+
+### 9.4 Franchises (Rosters)
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/rooms/:id/franchises/me` | ✓ | My roster for a room |
+| GET | `/api/rooms/:id/franchises/:userId` | — | Another user's roster |
+| PATCH | `/api/rooms/:id/franchises/me/captain` | ✓ | Set captain/vice-captain |
+
+### 9.5 Fixtures (Matches)
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/fixtures` | — | List fixtures (tournament filter) |
+| GET | `/api/fixtures/:id` | — | Fixture details with player stats |
+| POST | `/api/fixtures/:id/player-stats` | Admin | Enter player match stats |
+| POST | `/api/fixtures/:id/finalize` | Admin | Lock stats, compute fantasy points |
+
+### 9.6 Leaderboard
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/leaderboard/global` | — | Global leaderboard (all-time) |
+| GET | `/api/leaderboard/weekly` | — | Weekly leaderboard |
+| GET | `/api/leaderboard/:roomId` | — | Room-specific fantasy points leaderboard |
 | GET | `/api/leaderboard/history/:period` | — | Archived WEEKLY/MONTHLY snapshots |
 
-### 9.5 Users
+### 9.7 Draft Mode
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/draft/sessions` | ✓ | Start a draft session (uses ticket) |
+| GET | `/api/draft/sessions/:id` | ✓ | Get draft session state |
+| POST | `/api/draft/sessions/:id/pick` | ✓ | Make a player pick |
+| POST | `/api/draft/sessions/:id/complete` | ✓ | Complete draft and finalize squad |
+
+### 9.8 Users
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
@@ -1213,33 +1228,15 @@ sequenceDiagram
 | PATCH | `/api/users/me/notifications/read` | ✓ | Mark all notifications as read |
 | GET | `/api/users/check-username` | — | Username availability (query: username) |
 
-### 9.6 Leagues
+
+
+### 9.9 AI Auction Advisor
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| POST | `/api/leagues` | ✓ | Create league |
-| GET | `/api/leagues/mine` | ✓ | My leagues |
-| GET | `/api/leagues/:id` | — | League details with members |
-| POST | `/api/leagues/:id/join` | ✓ | Join league (body: inviteCode) |
-| GET | `/api/leagues/:id/leaderboard` | — | League standings |
+| POST | `/api/ai/auction-advice` | ✓ | AI auction advice (Pro-gated, Claude-powered) |
 
-### 9.7 Squads
-
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| POST | `/api/squads` | ✓ | Create squad |
-| GET | `/api/squads/mine` | ✓ | My squads |
-| GET | `/api/squads/:id` | — | Squad details with members |
-| POST | `/api/squads/:id/members/invite` | ✓ | Invite member |
-
-### 9.8 AI
-
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| POST | `/api/ai/predict/:matchId` | Optional✓ | AI prediction hint (Pro-gated) |
-| POST | `/api/ai/summary/:matchId` | ✓ | AI match summary |
-
-### 9.9 Stripe
+### 9.10 Stripe
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
@@ -1248,7 +1245,7 @@ sequenceDiagram
 | POST | `/api/stripe/create-portal-session` | ✓ | Billing portal session |
 | GET | `/api/stripe/status` | ✓ | Subscription status |
 
-### 9.10 Admin
+### 9.11 Admin
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -1265,7 +1262,7 @@ sequenceDiagram
 | GET | `/api/admin/activity-log` | Admin action log (page, limit) |
 | GET | `/api/admin/settings` | Feature flags |
 
-### 9.11 Direct Messages
+### 9.12 Direct Messages
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
@@ -1288,36 +1285,6 @@ sequenceDiagram
 
 **Error codes:** `USER_NOT_FOUND` (404), `SELF_MESSAGE` (400), `VALIDATION_ERROR` (400)
 
-### 9.12 Teams
-
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| GET | `/api/teams` | — | List teams (optional `sport` query filter) |
-| GET | `/api/teams/:id` | — | Full team profile with players, standings, recent matches, form |
-
-**Query parameters (`GET /api/teams`):**
-- `sport`: string — filter by sport (e.g. `FOOTBALL`, `BASKETBALL`). Omit or set to `all` for all sports.
-- Results limited to 50, ordered alphabetically by name.
-
-**Response (`GET /api/teams/:id`):**
-```json
-{
-  "id": "team-mci",
-  "name": "Manchester City",
-  "sport": "FOOTBALL",
-  "logo": "https://...",
-  "players": [{ "id": "...", "name": "..." }],
-  "standings": [{ "competition": { "name": "Premier League" }, "position": 1, "points": 89 }],
-  "recentMatches": [{ "id": "...", "homeTeamName": "...", "awayTeamName": "...", "homeScore": 2, "awayScore": 1, "status": "FINISHED" }],
-  "form": "WWDLW",
-  "squadSize": 25
-}
-```
-- `form`: computed from last 5 matches as a string of `W`/`L`/`D` characters
-- `standings`: latest season only (sorted by season descending, limited to 1)
-
-**Error codes:** `TEAM_NOT_FOUND` (404)
-
 ### 9.13 Players
 
 | Method | Endpoint | Auth | Description |
@@ -1336,7 +1303,7 @@ sequenceDiagram
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/api/search?q=` | — | Full-text search across users, teams, players, and matches |
+| GET | `/api/search?q=` | — | Full-text search across users, rooms, players, and tournaments |
 
 **Query parameters:**
 - `q` (required): string, minimum 2 characters. Queries with fewer than 2 chars return empty results.
@@ -1355,67 +1322,21 @@ sequenceDiagram
       "predAccuracy": 0.68
     }
   ],
-  "teams": [{ "id": "team-mci", "name": "Manchester City", "logo": "...", "sport": "FOOTBALL" }],
-  "players": [{ "id": "...", "name": "...", "team": { "id": "...", "name": "..." } }],
-  "matches": [{ "id": "...", "homeTeamName": "...", "awayTeamName": "...", "status": "SCHEDULED", "scheduledAt": "..." }]
+  "rooms": [{ "id": "room-1", "name": "Premier League Draft", "memberCount": 8 }],
+  "players": [{ "id": "...", "name": "...", "position": "FWD", "team": "Manchester City" }],
+  "tournaments": [{ "id": "...", "name": "FIFA World Cup 2026" }]
 }
 ```
 
 **Search targets (case-insensitive `contains`):**
 - **Users**: `username`, `displayName` (max 10 results)
-- **Teams**: `name` (max 10 results)
-- **Players**: `name` (max 10 results, includes team)
-- **Matches**: `homeTeamName`, `awayTeamName`, `competition` (max 10 results, ordered by date descending)
+- **Rooms**: `name` (max 10 results)
+- **Players**: `name` (max 10 results, includes team + position)
+- **Tournaments**: `name` (max 10 results)
 
 All 4 searches run in parallel via `Promise.all`.
 
-### 9.15 Match Simulation
-
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| POST | `/api/matches/:id/start-simulation` | Admin | Start async simulation (non-blocking, runs server-side) |
-| POST | `/api/matches/:id/start-simulation-sync` | Admin | Start sync simulation (blocks until match finishes) |
-| GET | `/api/matches/:id/simulation-status` | — | Get current simulation state and seed info |
-
-**Request (`POST /api/matches/:id/start-simulation`):**
-- No body required. Match must have status `SCHEDULED`.
-- Simulation runs asynchronously — response returns immediately with `{ message: "Simulation started", matchId }`
-- Errors during simulation are logged via Pino with event `simulation.start_failed`
-
-**Sync mode (`POST /api/matches/:id/start-simulation-sync`):**
-- Blocks until the entire simulation completes (events generated, match marked FINISHED, scoring triggered)
-- Useful for testing or small batches
-- Uses `skipDelay: true` (no compressed clock delay between events)
-
-**Simulation-status response (`GET /api/matches/:id/simulation-status`):**
-```json
-{
-  "id": "match-1",
-  "status": "SIMULATING",
-  "minute": 67,
-  "homeScore": 2,
-  "awayScore": 1,
-  "simSeed": 12345,
-  "simSpeedMultiplier": 1.0,
-  "simStartedAt": "2026-07-04T12:00:00Z",
-  "simEndsAt": "2026-07-04T12:02:30Z"
-}
-```
-
-**Known issues:**
-- No locking mechanism — parallel simulations can run on the same match
-- Match must be `SCHEDULED` — cannot re-simulate finished matches
-
-**Error codes:** `MATCH_NOT_FOUND` (404), `MATCH_NOT_SCHEDULED` (400)
-
-### 9.16 Other
-
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| GET | `/api/highlights` | — | Match highlights from goal events |
-| GET | `/api/health` | — | Health check (returns DB status + timestamp) |
-
-### 9.17 Common Error Format
+### 9.15 Common Error Format
 
 All API endpoints follow a consistent error response format:
 
@@ -1689,7 +1610,7 @@ The `Session` model stores refresh tokens but is **not used** for token validati
 
 | Role | Access Level |
 |------|-------------|
-| `USER` | Standard: predictions, leagues, profile, chat |
+| `USER` | Standard: rooms, auctions, draft, profile, chat |
 | `MODERATOR` | Not used in route protection (defined but no middleware) |
 | `ADMIN` | Admin panel: user management, match management, reports |
 | `SUPERADMIN` | Same as ADMIN (not separately distinguished in middleware) |
@@ -1698,10 +1619,10 @@ The `Session` model stores refresh tokens but is **not used** for token validati
 
 | Level | Middleware | Routes |
 |-------|-----------|--------|
-| Public | None | GET /api/matches, GET /api/leaderboard, POST /api/auth/signup |
-| Authenticated | `authenticateToken` | POST /api/predictions, PATCH /api/users/me, POST /api/stripe/* |
-| Admin | `authenticateToken` + `requireAdmin` | All /api/admin/*, POST /api/matches/:id/finish, POST /api/matches/:id/start-simulation |
-| Pro | `checkProStatus()` (in route body) | POST /api/ai/predict/:matchId (Pro content check) |
+| Public | None | GET /api/tournaments, GET /api/leaderboard, GET /api/fixtures, POST /api/auth/signup |
+| Authenticated | `authenticateToken` | POST /api/rooms, POST /api/draft/sessions, PATCH /api/users/me, POST /api/stripe/* |
+| Admin | `authenticateToken` + `requireAdmin` | All /api/admin/*, POST /api/fixtures/:id/finalize |
+| Pro | `checkProStatus()` (in route body) | POST /api/ai/auction-advice (Pro content check) |
 
 ### Features Gated by Pro Status
 - AI prediction insights (Claude-powered)
@@ -1711,7 +1632,7 @@ The `Session` model stores refresh tokens but is **not used** for token validati
 - Animated Pro badges (frontend component)
 - Custom profile themes (not implemented)
 - Priority notifications (not implemented)
-- Unlimited private leagues (free users limited to 3 — not enforced in code)
+- Unlimited private rooms (free users limited to 3 — not enforced in code)
 
 ---
 
@@ -1722,7 +1643,7 @@ The `Session` model stores refresh tokens but is **not used** for token validati
 | Variable | Purpose | Default | Security |
 |----------|---------|---------|----------|
 | `JWT_SECRET` | JWT signing secret | None (process exits if missing) | 🔴 Critical — must be 64+ random chars |
-| `DATABASE_URL` | Database connection string | Not used — JSON DB is file-based | 🔴 Not needed |
+
 | `LOG_LEVEL` | Pino log level | `info` | Controls log verbosity (fatal, error, warn, info, debug) |
 
 ### Optional
@@ -1733,8 +1654,8 @@ The `Session` model stores refresh tokens but is **not used** for token validati
 | `BACKEND_URL` | Backend URL for callbacks | `http://localhost:4000` | Used in Google OAuth |
 | `FRONTEND_URL` | Frontend URL for CORS | `http://localhost:3000` | Also used in Stripe redirects |
 | `NODE_ENV` | Environment | `development` | Controls secure cookies, error stack traces |
-| `JWT_REFRESH_SECRET` | Refresh token signing secret | Falls back to `JWT_SECRET` | Should be different from JWT_SECRET |
-| `JWT_RESET_SECRET` | Password reset token signing secret | Falls back to `JWT_SECRET` | Should be different from JWT_SECRET |
+| `JWT_REFRESH_SECRET` | Refresh token signing secret | None (process exits if missing) | 🔴 Required — must be distinct from JWT_SECRET |
+| `JWT_RESET_SECRET` | Password reset token signing secret | None (process exits if missing) | 🔴 Required — must be distinct from JWT_SECRET |
 | `GOOGLE_CLIENT_ID` | Google OAuth client ID | — | Optional — disables Google OAuth if missing |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | — | Optional |
 | `REDIS_URL` | Redis connection string | `redis://localhost:6379` | Optional — BullMQ falls back to direct |
@@ -1899,14 +1820,19 @@ Docker Compose provides a production container for the API. No external database
 
 ## 17. Testing
 
-### Current State: ✅ 71+ Tests Passing
+### Current State: ✅ 292+ Tests Passing
 
 | Test File | Location | Coverage | Status |
 |-----------|----------|----------|--------|
 | `scoring.test.ts` | `backend/src/services/scoring.test.ts` | `calculatePredictionPoints()` — exact score, result+GD, result only, wrong, BTTS, O/U, VOID, streaks, tiers | ✅ **47 test cases** — comprehensive coverage |
 | `auth.test.ts` | `backend/src/routes/auth.test.ts` | Signup, login, refresh, forgot/reset password, validation | ✅ **14 test cases** with supertest + async import |
-| `predictions.test.ts` | `backend/src/routes/predictions.test.ts` | Create, list, score predictions, auth, validation | ✅ **11 test cases** with supertest + mocked DB |
+| `rooms.test.ts` | `backend/src/routes/rooms.test.ts` | Room lifecycle, chat, member management | ✅ **5 test cases** |
+| `auctionEngine.test.ts` | `backend/src/services/auctionEngine.test.ts` | Auction state machine, bidding, timer | ✅ **18 test cases** |
+| `scoring.test.ts` | `backend/src/services/scoring.test.ts` | Fantasy points computation | ✅ **47 test cases** |
+| `jsonDb.atomicWrite.test.ts` | `backend/src/lib/jsonDb.atomicWrite.test.ts` | Atomic file writes, crash recovery | ✅ **25 test cases** |
+| `leaderboardService.test.ts` | `backend/src/services/leaderboardService.test.ts` | Leaderboard mapping | ✅ **3 test cases** |
 | `useApi.test.ts` | `frontend/src/hooks/useApi.test.ts` | `fetchJSON`, `ApiRequestError`, 401 refresh, concurrency | ✅ **9 test cases** (jsdom) |
+| e2e lifecycle tests | `backend/src/e2e/*.test.ts` | Room lifecycle, auction lifecycle | ✅ **2 suites** |
 
 ### Test Runners
 
@@ -1975,10 +1901,10 @@ npx vitest run                  # Run all frontend tests
 |-------|----------|----------|-------------|
 | No CSRF protection | 🔴 **Critical** | Throughout | Cookie-based auth without CSRF tokens |
 | No refresh token revocation | 🟠 **High** | `services/tokenService.js` | Stolen refresh tokens valid for 30 days |
-| JWT_RESET_SECRET falls back to JWT_SECRET | 🟠 **High** | `routes/auth.js:116` | Same secret for access tokens and password reset tokens |
+
 | User deletion without confirmation | 🟠 **High** | `routes/admin.js:112` | Admin can permanently delete users (cascade) |
 | Email verification not sent | 🟡 **Medium** | `routes/auth.js:46` | Verification token logged to console only |
-| No input sanitization in chat | 🟡 **Medium** | `socket/index.js` | Messages trimmed but not sanitized for XSS |
+| No input sanitization in chat | 🟡 **Medium** | `socket/index.js` | Server-side HTML entity encoding added (Phase 2) |
 | No HTTPS enforcement | 🟡 **Medium** | Throughout | No TLS at application level |
 | Weak CORS fallback | 🔵 **Low** | `index.js:58` | Falls back to `http://localhost:3000` |
 
@@ -2018,10 +1944,10 @@ npx vitest run                  # Run all frontend tests
 
 | Issue | Severity | Location | Impact |
 |-------|----------|----------|--------|
-| N+1 query in highlights | 🔴 **Critical** | `routes/highlights.js:15` | 1 + N queries for goal events |
+
 | No database indexes on search fields | 🟠 **High** | `routes/search.ts` | Full table scans with JSON DB |
 | No caching layer | 🟠 **High** | All routes | Every request hits the database |
-| Chat memory growth (frontend) | 🟠 **High** | `store/useStore.ts` | Messages accumulate unbounded |
+
 | Large vendor bundle | 🟡 **Medium** | Frontend | ~800KB+ gzipped (Three.js, GSAP, Framer Motion, Recharts) |
 | No compression middleware | 🟡 **Medium** | Backend | Response bodies not gzipped |
 | JSON DB in-memory only for dev | 🟡 **Medium** | `lib/jsonDb.js` | Not suitable for production at scale |

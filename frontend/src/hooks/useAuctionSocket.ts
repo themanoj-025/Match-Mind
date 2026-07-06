@@ -1,5 +1,5 @@
 /**
- * useAuctionSocket — AuctionXI
+ * useAuctionSocket — MatchMind
  *
  * Custom hook for real-time auction WebSocket events.
  * Handles connection lifecycle, event subscriptions, and cleanup.

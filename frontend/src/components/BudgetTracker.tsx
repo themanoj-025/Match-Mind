@@ -1,5 +1,5 @@
 /**
- * BudgetTracker — AuctionXI
+ * BudgetTracker — MatchMind
  *
  * Displays remaining budget, minimum reserve for remaining slots,
  * and position-by-position roster breakdown.

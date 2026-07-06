@@ -24,9 +24,9 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-[var(--gradient-live)] flex items-center justify-center">
-                <span className="text-[var(--mm-text-inverse)] font-bold text-sm">AX</span>
+                <span className="text-[var(--mm-text-inverse)] font-bold text-sm">MM</span>
               </div>
-              <span className="display-l text-2xl tracking-tight">AuctionXI</span>
+              <span className="display-l text-2xl tracking-tight">MatchMind</span>
             </Link>
 
             <div className="hidden md:flex items-center gap-6">
@@ -57,9 +57,9 @@ export default function Navbar() {
               </button>
               <Link to="/dashboard" className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-[var(--gradient-live)] flex items-center justify-center">
-                  <span className="text-[var(--mm-text-inverse)] font-bold text-sm">AX</span>
+                  <span className="text-[var(--mm-text-inverse)] font-bold text-sm">MM</span>
                 </div>
-                <span className="display-l text-2xl tracking-tight hidden sm:block">AuctionXI</span>
+                <span className="display-l text-2xl tracking-tight hidden sm:block">MatchMind</span>
               </Link>
             </div>
 

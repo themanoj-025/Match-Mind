@@ -55,7 +55,7 @@ export default function RoomWizardPage() {
 
   return (
     <div className="min-h-screen pt-16 pb-20">
-      <Helmet><title>Create Room — AuctionXI</title></Helmet>
+      <Helmet><title>Create Room — MatchMind</title></Helmet>
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6">
         <button onClick={() => navigate(-1)} className="flex items-center gap-1.5 body text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] mb-6 transition-colors">
           <ArrowLeft size={16} /> Back

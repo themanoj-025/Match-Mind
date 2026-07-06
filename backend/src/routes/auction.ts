@@ -1,5 +1,5 @@
 /**
- * Auction Routes — AuctionXI
+ * Auction Routes — MatchMind
  *
  * Host controls (start, next-player, pause, force-sold/unsold, re-auction)
  * and bid placement. All bid logic delegates to auctionEngine.ts.

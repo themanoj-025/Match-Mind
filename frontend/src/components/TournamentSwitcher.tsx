@@ -1,5 +1,5 @@
 /**
- * TournamentSwitcher — AuctionXI v2 §3.2
+ * TournamentSwitcher — MatchMind v2 §3.2
  *
  * Responsive tournament selector driven entirely by the registry response.
  * - Mobile: horizontally scrollable pill row with scroll-shadow affordance

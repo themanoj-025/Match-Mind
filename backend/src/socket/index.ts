@@ -1,7 +1,7 @@
 /**
- * Socket.IO event handlers — AuctionXI
+ * Socket.IO event handlers — MatchMind
  *
- * Extended from MatchMind with auction-specific events:
+ * Auction-specific events:
  * - PLACE_BID: client → server bid placement (delegates to auctionEngine)
  * - HOST_ACTION: host controls
  * - Auction server → client events: ROOM_STATE_SYNC, NEW_BID, PLAYER_SOLD, etc.
@@ -391,12 +391,32 @@ export const setupSocket = (io: Server, prisma: any): void => {
       }
     })
 
-    // ─── Chat Messages ───────────────────────────────────
+    // ─── Chat Messages (with server-side XSS sanitization) ──
+
+    /**
+     * Strip HTML tags from user-provided text to prevent XSS.
+     * This is defense in depth — the frontend should also sanitize,
+     * but we never trust client input unconditionally.
+     */
+    function sanitizeText(input: string): string {
+      return input
+        .replace(/[<>"']/g, (char) => {
+          switch (char) {
+            case '<': return '&lt;'
+            case '>': return '&gt;'
+            case '"': return '&quot;'
+            case "'": return '&#x27;'
+            default: return char
+          }
+        })
+        .trim()
+        .slice(0, 1000)
+    }
 
     socket.on('SEND_MESSAGE', async ({ roomId, text, gifUrl }: { roomId?: string; text?: string; gifUrl?: string }) => {
       try {
         if (!roomId || typeof roomId !== 'string') return
-        const cleanText = typeof text === 'string' ? text.trim().slice(0, 1000) : ''
+        const cleanText = typeof text === 'string' ? sanitizeText(text) : ''
         const cleanGifUrl = typeof gifUrl === 'string' ? gifUrl.trim().slice(0, 500) : null
         if (!cleanText && !cleanGifUrl) return
 

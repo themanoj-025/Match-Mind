@@ -1,5 +1,5 @@
 /**
- * tournamentRegistry.test.ts — AuctionXI v2 §8
+ * tournamentRegistry.test.ts — MatchMind v2 §8
  *
  * Validates the tournament registry boot-time invariants:
  * - Duplicate IDs rejected

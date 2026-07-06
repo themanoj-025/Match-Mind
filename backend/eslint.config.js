@@ -17,6 +17,9 @@ export default defineConfig([
       },
     },
     rules: {
+      // Discourage `as any` — use proper types or `unknown`. Set to error once all 58 casts are eliminated.
+      '@typescript-eslint/no-explicit-any': 'warn',
+
       // Allow console.log — replaced by Pino, but fallback OK
       'no-console': 'off',
 

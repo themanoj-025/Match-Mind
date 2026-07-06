@@ -1,5 +1,5 @@
 /**
- * Draft Ticket Service — AuctionXI v4 §4.1
+ * Draft Ticket Service — MatchMind v4 §4.1
  *
  * Manages the Draft Ticket economy:
  * - Free tier: 1 ticket per tournament per rolling 7 days, auto-refills

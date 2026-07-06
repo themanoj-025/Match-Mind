@@ -1,5 +1,5 @@
 /**
- * Room Lifecycle Tests — AuctionXI
+ * Room Lifecycle Tests — MatchMind
  *
  * Tests the room CRUD and lobby lifecycle endpoints:
  * - Create room (host, invite code generation, free tier limits)

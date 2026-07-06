@@ -1,5 +1,5 @@
 #!/bin/bash
-# ─── AuctionXI Data Backup Script ─────────────────────────
+# ─── MatchMind Data Backup Script ─────────────────────────
 # Creates a timestamped tarball of the JSON data directory
 # and optionally uploads to S3-compatible storage.
 #

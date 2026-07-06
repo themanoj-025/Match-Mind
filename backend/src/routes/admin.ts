@@ -37,11 +37,24 @@ function getAdminService(req: AuthenticatedRequest) {
 router.get('/stats', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const stats = await getAdminService(req).getDashboardStats()
 
+  // Compute sport distribution from real fixtures data
+  const prisma = req.app.get('prisma')
+  const allFixtures = await prisma.fixture.findMany({
+    select: { sport: true },
+  })
+  const sportCounts: Record<string, number> = {}
+  for (const f of allFixtures) {
+    const sport = f.sport || 'UNKNOWN'
+    sportCounts[sport] = (sportCounts[sport] || 0) + 1
+  }
+  const total = Object.values(sportCounts).reduce((a, b) => a + b, 0) || 1
+  const sportDistribution = Object.entries(sportCounts)
+    .map(([name, value]) => ({ name, value: Math.round((value / total) * 100) }))
+    .sort((a, b) => b.value - a.value)
+
   res.json({
     ...stats,
-    sportDistribution: [
-      { name: 'Football', value: 100 },
-    ],
+    sportDistribution,
   })
 }))
 
@@ -57,15 +70,14 @@ router.get('/users', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const limit = parseInt(req.query.limit as string) || 20
   const search = (req.query.search as string) || ''
 
-  const where: Record<string, any> = search
-    ? {
-        OR: [
-          { username: { contains: search, mode: 'insensitive' } },
-          { email: { contains: search, mode: 'insensitive' } },
-          { displayName: { contains: search, mode: 'insensitive' } },
-        ],
-      }
-    : {}
+  const where: Record<string, unknown> = { isDeleted: false }
+    if (search) {
+      where.OR = [
+        { username: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
+        { displayName: { contains: search, mode: 'insensitive' } },
+      ]
+    }
 
   const [users, total] = await Promise.all([
     prisma.user.findMany({
@@ -149,14 +161,16 @@ router.patch('/users/:id', asyncHandler(async (req: AuthenticatedRequest, res) =
 
 /**
  * DELETE /api/admin/users/:id
- * Soft-delete or permanently delete user
+ * Soft-delete user (sets isDeleted flag instead of permanent removal).
  */
 router.delete('/users/:id', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
-  // Cascade delete user data
-  await prisma.user.delete({ where: { id: req.params.id } })
-  getAdminService(req).logAction(req.userId!, 'USER_DELETED', String(req.params.id), 'user', {})
-  res.json({ message: 'User deleted' })
+  await prisma.user.update({
+    where: { id: req.params.id },
+    data: { isDeleted: true, email: `deleted-${req.params.id}@matchmind.gg`, username: `deleted-${req.params.id}` },
+  })
+  getAdminService(req).logAction(req.userId!, 'USER_SOFT_DELETED', String(req.params.id), 'user', {})
+  res.json({ message: 'User soft-deleted' })
 }))
 
 /**

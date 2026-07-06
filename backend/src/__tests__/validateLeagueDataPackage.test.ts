@@ -1,5 +1,5 @@
 /**
- * validateLeagueDataPackage.test.ts — AuctionXI v2 §8
+ * validateLeagueDataPackage.test.ts — MatchMind v2 §8
  *
  * Tests the data completeness validation logic:
  * - Team count matches registry

@@ -141,15 +141,23 @@ const useStore = create<StoreState>((set) => ({
       }),
     })),
 
-  // ── Chat ──────────────────────────────────────────
+  // ── Chat (capped at 500 messages per room) ────────
   chatMessages: {},
   addChatMessage: (roomId, message) =>
-    set((state) => ({
-      chatMessages: {
-        ...state.chatMessages,
-        [roomId]: [...(state.chatMessages[roomId] || []), message],
-      },
-    })),
+    set((state) => {
+      const existing = state.chatMessages[roomId] || []
+      const updated = [...existing, message]
+      // FIFO eviction: keep only the most recent 500 messages
+      if (updated.length > 500) {
+        updated.splice(0, updated.length - 500)
+      }
+      return {
+        chatMessages: {
+          ...state.chatMessages,
+          [roomId]: updated,
+        },
+      }
+    }),
   setChatMessages: (roomId, messages) =>
     set((state) => ({
       chatMessages: { ...state.chatMessages, [roomId]: messages },

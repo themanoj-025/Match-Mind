@@ -1,5 +1,5 @@
 /**
- * SoldStamp — AuctionXI
+ * SoldStamp — MatchMind
  *
  * Framer Motion "SOLD!" stamp animation on player-sold event.
  * AnimatePresence handled by parent — this component renders when phase === 'SOLD'.

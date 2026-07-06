@@ -1,5 +1,5 @@
 /**
- * Auction Engine Tests — AuctionXI
+ * Auction Engine Tests — MatchMind
  *
  * Tests the core bidding/timer/anti-snipe FSM:
  * - `requiredIncrement()` boundaries

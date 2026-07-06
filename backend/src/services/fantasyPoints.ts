@@ -1,5 +1,5 @@
 /**
- * Fantasy Points Engine — AuctionXI
+ * Fantasy Points Engine — MatchMind
  *
  * Computes fantasy points from real player match statistics.
  * Triggered by finalizeFixture workflow.

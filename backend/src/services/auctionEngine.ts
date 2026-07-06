@@ -1,5 +1,5 @@
 /**
- * Auction Engine — AuctionXI
+ * Auction Engine — MatchMind
  *
  * Core bidding/timer/anti-snipe state machine.
  * All state mutations happen inside per-room AsyncMutex critical sections.

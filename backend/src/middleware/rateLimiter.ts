@@ -30,9 +30,13 @@ try {
     url: process.env.REDIS_URL || 'redis://localhost:6379',
     enableReadyCheck: false,
   })
-  sharedRedisClient.connect().catch(() => { sharedRedisClient = null })
+  sharedRedisClient.connect().catch(() => {
+    sharedRedisClient = null
+    console.warn('[rateLimiter] Redis connection failed — rate limiting falling back to in-memory store')
+  })
 } catch {
   sharedRedisClient = null
+  console.warn('[rateLimiter] Redis client initialization failed — rate limiting falling back to in-memory store')
 }
 
 interface LimiterOptions {

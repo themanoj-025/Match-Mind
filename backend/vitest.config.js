@@ -10,10 +10,10 @@ export default defineConfig({
       provider: 'v8',
       include: ['src/services/**', 'src/middleware/validate.js', 'src/utils/**'],
       thresholds: {
-        branches: 40,
+        branches: 50,
         functions: 40,
-        lines: 40,
-        statements: 40,
+        lines: 49,
+        statements: 49,
       },
     },
     testTimeout: 10000,

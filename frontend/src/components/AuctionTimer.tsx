@@ -1,5 +1,5 @@
 /**
- * AuctionTimer — AuctionXI
+ * AuctionTimer — MatchMind
  *
  * Circular countdown timer that reads timerEndsAt from ROOM_STATE_SYNC.
  * Server is the single source of truth for timerEndsAt; client only renders
