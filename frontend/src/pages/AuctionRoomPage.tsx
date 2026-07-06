@@ -292,7 +292,7 @@ export default function AuctionRoomPage() {
           {/* Finished state (when no current player) */}
           {currentAuctionState?.phase === 'FINISHED' && !currentPlayer && (
             <div className="bg-[var(--mm-bg-secondary)] rounded-[var(--radius-xl)] p-12 text-center border border-[var(--border-subtle)]">
-              <div className="text-6xl mb-4">🏆</div>
+              <div className="text-fluid-display mb-4">🏆</div>
               <h2 className="heading-1 text-[var(--mm-accent-amber)] mb-2">Auction Complete!</h2>
               <p className="body text-[var(--mm-text-secondary)] mb-6">All players have been drafted.</p>
               <button

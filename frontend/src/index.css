@@ -77,6 +77,27 @@
   --gradient-predict: #111111;
   --gradient-pro: #111111;
   --gradient-card-hover: #F5F5F5;
+
+  /* Fluid Typography Tokens */
+  --fs-display-xl: clamp(2.75rem, 4vw + 1.5rem, 7rem);
+  --fs-display-l:  clamp(2.25rem, 3vw + 1.25rem, 5rem);
+  --fs-heading-1:  clamp(1.75rem, 1.4vw + 1.2rem, 3rem);
+  --fs-heading-2:  clamp(1.375rem, 1vw + 1rem, 2.25rem);
+  --fs-heading-3:  clamp(1.125rem, 0.6vw + 0.9rem, 1.5rem);
+  --fs-body-large: clamp(1rem, 0.3vw + 0.9rem, 1.25rem);
+  --fs-body:       clamp(0.9375rem, 0.2vw + 0.875rem, 1.0625rem);
+  --fs-caption:    clamp(0.75rem, 0.15vw + 0.7rem, 0.875rem);
+
+  /* Spacing Scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
 }
 
 * {
@@ -105,41 +126,58 @@ body {
   flex-direction: column;
 }
 
+h1, h2, h3, h4, h5, h6, .text-fluid-hero, .text-fluid-display, .text-fluid-h1, .text-fluid-h2, .text-fluid-h3, .heading-1, .heading-2, .heading-3 {
+  text-wrap: balance;
+  max-width: 20ch;
+}
+
+p, .body, .body-large {
+  text-wrap: pretty;
+  max-width: 65ch;
+}
+
+.container {
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 4vw, 3rem);
+}
+
 /* Typography Classes */
 @utility text-fluid-hero {
   font-family: var(--font-display);
-  font-size: clamp(3rem, 7vw, 6.5rem);
+  font-size: var(--fs-display-xl);
   letter-spacing: -0.04em;
-  line-height: 0.95;
+  line-height: 1.05;
   font-weight: 900;
 }
 
 @utility text-fluid-display {
   font-family: var(--font-display);
-  font-size: clamp(2.25rem, 5vw, 4.5rem);
+  font-size: var(--fs-display-l);
   letter-spacing: -0.02em;
-  line-height: 1;
+  line-height: 1.1;
   font-weight: 900;
 }
 
 @utility text-fluid-h1 {
   font-family: var(--font-display);
-  font-size: clamp(1.75rem, 4vw, 3rem);
+  font-size: var(--fs-heading-1);
   letter-spacing: -0.01em;
-  line-height: 1.1;
+  line-height: 1.15;
   font-weight: 700;
 }
 
 @utility text-fluid-h2 {
   font-family: var(--font-display);
-  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-size: var(--fs-heading-2);
   line-height: 1.2;
   font-weight: 700;
 }
 
 @utility text-fluid-h3 {
   font-family: var(--font-display);
-  font-size: clamp(1.25rem, 2vw, 1.5rem);
+  font-size: var(--fs-heading-3);
   line-height: 1.3;
   font-weight: 700;
 }
@@ -147,36 +185,36 @@ body {
 /* Restored Legacy Classes mapped to Fluid */
 .heading-1 {
   font-family: var(--font-display);
-  font-size: clamp(1.75rem, 4vw, 3rem);
+  font-size: var(--fs-heading-1);
   letter-spacing: -0.01em;
-  line-height: 1.1;
+  line-height: 1.15;
   font-weight: 700;
 }
 
 .heading-2 {
   font-family: var(--font-display);
-  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-size: var(--fs-heading-2);
   line-height: 1.2;
   font-weight: 700;
 }
 
 .heading-3 {
   font-family: var(--font-display);
-  font-size: clamp(1.25rem, 2vw, 1.5rem);
+  font-size: var(--fs-heading-3);
   line-height: 1.3;
   font-weight: 700;
 }
 
 .body-large {
-  font-size: clamp(1rem, 1.5vw, 1.125rem);
+  font-size: var(--fs-body-large);
   font-weight: 400;
-  line-height: 1.625;
+  line-height: 1.6;
 }
 
 .body {
-  font-size: clamp(0.875rem, 1.25vw, 1rem);
+  font-size: var(--fs-body);
   font-weight: 400;
-  line-height: 1.625;
+  line-height: 1.6;
 }
 
 .caption {

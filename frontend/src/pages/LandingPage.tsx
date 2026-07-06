@@ -87,7 +87,7 @@ export default function LandingPage() {
               <div className="flex flex-col gap-6">
                 {(tournaments).filter(t => t.status === 'LIVE' || t.status === 'ANNOUNCED').map((t) => (
                   <div key={t.id} className="border border-[#111111] bg-white p-6 sharp-corners hover:bg-neutral-100 transition-colors hard-shadow-hover relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-2 grayscale group-hover:grayscale-0 transition-all opacity-20 text-6xl">
+                    <div className="absolute top-0 right-0 p-2 grayscale group-hover:grayscale-0 transition-all opacity-20 text-fluid-display">
                       {TOURNAMENT_ICONS[t.nav.icon] || '⚽'}
                     </div>
                     <div className="relative z-10">

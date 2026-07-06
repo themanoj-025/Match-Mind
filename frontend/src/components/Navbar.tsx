@@ -30,7 +30,7 @@ export default function Navbar() {
   if (!isAuthenticated) {
     return (
       <nav className="sticky top-0 z-50 bg-[#F9F9F7] border-b-2 border-[#111111] newsprint-texture">
-        <div className="max-w-screen-xl mx-auto px-4 md:px-8">
+        <div className="container">
           <div className="flex items-center justify-between h-20">
             {logoBlock}
 
@@ -54,7 +54,7 @@ export default function Navbar() {
   return (
     <>
       <nav className="sticky top-0 z-50 bg-[#F9F9F7] border-b-2 border-[#111111] newsprint-texture">
-        <div className="max-w-screen-xl mx-auto px-4 md:px-8">
+        <div className="container">
           <div className="flex items-center justify-between h-20">
             <div className="flex items-center gap-6">
               <button onClick={toggleNav} className="md:hidden p-2 text-[#111111] border border-transparent hover:border-[#111111] sharp-corners transition-colors">

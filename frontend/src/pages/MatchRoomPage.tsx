@@ -263,7 +263,7 @@ export default function MatchRoomPage() {
               <motion.div
                 animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.2, 1.2, 1] }}
                 transition={{ duration: 0.5, ease: 'easeOut' }}
-                className="text-6xl mb-3"
+                className="text-fluid-display mb-3"
               >
                 ⚽
               </motion.div>
