@@ -1,6 +1,6 @@
 // ─── Sentry instrumentation (must be first) ────────────────────────────
 if (process.env.SENTRY_DSN) {
-  await import('../instrument')
+  require('../instrument')
 }
 
 import 'dotenv/config'
