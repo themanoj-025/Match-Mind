@@ -17,8 +17,8 @@ export default function BottomNav() {
   if (!isAuthenticated) return null
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[var(--mm-bg-secondary)]/95 backdrop-blur-lg border-t border-[var(--border-subtle)] md:hidden">
-      <div className="flex items-center justify-around h-16 px-2">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#F9F9F7] border-t-2 border-[#111111] md:hidden">
+      <div className="flex items-center justify-around h-16">
         {navItems.map((item) => {
           const isActive = location.pathname.startsWith(item.path)
           const Icon = item.icon
@@ -26,14 +26,14 @@ export default function BottomNav() {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-[var(--radius-md)] transition-colors ${
+              className={`flex-1 flex flex-col items-center justify-center gap-1 h-full transition-colors sharp-corners border-r-2 border-[#111111] last:border-r-0 ${
                 isActive
-                  ? 'text-[var(--mm-accent-green)]'
-                  : 'text-[var(--mm-text-muted)] hover:text-[var(--mm-text-secondary)]'
+                  ? 'bg-[#111111] text-[#F9F9F7]'
+                  : 'bg-transparent text-[#111111] hover:bg-neutral-200'
               }`}
             >
-              <Icon size={20} />
-              <span className="caption">{item.label}</span>
+              <Icon size={20} strokeWidth={1.5} />
+              <span className="font-mono text-[10px] uppercase tracking-widest">{item.label}</span>
             </Link>
           )
         })}

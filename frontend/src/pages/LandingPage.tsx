@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Users, Trophy, Timer, Shield, Star, ChevronDown } from 'lucide-react'
-import { motion, useAnimation, useInView } from 'framer-motion'
+import { motion, useInView } from 'framer-motion'
 import { gsap } from '../lib/animation/gsap'
 import { useTournaments } from '../lib/tournaments'
 
@@ -29,7 +29,7 @@ const TOURNAMENT_ICONS: Record<string, string> = {
 
 export default function LandingPage() {
   const { data: tournaments } = useTournaments()
-  const heroRef = useRef(null)
+  const heroRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     if (heroRef.current) {
@@ -38,104 +38,112 @@ export default function LandingPage() {
   }, [])
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#F9F9F7]">
+      {/* ── METADATA HEADER ───────────────────────── */}
+      <div className="border-b-4 border-[#111111] py-2 px-4 max-w-screen-xl mx-auto flex justify-between items-center font-mono text-xs uppercase tracking-widest text-[#111111]">
+        <span>Vol. 1</span>
+        <span>The Daily Draft</span>
+        <span>Global Edition</span>
+      </div>
+
       {/* ── HERO ───────────────────────────────────── */}
+      <section ref={heroRef} className="max-w-screen-xl mx-auto px-4 md:px-8 pt-12 pb-24 border-b-2 border-[#111111]">
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-12">
+          
+          {/* Main Headline (8 cols) */}
+          <div className="lg:col-span-8 lg:border-r-2 lg:border-[#111111] lg:pr-12">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }} className="mb-6">
+              <span className="font-mono text-xs uppercase tracking-widest text-[#CC0000] border border-[#CC0000] px-3 py-1 sharp-corners font-bold">
+                Fantasy Football
+              </span>
+            </motion.div>
 
-      <section ref={heroRef} className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[var(--mm-bg-primary)] via-[var(--mm-bg-secondary)] to-[var(--mm-bg-primary)]">
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 25% 25%, #D4AF37 0%, transparent 50%), radial-gradient(circle at 75% 75%, #8E44FF 0%, transparent 50%)' }} />
+            <h1 className="hero-anim font-serif text-6xl md:text-7xl lg:text-[88px] font-black tracking-tighter leading-[0.95] text-[#111111] mb-8 uppercase break-words">
+              Draft Your XI. Conquer It All.
+            </h1>
 
-        <div className="max-w-5xl mx-auto px-4 text-center relative z-10">
-          <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.6 }} className="mb-6">
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-[var(--mm-accent-green)]/10 border border-[var(--mm-accent-green)]/20 rounded-[var(--radius-full)] text-sm font-semibold text-[var(--mm-accent-green)]">
-              ⚽ Football Fantasy Auctions
-            </span>
-          </motion.div>
+            <p className="hero-anim font-body text-lg md:text-xl text-[#525252] mb-10 max-w-2xl leading-relaxed text-justify">
+              <span className="float-left text-[80px] font-serif font-black leading-none mr-3 mt-1">C</span>reate private auction rooms, draft real footballers from the World's biggest tournaments, and track your franchise's rise through the leaderboard. Absolute authority in fantasy drafting.
+            </p>
 
-          <h1 className="hero-anim text-5xl md:text-7xl font-extrabold tracking-tight text-[var(--mm-text-primary)] mb-6">
-            Draft Your XI.
-            <br />
-            <span className="bg-gradient-to-r from-[var(--mm-accent-green)] to-[var(--mm-accent-amber)] bg-clip-text text-transparent">
-              Conquer the Tournament.
-            </span>
-          </h1>
-
-          <p className="hero-anim text-lg md:text-xl text-[var(--mm-text-secondary)] max-w-2xl mx-auto mb-10">
-            Create private auction rooms, draft real footballers from FIFA World Cup 2026 and
-            UEFA Champions League 2026/27, then track your franchise's rise through the leaderboard.
-          </p>
-
-          <div className="hero-anim flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link to="/signup" className="bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] body font-semibold px-8 py-3.5 rounded-[var(--radius-md)] hover:shadow-[var(--shadow-glow-green)] transition-all duration-300 flex items-center gap-2">
-              Start Your Auction <ArrowRight size={18} />
-            </Link>
-            <Link to="/how-it-works" className="bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-primary)] body font-semibold px-8 py-3.5 rounded-[var(--radius-md)] hover:bg-[var(--mm-bg-hover)] transition-all duration-300 flex items-center gap-2 border border-[var(--border-subtle)]">
-              How Auctions Work <ChevronDown size={18} />
-            </Link>
+            <div className="hero-anim flex flex-col sm:flex-row gap-4">
+              <Link to="/signup" className="bg-[#111111] text-[#F9F9F7] border border-transparent hover:bg-white hover:text-[#111111] hover:border-[#111111] sharp-corners px-8 py-4 font-mono text-sm uppercase tracking-widest transition-all duration-200 flex items-center justify-center gap-2 group w-full sm:w-auto">
+                Start Your Auction <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link to="/how-it-works" className="bg-transparent text-[#111111] border border-[#111111] hover:bg-[#111111] hover:text-[#F9F9F7] sharp-corners px-8 py-4 font-mono text-sm uppercase tracking-widest transition-all duration-200 flex items-center justify-center gap-2 w-full sm:w-auto">
+                Read The Rules
+              </Link>
+            </div>
           </div>
 
-          {/* Tournament Cards */}
-          {tournaments && tournaments.filter(t => t.status === 'LIVE' || t.status === 'ANNOUNCED').length > 0 && (
-            <div className="hero-anim mt-16 grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-3xl mx-auto">
-              {(tournaments).filter(t => t.status === 'LIVE' || t.status === 'ANNOUNCED').map((t) => (
-                <div key={t.id} className="p-6 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--mm-bg-secondary)] hover:shadow-lg transition-all"
-                  style={{ borderColor: t.theme.accent + '30' }}
-                >
-                  <div className="text-3xl mb-3">{TOURNAMENT_ICONS[t.nav.icon] || '⚽'}</div>
-                  <h3 className="text-lg font-bold text-[var(--mm-text-primary)] mb-1">{t.name}</h3>
-                  <p className="text-sm text-[var(--mm-text-muted)]">{t.confederation} · {t.teamCount} teams{t.status === 'ANNOUNCED' ? ' · Coming soon' : ''}</p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+          {/* Side Column (4 cols) */}
+          <div className="lg:col-span-4 flex flex-col gap-8 hero-anim">
+            <h3 className="font-mono text-xs uppercase tracking-widest border-b border-[#111111] pb-2 font-bold text-[#111111]">
+              Live Tournaments
+            </h3>
+            
+            {tournaments && tournaments.filter(t => t.status === 'LIVE' || t.status === 'ANNOUNCED').length > 0 ? (
+              <div className="flex flex-col gap-6">
+                {(tournaments).filter(t => t.status === 'LIVE' || t.status === 'ANNOUNCED').map((t) => (
+                  <div key={t.id} className="border border-[#111111] bg-white p-6 sharp-corners hover:bg-neutral-100 transition-colors hard-shadow-hover relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-2 grayscale group-hover:grayscale-0 transition-all opacity-20 text-6xl">
+                      {TOURNAMENT_ICONS[t.nav.icon] || '⚽'}
+                    </div>
+                    <div className="relative z-10">
+                      <div className="font-mono text-[10px] uppercase tracking-widest text-[#CC0000] mb-2 font-bold">{t.status}</div>
+                      <h3 className="font-serif text-2xl font-black text-[#111111] mb-2">{t.name}</h3>
+                      <p className="font-mono text-xs text-[#525252] uppercase tracking-wider">{t.confederation} • {t.teamCount} Teams</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="border border-[#111111] p-6 bg-neutral-100 sharp-corners text-center font-mono text-xs uppercase tracking-widest text-[#737373]">
+                No live tournaments
+              </div>
+            )}
+          </div>
 
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <ChevronDown size={24} className="text-[var(--mm-text-muted)]" />
         </div>
       </section>
 
-      {/* ── STATS ───────────────────────────────────── */}
-
-      <section className="py-20 bg-[var(--mm-bg-secondary)] border-y border-[var(--border-subtle)]">
-        <div className="max-w-5xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          {[
-            { icon: '⚽', value: tournaments?.filter(t => t.status === 'LIVE').length ?? 2, suffix: ' Tournaments', label: 'Live' },
-            { icon: '🏃', value: 500, suffix: '+', label: 'Players to Draft' },
-            { icon: '👥', value: 1000, suffix: '+', label: 'Active Players' },
-            { icon: '🏆', value: tournaments?.filter(t => t.status === 'LIVE').length ?? 2, suffix: ' Leagues', label: 'Supported' },
-          ].map((stat) => (
-            <div key={stat.label} className="hero-anim">
-              <div className="text-3xl mb-2">{stat.icon}</div>
-              <div className="text-3xl font-bold text-[var(--mm-text-primary)]">
-                <AnimatedCountUp value={stat.value} />{stat.suffix}
-              </div>
-              <div className="text-sm text-[var(--mm-text-muted)] mt-1">{stat.label}</div>
-            </div>
+      {/* ── STATS (MARQUEE STYLE) ───────────────────── */}
+      <section className="border-b-2 border-[#111111] bg-[#111111] text-[#F9F9F7] overflow-hidden py-3">
+        <div className="flex items-center gap-8 whitespace-nowrap animate-scroll-ticker font-mono text-sm uppercase tracking-widest">
+          {[...Array(3)].map((_, i) => (
+            <React.Fragment key={i}>
+              <span className="text-[#CC0000] font-bold">● LIVE STATS</span>
+              <span><AnimatedCountUp value={tournaments?.filter(t => t.status === 'LIVE').length ?? 2} /> Tournaments</span>
+              <span><AnimatedCountUp value={500} />+ Players to Draft</span>
+              <span><AnimatedCountUp value={1000} />+ Active Managers</span>
+              <span><AnimatedCountUp value={2} /> Supported Leagues</span>
+            </React.Fragment>
           ))}
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ────────────────────────────── */}
+      {/* ── HOW IT WORKS (INVERTED GRID) ────────────── */}
+      <section className="bg-[#111111] text-[#F9F9F7] py-24 newsprint-texture border-b-4 border-[#111111]">
+        <div className="max-w-screen-xl mx-auto px-4 md:px-8">
+          <div className="border-b border-[#333333] pb-6 mb-12 flex items-end justify-between">
+            <h2 className="font-serif text-5xl md:text-6xl font-black uppercase">The Blueprint</h2>
+            <span className="font-mono text-xs uppercase tracking-widest text-[#CC0000] hidden sm:block">Fig 1. Auction Rules</span>
+          </div>
 
-      <section className="py-24">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-[var(--mm-text-primary)] mb-16">How Auctions Work</h2>
-
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-4 gap-0 border border-[#333333]">
             {[
-              { step: '01', icon: <Users size={28} />, title: 'Create Room', desc: 'Pick your tournament (WC26 or UCL), set budget & roster rules, and share the invite code.' },
-              { step: '02', icon: <Timer size={28} />, title: 'Live Auction', desc: 'Host runs the auction. Bid on players under the hammer — last-second bids trigger anti-sniping protection.' },
-              { step: '03', icon: <Shield size={28} />, title: 'Build Your Squad', desc: 'Set captain (×2) and vice-captain (×1.5). Fill your starting XI across GK, DEF, MID, FWD.' },
-              { step: '04', icon: <Star size={28} />, title: 'Track & Win', desc: 'Players score fantasy points from real match performances. The room leaderboard updates live.' },
-            ].map((step) => (
-              <div key={step.step} className="text-center group">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--gradient-live)] flex items-center justify-center text-[var(--mm-text-inverse)] group-hover:scale-110 transition-transform">
+              { step: '01', icon: <Users className="w-8 h-8 shrink-0" strokeWidth={1.5} />, title: 'Create Room', desc: 'Pick your tournament, set budget rules, and invite rivals.' },
+              { step: '02', icon: <Timer className="w-8 h-8 shrink-0" strokeWidth={1.5} />, title: 'Live Auction', desc: 'Bid on players under the hammer. Beware the anti-sniping clock.' },
+              { step: '03', icon: <Shield className="w-8 h-8 shrink-0" strokeWidth={1.5} />, title: 'Build Squad', desc: 'Set captain (×2) and vice-captain (×1.5). Fill your starting XI.' },
+              { step: '04', icon: <Star className="w-8 h-8 shrink-0" strokeWidth={1.5} />, title: 'Track & Win', desc: 'Players score fantasy points from real match performances.' },
+            ].map((step, idx) => (
+              <div key={step.step} className={`p-8 border-[#333333] hover:bg-[#1a1a1a] transition-colors ${idx !== 3 ? 'md:border-r border-b md:border-b-0' : 'border-b md:border-b-0'}`}>
+                <div className="text-[#CC0000] mb-6 flex justify-between items-start">
                   {step.icon}
+                  <span className="font-mono text-lg font-bold">{step.step}</span>
                 </div>
-                <div className="text-sm font-bold text-[var(--mm-accent-green)] mb-2">{step.step}</div>
-                <h3 className="text-lg font-bold text-[var(--mm-text-primary)] mb-2">{step.title}</h3>
-                <p className="text-sm text-[var(--mm-text-muted)]">{step.desc}</p>
+                <h3 className="font-serif text-2xl font-bold mb-4">{step.title}</h3>
+                <p className="font-body text-[#A3A3A3] text-sm leading-relaxed">{step.desc}</p>
               </div>
             ))}
           </div>
@@ -143,16 +151,19 @@ export default function LandingPage() {
       </section>
 
       {/* ── CTA ─────────────────────────────────────── */}
-
-      <section className="py-20 bg-gradient-to-r from-[var(--mm-accent-green)]/5 to-[var(--mm-accent-purple)]/5 border-t border-[var(--border-subtle)]">
-        <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-[var(--mm-text-primary)] mb-4">Ready to Draft Your Dream XI?</h2>
-          <p className="text-lg text-[var(--mm-text-secondary)] mb-8">No money down. Just bring your football knowledge and competitive spirit.</p>
-          <Link to="/signup" className="inline-flex items-center gap-2 bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] body font-semibold px-8 py-3.5 rounded-[var(--radius-md)] hover:shadow-[var(--shadow-glow-green)] transition-all duration-300">
-            Get Started Free <ArrowRight size={18} />
-          </Link>
-        </div>
+      <section className="py-24 max-w-screen-md mx-auto px-4 text-center">
+        <h2 className="font-serif text-5xl md:text-7xl font-black uppercase text-[#111111] mb-6 leading-none">Take The Pitch.</h2>
+        <p className="font-body text-xl text-[#525252] mb-10 leading-relaxed">No money down. Absolute bragging rights. Bring your football knowledge to the auction table.</p>
+        <Link to="/signup" className="inline-flex items-center gap-3 bg-[#CC0000] text-white border border-[#CC0000] hover:bg-white hover:text-[#CC0000] sharp-corners px-10 py-5 font-mono text-sm uppercase tracking-widest font-bold transition-all duration-200">
+          Subscribe Now <ArrowRight size={20} />
+        </Link>
       </section>
+      
+      {/* ── METADATA FOOTER ───────────────────────── */}
+      <div className="border-t-2 border-[#111111] py-4 px-4 max-w-screen-xl mx-auto flex justify-between items-center font-mono text-[10px] uppercase tracking-widest text-[#737373]">
+        <span>© 2026 MatchMind</span>
+        <span>Printed in Cyberspace</span>
+      </div>
     </div>
   )
 }

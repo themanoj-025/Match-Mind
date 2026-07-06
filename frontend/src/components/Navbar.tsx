@@ -17,27 +17,31 @@ export default function Navbar() {
     }
   }
 
+  const logoBlock = (
+    <Link to="/" className="flex items-center gap-3 group">
+      <div className="w-10 h-10 bg-[#111111] text-[#F9F9F7] flex items-center justify-center sharp-corners group-hover:bg-white group-hover:text-[#111111] border border-[#111111] transition-colors">
+        <span className="font-serif font-black text-xl italic leading-none pt-1">M</span>
+      </div>
+      <span className="font-serif text-3xl font-black tracking-tighter">MatchMind.</span>
+    </Link>
+  )
+
   if (!isAuthenticated) {
     return (
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[var(--mm-bg-primary)]/95 backdrop-blur-lg border-b border-[var(--border-subtle)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-[var(--gradient-live)] flex items-center justify-center">
-                <span className="text-[var(--mm-text-inverse)] font-bold text-sm">MM</span>
-              </div>
-              <span className="display-l text-2xl tracking-tight">MatchMind</span>
-            </Link>
+      <nav className="sticky top-0 z-50 bg-[#F9F9F7] border-b-2 border-[#111111] newsprint-texture">
+        <div className="max-w-screen-xl mx-auto px-4 md:px-8">
+          <div className="flex items-center justify-between h-20">
+            {logoBlock}
 
-            <div className="hidden md:flex items-center gap-6">
-              <Link to="/how-it-works" className="body text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] transition-colors">How It Works</Link>
-              <Link to="/pricing" className="body text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] transition-colors">Pricing</Link>
+            <div className="hidden md:flex items-center gap-8">
+              <Link to="/how-it-works" className="font-mono text-xs uppercase tracking-widest text-[#111111] hover:underline underline-offset-4 decoration-2 decoration-[#CC0000]">How It Works</Link>
+              <Link to="/pricing" className="font-mono text-xs uppercase tracking-widest text-[#111111] hover:underline underline-offset-4 decoration-2 decoration-[#CC0000]">Pricing</Link>
             </div>
 
-            <div className="flex items-center gap-3">
-              <Link to="/login" className="body text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] transition-colors px-4 py-2">Log In</Link>
-              <Link to="/signup" className="bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] body font-semibold px-5 py-2 rounded-[var(--radius-md)] hover:shadow-[var(--shadow-glow-green)] transition-all duration-300">
-                Join Free
+            <div className="flex items-center gap-4">
+              <Link to="/login" className="font-mono text-xs uppercase tracking-widest text-[#111111] hover:underline underline-offset-4 decoration-2 decoration-[#CC0000] px-4 py-2">Log In</Link>
+              <Link to="/signup" className="bg-[#111111] text-[#F9F9F7] border border-transparent hover:bg-white hover:text-[#111111] hover:border-[#111111] sharp-corners px-6 py-3 font-mono text-xs uppercase tracking-widest transition-all duration-200">
+                Subscribe
               </Link>
             </div>
           </div>
@@ -48,63 +52,60 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[var(--mm-bg-primary)]/95 backdrop-blur-lg border-b border-[var(--border-subtle)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-4">
-              <button onClick={toggleNav} className="md:hidden p-2 text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)]">
-                {isNavOpen ? <X size={22} /> : <Menu size={22} />}
+      <nav className="sticky top-0 z-50 bg-[#F9F9F7] border-b-2 border-[#111111] newsprint-texture">
+        <div className="max-w-screen-xl mx-auto px-4 md:px-8">
+          <div className="flex items-center justify-between h-20">
+            <div className="flex items-center gap-6">
+              <button onClick={toggleNav} className="md:hidden p-2 text-[#111111] border border-transparent hover:border-[#111111] sharp-corners transition-colors">
+                {isNavOpen ? <X size={24} strokeWidth={1.5} /> : <Menu size={24} strokeWidth={1.5} />}
               </button>
-              <Link to="/dashboard" className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-[var(--gradient-live)] flex items-center justify-center">
-                  <span className="text-[var(--mm-text-inverse)] font-bold text-sm">MM</span>
-                </div>
-                <span className="display-l text-2xl tracking-tight hidden sm:block">MatchMind</span>
-              </Link>
+              <div className="hidden sm:block">
+                {logoBlock}
+              </div>
             </div>
 
-            <div className="hidden md:flex items-center gap-4">
+            <div className="hidden lg:flex items-center gap-6">
               <TournamentSwitcher />
-              <Link to="/dashboard" className="flex items-center gap-1.5 body text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] transition-colors">
-                <Home size={16} /> Dashboard
+              <Link to="/dashboard" className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-[#111111] hover:bg-neutral-100 px-3 py-2 sharp-corners transition-colors">
+                <Home size={16} strokeWidth={1.5} /> Dashboard
               </Link>
-              <Link to="/rooms/new" className="flex items-center gap-1.5 body text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] transition-colors">
-                <Swords size={16} /> New Room
+              <Link to="/rooms/new" className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-[#111111] hover:bg-neutral-100 px-3 py-2 sharp-corners transition-colors">
+                <Swords size={16} strokeWidth={1.5} /> Create
               </Link>
-              <Link to="/leaderboard" className="flex items-center gap-1.5 body text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] transition-colors">
-                <Trophy size={16} /> Leaderboard
+              <Link to="/leaderboard" className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-[#111111] hover:bg-neutral-100 px-3 py-2 sharp-corners transition-colors">
+                <Trophy size={16} strokeWidth={1.5} /> Leaders
               </Link>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <form onSubmit={handleSearch} className="hidden md:flex items-center">
-                <div className="relative">
-                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--mm-text-muted)]" />
+                <div className="relative group">
+                  <Search size={16} strokeWidth={1.5} className="absolute left-0 top-1/2 -translate-y-1/2 text-[#111111]" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-                    placeholder="Search players, rooms..."
-                    className="bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-primary)] body rounded-[var(--radius-md)] pl-9 pr-3 py-2 w-44 focus:w-56 transition-all border border-transparent focus:border-[var(--border-active)] focus:outline-none"
+                    placeholder="SEARCH..."
+                    className="border-b-2 border-[#111111] bg-transparent pl-8 pr-3 py-2 font-mono text-sm focus-visible:bg-[#F0F0F0] focus-visible:outline-none sharp-corners w-44 focus:w-56 transition-all placeholder:text-neutral-400"
                   />
                 </div>
               </form>
-              <Link to="/profile/me/notifications" className="relative p-2 text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] transition-colors">
-                <Bell size={20} />
+              
+              <Link to="/profile/me/notifications" className="relative p-2 text-[#111111] border border-transparent hover:border-[#111111] sharp-corners transition-colors">
+                <Bell size={24} strokeWidth={1.5} />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[var(--mm-accent-red)] rounded-full flex items-center justify-center text-[10px] font-bold text-white">
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#CC0000] text-white flex items-center justify-center font-mono text-[10px] sharp-corners font-bold border border-[#111111]">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 )}
               </Link>
-              <Link to="/profile/me" className="flex items-center gap-2 p-1.5 rounded-[var(--radius-md)] hover:bg-[var(--mm-bg-hover)] transition-colors">
-                <div className="w-8 h-8 rounded-full bg-[var(--gradient-predict)] flex items-center justify-center overflow-hidden">
-                  {(user as { avatar?: string })?.avatar ? (
-                    <img src={(user as { avatar?: string }).avatar || ''} alt="" className="w-full h-full object-cover" />
-                  ) : (
-                    <User size={16} className="text-[var(--mm-text-inverse)]" />
-                  )}
-                </div>
+              
+              <Link to="/profile/me" className="flex items-center justify-center w-10 h-10 border border-[#111111] bg-white hover:bg-black hover:text-white sharp-corners transition-colors group">
+                {(user as { avatar?: string })?.avatar ? (
+                  <img src={(user as { avatar?: string }).avatar || ''} alt="" className="w-full h-full object-cover grayscale group-hover:sepia-[50%]" />
+                ) : (
+                  <User size={20} strokeWidth={1.5} />
+                )}
               </Link>
             </div>
           </div>
@@ -114,23 +115,23 @@ export default function Navbar() {
       {/* Mobile Side Nav */}
       {isNavOpen && (
         <div className="fixed inset-0 z-40 md:hidden" onClick={toggleNav}>
-          <div className="absolute inset-0 bg-black/60" />
-          <div className="absolute top-16 left-0 w-72 bg-[var(--mm-bg-secondary)] h-full border-r border-[var(--border-subtle)] p-6" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-            <div className="flex flex-col gap-2">
-              <Link to="/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-md)] hover:bg-[var(--mm-bg-hover)] body" onClick={toggleNav}>
-                <Home size={18} /> Dashboard
+          <div className="absolute inset-0 bg-[#F9F9F7]/90 backdrop-blur-sm" />
+          <div className="absolute top-20 left-0 w-80 bg-[#F9F9F7] h-[calc(100%-5rem)] border-r-2 border-[#111111] p-8 newsprint-texture" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+            <div className="flex flex-col gap-4">
+              <Link to="/dashboard" className="flex items-center gap-4 px-4 py-4 border border-transparent hover:border-[#111111] hover:bg-white font-mono text-sm uppercase tracking-widest sharp-corners transition-colors" onClick={toggleNav}>
+                <Home size={20} strokeWidth={1.5} /> Dashboard
               </Link>
-              <Link to="/rooms/new" className="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-md)] hover:bg-[var(--mm-bg-hover)] body" onClick={toggleNav}>
-                <Swords size={18} /> Create Room
+              <Link to="/rooms/new" className="flex items-center gap-4 px-4 py-4 border border-transparent hover:border-[#111111] hover:bg-white font-mono text-sm uppercase tracking-widest sharp-corners transition-colors" onClick={toggleNav}>
+                <Swords size={20} strokeWidth={1.5} /> Create Room
               </Link>
-              <Link to="/leaderboard" className="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-md)] hover:bg-[var(--mm-bg-hover)] body" onClick={toggleNav}>
-                <Trophy size={18} /> Leaderboard
+              <Link to="/leaderboard" className="flex items-center gap-4 px-4 py-4 border border-transparent hover:border-[#111111] hover:bg-white font-mono text-sm uppercase tracking-widest sharp-corners transition-colors" onClick={toggleNav}>
+                <Trophy size={20} strokeWidth={1.5} /> Leaderboard
               </Link>
-              <div className="border-t border-[var(--border-subtle)] my-4" />
-              <Link to="/profile/me" className="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-md)] hover:bg-[var(--mm-bg-hover)] body" onClick={toggleNav}>
-                <User size={18} /> My Profile
+              <div className="border-t-2 border-[#111111] my-4" />
+              <Link to="/profile/me" className="flex items-center gap-4 px-4 py-4 border border-transparent hover:border-[#111111] hover:bg-white font-mono text-sm uppercase tracking-widest sharp-corners transition-colors" onClick={toggleNav}>
+                <User size={20} strokeWidth={1.5} /> My Profile
               </Link>
-              <Link to="/profile/me/settings" className="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-md)] hover:bg-[var(--mm-bg-hover)] body" onClick={toggleNav}>
+              <Link to="/profile/me/settings" className="flex items-center gap-4 px-4 py-4 border border-transparent hover:border-[#111111] hover:bg-white font-mono text-sm uppercase tracking-widest sharp-corners transition-colors" onClick={toggleNav}>
                 Settings
               </Link>
             </div>
