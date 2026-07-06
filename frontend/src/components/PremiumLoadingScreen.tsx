@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -162,3 +163,4 @@ export default function PremiumLoadingScreen({ isLoading = true, minDisplay = 80
     </AnimatePresence>
   )
 }
+

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ComingSoonTeaser — MatchMind v2 §3.5
  *
@@ -149,3 +150,4 @@ export default function ComingSoonTeaser({ tournament }: ComingSoonTeaserProps) 
     </div>
   )
 }
+

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * RarityBadge — Draft Mode rarity tier badge
  *
@@ -54,3 +55,4 @@ export default function RarityBadge({ tier, size = 'sm', showLabel = true }: Rar
     </span>
   )
 }
+

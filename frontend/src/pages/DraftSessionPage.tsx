@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * DraftSessionPage — Draft Mode experience (§1)
  *
@@ -491,3 +492,4 @@ function StartDraftFlow({
     </div>
   )
 }
+

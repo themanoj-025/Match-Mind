@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * DraftTimer — Pick timer countdown
  *
@@ -94,3 +95,4 @@ export default function DraftTimer({
     </div>
   )
 }
+

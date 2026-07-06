@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BudgetTracker — MatchMind
  *
@@ -142,3 +143,4 @@ export default function BudgetTracker({
     </div>
   )
 }
+

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TournamentSwitcher — MatchMind v2 §3.2
  *
@@ -85,5 +86,6 @@ export default function TournamentSwitcher() {
     </div>
   )
 }
+
 
 

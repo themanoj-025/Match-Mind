@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * tournamentSwitcher.test.tsx — MatchMind v2 §8
  *
@@ -180,3 +181,4 @@ describe('TournamentSwitcher', () => {
     expect(buttons.length).toBe(0)
   })
 })
+

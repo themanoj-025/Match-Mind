@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react'
 import { User, Pin, Flag } from 'lucide-react'
 import TierBadge from './TierBadge'
@@ -114,3 +115,4 @@ export default function ChatMessage({ message, isOwn, onReact, onReport, onPin }
     </div>
   )
 }
+

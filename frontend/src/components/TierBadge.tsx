@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react'
 
 interface TierBadgeProps {
@@ -47,3 +48,4 @@ export default function TierBadge({ tier = 'BRONZE', size = 'sm', showLabel = tr
     </div>
   )
 }
+

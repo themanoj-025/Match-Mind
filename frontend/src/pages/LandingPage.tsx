@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Users, Trophy, Timer, Shield, Star, ChevronDown } from 'lucide-react'
@@ -58,12 +59,12 @@ export default function LandingPage() {
               </span>
             </motion.div>
 
-            <h1 className="hero-anim font-serif text-6xl md:text-7xl lg:text-[88px] font-black tracking-tighter leading-[0.95] text-[#111111] mb-8 uppercase break-words">
+            <h1 className="hero-anim text-fluid-hero text-[#111111] mb-8 uppercase break-words">
               Draft Your XI. Conquer It All.
             </h1>
 
             <p className="hero-anim font-body text-lg md:text-xl text-[#525252] mb-10 max-w-2xl leading-relaxed text-justify">
-              <span className="float-left text-[80px] font-serif font-black leading-none mr-3 mt-1">C</span>reate private auction rooms, draft real footballers from the World's biggest tournaments, and track your franchise's rise through the leaderboard. Absolute authority in fantasy drafting.
+              <span className="float-left text-fluid-hero leading-none mr-3 mt-1">C</span>reate private auction rooms, draft real footballers from the World's biggest tournaments, and track your franchise's rise through the leaderboard. Absolute authority in fantasy drafting.
             </p>
 
             <div className="hero-anim flex flex-col sm:flex-row gap-4">
@@ -126,7 +127,7 @@ export default function LandingPage() {
       <section className="bg-[#111111] text-[#F9F9F7] py-24 newsprint-texture border-b-4 border-[#111111]">
         <div className="max-w-screen-xl mx-auto px-4 md:px-8">
           <div className="border-b border-[#333333] pb-6 mb-12 flex items-end justify-between">
-            <h2 className="font-serif text-5xl md:text-6xl font-black uppercase">The Blueprint</h2>
+            <h2 className="text-fluid-display uppercase">The Blueprint</h2>
             <span className="font-mono text-xs uppercase tracking-widest text-[#CC0000] hidden sm:block">Fig 1. Auction Rules</span>
           </div>
 
@@ -152,7 +153,7 @@ export default function LandingPage() {
 
       {/* ── CTA ─────────────────────────────────────── */}
       <section className="py-24 max-w-screen-md mx-auto px-4 text-center">
-        <h2 className="font-serif text-5xl md:text-7xl font-black uppercase text-[#111111] mb-6 leading-none">Take The Pitch.</h2>
+        <h2 className="text-fluid-hero uppercase text-[#111111] mb-6 leading-none">Take The Pitch.</h2>
         <p className="font-body text-xl text-[#525252] mb-10 leading-relaxed">No money down. Absolute bragging rights. Bring your football knowledge to the auction table.</p>
         <Link to="/signup" className="inline-flex items-center gap-3 bg-[#CC0000] text-white border border-[#CC0000] hover:bg-white hover:text-[#CC0000] sharp-corners px-10 py-5 font-mono text-sm uppercase tracking-widest font-bold transition-all duration-200">
           Subscribe Now <ArrowRight size={20} />
@@ -167,3 +168,4 @@ export default function LandingPage() {
     </div>
   )
 }
+

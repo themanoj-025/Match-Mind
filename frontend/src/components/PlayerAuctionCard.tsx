@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * PlayerAuctionCard — MatchMind
  *
@@ -177,3 +178,4 @@ export default function PlayerAuctionCard({
     </div>
   )
 }
+

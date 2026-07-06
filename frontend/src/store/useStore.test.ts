@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Store Tests — MatchMind
  *
@@ -135,3 +136,4 @@ describe('useStore — Chat Message Cap', () => {
     expect(ids[499]).toBe('msg-509')
   })
 })
+

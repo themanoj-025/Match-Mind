@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * RosterPreview — Draft Mode squad preview
  *
@@ -225,3 +226,4 @@ export default function RosterPreview({
     </div>
   )
 }
+

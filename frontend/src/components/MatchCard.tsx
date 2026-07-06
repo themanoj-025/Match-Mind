@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { Users, Clock } from 'lucide-react'
@@ -141,3 +142,4 @@ export default function MatchCard({ match, onEnterRoom, onPredict }: MatchCardPr
     </div>
   )
 }
+

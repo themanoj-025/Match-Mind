@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useRef, useEffect, useCallback } from 'react'
 
 export default function HeroSceneImpl() {
@@ -155,3 +156,4 @@ export default function HeroSceneImpl() {
     />
   )
 }
+

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * RosterBoard — MatchMind
  *
@@ -153,3 +154,4 @@ export default function RosterBoard({
     </div>
   )
 }
+

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react'
 import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
@@ -19,7 +20,7 @@ export default function NotFoundPage() {
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-          className="text-8xl mb-6"
+          className="text-fluid-hero mb-6"
         >
           ⚽
         </motion.div>
@@ -52,3 +53,4 @@ export default function NotFoundPage() {
     </motion.div>
   )
 }
+

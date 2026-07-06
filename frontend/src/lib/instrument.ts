@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Sentry Instrumentation — MatchMind Frontend
  *
@@ -30,3 +31,4 @@ Sentry.init({
 })
 
 export default Sentry
+

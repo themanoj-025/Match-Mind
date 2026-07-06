@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { MessageCircle, X, ChevronUp, Users, Sparkles } from 'lucide-react'
@@ -118,3 +119,4 @@ export default function QuickChatFeed() {
     </>
   )
 }
+

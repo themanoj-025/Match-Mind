@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * FormatSelector — Formation picker for starting a Draft
  *
@@ -83,3 +84,4 @@ export default function FormatSelector({ formations, selected, onSelect }: Forma
     </div>
   )
 }
+

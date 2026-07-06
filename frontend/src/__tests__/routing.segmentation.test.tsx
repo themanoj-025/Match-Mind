@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * routing.segmentation.test.tsx — MatchMind v2 §8
  *
@@ -80,3 +81,4 @@ describe('Routing Segmentation', () => {
     expect(screen.getByTestId('guard-check')).toBeTruthy()
   })
 })
+

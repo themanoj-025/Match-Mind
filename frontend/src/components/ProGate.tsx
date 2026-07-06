@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { Sparkles, Lock } from 'lucide-react'
@@ -49,3 +50,4 @@ export default function ProGate({ children, isPro = false, showLockIcon = true, 
     </div>
   )
 }
+

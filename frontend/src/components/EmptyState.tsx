@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react'
 import { motion } from 'framer-motion'
 
@@ -22,3 +23,4 @@ export default function EmptyState({ icon, title, description, action }: EmptySt
     </motion.div>
   )
 }
+

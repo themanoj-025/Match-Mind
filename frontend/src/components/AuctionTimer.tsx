@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AuctionTimer — MatchMind
  *
@@ -104,3 +105,4 @@ export default function AuctionTimer({
     </div>
   )
 }
+

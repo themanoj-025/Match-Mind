@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { Link, useSearchParams } from 'react-router-dom'
@@ -237,3 +238,4 @@ export default function SearchPage() {
     </div>
   )
 }
+

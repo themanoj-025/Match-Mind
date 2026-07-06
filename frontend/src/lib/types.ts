@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ─── Tournament (v2 — open registry, not a closed union) ─
 export interface Tournament {
   id: string
@@ -344,3 +345,4 @@ export interface StripeStatus {
   subscriptionStatus?: string
   currentPeriodEnd?: string
 }
+

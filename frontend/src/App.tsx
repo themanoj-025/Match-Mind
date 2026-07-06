@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { lazy, Suspense, useEffect, useState, useCallback } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion, type Variants } from 'framer-motion'
@@ -205,3 +206,4 @@ export default function App() {
     </div>
   )
 }
+

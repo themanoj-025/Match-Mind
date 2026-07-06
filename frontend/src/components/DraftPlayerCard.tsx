@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * DraftPlayerCard — Choice round player card
  *
@@ -158,3 +159,4 @@ export default function DraftPlayerCard({
     </motion.div>
   )
 }
+

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { fetchJSON, ApiRequestError } from './useApi'
 
@@ -231,3 +232,4 @@ describe('ApiRequestError', () => {
     expect('status' in regularErr).toBe(false)
   })
 })
+

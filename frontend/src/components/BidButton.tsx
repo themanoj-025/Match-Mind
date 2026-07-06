@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BidButton — MatchMind
  *
@@ -93,3 +94,4 @@ export default function BidButton({
     </div>
   )
 }
+

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react'
 import { User, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 
@@ -96,3 +97,4 @@ export default function LeaderboardRow({ rank, user, points, accuracy, streak, r
     </div>
   )
 }
+

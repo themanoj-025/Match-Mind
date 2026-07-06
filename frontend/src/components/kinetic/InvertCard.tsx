@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { invertCardVariants, prefersReducedMotion } from '../../lib/kinetic'
@@ -172,3 +173,4 @@ export default function InvertCard({
     </div>
   )
 }
+

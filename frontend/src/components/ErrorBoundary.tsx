@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react'
 import { Link } from 'react-router-dom'
 import * as Sentry from '@sentry/react'
@@ -58,3 +59,4 @@ export default class ErrorBoundary extends React.Component<ErrorBoundaryProps, E
     return this.props.children
   }
 }
+

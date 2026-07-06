@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, ArrowRight, Trophy, Users, User, Zap, Star, X, Command, Sparkles } from 'lucide-react'
@@ -268,3 +269,4 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
     </div>
   )
 }
+

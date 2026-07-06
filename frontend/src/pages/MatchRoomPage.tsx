@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect, useRef } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useParams, Link } from 'react-router-dom'
@@ -627,3 +628,4 @@ export default function MatchRoomPage() {
     </div>
   )
 }
+

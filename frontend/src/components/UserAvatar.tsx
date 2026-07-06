@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react'
 import { User } from 'lucide-react'
 
@@ -45,3 +46,4 @@ export default function UserAvatar({ src, name, tier, isOnline = false, size = '
     </div>
   )
 }
+

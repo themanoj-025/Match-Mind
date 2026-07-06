@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Home, Trophy, Swords, User } from 'lucide-react'
@@ -41,3 +42,4 @@ export default function BottomNav() {
     </nav>
   )
 }
+

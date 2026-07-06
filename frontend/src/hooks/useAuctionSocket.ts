@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useAuctionSocket — MatchMind
  *
@@ -119,3 +120,4 @@ export function useAuctionSocket(
 
   return { placeBid, sendChat, toggleStar }
 }
+

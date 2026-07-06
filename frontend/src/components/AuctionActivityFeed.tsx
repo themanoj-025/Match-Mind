@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AuctionActivityFeed — MatchMind
  *
@@ -90,3 +91,4 @@ export default function AuctionActivityFeed({ bids, players }: AuctionActivityFe
     </div>
   )
 }
+

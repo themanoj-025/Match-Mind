@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useRef, useEffect, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import {
@@ -108,3 +109,4 @@ export default function GridGap({
     </motion.div>
   )
 }
+

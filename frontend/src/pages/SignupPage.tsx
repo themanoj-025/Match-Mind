@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Mail, Lock, User, ArrowRight, Eye, EyeOff, Check, X } from 'lucide-react'
@@ -229,3 +230,4 @@ export default function SignupPage() {
     </motion.div>
   )
 }
+

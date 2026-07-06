@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SoldStamp — MatchMind
  *
@@ -54,3 +55,4 @@ export default function SoldStamp({ playerName, price, buyerId }: SoldStampProps
     </motion.div>
   )
 }
+

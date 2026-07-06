@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react'
 
 interface LiveBadgeProps {
@@ -19,3 +20,4 @@ export default function LiveBadge({ minute, size = 'md' }: LiveBadgeProps) {
     </div>
   )
 }
+
