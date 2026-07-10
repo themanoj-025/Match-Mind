@@ -19,7 +19,7 @@ import { requestId } from './middleware/requestId'
 // ─── Validate required environment variables ──────────────────────────
 import logger from './utils/logger'
 
-const REQUIRED_ENV_VARS = ['JWT_SECRET', 'JWT_REFRESH_SECRET', 'JWT_RESET_SECRET']
+const REQUIRED_ENV_VARS = ['JWT_SECRET', 'JWT_REFRESH_SECRET', 'JWT_RESET_SECRET', 'DATABASE_URL', 'REDIS_URL']
 for (const envVar of REQUIRED_ENV_VARS) {
   if (!process.env[envVar]) {
     logger.fatal({ event: 'startup.env_missing', envVar }, `Required environment variable ${envVar} is not set.`)
@@ -88,6 +88,8 @@ import adminRoutes from './routes/admin'
 import stripeRoutes from './routes/stripe'
 import aiRoutes from './routes/ai'
 import draftRoutes from './routes/draft'
+import testQueueRoutes from './routes/testQueue'
+import './workers'
 import { setupSocket } from './socket'
 import { globalLimiter, authLimiter, passwordResetLimiter, publicLimiter } from './middleware/rateLimiter'
 import asyncHandler from './middleware/asyncHandler'
@@ -202,6 +204,7 @@ app.use('/api/admin', adminRoutes)
 app.use('/api/stripe', stripeRoutes)
 app.use('/api/ai', aiRoutes)
 app.use('/api/draft', draftRoutes)
+app.use('/api/test-queue', testQueueRoutes)
 
 // Health check (before error handler, with public rate limiter)
 app.get('/api/health', publicLimiter, async (req: express.Request, res: express.Response) => {

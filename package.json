@@ -5,6 +5,7 @@
   "description": "🏟️ MatchMind — The Internet's Sports Bar",
   "scripts": {
     "dev": "concurrently -n api,web -c cyan,green \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:up": "docker-compose up -d && node -e \"setTimeout(()=>{}, 5000)\" && cd backend && npx prisma migrate deploy && cd .. && npm run dev",
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:watch": "concurrently -n api,web -c cyan,green \"cd backend && npm run dev:watch\" \"cd frontend && npm run dev\"",
