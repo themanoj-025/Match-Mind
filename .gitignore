@@ -70,5 +70,7 @@ backend/prisma/*.tsbuildinfo
 *.temp
 .cache/
 
+.gemini/
+
 CLAUDE.md
 start.bat
