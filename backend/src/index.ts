@@ -13,7 +13,7 @@ import cookieParser from 'cookie-parser'
 import passport from 'passport'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
-import { createJsonDatabase } from './lib/jsonDb'
+import { PrismaClient } from '@prisma/client'
 import { requestId } from './middleware/requestId'
 
 // ─── Validate required environment variables ──────────────────────────
@@ -40,31 +40,27 @@ for (let i = 0; i < secretKeys.length; i++) {
     if (jwtSecrets[secretKeys[i] as keyof typeof jwtSecrets] === jwtSecrets[secretKeys[j] as keyof typeof jwtSecrets]) {
       logger.fatal(
         { event: 'startup.identical_secrets', secrets: [secretKeys[i], secretKeys[j]] },
-        `JWT secrets ${secretKeys[i]} and ${secretKeys[j]} are identical. They must be distinct.`
+        `JWT secrets ${secretKeys[i]} and ${secretKeys[j]} are identical. They must be distinct.`,
       )
       process.exit(1)
     }
   }
 }
 
-// Initialize JSON Database (MatchMind production database)
-const prisma = createJsonDatabase()
+// Initialize Postgres Database with Prisma
+const prisma = new PrismaClient()
 let dbInitialized = false
 
 async function initDatabase(): Promise<void> {
   try {
-    await prisma.initialize()
+    await prisma.$connect()
     dbInitialized = true
-    logger.info({ event: 'database.initialized', dbType: 'json-file' }, 'MatchMind JSON Database initialized')
-
-    // Log record counts per model
-    const counts: Record<string, number> = {}
-    for (const [name, records] of Object.entries(prisma.data)) {
-      if (Array.isArray(records)) counts[name] = records.length
-    }
-    logger.info({ event: 'database.stats', counts }, `Database loaded: ${Object.values(counts).reduce((a, b) => a + b, 0)} total records`)
+    logger.info({ event: 'database.initialized', dbType: 'postgres' }, 'MatchMind Postgres Database initialized')
   } catch (err: any) {
-    logger.error({ event: 'database.initialization_failed', err: err.message }, 'Failed to initialize JSON Database')
+    logger.error(
+      { event: 'database.initialization_failed', err: err.message },
+      'Failed to connect to Postgres Database',
+    )
     process.exit(1)
   }
 }
@@ -117,26 +113,34 @@ const io = new Server(httpServer, {
 })
 
 // ─── Security headers (Helmet with explicit CSP) — after CORS ──────
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https://js.stripe.com', 'https://www.googletagmanager.com'],
-      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-      imgSrc: ["'self'", 'data:', 'https:', 'blob:'],
-      fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
-      connectSrc: ["'self'", 'https://api.stripe.com', 'https://o*.sentry.io', 'https://sentry.io'],
-      frameSrc: ["'self'", 'https://js.stripe.com'],
-      objectSrc: ["'none'"],
-      upgradeInsecureRequests: [],
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "'unsafe-eval'",
+          'https://js.stripe.com',
+          'https://www.googletagmanager.com',
+        ],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+        imgSrc: ["'self'", 'data:', 'https:', 'blob:'],
+        fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
+        connectSrc: ["'self'", 'https://api.stripe.com', 'https://o*.sentry.io', 'https://sentry.io'],
+        frameSrc: ["'self'", 'https://js.stripe.com'],
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests: [],
+      },
     },
-  },
-  strictTransportSecurity: {
-    maxAge: 31536000,
-    includeSubDomains: true,
-    preload: true,
-  },
-}))
+    strictTransportSecurity: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true,
+    },
+  }),
+)
 
 // ─── HTTPS redirect — before routes, before rate limiter, after CORS/Helmet ──
 app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -151,13 +155,15 @@ app.use((req: express.Request, res: express.Response, next: express.NextFunction
 // ─── Rate limiters — before pino-http to reduce noise ──────────────
 app.use(globalLimiter)
 
-app.use(pinoHttp({
-  logger,
-  // Include request ID in all pino-http log lines
-  customProps: (req: any) => ({
-    requestId: req.id,
-  }),
-} as any))
+app.use(
+  pinoHttp({
+    logger,
+    // Include request ID in all pino-http log lines
+    customProps: (req: any) => ({
+      requestId: req.id,
+    }),
+  } as any),
+)
 
 // Stripe webhook needs raw body BEFORE express.json() consumes it
 app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }))
@@ -185,8 +191,8 @@ app.use('/api/auth', authRoutes)
 app.use('/api/tournaments', tournamentRoutes)
 app.use('/api/players', playerRoutes)
 app.use('/api/rooms', roomRoutes)
-app.use('/api/rooms', auctionRoutes)    // /api/rooms/:roomId/auction/*
-app.use('/api/rooms', franchiseRoutes)  // /api/rooms/:roomId/franchises/*
+app.use('/api/rooms', auctionRoutes) // /api/rooms/:roomId/auction/*
+app.use('/api/rooms', franchiseRoutes) // /api/rooms/:roomId/franchises/*
 app.use('/api/fixtures', fixtureRoutes)
 app.use('/api/leaderboard', leaderboardRoutes)
 app.use('/api/users', userRoutes)
@@ -203,18 +209,16 @@ app.get('/api/health', publicLimiter, async (req: express.Request, res: express.
     status: 'healthy',
     timestamp: new Date().toISOString(),
     checks: {
-      database: { status: 'ok', type: 'json-file' },
+      database: { status: 'ok', type: 'postgres' },
     },
   }
 
-  // Check file writability (data dir exists and is writable)
+  // Check database connectivity
   try {
-    const testFile = `${prisma.dataDir}/.healthcheck-${Date.now()}.tmp`
-    require('fs').writeFileSync(testFile, 'ok')
-    require('fs').unlinkSync(testFile)
+    await prisma.$queryRaw`SELECT 1`
   } catch {
     checks.checks.database.status = 'degraded'
-    checks.checks.database.error = 'data directory not writable'
+    checks.checks.database.error = 'database connection failed'
     checks.status = 'degraded'
   }
 
@@ -239,11 +243,14 @@ setupSocket(io, prisma)
 // ─── Prometheus metrics endpoint ────────────────────────────────
 import { metricsMiddleware, metricsEndpoint } from './middleware/metrics'
 app.use(metricsMiddleware)
-app.get('/api/metrics', asyncHandler(async (_req: express.Request, res: express.Response) => {
-  const metrics = await metricsEndpoint()
-  res.setHeader('Content-Type', 'text/plain')
-  res.send(metrics)
-}))
+app.get(
+  '/api/metrics',
+  asyncHandler(async (_req: express.Request, res: express.Response) => {
+    const metrics = await metricsEndpoint()
+    res.setHeader('Content-Type', 'text/plain')
+    res.send(metrics)
+  }),
+)
 
 // ─── Auction Timer Expiry Check ────────────────────────────────────
 // Runs every 2 seconds to auto-advance auctions when player timers expire.
@@ -252,7 +259,10 @@ app.get('/api/metrics', asyncHandler(async (_req: express.Request, res: express.
 const AUCTION_TICK_INTERVAL_MS = 2000
 let auctionTimerInterval: ReturnType<typeof setInterval> | null = null
 
-interface RoomWithId { id: string; status: string }
+interface RoomWithId {
+  id: string
+  status: string
+}
 
 async function tickAuctionTimers(): Promise<void> {
   try {
@@ -317,7 +327,9 @@ async function tickAuctionTimers(): Promise<void> {
               io_instance.to(`room:${room.id}`).emit('AUCTION_FINISHED', { roomId: room.id })
               logger.info({ event: 'auction.timer_finished', roomId: room.id })
             } else if (result.state?.phase === 'RE_AUCTION') {
-              io_instance.to(`room:${room.id}`).emit('RE_AUCTION_STARTED', { roomId: room.id, poolQueue: result.state.poolQueue })
+              io_instance
+                .to(`room:${room.id}`)
+                .emit('RE_AUCTION_STARTED', { roomId: room.id, poolQueue: result.state.poolQueue })
               logger.info({ event: 'auction.timer_re_auction', roomId: room.id })
             }
           }
@@ -349,7 +361,10 @@ const PORT = parseInt(process.env.PORT || '4000', 10)
 // Start database then server
 initDatabase().then(() => {
   httpServer.listen(PORT, () => {
-    logger.info({ event: 'server.start', port: PORT, env: process.env.NODE_ENV || 'development' }, `MatchMind API server running on port ${PORT}`)
+    logger.info(
+      { event: 'server.start', port: PORT, env: process.env.NODE_ENV || 'development' },
+      `MatchMind API server running on port ${PORT}`,
+    )
   })
   // Start auction timer expiry check
   startAuctionTimer()

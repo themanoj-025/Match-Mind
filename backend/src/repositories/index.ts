@@ -18,27 +18,9 @@ import type {
   LeaderboardEntry,
 } from './types'
 
-/** Minimal type compatible with both PrismaClient and JsonDatabase */
-export type DatabaseClient = {
-  [model: string]: {
-    findUnique: (args: any) => Promise<any>
-    findFirst: (args: any) => Promise<any>
-    findMany: (args: any) => Promise<any[]>
-    create: (args: any) => Promise<any>
-    update: (args: any) => Promise<any>
-    updateMany: (args: any) => Promise<{ count: number }>
-    delete: (args: any) => Promise<any>
-    deleteMany: (args: any) => Promise<{ count: number }>
-    count: (args?: any) => Promise<number>
-    upsert: (args: any) => Promise<any>
-    createMany: (args: any) => Promise<{ count: number }>
-  }
-} & {
-  $transaction: (ops: any[]) => Promise<any[]>
-  $connect: () => Promise<void>
-  $disconnect: () => Promise<void>
-  $queryRawUnsafe: (query: string) => Promise<any[]>
-}
+import { PrismaClient } from '@prisma/client'
+
+export type DatabaseClient = PrismaClient
 
 // ─── User Repository ─────────────────────────────────────
 
@@ -63,10 +45,7 @@ export class PrismaUserRepository implements IUserRepository {
   async findByEmailOrUsername(email: string, username: string): Promise<UserData | null> {
     return this.prisma.user.findFirst({
       where: {
-        OR: [
-          { email },
-          { username },
-        ],
+        OR: [{ email }, { username }],
       },
     }) as unknown as UserData | null
   }
@@ -205,7 +184,7 @@ export class PrismaPredictionRepository implements IPredictionRepository {
 
   async updateMany(
     where: { matchId?: string; status?: string },
-    data: Partial<PredictionData>
+    data: Partial<PredictionData>,
   ): Promise<{ count: number }> {
     return this.prisma.prediction.updateMany({ where: where as any, data: data as any })
   }
@@ -328,11 +307,7 @@ export class PrismaAdminLogRepository implements IAdminLogRepository {
     })
   }
 
-  async findMany(opts: {
-    orderBy?: Record<string, 'asc' | 'desc'>
-    take?: number
-    skip?: number
-  }): Promise<unknown[]> {
+  async findMany(opts: { orderBy?: Record<string, 'asc' | 'desc'>; take?: number; skip?: number }): Promise<unknown[]> {
     return (this.prisma as any).adminLog.findMany(opts)
   }
 

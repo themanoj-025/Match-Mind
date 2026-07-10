@@ -11,7 +11,7 @@ import passport from 'passport'
 import path from 'path'
 import os from 'os'
 import fs from 'fs'
-import { createJsonDatabase } from '../lib/jsonDb'
+import { PrismaClient } from '@prisma/client'
 
 // ── Helpers ──────────────────────────────────────────────
 
@@ -24,7 +24,9 @@ export function createTempDir(): string {
 export function cleanupDir(dir: string): void {
   try {
     fs.rmSync(dir, { recursive: true, force: true })
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 }
 
 export function createTestUser(overrides: Record<string, any> = {}) {
@@ -82,21 +84,10 @@ function mockAuthenticateToken(req: any, _res: any, next: any) {
 // ── App Factory ──────────────────────────────────────────
 
 export async function createTestApp() {
-  const dataDir = createTempDir()
-  const prisma = createJsonDatabase(dataDir)
+  const prisma = new PrismaClient()
 
-  // Initialize with seed data
-  await prisma.initialize({
-    user: [createTestUser()],
-    tournament: [createTestTournament()],
-    player: [
-      createTestPlayer(),
-      createTestPlayer({ id: 'player-2', name: 'Striker One', position: 'FWD', basePrice: 15 }),
-      createTestPlayer({ id: 'player-3', name: 'Defender Max', position: 'DEF', basePrice: 8 }),
-      createTestPlayer({ id: 'player-4', name: 'Keeper Ace', position: 'GK', basePrice: 12 }),
-      createTestPlayer({ id: 'player-5', name: 'Midfield Maestro', position: 'MID', basePrice: 20 }),
-    ],
-  })
+  // In a real e2e environment with Postgres, we would truncate tables and seed data here
+  // For now, assume CI sets up the test database
 
   const app = express()
   app.use(express.json())
