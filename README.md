@@ -834,3 +834,18 @@ Built for demonstration and learning purposes.
 ---
 
 *Document version: 4.0 | Project: MatchMind | TypeScript + JSON DB + Socket.IO + Vitest | Generated: July 2026*
+
+---
+
+## 📖 Documentation
+
+For comprehensive codebase intelligence and architecture documentation, see the [`docs/`](docs/) folder:
+
+| File | Description |
+|------|-------------|
+| [`memory.md`](memory.md) | Complete project brain — purpose, tech stack, features, data flow |
+| [`docs/architecture.md`](docs/architecture.md) | System architecture diagram + layered breakdown |
+| [`docs/routes.md`](docs/routes.md) | Full route table (frontend pages + backend API + WebSocket events) |
+| [`docs/api-map.md`](docs/api-map.md) | Complete API inventory with endpoints, inputs, outputs |
+| [`docs/database-map.md`](docs/database-map.md) | Database schema, entities, fields, relationships |
+| [`docs/dependency-graph.md`](docs/dependency-graph.md) | Module dependency map + critical files |
