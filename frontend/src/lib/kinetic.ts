@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Kinetic Typography Motion Primitives
  * MatchMind — Motion-First Design Language

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
@@ -125,7 +124,7 @@ export default function LeaderboardPage() {
           <div className="flex-1">
             <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-xl)] overflow-hidden">
               <div className="flex flex-col gap-0.5 p-2">
-                {displayUsers.slice(0, 10).map((user, i) => (
+                {displayUsers.slice(0, 10).map((user: any, i) => (
                   <LeaderboardRow
                     key={user.id || user.username || i}
                     rank={user.rank || i + 1}

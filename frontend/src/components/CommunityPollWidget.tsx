@@ -1,3 +1,3 @@
-// @ts-nocheck
-export default function CommunityPollWidget() { return null }
-
+export default function CommunityPollWidget() {
+  return null
+}

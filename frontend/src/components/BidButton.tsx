@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * BidButton — MatchMind
  *
@@ -65,15 +64,14 @@ export default function BidButton({
         className={`
           relative px-10 py-5 rounded-[var(--radius-xl)] font-bold text-xl
           transition-all duration-200 select-none
-          ${disabled
-            ? 'bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-muted)] cursor-not-allowed opacity-50'
-            : 'bg-[var(--gradient-live)] text-[var(--mm-text-inverse)] hover:shadow-[var(--shadow-glow-green)] hover:scale-[1.02] active:scale-95 cursor-pointer'
+          ${
+            disabled
+              ? 'bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-muted)] cursor-not-allowed opacity-50'
+              : 'bg-[var(--gradient-live)] text-[var(--mm-text-inverse)] hover:shadow-[var(--shadow-glow-green)] hover:scale-[1.02] active:scale-95 cursor-pointer'
           }
         `}
       >
-        <span className="flex items-center gap-2">
-          Bid 🪙 ${nextMinBid}
-        </span>
+        <span className="flex items-center gap-2">Bid 🪙 ${nextMinBid}</span>
       </button>
 
       {isHighestBidder && (
@@ -83,15 +81,16 @@ export default function BidButton({
       )}
 
       {!canAfford && phase === 'PLAYER_LIVE' && !isHighestBidder && (
-        <span className="caption text-[var(--mm-accent-red)]">
-          Insufficient budget for minimum bid
-        </span>
+        <span className="caption text-[var(--mm-accent-red)]">Insufficient budget for minimum bid</span>
       )}
 
       <span className="caption text-[var(--mm-text-muted)]">
-        Press <kbd className="px-1.5 py-0.5 bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-sm)] font-mono text-xs">Space</kbd> to quick-bid
+        Press{' '}
+        <kbd className="px-1.5 py-0.5 bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-sm)] font-mono text-xs">
+          Space
+        </kbd>{' '}
+        to quick-bid
       </span>
     </div>
   )
 }
-

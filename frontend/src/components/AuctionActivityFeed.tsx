@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * AuctionActivityFeed — MatchMind
  *
@@ -42,9 +41,7 @@ export default function AuctionActivityFeed({ bids, players }: AuctionActivityFe
       <h3 className="heading-3 flex items-center gap-2 mb-3">
         <DollarSign size={16} className="text-[var(--mm-accent-amber)]" />
         Bid Activity
-        {bids.length > 0 && (
-          <span className="caption text-[var(--mm-text-muted)] font-normal">({bids.length})</span>
-        )}
+        {bids.length > 0 && <span className="caption text-[var(--mm-text-muted)] font-normal">({bids.length})</span>}
       </h3>
 
       <div
@@ -75,9 +72,7 @@ export default function AuctionActivityFeed({ bids, players }: AuctionActivityFe
                     <span className="caption font-medium truncate block">
                       {player?.name || bid.playerId.slice(0, 8)}
                     </span>
-                    <span className="caption text-[var(--mm-text-muted)]">
-                      {formatTime(bid.timestamp)}
-                    </span>
+                    <span className="caption text-[var(--mm-text-muted)]">{formatTime(bid.timestamp)}</span>
                   </div>
                 </div>
                 <span className="caption font-semibold text-[var(--mm-accent-amber)] shrink-0 ml-2">
@@ -91,4 +86,3 @@ export default function AuctionActivityFeed({ bids, players }: AuctionActivityFe
     </div>
   )
 }
-

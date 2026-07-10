@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * RosterBoard — MatchMind
  *
@@ -60,9 +59,7 @@ export default function RosterBoard({
             <div key={position}>
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-lg">{POSITION_ICONS[position]}</span>
-                <h4 className="body font-semibold text-[var(--mm-accent-green)]">
-                  {position}
-                </h4>
+                <h4 className="body font-semibold text-[var(--mm-accent-green)]">{position}</h4>
                 {rosterRules && (
                   <span className="caption text-[var(--mm-text-muted)]">
                     ({entries.length}/{limit})
@@ -91,11 +88,12 @@ export default function RosterBoard({
                         className={`
                           bg-[var(--mm-bg-secondary)] rounded-[var(--radius-md)] p-3
                           border transition-all duration-200
-                          ${entry.isCaptain
-                            ? 'border-[var(--mm-accent-amber)] ring-1 ring-[var(--mm-accent-amber)]'
-                            : entry.isViceCaptain
-                              ? 'border-[var(--mm-accent-purple)] ring-1 ring-[var(--mm-accent-purple)]'
-                              : 'border-[var(--border-subtle)] hover:border-[var(--border-default)]'
+                          ${
+                            entry.isCaptain
+                              ? 'border-[var(--mm-accent-amber)] ring-1 ring-[var(--mm-accent-amber)]'
+                              : entry.isViceCaptain
+                                ? 'border-[var(--mm-accent-purple)] ring-1 ring-[var(--mm-accent-purple)]'
+                                : 'border-[var(--border-subtle)] hover:border-[var(--border-default)]'
                           }
                         `}
                       >
@@ -104,18 +102,14 @@ export default function RosterBoard({
                             <span className="caption font-semibold truncate">
                               {player?.name || entry.playerId.slice(0, 8)}
                             </span>
-                            {entry.isCaptain && (
-                              <Crown size={14} className="text-[var(--mm-accent-amber)] shrink-0" />
-                            )}
+                            {entry.isCaptain && <Crown size={14} className="text-[var(--mm-accent-amber)] shrink-0" />}
                             {entry.isViceCaptain && (
                               <Star size={14} className="text-[var(--mm-accent-purple)] shrink-0" />
                             )}
                           </div>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="caption text-[var(--mm-text-muted)]">
-                            🪙 ${entry.soldPrice}
-                          </span>
+                          <span className="caption text-[var(--mm-text-muted)]">🪙 ${entry.soldPrice}</span>
                           {isOwn && !entry.isCaptain && !entry.isViceCaptain && (
                             <div className="flex gap-1">
                               <button
@@ -154,4 +148,3 @@ export default function RosterBoard({
     </div>
   )
 }
-

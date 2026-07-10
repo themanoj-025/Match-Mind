@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useParams, Link } from 'react-router-dom'
@@ -16,19 +15,36 @@ const profileTabs = [
   { id: 'activity', label: 'Activity' },
 ]
 
+interface ProfileUserData {
+  name: string;
+  username: string;
+  bio: string;
+  country: string;
+  joined: string;
+  accuracy: number;
+  points: number;
+  rank: number;
+  streak: number;
+  tier: string;
+  sports: string[];
+  teams: string[];
+  isPro: boolean;
+}
+
 export default function ProfilePage() {
   const { userId } = useParams()
   const currentUser = useStore((s) => s.user)
   const [activeTab, setActiveTab] = useState('overview')
 
-  const { data: profileData, isLoading } = useUser(userId)
+  const { data: profileData, isLoading } = useUser(userId || '')
+  const { data: { predictions = [] } = {} as any, isLoading: loadingPreds } = useMyPredictions()
   const followMutation = useFollowUser()
   const unfollowMutation = useUnfollowUser()
-  const { data: predictions = [] } = useMyPredictions()
 
-  const isFollowing = profileData?.isFollowing || false
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const isFollowing = (profileData as any)?.isFollowing || false
 
-  const user = profileData || {
+  const user: ProfileUserData = (profileData as unknown as ProfileUserData) || {
     name: 'SportsKing',
     username: 'sportsking',
     bio: 'Football & NBA fanatic. Premier League expert. 4x weekly leaderboard winner.',
@@ -46,9 +62,9 @@ export default function ProfilePage() {
 
   const handleFollow = () => {
     if (isFollowing) {
-      unfollowMutation.mutate(userId)
+      unfollowMutation.mutate((userId || "") as string)
     } else {
-      followMutation.mutate(userId)
+      followMutation.mutate(userId as string)
     }
   }
 
@@ -184,9 +200,12 @@ export default function ProfilePage() {
                 <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-xl)] p-5 sm:p-6">
                   <h3 className="heading-3 mb-4">Achievements</h3>
                   <div className="flex gap-3">
-                    {['🎯', '🔥', '🌍', '💯', '🧠', '⚡'].map((icon, i) => (
-                      <AchievementBadge key={i} icon={icon} name={['Sharpshooter', 'On Fire', 'Global Fan', 'Century', 'Big Brain', 'Speed Guesser'][i]} rarity={['rare', 'epic', 'common', 'legendary', 'epic', 'rare'][i]} unlocked={i < 3} size="sm" />
-                    ))}
+                    {['🎯', '🔥', '🌍', '💯', '🧠', '⚡'].map((icon, i) => {
+                      const names = ['Sharpshooter', 'On Fire', 'Global Fan', 'Century', 'Big Brain', 'Speed Guesser'];
+                      const rarities = ['rare', 'epic', 'common', 'legendary', 'epic', 'rare'] as const;
+                      return (
+                        <AchievementBadge key={i} icon={icon} name={names[i] as any} rarity={rarities[i] as any} unlocked={i < 3} size="md" />
+                      )})}
                     <div className="flex items-center">
                       <span className="caption text-[var(--mm-text-muted)]">+{12 - 6} more</span>
                     </div>
@@ -223,7 +242,7 @@ export default function ProfilePage() {
                     { icon: '🏟️', name: 'Match Hero', rarity: 'rare', unlocked: false },
                     { icon: '🛡️', name: 'Defense Expert', rarity: 'common', unlocked: false },
                   ].map((badge, i) => (
-                    <AchievementBadge key={i} icon={badge.icon} name={badge.name} rarity={badge.rarity} unlocked={badge.unlocked} />
+                    <AchievementBadge key={i} icon={badge.icon} name={badge.name} rarity={badge.rarity as any} unlocked={badge.unlocked} />
                   ))}
                 </div>
               </div>

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react'
 import { User, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 
@@ -27,11 +26,25 @@ const tierColors: Record<string, string> = {
   LEGEND: 'from-orange-500 to-red-500',
 }
 
-export default function LeaderboardRow({ rank, user, points, accuracy, streak, rankChange = 0, isCurrentUser = false, tier }: LeaderboardRowProps) {
+export default function LeaderboardRow({
+  rank,
+  user,
+  points,
+  accuracy,
+  streak,
+  rankChange = 0,
+  isCurrentUser = false,
+  tier,
+}: LeaderboardRowProps) {
   const isPodium = rank <= 3
 
   const RankChangeIcon = rankChange > 0 ? TrendingUp : rankChange < 0 ? TrendingDown : Minus
-  const rankChangeColor = rankChange > 0 ? 'text-[var(--mm-accent-green)]' : rankChange < 0 ? 'text-[var(--mm-accent-red)]' : 'text-[var(--mm-text-muted)]'
+  const rankChangeColor =
+    rankChange > 0
+      ? 'text-[var(--mm-accent-green)]'
+      : rankChange < 0
+        ? 'text-[var(--mm-accent-red)]'
+        : 'text-[var(--mm-text-muted)]'
 
   return (
     <div
@@ -42,11 +55,15 @@ export default function LeaderboardRow({ rank, user, points, accuracy, streak, r
       }`}
     >
       {/* Rank */}
-      <div className={`w-8 h-8 flex items-center justify-center ${
-        isPodium ? 'font-bold' : 'body text-[var(--mm-text-muted)]'
-      }`}>
+      <div
+        className={`w-8 h-8 flex items-center justify-center ${
+          isPodium ? 'font-bold' : 'body text-[var(--mm-text-muted)]'
+        }`}
+      >
         {isPodium ? (
-          <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${tierColors[tier || ''] || 'from-gray-500 to-gray-400'} flex items-center justify-center text-xs font-bold text-[var(--mm-text-inverse)]`}>
+          <div
+            className={`w-8 h-8 rounded-full bg-gradient-to-br ${tierColors[tier || ''] || 'from-gray-500 to-gray-400'} flex items-center justify-center text-xs font-bold text-[var(--mm-text-inverse)]`}
+          >
             {rank}
           </div>
         ) : (
@@ -66,15 +83,9 @@ export default function LeaderboardRow({ rank, user, points, accuracy, streak, r
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <span className="body font-semibold truncate">{user?.name || 'Anonymous'}</span>
-            {isCurrentUser && (
-              <span className="caption text-[var(--mm-accent-green)] font-medium">(You)</span>
-            )}
+            {isCurrentUser && <span className="caption text-[var(--mm-accent-green)] font-medium">(You)</span>}
           </div>
-          {accuracy !== undefined && (
-            <span className="caption text-[var(--mm-text-muted)]">
-              {accuracy}% accuracy
-            </span>
-          )}
+          {accuracy !== undefined && <span className="caption text-[var(--mm-text-muted)]">{accuracy}% accuracy</span>}
         </div>
       </div>
 
@@ -91,10 +102,11 @@ export default function LeaderboardRow({ rank, user, points, accuracy, streak, r
 
       {/* Points */}
       <div className="text-right">
-        <span className="font-bold font-[var(--font-display)] text-lg text-[var(--mm-accent-amber)]">{points.toLocaleString()}</span>
+        <span className="font-bold font-[var(--font-display)] text-lg text-[var(--mm-accent-amber)]">
+          {points.toLocaleString()}
+        </span>
         <span className="caption text-[var(--mm-text-muted)] ml-1">pts</span>
       </div>
     </div>
   )
 }
-

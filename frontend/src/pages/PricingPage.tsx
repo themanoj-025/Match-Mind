@@ -1,9 +1,9 @@
-// @ts-nocheck
 import React, { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Check, Sparkles, ArrowRight, Zap, Brain, BarChart3, Shield, Users, Bell, Download, Star } from 'lucide-react'
+import useStore from '../store/useStore'
 
 const plans = [
   {
@@ -51,11 +51,12 @@ const faqs = [
 ]
 
 export default function PricingPage() {
+  const { user } = useStore()
   const [isAnnual, setIsAnnual] = useState(false)
-  const [selectedPlan, setSelectedPlan] = useState(null)
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
 
-  const handleCheckout = async (planName) => {
-    setSelectedPlan(planName)
+  const handleSubscribe = async (planName: string) => {
+    if (!user) { setSelectedPlan(planName) }
     try {
       const res = await fetch('/api/stripe/create-checkout', {
         method: 'POST',
@@ -152,7 +153,7 @@ export default function PricingPage() {
 
               {plan.highlighted ? (
                 <button
-                  onClick={() => handleCheckout(plan.name)}
+                  onClick={() => handleSubscribe(plan.name)}
                   disabled={selectedPlan === plan.name}
                   className="w-full bg-[var(--gradient-pro)] text-white body font-bold py-3.5 rounded-[var(--radius-md)] hover:shadow-[var(--shadow-glow-purple)] disabled:opacity-50 transition-all duration-300 flex items-center justify-center gap-2"
                 >

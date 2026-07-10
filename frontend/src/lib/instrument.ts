@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Sentry Instrumentation — MatchMind Frontend
  *

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useMemo, useEffect } from 'react'
 
 const HeroScene = React.lazy(() => import('./HeroSceneImpl'))

@@ -1,3 +1,3 @@
-// @ts-nocheck
-export default function StatBar() { return null }
-
+export default function StatBar(props: any) {
+  return null
+}

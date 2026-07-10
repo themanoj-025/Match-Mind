@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect, useCallback } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useParams, useNavigate } from 'react-router-dom'
@@ -94,13 +93,13 @@ export default function AuctionRoomPage() {
   }, [])
 
   const onNewBid = useCallback((data: any) => {
-    setCurrentAuctionState(prev => prev ? {
+    setCurrentAuctionState(((prev: any) => prev ? {
       ...prev,
       currentBid: data.amount,
       currentBidderId: data.bidderId,
       timerEndsAt: data.timerEndsAt,
       version: data.version,
-    } : null)
+    } : null) as any)
 
     setBidHistory(h => [{
       id: `${data.playerId}-${Date.now()}-${++bidCounter}`,
@@ -114,7 +113,7 @@ export default function AuctionRoomPage() {
   }, [roomId])
 
   const onPlayerSold = useCallback((data: any) => {
-    setCurrentAuctionState(prev => prev ? { ...prev, phase: 'SOLD' } : null)
+    setCurrentAuctionState(((prev: any) => prev ? { ...prev, phase: 'SOLD' } : null) as any)
     // Refresh budget and roster after sale
     if (data.buyerId === user?.id) {
       setMyBudget(prev => prev - (data.price || 0))
@@ -123,7 +122,7 @@ export default function AuctionRoomPage() {
   }, [user, loadMyRoster])
 
   const onPlayerUnsold = useCallback(() => {
-    setCurrentAuctionState(prev => prev ? { ...prev, phase: 'UNSOLD' } : null)
+    setCurrentAuctionState(((prev: any) => prev ? { ...prev, phase: 'UNSOLD' } : null) as any)
   }, [])
 
   const onAuctionPhaseChange = useCallback((data: any) => {
@@ -131,11 +130,11 @@ export default function AuctionRoomPage() {
   }, [])
 
   const onAuctionFinished = useCallback(() => {
-    setCurrentAuctionState(prev => prev ? { ...prev, phase: 'FINISHED' } : null)
+    setCurrentAuctionState(((prev: any) => prev ? { ...prev, phase: 'FINISHED' } : null) as any)
   }, [])
 
   const onReAuctionStarted = useCallback(() => {
-    setCurrentAuctionState(prev => prev ? { ...prev, phase: 'RE_AUCTION' } : null)
+    setCurrentAuctionState(((prev: any) => prev ? { ...prev, phase: 'RE_AUCTION' } : null) as any)
   }, [])
 
   const onAuctionPaused = useCallback(() => {

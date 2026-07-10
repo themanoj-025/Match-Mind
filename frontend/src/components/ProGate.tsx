@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { Sparkles, Lock } from 'lucide-react'
@@ -24,7 +23,10 @@ export default function ProGate({ children, isPro = false, showLockIcon = true, 
   return (
     <div className="relative group">
       {/* Blurred content */}
-      <div className="relative overflow-hidden" style={{ filter: 'blur(4px)', pointerEvents: 'none', userSelect: 'none' }}>
+      <div
+        className="relative overflow-hidden"
+        style={{ filter: 'blur(4px)', pointerEvents: 'none', userSelect: 'none' }}
+      >
         {children}
       </div>
 
@@ -50,4 +52,3 @@ export default function ProGate({ children, isPro = false, showLockIcon = true, 
     </div>
   )
 }
-

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react'
 
 interface SportIconProps {
@@ -30,4 +29,3 @@ export default function SportIcon({ sport, size = 'md', className = '' }: SportI
     </span>
   )
 }
-

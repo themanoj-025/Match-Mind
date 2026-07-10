@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { Link, useSearchParams } from 'react-router-dom'
@@ -17,8 +16,8 @@ const SUGGESTED_SEARCHES = [
 
 // Mock search results
 const ITEM_TYPES = ['matches', 'users', 'teams', 'players']
-const TYPE_LABELS = { matches: 'Matches', users: 'Users', teams: 'Teams', players: 'Players' }
-const TYPE_ICONS = { matches: '⚽', users: '👤', teams: '🏟️', players: '🎽' }
+const TYPE_LABELS: Record<string, string> = { matches: 'Matches', users: 'Users', teams: 'Teams', players: 'Players' }
+const TYPE_ICONS: Record<string, string> = { matches: '⚽', users: '👤', teams: '🏟️', players: '🎽' }
 
 export default function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -26,16 +25,17 @@ export default function SearchPage() {
   const [query, setQuery] = useState(initialQuery)
   const [selectedIdx, setSelectedIdx] = useState(-1)
   const [activeTab, setActiveTab] = useState('all')
-  const inputRef = useRef(null)
-  const resultsRef = useRef(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const resultsRef = useRef<HTMLDivElement>(null)
 
-  const { data: searchData } = useSearch(query.trim())
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: searchData } = useSearch(query.trim()) as { data: any }
 
   useEffect(() => {
     inputRef.current?.focus()
   }, [])
 
-  const handleQueryChange = (value) => {
+  const handleQueryChange = (value: string) => {
     setQuery(value)
     setSearchParams(value ? { q: value } : {}, { replace: true })
     setSelectedIdx(-1)
@@ -48,28 +48,32 @@ export default function SearchPage() {
     const mapped = [
       {
         type: 'matches',
-        items: (searchData.matches || []).map(m => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        items: (searchData.matches || []).map((m: any) => ({
           id: m.id, label: `${m.homeTeamName} vs ${m.awayTeamName}`, icon: '⚽',
           path: `/live/${m.id}`, meta: `${m.competition} · ${m.status === 'FINISHED' ? `${m.homeScore}-${m.awayScore}` : new Date(m.scheduledAt).toLocaleDateString()}`,
         })),
       },
       {
         type: 'users',
-        items: (searchData.users || []).map(u => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        items: (searchData.users || []).map((u: any) => ({
           id: u.id, label: u.displayName || u.username, icon: User,
           path: `/profile/${u.id}`, meta: `${u.totalPoints || 0} pts · ${u.predAccuracy || 0}% acc`,
         })),
       },
       {
         type: 'teams',
-        items: (searchData.teams || []).map(t => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        items: (searchData.teams || []).map((t: any) => ({
           id: t.id, label: t.name, icon: '🏟️',
           path: `/teams/${t.id}`, meta: t.sport?.toLowerCase() || 'Sport',
         })),
       },
       {
         type: 'players',
-        items: (searchData.players || []).map(p => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        items: (searchData.players || []).map((p: any) => ({
           id: p.id, label: p.name, icon: '🎽',
           path: `/players/${p.id}`, meta: p.team?.name || 'Free Agent',
         })),
@@ -91,7 +95,7 @@ export default function SearchPage() {
   }, [results, activeTab])
 
   // Keyboard navigation
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault()
       setSelectedIdx(prev => Math.min(prev + 1, totalResults - 1))
@@ -194,7 +198,7 @@ export default function SearchPage() {
                       <span className="caption text-[var(--mm-text-muted)]">({section.items.length})</span>
                     </div>
                     <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-xl)] overflow-hidden">
-                      {section.items.map((item, i) => {
+                      {section.items.map((item: any, i: number) => {
                         const ItemIcon = typeof item.icon === 'function' ? item.icon : null
                         return (
                           <Link

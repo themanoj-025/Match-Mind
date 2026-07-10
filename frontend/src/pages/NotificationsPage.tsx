@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
@@ -44,7 +43,7 @@ export default function NotificationsPage() {
         title: n.title || n.type,
         message: n.message || '',
         time: n.createdAt ? new Date(n.createdAt).toLocaleDateString() : '',
-        isRead: localRead.has(n.id) || n.read || false,
+        isRead: localRead.has(n.id) || n.isRead || false,
       }))
     : FALLBACK_NOTIFS.map(n => ({ ...n, isRead: localRead.has(n.id) || n.isRead }))
 
@@ -60,7 +59,7 @@ export default function NotificationsPage() {
     markAllReadMutation.mutate()
   }
 
-  const handleMarkRead = (id) => {
+  const handleMarkRead = (id: string) => {
     setLocalRead(prev => new Set([...prev, id]))
   }
 
@@ -98,7 +97,7 @@ export default function NotificationsPage() {
           {filteredItems.length > 0 ? (
             <motion.div variants={cardStaggerContainer} initial="initial" animate="animate" className="space-y-2">
               {filteredItems.map((notif) => {
-                const Icon = typeIcons[notif.type] || Bell
+                const Icon = typeIcons[notif.type as keyof typeof typeIcons] || Bell
                 return (
                   <motion.div
                     key={notif.id} layout variants={cardStaggerItem}
@@ -109,7 +108,7 @@ export default function NotificationsPage() {
                         : 'bg-[var(--mm-bg-tertiary)] border-[var(--border-active)]/20'
                     }`}
                   >
-                    <div className="w-10 h-10 rounded-full bg-[var(--mm-bg-hover)] flex items-center justify-center shrink-0" style={{ color: notif.color }}>
+                    <div className="w-10 h-10 rounded-full bg-[var(--mm-bg-hover)] flex items-center justify-center shrink-0">
                       <Icon size={18} />
                     </div>
                     <div className="flex-1 min-w-0">

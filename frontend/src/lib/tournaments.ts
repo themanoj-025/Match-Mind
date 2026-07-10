@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Tournament Configuration — Frontend (v2)
  * 

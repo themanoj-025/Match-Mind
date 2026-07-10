@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { lazy, Suspense, useEffect, useState, useCallback } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion, type Variants } from 'framer-motion'
@@ -45,27 +44,51 @@ const TournamentGuard = lazy(() => import('./components/TournamentGuard'))
 // ─── Tournament-scoped pages ────────────────────────────
 
 function TournamentDashboard() {
-  return <TournamentGuard><DashboardPage /></TournamentGuard>
+  return (
+    <TournamentGuard>
+      <DashboardPage />
+    </TournamentGuard>
+  )
 }
 
 function TournamentRoomWizard() {
-  return <TournamentGuard requireLive><RoomWizardPage /></TournamentGuard>
+  return (
+    <TournamentGuard requireLive>
+      <RoomWizardPage />
+    </TournamentGuard>
+  )
 }
 
 function TournamentRoomLobby() {
-  return <TournamentGuard requireLive><RoomLobbyPage /></TournamentGuard>
+  return (
+    <TournamentGuard requireLive>
+      <RoomLobbyPage />
+    </TournamentGuard>
+  )
 }
 
 function TournamentAuctionRoom() {
-  return <TournamentGuard requireLive><AuctionRoomPage /></TournamentGuard>
+  return (
+    <TournamentGuard requireLive>
+      <AuctionRoomPage />
+    </TournamentGuard>
+  )
 }
 
 function TournamentFranchise() {
-  return <TournamentGuard><FranchisePage /></TournamentGuard>
+  return (
+    <TournamentGuard>
+      <FranchisePage />
+    </TournamentGuard>
+  )
 }
 
 function TournamentLeaderboard() {
-  return <TournamentGuard><LeaderboardPage /></TournamentGuard>
+  return (
+    <TournamentGuard>
+      <LeaderboardPage />
+    </TournamentGuard>
+  )
 }
 
 // ─── Page transition wrapper ────────────────────────────
@@ -154,49 +177,322 @@ export default function App() {
           <AnimatePresence mode="wait">
             <Suspense fallback={<LoadingFallback />}>
               <Routes location={location} key={location.pathname}>
-                <Route path="/" element={<AnimatedRoute><LandingPage /></AnimatedRoute>} />
-                <Route path="/login" element={<AnimatedRoute><LoginPage /></AnimatedRoute>} />
-                <Route path="/signup" element={<AnimatedRoute><SignupPage /></AnimatedRoute>} />
-                <Route path="/forgot-password" element={<AnimatedRoute><ForgotPasswordPage /></AnimatedRoute>} />
-                <Route path="/reset-password" element={<AnimatedRoute><ResetPasswordPage /></AnimatedRoute>} />
-                <Route path="/verify-email" element={<AnimatedRoute><VerifyEmailPage /></AnimatedRoute>} />
-                <Route path="/about" element={<AnimatedRoute><AboutPage /></AnimatedRoute>} />
-                <Route path="/faq" element={<AnimatedRoute><FAQPage /></AnimatedRoute>} />
-                <Route path="/404" element={<AnimatedRoute><NotFoundPage /></AnimatedRoute>} />
-                <Route path="*" element={<AnimatedRoute><NotFoundPage /></AnimatedRoute>} />
+                <Route
+                  path="/"
+                  element={
+                    <AnimatedRoute>
+                      <LandingPage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/login"
+                  element={
+                    <AnimatedRoute>
+                      <LoginPage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/signup"
+                  element={
+                    <AnimatedRoute>
+                      <SignupPage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/forgot-password"
+                  element={
+                    <AnimatedRoute>
+                      <ForgotPasswordPage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/reset-password"
+                  element={
+                    <AnimatedRoute>
+                      <ResetPasswordPage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/verify-email"
+                  element={
+                    <AnimatedRoute>
+                      <VerifyEmailPage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/about"
+                  element={
+                    <AnimatedRoute>
+                      <AboutPage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/faq"
+                  element={
+                    <AnimatedRoute>
+                      <FAQPage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/404"
+                  element={
+                    <AnimatedRoute>
+                      <NotFoundPage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="*"
+                  element={
+                    <AnimatedRoute>
+                      <NotFoundPage />
+                    </AnimatedRoute>
+                  }
+                />
                 {/* ── Legacy routes (redirect to /t/:id equivalents) ── */}
-                <Route path="/dashboard" element={<AnimatedRoute><DashboardPage /></AnimatedRoute>} />
-                <Route path="/rooms/new" element={<AnimatedRoute><RoomWizardPage /></AnimatedRoute>} />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <AnimatedRoute>
+                      <DashboardPage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/rooms/new"
+                  element={
+                    <AnimatedRoute>
+                      <RoomWizardPage />
+                    </AnimatedRoute>
+                  }
+                />
                 {/* ── Draft Mode (§1, §2) ── */}
-                <Route path="/draft/new" element={<AnimatedRoute><DraftSessionPage /></AnimatedRoute>} />
-                <Route path="/draft/:sessionId" element={<AnimatedRoute><DraftSessionPage /></AnimatedRoute>} />
-                <Route path="/rooms/:roomId/lobby" element={<AnimatedRoute><RoomLobbyPage /></AnimatedRoute>} />
-                <Route path="/rooms/:roomId/auction" element={<AnimatedRoute><AuctionRoomPage /></AnimatedRoute>} />
-                <Route path="/rooms/:roomId/franchise/:userId" element={<AnimatedRoute><FranchisePage /></AnimatedRoute>} />
-                <Route path="/leaderboard" element={<AnimatedRoute><LeaderboardPage /></AnimatedRoute>} />
+                <Route
+                  path="/draft/new"
+                  element={
+                    <AnimatedRoute>
+                      <DraftSessionPage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/draft/:sessionId"
+                  element={
+                    <AnimatedRoute>
+                      <DraftSessionPage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/rooms/:roomId/lobby"
+                  element={
+                    <AnimatedRoute>
+                      <RoomLobbyPage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/rooms/:roomId/auction"
+                  element={
+                    <AnimatedRoute>
+                      <AuctionRoomPage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/rooms/:roomId/franchise/:userId"
+                  element={
+                    <AnimatedRoute>
+                      <FranchisePage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/leaderboard"
+                  element={
+                    <AnimatedRoute>
+                      <LeaderboardPage />
+                    </AnimatedRoute>
+                  }
+                />
 
                 {/* ── Tournament-scoped routes (§3.4) ── */}
-                <Route path="/t/:tournamentId" element={<AnimatedRoute><TournamentDashboard /></AnimatedRoute>} />
-                <Route path="/t/:tournamentId/dashboard" element={<AnimatedRoute><TournamentDashboard /></AnimatedRoute>} />
-                <Route path="/t/:tournamentId/rooms/new" element={<AnimatedRoute><TournamentRoomWizard /></AnimatedRoute>} />
-                <Route path="/t/:tournamentId/rooms/:roomId/lobby" element={<AnimatedRoute><TournamentRoomLobby /></AnimatedRoute>} />
-                <Route path="/t/:tournamentId/rooms/:roomId/auction" element={<AnimatedRoute><TournamentAuctionRoom /></AnimatedRoute>} />
-                <Route path="/t/:tournamentId/rooms/:roomId/franchise/me" element={<AnimatedRoute><TournamentFranchise /></AnimatedRoute>} />
-                <Route path="/t/:tournamentId/rooms/:roomId/franchise/:userId" element={<AnimatedRoute><TournamentFranchise /></AnimatedRoute>} />
-                <Route path="/t/:tournamentId/rooms/:roomId/leaderboard" element={<AnimatedRoute><TournamentLeaderboard /></AnimatedRoute>} />
-                <Route path="/t/:tournamentId/fixtures" element={<AnimatedRoute><TournamentDashboard /></AnimatedRoute>} />
-                <Route path="/t/:tournamentId/fixtures/:fixtureId" element={<AnimatedRoute><MatchCenterPage /></AnimatedRoute>} />
-                <Route path="/t/:tournamentId/players/:playerId" element={<AnimatedRoute><PlayerProfilePage /></AnimatedRoute>} />
-                <Route path="/matches/:matchId" element={<AnimatedRoute><MatchCenterPage /></AnimatedRoute>} />
-                <Route path="/players/:playerId" element={<AnimatedRoute><PlayerProfilePage /></AnimatedRoute>} />
-                <Route path="/profile/:userId" element={<AnimatedRoute><ProfilePage /></AnimatedRoute>} />
-                <Route path="/profile/me" element={<AnimatedRoute><MyProfilePage /></AnimatedRoute>} />
-                <Route path="/profile/me/settings" element={<AnimatedRoute><SettingsPage /></AnimatedRoute>} />
-                <Route path="/profile/me/notifications" element={<AnimatedRoute><NotificationsPage /></AnimatedRoute>} />
-                <Route path="/messages" element={<AnimatedRoute><MessagesPage /></AnimatedRoute>} />
-                <Route path="/pricing" element={<AnimatedRoute><PricingPage /></AnimatedRoute>} />
-                <Route path="/search" element={<AnimatedRoute><SearchPage /></AnimatedRoute>} />
-                <Route path="/admin" element={<AnimatedRoute><AdminPage /></AnimatedRoute>} />
+                <Route
+                  path="/t/:tournamentId"
+                  element={
+                    <AnimatedRoute>
+                      <TournamentDashboard />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/t/:tournamentId/dashboard"
+                  element={
+                    <AnimatedRoute>
+                      <TournamentDashboard />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/t/:tournamentId/rooms/new"
+                  element={
+                    <AnimatedRoute>
+                      <TournamentRoomWizard />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/t/:tournamentId/rooms/:roomId/lobby"
+                  element={
+                    <AnimatedRoute>
+                      <TournamentRoomLobby />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/t/:tournamentId/rooms/:roomId/auction"
+                  element={
+                    <AnimatedRoute>
+                      <TournamentAuctionRoom />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/t/:tournamentId/rooms/:roomId/franchise/me"
+                  element={
+                    <AnimatedRoute>
+                      <TournamentFranchise />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/t/:tournamentId/rooms/:roomId/franchise/:userId"
+                  element={
+                    <AnimatedRoute>
+                      <TournamentFranchise />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/t/:tournamentId/rooms/:roomId/leaderboard"
+                  element={
+                    <AnimatedRoute>
+                      <TournamentLeaderboard />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/t/:tournamentId/fixtures"
+                  element={
+                    <AnimatedRoute>
+                      <TournamentDashboard />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/t/:tournamentId/fixtures/:fixtureId"
+                  element={
+                    <AnimatedRoute>
+                      <MatchCenterPage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/t/:tournamentId/players/:playerId"
+                  element={
+                    <AnimatedRoute>
+                      <PlayerProfilePage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/matches/:matchId"
+                  element={
+                    <AnimatedRoute>
+                      <MatchCenterPage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/players/:playerId"
+                  element={
+                    <AnimatedRoute>
+                      <PlayerProfilePage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/profile/:userId"
+                  element={
+                    <AnimatedRoute>
+                      <ProfilePage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/profile/me"
+                  element={
+                    <AnimatedRoute>
+                      <MyProfilePage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/profile/me/settings"
+                  element={
+                    <AnimatedRoute>
+                      <SettingsPage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/profile/me/notifications"
+                  element={
+                    <AnimatedRoute>
+                      <NotificationsPage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/messages"
+                  element={
+                    <AnimatedRoute>
+                      <MessagesPage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/pricing"
+                  element={
+                    <AnimatedRoute>
+                      <PricingPage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/search"
+                  element={
+                    <AnimatedRoute>
+                      <SearchPage />
+                    </AnimatedRoute>
+                  }
+                />
+                <Route
+                  path="/admin"
+                  element={
+                    <AnimatedRoute>
+                      <AdminPage />
+                    </AnimatedRoute>
+                  }
+                />
               </Routes>
             </Suspense>
           </AnimatePresence>
@@ -206,4 +502,3 @@ export default function App() {
     </div>
   )
 }
-

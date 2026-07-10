@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * DraftPlayerCard — Choice round player card
  *
@@ -59,11 +58,12 @@ export default function DraftPlayerCard({
       className={`
         relative bg-[var(--mm-bg-secondary)] rounded-[var(--radius-xl)] border-2 overflow-hidden
         transition-all duration-300
-        ${picked
-          ? 'border-[var(--mm-accent-green)] opacity-80 scale-95'
-          : disabled
-            ? 'border-[var(--border-subtle)] opacity-50 cursor-not-allowed'
-            : 'border-[var(--border-subtle)] hover:border-[var(--mm-accent-green)] hover:shadow-[var(--shadow-glow-green)] cursor-pointer'
+        ${
+          picked
+            ? 'border-[var(--mm-accent-green)] opacity-80 scale-95'
+            : disabled
+              ? 'border-[var(--border-subtle)] opacity-50 cursor-not-allowed'
+              : 'border-[var(--border-subtle)] hover:border-[var(--mm-accent-green)] hover:shadow-[var(--shadow-glow-green)] cursor-pointer'
         }
         ${isIcon ? 'ring-1 ring-amber-400/30' : ''}
       `}
@@ -98,9 +98,10 @@ export default function DraftPlayerCard({
             <div
               className={`
                 w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold
-                ${isIcon
-                  ? 'bg-gradient-to-br from-amber-500 to-purple-600'
-                  : 'bg-gradient-to-br from-[var(--mm-accent-green)] to-[var(--mm-accent-blue)]'
+                ${
+                  isIcon
+                    ? 'bg-gradient-to-br from-amber-500 to-purple-600'
+                    : 'bg-gradient-to-br from-[var(--mm-accent-green)] to-[var(--mm-accent-blue)]'
                 }
                 text-[var(--mm-text-inverse)] shadow-lg
               `}
@@ -117,9 +118,7 @@ export default function DraftPlayerCard({
 
         {/* Club & Nationality */}
         <div className="flex items-center justify-center gap-2 mb-2">
-          <span className="text-xs text-[var(--mm-text-secondary)] truncate max-w-[120px]">
-            {player.club}
-          </span>
+          <span className="text-xs text-[var(--mm-text-secondary)] truncate max-w-[120px]">{player.club}</span>
           <span className="text-xs" title={player.nationality}>
             {getFlagEmoji(player.nationality)}
           </span>
@@ -143,13 +142,14 @@ export default function DraftPlayerCard({
           disabled={disabled || picked}
           className={`
             w-full py-2.5 rounded-[var(--radius-md)] font-semibold text-sm transition-all duration-200
-            ${picked
-              ? 'bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] cursor-default'
-              : disabled
-                ? 'bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-muted)]'
-                : isIcon
-                  ? 'bg-gradient-to-r from-amber-500 to-purple-600 text-white hover:opacity-90 shadow-md active:scale-95'
-                  : 'bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] hover:opacity-90 active:scale-95'
+            ${
+              picked
+                ? 'bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] cursor-default'
+                : disabled
+                  ? 'bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-muted)]'
+                  : isIcon
+                    ? 'bg-gradient-to-r from-amber-500 to-purple-600 text-white hover:opacity-90 shadow-md active:scale-95'
+                    : 'bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] hover:opacity-90 active:scale-95'
             }
           `}
         >
@@ -159,4 +159,3 @@ export default function DraftPlayerCard({
     </motion.div>
   )
 }
-

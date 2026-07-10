@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * DraftRunStatus — Draft Run progress & rewards display
  *
@@ -80,9 +79,7 @@ export default function DraftRunStatus({ state, onResolveMatchday, resolving }: 
               <div
                 key={w}
                 className={`flex-1 h-2 rounded-full transition-all ${
-                  result.totalWins >= w
-                    ? 'bg-[var(--mm-accent-amber)]'
-                    : 'bg-[var(--mm-bg-tertiary)]'
+                  result.totalWins >= w ? 'bg-[var(--mm-accent-amber)]' : 'bg-[var(--mm-bg-tertiary)]'
                 }`}
               />
             ))}
@@ -100,9 +97,7 @@ export default function DraftRunStatus({ state, onResolveMatchday, resolving }: 
               <div
                 key={l}
                 className={`flex-1 h-2 rounded-full transition-all ${
-                  result.totalLosses >= l
-                    ? 'bg-[var(--mm-accent-red)]'
-                    : 'bg-[var(--mm-bg-tertiary)]'
+                  result.totalLosses >= l ? 'bg-[var(--mm-accent-red)]' : 'bg-[var(--mm-bg-tertiary)]'
                 }`}
               />
             ))}
@@ -144,11 +139,15 @@ export default function DraftRunStatus({ state, onResolveMatchday, resolving }: 
                 </div>
                 <div className="flex items-center gap-2">
                   {OUTCOME_ICONS[round.outcome || 'TIE']}
-                  <span className={`text-xs font-bold ${
-                    round.outcome === 'WIN' ? 'text-[var(--mm-accent-green)]' :
-                    round.outcome === 'LOSS' ? 'text-[var(--mm-accent-red)]' :
-                    'text-[var(--mm-text-muted)]'
-                  }`}>
+                  <span
+                    className={`text-xs font-bold ${
+                      round.outcome === 'WIN'
+                        ? 'text-[var(--mm-accent-green)]'
+                        : round.outcome === 'LOSS'
+                          ? 'text-[var(--mm-accent-red)]'
+                          : 'text-[var(--mm-text-muted)]'
+                    }`}
+                  >
                     {round.outcome}
                   </span>
                 </div>
@@ -220,4 +219,3 @@ export default function DraftRunStatus({ state, onResolveMatchday, resolving }: 
     </div>
   )
 }
-

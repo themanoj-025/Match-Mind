@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -29,7 +28,7 @@ export default function PremiumLoadingScreen({ isLoading = true, minDisplay = 80
   useEffect(() => {
     if (!show) return
     const interval = setInterval(() => {
-      setMessageIdx(prev => (prev + 1) % LOADING_MESSAGES.length)
+      setMessageIdx((prev) => (prev + 1) % LOADING_MESSAGES.length)
     }, 1200)
     return () => clearInterval(interval)
   }, [show])
@@ -94,7 +93,9 @@ export default function PremiumLoadingScreen({ isLoading = true, minDisplay = 80
               className="relative"
             >
               <div className="w-20 h-20 rounded-[var(--radius-xl)] bg-[var(--gradient-live)] flex items-center justify-center shadow-[var(--shadow-glow-green)]">
-                <span className="text-[var(--mm-text-inverse)] font-bold text-3xl font-[var(--font-display)] tracking-wider">MM</span>
+                <span className="text-[var(--mm-text-inverse)] font-bold text-3xl font-[var(--font-display)] tracking-wider">
+                  MM
+                </span>
               </div>
               {/* Ring animation */}
               <motion.div
@@ -163,4 +164,3 @@ export default function PremiumLoadingScreen({ isLoading = true, minDisplay = 80
     </AnimatePresence>
   )
 }
-

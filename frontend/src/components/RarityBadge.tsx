@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * RarityBadge — Draft Mode rarity tier badge
  *
@@ -43,8 +42,9 @@ const config: Record<string, { label: string; bg: string; text: string; border: 
 }
 
 export default function RarityBadge({ tier, size = 'sm', showLabel = true }: RarityBadgeProps) {
-  const c = config[tier] || config.BRONZE
-  const sizeClasses = size === 'lg' ? 'px-3 py-1 text-sm' : size === 'md' ? 'px-2.5 py-0.5 text-xs' : 'px-2 py-0.5 text-[10px]'
+  const c = config[tier] || config['BRONZE']!
+  const sizeClasses =
+    size === 'lg' ? 'px-3 py-1 text-sm' : size === 'md' ? 'px-2.5 py-0.5 text-xs' : 'px-2 py-0.5 text-[10px]'
 
   return (
     <span
@@ -55,4 +55,3 @@ export default function RarityBadge({ tier, size = 'sm', showLabel = true }: Rar
     </span>
   )
 }
-

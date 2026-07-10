@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * useDraft — React Query hooks for Draft Mode (§1, §2)
  *

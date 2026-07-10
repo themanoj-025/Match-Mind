@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -49,14 +48,20 @@ const faqs = {
 }
 
 export default function FAQPage() {
-  const [activeCategory, setActiveCategory] = useState('general')
-  const [openItem, setOpenItem] = useState(null)
+  const [activeTab, setActiveTab] = useState('general')
   const [searchQuery, setSearchQuery] = useState('')
+  const [openItems, setOpenItems] = useState<number[]>([])
 
-  const currentFaqs = faqs[activeCategory] || []
+  const currentFaqs = faqs[activeTab as keyof typeof faqs] || []
   const filteredFaqs = searchQuery
     ? Object.values(faqs).flat().filter(f => f.q.toLowerCase().includes(searchQuery.toLowerCase()) || f.a.toLowerCase().includes(searchQuery.toLowerCase()))
     : currentFaqs
+
+  const toggleItem = (index: number) => {
+    setOpenItems(prev =>
+      prev.includes(index) ? prev.filter(i => i !== index) : [...prev, index]
+    )
+  }
 
   return (
     <motion.div className="min-h-screen pt-16 pb-20">
@@ -86,9 +91,9 @@ export default function FAQPage() {
             {categories.map((cat) => (
               <button
                 key={cat.id}
-                onClick={() => { setActiveCategory(cat.id); setOpenItem(null) }}
+                onClick={() => { setActiveTab(cat.id); setOpenItems([]) }}
                 className={`px-4 py-2 rounded-[var(--radius-full)] body whitespace-nowrap transition-all ${
-                  activeCategory === cat.id
+                  activeTab === cat.id
                     ? 'bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] font-semibold'
                     : 'bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-secondary)] hover:bg-[var(--mm-bg-hover)]'
                 }`}
@@ -100,23 +105,23 @@ export default function FAQPage() {
         )}
 
         {/* FAQ items */}
-        <div className="space-y-2">
-          {filteredFaqs.map((faq, i) => (
+        <div className="space-y-4">
+          {filteredFaqs.map((faq: any, i: number) => (
             <div key={i} className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] overflow-hidden">
               <button
-                onClick={() => setOpenItem(openItem === i ? null : i)}
+                onClick={() => toggleItem(i)}
                 className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-[var(--mm-bg-hover)] transition-colors"
               >
                 <span className="body font-medium pr-4">{faq.q}</span>
                 <ChevronDown
                   size={18}
                   className={`text-[var(--mm-text-muted)] shrink-0 transition-transform duration-300 ${
-                    openItem === i ? 'rotate-180' : ''
+                    openItems.includes(i) ? 'rotate-180' : ''
                   }`}
                 />
               </button>
               <AnimatePresence>
-                {openItem === i && (
+                {openItems.includes(i) && (
                   <motion.div
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}

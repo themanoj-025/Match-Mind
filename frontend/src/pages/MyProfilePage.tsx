@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { Link, useNavigate } from 'react-router-dom'
@@ -23,8 +22,8 @@ export default function MyProfilePage() {
   const { data: predictions = [] } = useMyPredictions()
   const { data: stripeStatus } = useStripeStatus()
 
-  const isPro = stripeStatus?.isPro || user?.isPro || false
-  const recentPredictions = predictions.slice(0, 4)
+  const isPro = (stripeStatus as any)?.isPro || user?.isPro || false
+  const recentPredictions = (predictions as any[]).slice(0, 4)
 
   const achievements = [
     { icon: '🎯', name: 'Sharpshooter', rarity: 'rare', unlocked: false, progress: '7/10 correct' },
@@ -112,7 +111,7 @@ export default function MyProfilePage() {
                   <h3 className="heading-3 mb-4">Your Achievements</h3>
                   <div className="flex gap-3">
                     {achievements.filter(a => a.unlocked).slice(0, 6).map((badge, i) => (
-                      <AchievementBadge key={i} icon={badge.icon} name={badge.name} rarity={badge.rarity} unlocked={true} />
+                      <AchievementBadge key={i} icon={badge.icon} name={badge.name} rarity={badge.rarity as any} unlocked={true} />
                     ))}
                     <Link to="/profile/me" className="flex items-center text-[var(--mm-text-muted)] hover:text-[var(--mm-text-secondary)] transition-colors">
                       <span className="caption">+{achievements.filter(a => !a.unlocked).length} locked</span>
@@ -154,7 +153,7 @@ export default function MyProfilePage() {
               <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-xl)] p-5 sm:p-6">
                 <h3 className="heading-3 mb-4">Prediction History</h3>
                 <div className="grid sm:grid-cols-2 gap-4">
-                  {recentPredictions.length > 0 ? recentPredictions.map((pred, i) => (
+                  {recentPredictions.length > 0 ? recentPredictions.map((pred: any, i: number) => (
                     <div key={pred.id || i} className="bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-lg)] p-4 border border-[var(--border-subtle)]">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-lg">🎯</span>

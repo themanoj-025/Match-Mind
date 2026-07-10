@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { Link, useNavigate } from 'react-router-dom'
@@ -26,9 +25,9 @@ export default function LiveHubPage() {
   const today = new Date(Date.now() + dateOffset * 86400000)
   const dateStr = today.toISOString().split('T')[0]
 
-  const { data: liveMatches = [], isLoading: matchesLoading } = useMatches({
-    sport: activeSport === 'all' ? undefined : activeSport,
-  })
+  const { data: liveMatches = [], isLoading: matchesLoading } = useMatches(
+    activeSport === 'all' ? undefined : activeSport
+  )
   const { data: topUsers = [] } = useLeaderboard('global')
 
   const getTodayLabel = (): string => {
@@ -38,9 +37,9 @@ export default function LiveHubPage() {
     return today.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
   }
 
-  const liveMatchList: Match[] = liveMatches.filter((m: Match) => m.status === 'SIMULATING')
-  const upcomingList: Match[] = liveMatches.filter((m: Match) => m.status === 'SCHEDULED')
-  const finishedList: Match[] = liveMatches.filter((m: Match) => m.status === 'FINISHED' || m.status === 'COMPLETED')
+  const liveMatchList: Match[] = (liveMatches as any[]).filter((m: Match) => m.status === 'SIMULATING')
+  const upcomingList: Match[] = (liveMatches as any[]).filter((m: Match) => m.status === 'SCHEDULED')
+  const finishedList: Match[] = (liveMatches as any[]).filter((m: Match) => m.status === 'FINISHED' || m.status === 'COMPLETED')
 
   return (
     <div className="min-h-screen pt-16 pb-20 md:pb-8">
@@ -112,7 +111,7 @@ export default function LiveHubPage() {
                 {liveMatchList.length > 0 ? liveMatchList.map((match) => (
                   <MatchCard
                     key={match.id}
-                    match={match}
+                    match={match as any}
                     onEnterRoom={() => navigate(`/live/${match.id}`)}
                     onPredict={() => navigate(`/predictions/new/${match.id}`)}
                   />
@@ -163,15 +162,15 @@ export default function LiveHubPage() {
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-2">
                               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--mm-accent-green)]/20 to-[var(--mm-accent-blue)]/20 flex items-center justify-center">
-                                <span className="text-xs font-bold">{(match.homeTeamName || match.homeTeam || 'H').charAt(0)}</span>
+                                <span className="text-xs font-bold">{(match.homeTeam || 'H').charAt(0)}</span>
                               </div>
-                              <span className="body font-semibold">{match.homeTeamName || match.homeTeam}</span>
+                              <span className="body font-semibold">{match.homeTeam}</span>
                             </div>
                             <span className="body text-[var(--mm-text-muted)] mx-2">vs</span>
                             <div className="flex items-center gap-2">
-                              <span className="body font-semibold">{match.awayTeamName || match.awayTeam}</span>
+                              <span className="body font-semibold">{match.awayTeam}</span>
                               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--mm-accent-amber)]/20 to-[var(--mm-accent-purple)]/20 flex items-center justify-center">
-                                <span className="text-xs font-bold">{(match.awayTeamName || match.awayTeam || 'A').charAt(0)}</span>
+                                <span className="text-xs font-bold">{(match.awayTeam || 'A').charAt(0)}</span>
                               </div>
                             </div>
                           </div>
@@ -209,7 +208,7 @@ export default function LiveHubPage() {
                   {finishedList.slice(0, 4).map((match) => (
                     <MatchCard
                       key={match.id}
-                      match={match}
+                      match={match as any}
                       onEnterRoom={() => navigate(`/live/${match.id}`)}
                       onPredict={undefined}
                     />
@@ -223,7 +222,7 @@ export default function LiveHubPage() {
           <aside className="w-full lg:w-72 shrink-0">
             <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4 mb-4">
               <h3 className="caption font-semibold text-[var(--mm-text-muted)] uppercase tracking-wider mb-3">Top Predictors Online</h3>
-              {topUsers.slice(0, 3).map((p: LeaderboardEntry, i: number) => (
+              {topUsers.slice(0, 3).map((p: any, i: number) => (
                 <div key={i} className="flex items-center gap-2 py-1.5">
                   <span className="caption text-[var(--mm-text-muted)] w-5">{i + 1}</span>
                   <span className="body flex-1">{p.name || p.displayName || p.username}</span>
@@ -264,7 +263,7 @@ export default function LiveHubPage() {
                   <div key={match.id || i} className="flex items-center gap-2">
                     <div className="w-7 h-7 rounded-full bg-[var(--mm-bg-tertiary)] flex items-center justify-center text-xs font-bold text-[var(--mm-text-muted)]">{i + 1}</div>
                     <div className="flex-1 min-w-0">
-                      <span className="body truncate block">{(match.homeTeamName || match.homeTeam)} vs {(match.awayTeamName || match.awayTeam)}</span>
+                      <span className="body truncate block">{match.homeTeam} vs {match.awayTeam}</span>
                       <span className="caption text-[var(--mm-text-muted)]">🔥 {Math.floor(Math.random() * 200 + 50)} predictions</span>
                     </div>
                     <button

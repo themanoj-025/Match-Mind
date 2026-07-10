@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * RosterPreview — Draft Mode squad preview
  *
@@ -55,7 +54,7 @@ export default function RosterPreview({
   formationBonus = false,
 }: RosterPreviewProps) {
   // Build filled picks by slot index
-  const filledMap = new Map<number, typeof picks[0]>()
+  const filledMap = new Map<number, (typeof picks)[0]>()
   for (const p of picks) {
     filledMap.set(p.slotIndex, p)
   }
@@ -115,7 +114,9 @@ export default function RosterPreview({
               <div className="flex items-center gap-1.5 mb-1.5">
                 <span className="text-xs">{POSITION_ICONS[position]}</span>
                 <span className="text-xs font-semibold text-[var(--mm-text-secondary)]">{position}</span>
-                <span className="text-xs text-[var(--mm-text-muted)]">({posFilled}/{posSlots.length})</span>
+                <span className="text-xs text-[var(--mm-text-muted)]">
+                  ({posFilled}/{posSlots.length})
+                </span>
               </div>
               <div className="space-y-1">
                 {posSlots.map((s) => {
@@ -128,9 +129,10 @@ export default function RosterPreview({
                       key={s.slotIndex}
                       className={`
                         flex items-center gap-2 px-2.5 py-1.5 rounded-[var(--radius-md)] text-xs
-                        ${isFilled
-                          ? 'bg-[var(--mm-bg-tertiary)] border border-[var(--border-subtle)]'
-                          : 'border border-dashed border-[var(--border-subtle)] bg-transparent'
+                        ${
+                          isFilled
+                            ? 'bg-[var(--mm-bg-tertiary)] border border-[var(--border-subtle)]'
+                            : 'border border-dashed border-[var(--border-subtle)] bg-transparent'
                         }
                       `}
                     >
@@ -140,12 +142,8 @@ export default function RosterPreview({
                           <span className="truncate text-[var(--mm-text-primary)] font-medium flex-1">
                             {playerName}
                           </span>
-                          {pick?.player?.rarityTier && (
-                            <RarityBadge tier={pick.player.rarityTier} size="sm" />
-                          )}
-                          {pick?.autoPicked && (
-                            <Clock size={10} className="text-[var(--mm-text-muted)] shrink-0" />
-                          )}
+                          {pick?.player?.rarityTier && <RarityBadge tier={pick.player.rarityTier} size="sm" />}
+                          {pick?.autoPicked && <Clock size={10} className="text-[var(--mm-text-muted)] shrink-0" />}
                         </>
                       ) : (
                         <>
@@ -168,38 +166,42 @@ export default function RosterPreview({
               <span className="text-xs">🪑</span>
               <span className="text-xs font-semibold text-[var(--mm-text-secondary)]">Bench</span>
               <span className="text-xs text-[var(--mm-text-muted)]">
-                ({displaySlots.filter((s) => s.isBench && filledMap.get(s.slotIndex)?.pickedPlayerId != null).length}/{benchSlots})
+                ({displaySlots.filter((s) => s.isBench && filledMap.get(s.slotIndex)?.pickedPlayerId != null).length}/
+                {benchSlots})
               </span>
             </div>
             <div className="grid grid-cols-2 gap-1">
-              {displaySlots.filter((s) => s.isBench).map((s) => {
-                const pick = filledMap.get(s.slotIndex)
-                const isFilled = pick?.pickedPlayerId != null
+              {displaySlots
+                .filter((s) => s.isBench)
+                .map((s) => {
+                  const pick = filledMap.get(s.slotIndex)
+                  const isFilled = pick?.pickedPlayerId != null
 
-                return (
-                  <div
-                    key={s.slotIndex}
-                    className={`
+                  return (
+                    <div
+                      key={s.slotIndex}
+                      className={`
                       flex items-center gap-1.5 px-2 py-1.5 rounded-[var(--radius-md)] text-xs
-                      ${isFilled
-                        ? 'bg-[var(--mm-bg-tertiary)] border border-[var(--border-subtle)]'
-                        : 'border border-dashed border-[var(--border-subtle)]'
+                      ${
+                        isFilled
+                          ? 'bg-[var(--mm-bg-tertiary)] border border-[var(--border-subtle)]'
+                          : 'border border-dashed border-[var(--border-subtle)]'
                       }
                     `}
-                  >
-                    {isFilled ? (
-                      <>
-                        <Check size={10} className="text-[var(--mm-accent-green)] shrink-0" />
-                        <span className="truncate text-[var(--mm-text-primary)] flex-1">
-                          {pick?.player?.name || 'Player'}
-                        </span>
-                      </>
-                    ) : (
-                      <span className="text-[var(--mm-text-muted)] italic">Open</span>
-                    )}
-                  </div>
-                )
-              })}
+                    >
+                      {isFilled ? (
+                        <>
+                          <Check size={10} className="text-[var(--mm-accent-green)] shrink-0" />
+                          <span className="truncate text-[var(--mm-text-primary)] flex-1">
+                            {pick?.player?.name || 'Player'}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-[var(--mm-text-muted)] italic">Open</span>
+                      )}
+                    </div>
+                  )
+                })}
             </div>
           </div>
         )}
@@ -208,9 +210,7 @@ export default function RosterPreview({
       {/* Formation bonus indicator */}
       {formationBonus && (
         <div className="px-3 py-2 bg-[var(--mm-accent-amber)]/10 rounded-[var(--radius-md)] border border-[var(--mm-accent-amber)]/20">
-          <span className="text-xs font-semibold text-[var(--mm-accent-amber)]">
-            ✓ Formation Fill Bonus: +5%
-          </span>
+          <span className="text-xs font-semibold text-[var(--mm-accent-amber)]">✓ Formation Fill Bonus: +5%</span>
         </div>
       )}
 
@@ -226,4 +226,3 @@ export default function RosterPreview({
     </div>
   )
 }
-

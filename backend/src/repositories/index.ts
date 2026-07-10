@@ -103,7 +103,7 @@ export class PrismaMatchRepository implements IMatchRepository {
   }
 
   async findById(id: string): Promise<MatchData | null> {
-    return this.prisma.match.findUnique({ where: { id } }) as unknown as MatchData | null
+    return this.prisma.fixture.findUnique({ where: { id } }) as unknown as MatchData | null
   }
 
   async findMany(opts: {
@@ -113,15 +113,15 @@ export class PrismaMatchRepository implements IMatchRepository {
     skip?: number
     select?: Record<string, unknown>
   }): Promise<Partial<MatchData>[]> {
-    return this.prisma.match.findMany(opts) as unknown as Partial<MatchData>[]
+    return this.prisma.fixture.findMany(opts) as unknown as Partial<MatchData>[]
   }
 
   async update(id: string, data: Partial<MatchData>): Promise<MatchData> {
-    return this.prisma.match.update({ where: { id }, data: data as any }) as unknown as MatchData
+    return this.prisma.fixture.update({ where: { id }, data: data as any }) as unknown as MatchData
   }
 
   async count(where?: Record<string, unknown>): Promise<number> {
-    return this.prisma.match.count({ where })
+    return this.prisma.fixture.count({ where })
   }
 }
 

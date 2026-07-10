@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * DraftTimer — Pick timer countdown
  *
@@ -15,11 +14,7 @@ interface DraftTimerProps {
   totalSeconds?: number
 }
 
-export default function DraftTimer({
-  expiresAt,
-  onExpired,
-  totalSeconds = 20,
-}: DraftTimerProps) {
+export default function DraftTimer({ expiresAt, onExpired, totalSeconds = 20 }: DraftTimerProps) {
   const [timeLeft, setTimeLeft] = useState(totalSeconds)
   const [progress, setProgress] = useState(100)
   const expiredRef = useRef(false)
@@ -61,14 +56,7 @@ export default function DraftTimer({
       aria-label={`${timeLeft} seconds remaining for this pick`}
     >
       <svg width="68" height="68" className="transform -rotate-90">
-        <circle
-          cx="34"
-          cy="34"
-          r="28"
-          fill="none"
-          stroke="var(--mm-bg-tertiary)"
-          strokeWidth="4"
-        />
+        <circle cx="34" cy="34" r="28" fill="none" stroke="var(--mm-bg-tertiary)" strokeWidth="4" />
         <circle
           cx="34"
           cy="34"
@@ -95,4 +83,3 @@ export default function DraftTimer({
     </div>
   )
 }
-

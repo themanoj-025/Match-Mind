@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * AuctionTimer — MatchMind
  *
@@ -21,12 +20,7 @@ interface AuctionTimerProps {
   onExpired?: () => void
 }
 
-export default function AuctionTimer({
-  timerEndsAt,
-  phase,
-  totalSeconds = 15,
-  onExpired,
-}: AuctionTimerProps) {
+export default function AuctionTimer({ timerEndsAt, phase, totalSeconds = 15, onExpired }: AuctionTimerProps) {
   const [timeLeft, setTimeLeft] = useState(0)
   const [progress, setProgress] = useState(100)
   const expiredRef = useRef(false)
@@ -63,17 +57,15 @@ export default function AuctionTimer({
   const offset = circumference - (progress / 100) * circumference
 
   return (
-    <div className="relative flex items-center gap-2" role="timer" aria-live="assertive" aria-label={`${timeLeft} seconds remaining`}>
+    <div
+      className="relative flex items-center gap-2"
+      role="timer"
+      aria-live="assertive"
+      aria-label={`${timeLeft} seconds remaining`}
+    >
       {/* Circular SVG */}
       <svg width="80" height="80" className="transform -rotate-90">
-        <circle
-          cx="40"
-          cy="40"
-          r="36"
-          fill="none"
-          stroke="var(--mm-bg-tertiary)"
-          strokeWidth="4"
-        />
+        <circle cx="40" cy="40" r="36" fill="none" stroke="var(--mm-bg-tertiary)" strokeWidth="4" />
         <circle
           cx="40"
           cy="40"
@@ -105,4 +97,3 @@ export default function AuctionTimer({
     </div>
   )
 }
-

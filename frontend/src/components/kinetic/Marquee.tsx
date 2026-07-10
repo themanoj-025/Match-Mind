@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useRef, useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { prefersReducedMotion } from '../../lib/kinetic'
@@ -72,7 +71,7 @@ export default function Marquee({
     if (!pauseWhenNotInView || !containerRef.current) return
 
     const observer = new IntersectionObserver(
-      ([entry]) => setIsVisible(entry.isIntersecting),
+      ([entry]) => setIsVisible(entry?.isIntersecting ?? false),
       { threshold: 0.1 }
     )
     observer.observe(containerRef.current)

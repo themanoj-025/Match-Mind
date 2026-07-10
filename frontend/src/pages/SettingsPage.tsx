@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
@@ -80,14 +79,14 @@ export default function SettingsPage() {
                   <div className="flex items-center gap-2 caption text-[var(--mm-text-muted)]">
                     <Loader size={12} className="animate-spin" /> Checking status...
                   </div>
-                ) : proStatus?.isPro ? (
+                ) : (proStatus as any)?.isPro ? (
                   <div className="flex items-center gap-1.5 caption">
                     <CheckCircle size={12} className="text-[var(--mm-accent-green)]" />
                     <span className="text-[var(--mm-accent-green)] font-semibold">Active</span>
-                    {proStatus.subscription && (
+                    {(proStatus as any)?.subscription && (
                       <span className="text-[var(--mm-text-muted)]">
-                        · {proStatus.subscription.plan === 'annual' ? 'Annual' : 'Monthly'} plan
-                        {proStatus.subscription.cancelAtPeriodEnd ? ' · Cancels at period end' : ''}
+                        · {(proStatus as any).subscription.plan === 'annual' ? 'Annual' : 'Monthly'} plan
+                        {(proStatus as any).subscription.cancelAtPeriodEnd ? ' · Cancels at period end' : ''}
                       </span>
                     )}
                   </div>
@@ -101,7 +100,7 @@ export default function SettingsPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              {proStatus?.isPro ? (
+              {(proStatus as any)?.isPro ? (
                 <button
                   onClick={handleManageBilling}
                   disabled={portalLoading}
@@ -125,9 +124,9 @@ export default function SettingsPage() {
           </div>
 
           {/* Pro expiry */}
-          {proStatus?.proExpiresAt && (
+          {(proStatus as any)?.proExpiresAt && (
             <p className="caption text-[var(--mm-text-muted)] mt-2 ml-[52px]">
-              Expires {new Date(proStatus.proExpiresAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+              Expires {new Date((proStatus as any).proExpiresAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
             </p>
           )}
         </motion.div>

@@ -36,7 +36,7 @@ export default function BudgetTracker({
   // Count filled positions
   const positionCounts: Record<string, number> = { GK: 0, DEF: 0, MID: 0, FWD: 0 }
   for (const entry of roster) {
-    const pos = players[entry.playerId]?.position
+    const pos = players?.[entry.playerId]?.position
     if (pos && pos in positionCounts) positionCounts[pos]++
   }
 
@@ -58,19 +58,13 @@ export default function BudgetTracker({
 
   return (
     <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4">
-      <h3 className="heading-3 mb-3 flex items-center gap-2">
-        🪙 Budget
-      </h3>
+      <h3 className="heading-3 mb-3 flex items-center gap-2">🪙 Budget</h3>
 
       {/* Main budget display */}
       <div className="mb-4">
         <div className="flex items-baseline justify-between mb-1">
-          <span className="display-l text-[var(--mm-accent-amber)]">
-            🪙 ${remainingBudget.toLocaleString()}
-          </span>
-          <span className="caption text-[var(--mm-text-muted)]">
-            of ${totalBudget.toLocaleString()}
-          </span>
+          <span className="display-l text-[var(--mm-accent-amber)]">🪙 ${remainingBudget.toLocaleString()}</span>
+          <span className="caption text-[var(--mm-text-muted)]">of ${totalBudget.toLocaleString()}</span>
         </div>
 
         {/* Progress bar */}
@@ -126,9 +120,7 @@ export default function BudgetTracker({
                 <div
                   key={i}
                   className={`w-2.5 h-2.5 rounded-full ${
-                    i < filled
-                      ? 'bg-[var(--mm-accent-green)]'
-                      : 'bg-[var(--mm-bg-tertiary)]'
+                    i < filled ? 'bg-[var(--mm-accent-green)]' : 'bg-[var(--mm-bg-tertiary)]'
                   }`}
                   aria-label={i < filled ? 'Filled' : 'Empty'}
                 />
@@ -143,4 +135,3 @@ export default function BudgetTracker({
     </div>
   )
 }
-

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect, useMemo } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useNavigate } from 'react-router-dom'
@@ -21,7 +20,7 @@ export default function RoomWizardPage() {
   // Auto-select first live tournament once data loads
   useEffect(() => {
     if (!tournamentId && liveTournaments.length > 0) {
-      setTournamentId(liveTournaments[0].id)
+      setTournamentId(liveTournaments[0]?.id || '')
     }
   }, [tournamentId, liveTournaments])
   const [totalBudget, setTotalBudget] = useState(500)

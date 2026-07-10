@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * DraftSessionPage — Draft Mode experience (§1)
  *
@@ -96,7 +95,7 @@ export default function DraftSessionPage() {
     makePick.mutate({
       sessionId: session.id,
       slotIndex: nextRound.round.slotIndex,
-      pickedPlayerId: sorted[0].id,
+      pickedPlayerId: sorted[0]?.id as string,
     })
   }, [nextRound, session?.id, makePick])
 

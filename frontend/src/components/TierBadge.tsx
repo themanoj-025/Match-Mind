@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react'
 
 interface TierBadgeProps {
@@ -23,7 +22,7 @@ const tierConfig: Record<string, TierConfig> = {
 }
 
 export default function TierBadge({ tier = 'BRONZE', size = 'sm', showLabel = true }: TierBadgeProps) {
-  const config = tierConfig[tier] || tierConfig.BRONZE
+  const config = tierConfig[tier] || tierConfig['BRONZE']! || tierConfig.BRONZE
   const sizeClasses = size === 'lg' ? 'text-sm px-3 py-1' : 'text-[10px] px-2 py-0.5'
 
   if (tier === 'LEGEND') {
@@ -33,19 +32,18 @@ export default function TierBadge({ tier = 'BRONZE', size = 'sm', showLabel = tr
         style={{ background: 'var(--tier-legend)', color: 'var(--mm-text-inverse)' }}
       >
         <span>⭐</span>
-        {showLabel && <span>{config.label}</span>}
+        {showLabel && <span>{config!.label}</span>}
       </div>
     )
   }
 
   return (
     <div
-      className={`inline-flex items-center gap-1 rounded-[var(--radius-full)] bg-gradient-to-r ${config.gradient} font-bold uppercase tracking-wider ${sizeClasses}`}
+      className={`inline-flex items-center gap-1 rounded-[var(--radius-full)] bg-gradient-to-r ${config!.gradient} font-bold uppercase tracking-wider ${sizeClasses}`}
       style={{ color: 'var(--mm-text-inverse)' }}
     >
       <span>◆</span>
-      {showLabel && <span>{config.label}</span>}
+      {showLabel && <span>{config!.label}</span>}
     </div>
   )
 }
-

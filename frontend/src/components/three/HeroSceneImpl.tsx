@@ -56,9 +56,9 @@ export default function HeroSceneImpl() {
         positions[i * 3 + 2] = r * Math.cos(phi)
 
         const color = colorPalette[Math.floor(Math.random() * colorPalette.length)]
-        colors[i * 3] = color.r
-        colors[i * 3 + 1] = color.g
-        colors[i * 3 + 2] = color.b
+        colors[i * 3] = color?.r || 0
+        colors[i * 3 + 1] = color?.g || 0
+        colors[i * 3 + 2] = color?.b || 0
 
         sizes[i] = 0.04 + Math.random() * 0.08
         speeds[i] = 0.2 + Math.random() * 0.4
@@ -96,13 +96,13 @@ export default function HeroSceneImpl() {
           particles.rotation.y += mx * 0.01
           particles.rotation.x += my * 0.01
 
-          const pos = geometry.attributes.position.array
+          const pos = (geometry.attributes.position as any).array
           for (let i = 0; i < count; i++) {
             if (!particles.userData.origY) particles.userData.origY = new Float32Array(pos)
             const origY = particles.userData.origY[i * 3 + 1]
-            pos[i * 3 + 1] = origY + Math.sin(time * speeds[i] + i) * 0.3
+            if (pos) pos[i * 3 + 1] = origY + Math.sin(time * speeds[i] + i) * 0.3
           }
-          geometry.attributes.position.needsUpdate = true
+          if (geometry.attributes.position) (geometry.attributes.position as any).needsUpdate = true
         }
 
         renderer.render(scene, camera)

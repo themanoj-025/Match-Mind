@@ -126,5 +126,5 @@ export async function createTestApp() {
   const { errorHandler } = await import('../middleware/errorHandler')
   app.use(errorHandler)
 
-  return { app, prisma, dataDir }
+  return { app, prisma }
 }

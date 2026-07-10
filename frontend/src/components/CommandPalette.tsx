@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, ArrowRight, Trophy, Users, User, Zap, Star, X, Command, Sparkles } from 'lucide-react'
@@ -75,17 +74,16 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
     if (!query.trim()) return SECTIONS
 
     const q = query.toLowerCase()
-    return SECTIONS.map(section => ({
+    return SECTIONS.map((section) => ({
       ...section,
-      items: section.items.filter(item =>
-        item.label.toLowerCase().includes(q) ||
-        (item.meta && item.meta.toLowerCase().includes(q))
+      items: section.items.filter(
+        (item) => item.label.toLowerCase().includes(q) || (item.meta && item.meta.toLowerCase().includes(q)),
       ),
-    })).filter(s => s.items.length > 0)
+    })).filter((s) => s.items.length > 0)
   }, [query])
 
   const filteredItems = useMemo(() => {
-    return filteredSections.flatMap(s => s.items)
+    return filteredSections.flatMap((s) => s.items)
   }, [filteredSections])
 
   // Reset selection when results change
@@ -103,28 +101,34 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
   }, [isOpen])
 
   // Keyboard navigation
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'ArrowDown') {
-      e.preventDefault()
-      setSelectedIdx(prev => Math.min(prev + 1, filteredItems.length - 1))
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault()
-      setSelectedIdx(prev => Math.max(prev - 1, 0))
-    } else if (e.key === 'Enter') {
-      e.preventDefault()
-      if (filteredItems[selectedIdx]) {
-        handleSelect(filteredItems[selectedIdx])
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        setSelectedIdx((prev) => Math.min(prev + 1, filteredItems.length - 1))
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        setSelectedIdx((prev) => Math.max(prev - 1, 0))
+      } else if (e.key === 'Enter') {
+        e.preventDefault()
+        if (filteredItems[selectedIdx]) {
+          handleSelect(filteredItems[selectedIdx])
+        }
+      } else if (e.key === 'Escape') {
+        e.preventDefault()
+        onClose()
       }
-    } else if (e.key === 'Escape') {
-      e.preventDefault()
-      onClose()
-    }
-  }, [filteredItems, selectedIdx, onClose])
+    },
+    [filteredItems, selectedIdx, onClose],
+  )
 
-  const handleSelect = useCallback((item: SectionItem) => {
-    if (item.path) navigate(item.path)
-    onClose()
-  }, [navigate, onClose])
+  const handleSelect = useCallback(
+    (item: SectionItem) => {
+      if (item.path) navigate(item.path)
+      onClose()
+    },
+    [navigate, onClose],
+  )
 
   // Scroll selected item into view
   useEffect(() => {
@@ -177,7 +181,10 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
           <kbd className="hidden sm:inline-flex items-center gap-1 px-2 py-1 bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-sm)] caption text-[var(--mm-text-muted)]">
             <Command size={12} />K
           </kbd>
-          <button onClick={onClose} className="p-1 text-[var(--mm-text-muted)] hover:text-[var(--mm-text-secondary)] transition-colors">
+          <button
+            onClick={onClose}
+            className="p-1 text-[var(--mm-text-muted)] hover:text-[var(--mm-text-secondary)] transition-colors"
+          >
             <X size={16} />
           </button>
         </div>
@@ -186,16 +193,46 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
         {!query.trim() && (
           <div className="px-5 py-3 border-b border-[var(--border-subtle)]">
             <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-              <SuggestionChip text="Dashboard" icon="🏠" onClick={() => { navigate('/dashboard'); onClose() }} />
-              <SuggestionChip text="New Room" icon="⚽" onClick={() => { navigate('/rooms/new'); onClose() }} />
-              <SuggestionChip text="Leaderboard" icon="🏆" onClick={() => { navigate('/leaderboard'); onClose() }} />
-              <SuggestionChip text="Pricing" icon="✨" onClick={() => { navigate('/pricing'); onClose() }} />
+              <SuggestionChip
+                text="Dashboard"
+                icon="🏠"
+                onClick={() => {
+                  navigate('/dashboard')
+                  onClose()
+                }}
+              />
+              <SuggestionChip
+                text="New Room"
+                icon="⚽"
+                onClick={() => {
+                  navigate('/rooms/new')
+                  onClose()
+                }}
+              />
+              <SuggestionChip
+                text="Leaderboard"
+                icon="🏆"
+                onClick={() => {
+                  navigate('/leaderboard')
+                  onClose()
+                }}
+              />
+              <SuggestionChip
+                text="Pricing"
+                icon="✨"
+                onClick={() => {
+                  navigate('/pricing')
+                  onClose()
+                }}
+              />
             </div>
           </div>
         )}
 
         {/* Results */}
-        <div ref={listRef} className="max-h-[50vh] overflow-y-auto py-2">            {filteredSections.length > 0 ? (
+        <div ref={listRef} className="max-h-[50vh] overflow-y-auto py-2">
+          {' '}
+          {filteredSections.length > 0 ? (
             filteredSections.map((section, si) => {
               return (
                 <div key={section.id}>
@@ -215,12 +252,14 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
                         onClick={() => handleSelect(item)}
                         onMouseEnter={() => setSelectedIdx(currentIdx)}
                         className={`w-full flex items-center gap-3 px-5 py-2.5 text-left transition-colors ${
-                          isSelected ? 'bg-[var(--mm-accent-green)]/10 border-l-2 border-[var(--mm-accent-green)]' : 'border-l-2 border-transparent hover:bg-[var(--mm-bg-hover)]'
+                          isSelected
+                            ? 'bg-[var(--mm-accent-green)]/10 border-l-2 border-[var(--mm-accent-green)]'
+                            : 'border-l-2 border-transparent hover:bg-[var(--mm-bg-hover)]'
                         }`}
                       >
                         {/* Icon */}
                         {ItemIcon ? (
-                          <ItemIcon size={16} className="text-[var(--mm-text-secondary)] shrink-0" />
+                          <ItemIcon size={16} />
                         ) : (
                           <span className="text-base w-5 text-center shrink-0">{item.icon as string}</span>
                         )}
@@ -269,4 +308,3 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
     </div>
   )
 }
-

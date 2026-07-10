@@ -18,7 +18,7 @@ interface Props {
  * Accepts an optional `theme` prop for tournament-scoped pages where the parent
  * has already fetched the tournament data (avoids extra API call in presentational wrapper).
  * Falls back to lookup via useTournaments() if no theme prop is provided.
- * 
+ *
  * Usage:
  *   <TournamentThemeWrapper tournamentId={room.tournamentId}>
  *     <PageContent />
@@ -38,12 +38,12 @@ export default function TournamentThemeWrapper({ tournamentId, children, classNa
       data-tournament={tournamentId}
       style={
         theme
-          ? {
+          ? ({
               '--tournament-primary': theme.primary,
               '--tournament-accent': theme.accent,
-              '--tournament-primary-rgb': hexToRgb(theme.primary),
-              '--tournament-accent-rgb': hexToRgb(theme.accent),
-            } as React.CSSProperties
+              '--tournament-primary-rgb': hexToRgb(theme.primary || ''),
+              '--tournament-accent-rgb': hexToRgb(theme.accent || ''),
+            } as React.CSSProperties)
           : undefined
       }
     >
@@ -54,8 +54,5 @@ export default function TournamentThemeWrapper({ tournamentId, children, classNa
 
 function hexToRgb(hex: string): string {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-  return result
-    ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
-    : '0, 0, 0'
+  return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '0, 0, 0'
 }
-

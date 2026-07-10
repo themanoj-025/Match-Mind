@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react'
 import { Trophy, TrendingUp } from 'lucide-react'
 import useStore from '../store/useStore'
@@ -31,4 +30,3 @@ export default function GamificationStrip() {
     </div>
   )
 }
-

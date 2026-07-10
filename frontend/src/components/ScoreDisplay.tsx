@@ -1,3 +1,3 @@
-// @ts-nocheck
-export default function ScoreDisplay() { return null }
-
+export default function ScoreDisplay(props: any) {
+  return null
+}

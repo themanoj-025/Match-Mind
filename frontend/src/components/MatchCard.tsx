@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { Users, Clock } from 'lucide-react'
@@ -31,9 +30,19 @@ interface MatchCardProps {
 
 export default function MatchCard({ match, onEnterRoom, onPredict }: MatchCardProps) {
   const {
-    id, homeTeam, awayTeam, homeTeamLogo, awayTeamLogo,
-    homeScore, awayScore, status, minute, competition,
-    viewersCount, sport, scheduledAt
+    id,
+    homeTeam,
+    awayTeam,
+    homeTeamLogo,
+    awayTeamLogo,
+    homeScore,
+    awayScore,
+    status,
+    minute,
+    competition,
+    viewersCount,
+    sport,
+    scheduledAt,
   } = match
 
   const isLive = status === 'SIMULATING' || status === 'HALFTIME'
@@ -84,14 +93,12 @@ export default function MatchCard({ match, onEnterRoom, onPredict }: MatchCardPr
 
           {/* Score */}
           <div className="flex flex-col items-center gap-1">
-            <div className={`flex items-center gap-2 ${isLive ? 'text-[var(--mm-accent-green)]' : 'text-[var(--mm-text-primary)]'}`}>
-              <span className="font-bold text-3xl font-[var(--font-display)] tracking-tight">
-                {homeScore ?? '-'}
-              </span>
+            <div
+              className={`flex items-center gap-2 ${isLive ? 'text-[var(--mm-accent-green)]' : 'text-[var(--mm-text-primary)]'}`}
+            >
+              <span className="font-bold text-3xl font-[var(--font-display)] tracking-tight">{homeScore ?? '-'}</span>
               <span className="text-[var(--mm-text-muted)] text-lg">:</span>
-              <span className="font-bold text-3xl font-[var(--font-display)] tracking-tight">
-                {awayScore ?? '-'}
-              </span>
+              <span className="font-bold text-3xl font-[var(--font-display)] tracking-tight">{awayScore ?? '-'}</span>
             </div>
             {isLive && (
               <div className="flex items-center gap-1">
@@ -142,4 +149,3 @@ export default function MatchCard({ match, onEnterRoom, onPredict }: MatchCardPr
     </div>
   )
 }
-

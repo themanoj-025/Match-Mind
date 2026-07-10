@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Mail, Lock, User, ArrowRight, Eye, EyeOff, Check, X } from 'lucide-react'
@@ -9,16 +8,18 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [usernameAvailable, setUsernameAvailable] = useState(null) // null | true | false
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null)
   const { setUser } = useStore()
   const navigate = useNavigate()
 
-  const usernameTimerRef = useRef(null)
+  const timeoutRef = useRef<number | null>(null)
 
-  const updateField = (field, value) => setForm((prev) => ({ ...prev, [field]: value }))
+  const handleChange = (field: string, value: string) => {
+    setForm(prev => ({ ...prev, [field]: value }))
+  }
 
   // Password strength
-  const getStrength = (pwd) => {
+  const getStrength = (pwd: string) => {
     if (!pwd) return 0
     let score = 0
     if (pwd.length >= 8) score++
@@ -32,7 +33,7 @@ export default function SignupPage() {
   const strengthColors = ['', 'var(--mm-accent-red)', 'var(--mm-accent-amber)', 'var(--mm-accent-blue)', 'var(--mm-accent-green)']
 
   // Username availability check (debounced)
-  const checkUsername = async (username) => {
+  const checkUsername = async (username: string) => {
     if (username.length < 3) { setUsernameAvailable(null); return }
     try {
       const res = await fetch(`/api/users/check-username?username=${encodeURIComponent(username)}`)
@@ -41,13 +42,13 @@ export default function SignupPage() {
     } catch { setUsernameAvailable(null) }
   }
 
-  const handleUsernameChange = (value) => {
-    updateField('username', value)
-    if (usernameTimerRef.current) clearTimeout(usernameTimerRef.current)
-    usernameTimerRef.current = setTimeout(() => checkUsername(value), 500)
+  const handleUsernameChange = (value: string) => {
+    handleChange('username', value)
+    if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    timeoutRef.current = setTimeout(() => checkUsername(value), 500) as unknown as number
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     if (!form.username || !form.email || !form.password) {
@@ -74,7 +75,7 @@ export default function SignupPage() {
       localStorage.setItem('accessToken', data.accessToken)
       setUser(data.user)
       navigate('/verify-email')
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message)
     } finally {
       setLoading(false)
@@ -137,7 +138,7 @@ export default function SignupPage() {
                 <input
                   type="email"
                   value={form.email}
-                  onChange={(e) => updateField('email', e.target.value)}
+                  onChange={(e) => handleChange('email', e.target.value)}
                   placeholder="you@example.com"
                   className="w-full bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-primary)] body rounded-[var(--radius-md)] pl-10 pr-4 py-3 border border-[var(--border-subtle)] focus:border-[var(--border-active)] focus:outline-none transition-colors"
                 />
@@ -151,7 +152,7 @@ export default function SignupPage() {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={form.password}
-                  onChange={(e) => updateField('password', e.target.value)}
+                  onChange={(e) => handleChange('password', e.target.value)}
                   placeholder="••••••••"
                   autoComplete="new-password"
                   className="w-full bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-primary)] body rounded-[var(--radius-md)] pl-10 pr-10 py-3 border border-[var(--border-subtle)] focus:border-[var(--border-active)] focus:outline-none transition-colors"
@@ -190,7 +191,7 @@ export default function SignupPage() {
                 <input
                   type="password"
                   value={form.confirmPassword}
-                  onChange={(e) => updateField('confirmPassword', e.target.value)}
+                  onChange={(e) => handleChange('confirmPassword', e.target.value)}
                   placeholder="••••••••"
                   className="w-full bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-primary)] body rounded-[var(--radius-md)] pl-10 pr-4 py-3 border border-[var(--border-subtle)] focus:border-[var(--border-active)] focus:outline-none transition-colors"
                 />

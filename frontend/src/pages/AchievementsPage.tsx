@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
@@ -69,7 +68,7 @@ export default function AchievementsPage() {
         <motion.div variants={cardStaggerContainer} initial="initial" animate="animate" className="grid grid-cols-3 sm:grid-cols-4 gap-4">
           {filtered.map((badge, i) => (
             <motion.div key={i} variants={cardStaggerItem}>
-              <AchievementBadge icon={badge.icon} name={badge.name} rarity={badge.rarity} unlocked={badge.unlocked} />
+              <AchievementBadge icon={badge.icon} name={badge.name} rarity={badge.rarity as any} unlocked={badge.unlocked} />
               <div className="mt-1 text-center">
                 {!badge.unlocked && badge.progress && (
                   <span className="caption text-[var(--mm-text-muted)]">{badge.progress}</span>

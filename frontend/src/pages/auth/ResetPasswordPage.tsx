@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { Link, useSearchParams, useNavigate } from 'react-router-dom'
@@ -16,7 +15,7 @@ export default function ResetPasswordPage() {
   const [status, setStatus] = useState(token ? 'idle' : 'invalid') // idle | loading | success | error | invalid
   const [errorMsg, setErrorMsg] = useState('')
 
-  const getStrength = (pwd) => {
+  const getStrength = (pwd: string) => {
     if (!pwd) return 0
     let score = 0
     if (pwd.length >= 8) score++
@@ -30,7 +29,7 @@ export default function ResetPasswordPage() {
   const strengthLabels = ['', 'Weak', 'Fair', 'Good', 'Strong']
   const strengthColors = ['', 'var(--mm-accent-red)', 'var(--mm-accent-amber)', 'var(--mm-accent-blue)', 'var(--mm-accent-green)']
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault()
     if (password !== confirmPassword) {
       setErrorMsg('Passwords do not match')
@@ -53,7 +52,7 @@ export default function ResetPasswordPage() {
       if (!res.ok) throw new Error('Invalid or expired reset link')
       setStatus('success')
       setTimeout(() => navigate('/login'), 2000)
-    } catch (err) {
+    } catch (err: any) {
       setStatus('error')
       setErrorMsg(err.message)
     }

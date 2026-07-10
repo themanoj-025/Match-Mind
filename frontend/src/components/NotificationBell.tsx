@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useRef, useEffect } from 'react'
 import { Bell } from 'lucide-react'
 import useStore from '../store/useStore'
@@ -46,24 +45,32 @@ export default function NotificationBell() {
           <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-subtle)]">
             <span className="body font-semibold">Notifications</span>
             {unreadCount > 0 && (
-              <button onClick={markAllRead} className="caption text-[var(--mm-accent-green)] font-medium hover:underline">
+              <button
+                onClick={markAllRead}
+                className="caption text-[var(--mm-accent-green)] font-medium hover:underline"
+              >
                 Mark all read
               </button>
             )}
           </div>
 
           <div className="max-h-72 overflow-y-auto">
-            {recentNotifs.length > 0 ? recentNotifs.map((notif, i) => (
-              <div key={notif.id || i} className="flex items-start gap-3 px-4 py-3 hover:bg-[var(--mm-bg-hover)] transition-colors border-b border-[var(--border-subtle)] last:border-0">
-                <div className="flex-1 min-w-0">
-                  <p className="body text-[var(--mm-text-primary)] truncate">{notif.title}</p>
-                  {notif.message && <p className="caption text-[var(--mm-text-muted)] truncate">{notif.message}</p>}
+            {recentNotifs.length > 0 ? (
+              recentNotifs.map((notif, i) => (
+                <div
+                  key={notif.id || i}
+                  className="flex items-start gap-3 px-4 py-3 hover:bg-[var(--mm-bg-hover)] transition-colors border-b border-[var(--border-subtle)] last:border-0"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="body text-[var(--mm-text-primary)] truncate">{notif.title}</p>
+                    {notif.message && <p className="caption text-[var(--mm-text-muted)] truncate">{notif.message}</p>}
+                  </div>
+                  {!notif.isRead && (
+                    <span className="w-2 h-2 rounded-full bg-[var(--mm-accent-green)] mt-1.5 shrink-0" />
+                  )}
                 </div>
-                {!notif.isRead && (
-                  <span className="w-2 h-2 rounded-full bg-[var(--mm-accent-green)] mt-1.5 shrink-0" />
-                )}
-              </div>
-            )) : (
+              ))
+            ) : (
               <div className="text-center py-8">
                 <Bell size={20} className="mx-auto text-[var(--mm-text-muted)] mb-2" />
                 <p className="caption text-[var(--mm-text-muted)]">No notifications yet</p>
@@ -83,4 +90,3 @@ export default function NotificationBell() {
     </div>
   )
 }
-

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * TournamentGuard — MatchMind v2 §3.4
  *
@@ -47,9 +46,7 @@ export default function TournamentGuard({ children, requireLive = false }: Tourn
       <div className="pt-16">
         <ComingSoonTeaser tournament={tournament} />
         {!requireLive && (
-          <div className="max-w-5xl mx-auto px-4 mt-8 opacity-60 pointer-events-none select-none">
-            {children}
-          </div>
+          <div className="max-w-5xl mx-auto px-4 mt-8 opacity-60 pointer-events-none select-none">{children}</div>
         )}
       </div>
     )
@@ -58,4 +55,3 @@ export default function TournamentGuard({ children, requireLive = false }: Tourn
   // LIVE — render normally
   return <>{children}</>
 }
-

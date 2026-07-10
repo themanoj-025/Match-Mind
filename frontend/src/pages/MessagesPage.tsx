@@ -1,22 +1,24 @@
-// @ts-nocheck
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Search, Send, MessageSquare, Loader2 } from 'lucide-react'
-import { io as socketIO } from 'socket.io-client'
+import { io as socketIO, Socket } from 'socket.io-client'
 import UserAvatar from '../components/UserAvatar'
 import TierBadge from '../components/TierBadge'
 import EmptyState from '../components/EmptyState'
 import useStore from '../store/useStore'
 import { useConversations, useMessages, useSendMessage } from '../hooks/useApi'
 
+// Add missing auth token function
+const getToken = () => localStorage.getItem('mm_token')
+
 const API = import.meta.env.VITE_API_URL || 'http://localhost:4000'
 
 // ─── Helpers ──────────────────────────────────────────
 
-function formatTime(dateStr) {
+function formatTime(dateStr: string | Date) {
   const d = new Date(dateStr)
   const now = new Date()
-  const diff = now - d
+  const diff = now.getTime() - d.getTime()
   const minutes = Math.floor(diff / 60000)
 
   if (minutes < 1) return 'Now'
@@ -27,13 +29,14 @@ function formatTime(dateStr) {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
-function getDMRoomId(a, b) {
+function getDMRoomId(a: string, b: string) {
   return `dm:${[a, b].sort().join(':')}`
 }
 
 // ─── Conversation Item ────────────────────────────────
 
-function ConversationItem({ conversation, isActive, onSelect }) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function ConversationItem({ conversation, isActive, onSelect }: any) {
   const { otherUser, lastMessage, unreadCount } = conversation
 
   return (
@@ -76,7 +79,8 @@ function ConversationItem({ conversation, isActive, onSelect }) {
 
 // ─── Message Bubble ───────────────────────────────────
 
-function MessageBubble({ message, isOwn }) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function MessageBubble({ message, isOwn }: any) {
   // Format full timestamp for hover tooltip
   const fullTime = message.createdAt
     ? new Date(message.createdAt).toLocaleTimeString('en-US', {
@@ -121,9 +125,10 @@ function MessageBubble({ message, isOwn }) {
 
 // ─── Typing Indicator ─────────────────────────────────
 
-function TypingIndicator({ users, currentUserId }) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function TypingIndicator({ users, currentUserId }: any) {
   if (users.length === 0) return null
-  const otherTyping = users.filter((u) => u !== currentUserId)
+  const otherTyping = users.filter((u: string) => u !== currentUserId)
   if (otherTyping.length === 0) return null
 
   return (
@@ -147,25 +152,31 @@ export default function MessagesPage() {
   const user = useStore((s) => s.user)
   const isMobile = useStore((s) => s.isMobile)
 
-  const [conversations, setConversations] = useState([])
-  const [activeConv, setActiveConv] = useState(null)
-  const [messages, setMessages] = useState([])
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [conversations, setConversations] = useState<any[]>([])
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [activeConv, setActiveConv] = useState<any>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [messages, setMessages] = useState<any[]>([])
   const [inputText, setInputText] = useState('')
   const [loading, setLoading] = useState(true)
   const [loadingMessages, setLoadingMessages] = useState(false)
   const [sending, setSending] = useState(false)
-  const [error, setError] = useState(null)
-  const [typingUsers, setTypingUsers] = useState([])
+  const [error, setError] = useState<string | null>(null)
+  const [typingUsers, setTypingUsers] = useState<string[]>([])
   const [showMobileThread, setShowMobileThread] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
 
-  const messagesEndRef = useRef(null)
-  const typingTimeoutRef = useRef(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const typingTimeoutRef = useRef<any>(null)
   const lastTypingEmitRef = useRef(0)
-  const socketRef = useRef(null)
-  const inputRef = useRef(null)
+  const socketRef = useRef<Socket | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   // ─── Socket connection ────────────────────────────
+  const { data: conversationsData = [], isLoading: convsLoading, refetch: fetchConversations } = useConversations()
+  const { data: messagesData = { messages: [] }, isLoading: msgsLoading } = useMessages(activeConv?.otherUserId)
+  const sendMessageMutation = useSendMessage()
 
   useEffect(() => {
     const token = getToken()
@@ -182,8 +193,9 @@ export default function MessagesPage() {
     })
 
     // Listen for incoming DM messages
-    socket.on('DM_MESSAGE', ({ message, roomId, fromUserId }) => {
-      if (activeConv && roomId === getDMRoomId(user?.id, activeConv.otherUserId)) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    socket.on('DM_MESSAGE', ({ message, roomId, fromUserId }: any) => {
+      if (activeConv && roomId === getDMRoomId(user?.id || '', activeConv.otherUserId)) {
         setMessages((prev) => [...prev, { ...message, user: message.user || { id: fromUserId } }])
       }
       // Refresh conversations list
@@ -191,15 +203,17 @@ export default function MessagesPage() {
     })
 
     // Listen for typing indicators
-    socket.on('DM_TYPING', ({ roomId, userId }) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    socket.on('DM_TYPING', ({ roomId, userId }: any) => {
       if (!activeConv) return
-      const convRoomId = getDMRoomId(user?.id, activeConv.otherUserId)
+      const convRoomId = getDMRoomId(user?.id || '', activeConv.otherUserId)
       if (roomId === convRoomId && userId !== user?.id) {
         setTypingUsers((prev) => (prev.includes(userId) ? prev : [...prev, userId]))
       }
     })
 
-    socket.on('DM_STOP_TYPING', ({ roomId, userId }) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    socket.on('DM_STOP_TYPING', ({ roomId, userId }: any) => {
       setTypingUsers((prev) => prev.filter((u) => u !== userId))
     })
 
@@ -212,13 +226,13 @@ export default function MessagesPage() {
       if (socketRef.current) {
         if (activeConv) {
           socketRef.current.emit('LEAVE_DM', {
-            roomId: getDMRoomId(user?.id, activeConv.otherUserId),
+            roomId: getDMRoomId(user?.id || '', activeConv.otherUserId),
           })
         }
         socketRef.current.disconnect()
       }
     }
-  }, [user?.id])
+  }, [user?.id, activeConv, fetchConversations])
 
   // Join/leave DM room when active conversation changes
   useEffect(() => {
@@ -245,20 +259,20 @@ export default function MessagesPage() {
 
   // ─── Use React Query hooks ────────────────────────
 
-  const { data: conversationsData = [], isLoading: convsLoading } = useConversations()
-  const { data: messagesData = { messages: [] }, isLoading: msgsLoading } = useMessages(activeConv?.otherUserId)
-  const sendMessageMutation = useSendMessage()
+
 
   // Sync conversations from React Query
   useEffect(() => {
-    setConversations(conversationsData)
+    if (conversationsData) {
+      setConversations(conversationsData as any[])
+    }
     setLoading(convsLoading)
   }, [conversationsData, convsLoading])
 
   // Sync messages from React Query
   useEffect(() => {
-    if (messagesData?.messages) {
-      setMessages(messagesData.messages)
+    if (messagesData && (messagesData as any).messages) {
+      setMessages((messagesData as any).messages)
     }
     setLoadingMessages(msgsLoading)
   }, [messagesData, msgsLoading])
@@ -266,7 +280,8 @@ export default function MessagesPage() {
   // ─── Select conversation ──────────────────────────
 
   const handleSelectConversation = useCallback(
-    (conv) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (conv: any) => {
       setActiveConv(conv)
       setMessages([])
       setTypingUsers([])
@@ -317,7 +332,7 @@ export default function MessagesPage() {
 
   // ─── Typing indicator logic ───────────────────────
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputText(e.target.value)
 
     if (!socketRef.current?.connected || !activeConv?.otherUserId || !user?.id) return
@@ -341,7 +356,7 @@ export default function MessagesPage() {
   }
 
   // Handle enter to send
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       handleSend()
@@ -407,7 +422,6 @@ export default function MessagesPage() {
                 <EmptyState
                   title="No messages yet"
                   description={searchQuery ? 'No conversations match your search' : 'Start a conversation with someone from the leaderboard or their profile'}
-                  illustration="no-matches"
                 />
               </div>
             ) : (

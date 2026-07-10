@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { create } from 'zustand'
 import type { User, Notification, Room, AuctionState, RosterEntry, LeaderboardEntry, ChatMessage as ChatMessageType, Player } from '../lib/types'
 
@@ -58,6 +57,10 @@ interface StoreState {
   // Viewport
   isMobile: boolean
   setIsMobile: (val: boolean) => void
+
+  // Viewer counts
+  viewerCounts: Record<string, number>
+  setViewerCount: (roomId: string, count: number) => void
 
   // Loading States
   loadingStates: Record<string, boolean>
@@ -200,6 +203,10 @@ const useStore = create<StoreState>((set) => ({
   // ── Viewport ──────────────────────────────────────
   isMobile: false,
   setIsMobile: (val) => set({ isMobile: val }),
+
+  // ── Viewer counts ─────────────────────────────────
+  viewerCounts: {},
+  setViewerCount: (roomId, count) => set((state) => ({ viewerCounts: { ...state.viewerCounts, [roomId]: count } })),
 
   // ── Loading States ────────────────────────────────
   loadingStates: {},

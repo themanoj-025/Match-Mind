@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react'
 
 interface TooltipProps {
@@ -37,4 +36,3 @@ export default function Tooltip({ content, children, position = 'top' }: Tooltip
     </div>
   )
 }
-

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect, useRef } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useParams, Link } from 'react-router-dom'
@@ -110,8 +109,7 @@ export default function MatchRoomPage() {
     }))
   }
 
-  // Build match from API data with graceful fallback
-  const match: Match = matchData || {
+  const match = (matchData || {
     id: matchId!,
     homeTeam: 'Manchester City',
     awayTeam: 'Arsenal',
@@ -125,9 +123,9 @@ export default function MatchRoomPage() {
     homeTeamLogo: null,
     awayTeamLogo: null,
     scheduledAt: null,
-  }
+  }) as unknown as Match
 
-  const stats: MatchStats = statsData || {
+  const stats = (statsData || {
     possession: [55, 45],
     shots: [12, 8],
     shotsOnTarget: [5, 3],
@@ -135,22 +133,22 @@ export default function MatchRoomPage() {
     fouls: [10, 8],
     yellowCards: [2, 1],
     xg: [1.8, 1.2],
-  }
+  }) as unknown as MatchStats
 
-  const timeline: TimelineEvent[] = timelineData || [
+  const timeline = (timelineData || [
     { minute: 67, type: 'goal', team: 'home', description: 'J. Alvarez — Assisted by K. De Bruyne', scorer: 'J. Alvarez' },
     { minute: 42, type: 'goal', team: 'away', description: 'M. Ødegaard — Penalty', scorer: 'M. Ødegaard' },
     { minute: 28, type: 'goal', team: 'home', description: 'E. Haaland — Header from corner', scorer: 'E. Haaland' },
     { minute: 22, type: 'yellow', team: 'away', description: 'D. Rice' },
     { minute: 15, type: 'yellow', team: 'home', description: 'R. Dias' },
-  ]
+  ]) as unknown as TimelineEvent[]
 
-  const lineups: Lineups = lineupsData || {
+  const lineups = (lineupsData || {
     home: { formation: '4-3-3', players: ['Ederson', 'Walker', 'Dias', 'Aké', 'Gvardiol', 'Rodri', 'De Bruyne', 'Silva', 'Foden', 'Haaland', 'Alvarez'] },
     away: { formation: '4-3-3', players: ['Raya', 'White', 'Saliba', 'Gabriel', 'Zinchenko', 'Rice', 'Ødegaard', 'Havertz', 'Saka', 'Jesus', 'Martinelli'] },
-  }
+  }) as unknown as Lineups
 
-  const h2h: H2H = h2hData || { homeWins: 12, draws: 5, awayWins: 8, lastMeetings: [{ date: 'Sep 2025', score: '2-2' }, { date: 'Mar 2025', score: '1-0' }, { date: 'Oct 2024', score: '2-1' }, { date: 'Apr 2024', score: '0-0' }, { date: 'Jan 2024', score: '1-1' }] }
+  const h2h = (h2hData || { homeWins: 12, draws: 5, awayWins: 8, lastMeetings: [{ date: 'Sep 2025', score: '2-2' }, { date: 'Mar 2025', score: '1-0' }, { date: 'Oct 2024', score: '2-1' }, { date: 'Apr 2024', score: '0-0' }, { date: 'Jan 2024', score: '1-1' }] }) as unknown as H2H
 
   // Socket sim: initial chat + goal effect
   useEffect(() => {
@@ -302,7 +300,7 @@ export default function MatchRoomPage() {
 
             {/* Score */}
             <div className="flex flex-col items-center">
-              <ScoreDisplay home={match.homeScore} away={match.awayScore} status={match.status} size="xl" />
+              <ScoreDisplay home={match.homeScore} away={match.awayScore} status={match.status as any} size="xl" />
               <div className="flex items-center gap-2 mt-1">
                 <LiveBadge minute={match.minute} />
                 <span className="caption text-[var(--mm-text-muted)] hidden sm:inline">{match.stadium}</span>
@@ -451,7 +449,7 @@ export default function MatchRoomPage() {
                   <div className="grid sm:grid-cols-2 gap-6">
                     <div>
                       <h4 className="body font-semibold mb-3 text-[var(--mm-accent-green)]">{match.homeTeam}</h4>
-                      {lineups.home.players.map((p, i) => (
+                      {lineups.home.players.map((p: string, i: number) => (
                         <div key={i} className="flex items-center gap-2 py-1 px-2 rounded-[var(--radius-sm)] hover:bg-[var(--mm-bg-hover)] body text-[var(--mm-text-secondary)]">
                           <span className="caption text-[var(--mm-text-muted)] w-5 text-right">{i + 1}.</span>
                           <span>{p}</span>
@@ -460,7 +458,7 @@ export default function MatchRoomPage() {
                     </div>
                     <div>
                       <h4 className="body font-semibold mb-3 text-[var(--mm-accent-amber)]">{match.awayTeam}</h4>
-                      {lineups.away.players.map((p, i) => (
+                      {lineups.away.players.map((p: string, i: number) => (
                         <div key={i} className="flex items-center gap-2 py-1 px-2 rounded-[var(--radius-sm)] hover:bg-[var(--mm-bg-hover)] body text-[var(--mm-text-secondary)]">
                           <span className="caption text-[var(--mm-text-muted)] w-5 text-right">{i + 1}.</span>
                           <span>{p}</span>
@@ -490,7 +488,7 @@ export default function MatchRoomPage() {
                     </div>
                   </div>
                   <span className="caption text-[var(--mm-text-muted)] mb-3 block">Last 5 Meetings</span>
-                  {h2h.lastMeetings.map((meeting, i) => (
+                  {h2h.lastMeetings.map((meeting: any, i: number) => (
                     <div key={i} className="flex items-center justify-between py-2 border-b border-[var(--border-subtle)] last:border-0">
                       <span className="caption text-[var(--mm-text-muted)]">{meeting.date}</span>
                       <span className="body font-semibold">{meeting.score}</span>

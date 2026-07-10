@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * ComingSoonTeaser — MatchMind v2 §3.5
  *
@@ -23,7 +22,10 @@ function Countdown({ targetDate }: { targetDate: string }) {
     const tick = () => {
       const now = Date.now()
       const diff = target - now
-      if (diff <= 0) { setTimeLeft('Starts soon!'); return }
+      if (diff <= 0) {
+        setTimeLeft('Starts soon!')
+        return
+      }
 
       const days = Math.floor(diff / (1000 * 60 * 60 * 24))
       const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
@@ -85,14 +87,12 @@ export default function ComingSoonTeaser({ tournament }: ComingSoonTeaserProps) 
         </span>
 
         {/* Tournament name */}
-        <h1
-          className="text-3xl sm:text-4xl font-bold mb-2"
-          style={{ color: tournament.theme.primary }}
-        >
+        <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: tournament.theme.primary }}>
           {tournament.name}
         </h1>
         <p className="text-lg text-[var(--mm-text-secondary)] mb-6">
-          {tournament.confederation} · {tournament.gender === 'MEN' ? "Men's" : "Women's"} · {tournament.format.replace('_', ' ')}
+          {tournament.confederation} · {tournament.gender === 'MEN' ? "Men's" : "Women's"} ·{' '}
+          {tournament.format.replace('_', ' ')}
         </p>
 
         {/* Stats row */}
@@ -105,16 +105,30 @@ export default function ComingSoonTeaser({ tournament }: ComingSoonTeaserProps) 
             <div className="flex items-center gap-2">
               <Calendar size={16} className="text-[var(--mm-text-muted)]" />
               <span className="body text-[var(--mm-text-primary)]">
-                {new Date(tournament.dateRange.start + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                {new Date(tournament.dateRange.start + 'T00:00:00Z').toLocaleDateString('en-US', {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
                 {tournament.dateRange.end && (
-                  <> – {new Date(tournament.dateRange.end + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</>
+                  <>
+                    {' '}
+                    –{' '}
+                    {new Date(tournament.dateRange.end + 'T00:00:00Z').toLocaleDateString('en-US', {
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
+                  </>
                 )}
               </span>
             </div>
           )}
           <div className="flex items-center gap-2">
             <MapPin size={16} className="text-[var(--mm-text-muted)]" />
-            <span className="body text-[var(--mm-text-primary)]">{tournament.gender === 'WOMEN' ? 'Brazil' : 'Multi-host'}</span>
+            <span className="body text-[var(--mm-text-primary)]">
+              {tournament.gender === 'WOMEN' ? 'Brazil' : 'Multi-host'}
+            </span>
           </div>
         </div>
 
@@ -150,4 +164,3 @@ export default function ComingSoonTeaser({ tournament }: ComingSoonTeaserProps) 
     </div>
   )
 }
-

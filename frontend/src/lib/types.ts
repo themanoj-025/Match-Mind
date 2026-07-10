@@ -1,4 +1,3 @@
-// @ts-nocheck
 // ─── Tournament (v2 — open registry, not a closed union) ─
 export interface Tournament {
   id: string
@@ -30,6 +29,11 @@ export interface User {
   predAccuracy?: number
   isFollowing?: boolean
   createdAt?: string
+  subscription?: any
+  proExpiresAt?: string
+  globalRank?: number
+  streakCurrent?: number
+  bio?: string
 }
 
 export type Tier = 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM' | 'DIAMOND' | 'LEGEND'
@@ -220,6 +224,52 @@ export interface Fixture {
   scheduledAt: string
   kickoffAt?: string
   playerMatchStats?: PlayerMatchStat[]
+}
+
+export interface MatchStats {
+  possession: [number, number];
+  shots: [number, number];
+  shotsOnTarget: [number, number];
+  corners: [number, number];
+  fouls: [number, number];
+  yellowCards: [number, number];
+  xg: [number, number];
+}
+
+export interface Lineups {
+  home: { formation: string; players: string[] };
+  away: { formation: string; players: string[] };
+}
+
+export interface H2H {
+  homeWins: number;
+  draws: number;
+  awayWins: number;
+  lastMeetings: { date: string; score: string }[];
+}
+
+export interface TimelineEvent {
+  minute: number;
+  type: string;
+  team: string;
+  description: string;
+  scorer?: string;
+}
+
+export interface Match {
+  id: string;
+  homeTeam: string;
+  awayTeam: string;
+  homeScore: number;
+  awayScore: number;
+  status: string;
+  minute: number;
+  competition: string;
+  sport: string;
+  stadium: string;
+  homeTeamLogo: string | null;
+  awayTeamLogo: string | null;
+  scheduledAt: string | null;
 }
 
 export interface PlayerMatchStat {

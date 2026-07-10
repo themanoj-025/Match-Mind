@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useEffect, useRef } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
@@ -24,20 +23,21 @@ const values = [
 ]
 
 export default function AboutPage() {
-  const statsRef = useRef(null)
-  const valuesRef = useRef(null)
+  const statsRef = useRef<HTMLDivElement>(null)
+  const valuesRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const reveals = []
+    const reveals: { kill: () => void }[] = []
     if (valuesRef.current) {
-      reveals.push(useScrollReveal(valuesRef.current.querySelectorAll('.value-card')))
+      reveals.push(useScrollReveal(Array.from(valuesRef.current.querySelectorAll('.value-card'))))
     }
     if (statsRef.current) {
       const counters = statsRef.current.querySelectorAll('[data-countup]')
-      const tweens = []
+      const tweens: gsap.core.Tween[] = []
       counters.forEach((counter) => {
-        const target = parseInt(counter.dataset.target, 10)
-        tweens.push(animateCountUp(counter, target, 2))
+        const element = counter as HTMLElement
+        const target = parseInt(element.dataset.target || '0', 10)
+        tweens.push(animateCountUp(element, target, 2))
       })
       reveals.push({ kill: () => tweens.forEach((t) => t.kill()) })
     }

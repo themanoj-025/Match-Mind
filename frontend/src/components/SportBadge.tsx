@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react'
 
 interface SportBadgeProps {
@@ -26,4 +25,3 @@ export default function SportBadge({ sport, size = 'md', showLabel = true }: Spo
     </div>
   )
 }
-

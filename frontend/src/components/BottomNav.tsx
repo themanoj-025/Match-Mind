@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Home, Trophy, Swords, User } from 'lucide-react'
@@ -28,9 +27,7 @@ export default function BottomNav() {
               key={item.path}
               to={item.path}
               className={`flex-1 flex flex-col items-center justify-center gap-1 h-full transition-colors sharp-corners border-r-2 border-[#111111] last:border-r-0 ${
-                isActive
-                  ? 'bg-[#111111] text-[#F9F9F7]'
-                  : 'bg-transparent text-[#111111] hover:bg-neutral-200'
+                isActive ? 'bg-[#111111] text-[#F9F9F7]' : 'bg-transparent text-[#111111] hover:bg-neutral-200'
               }`}
             >
               <Icon size={20} strokeWidth={1.5} />
@@ -42,4 +39,3 @@ export default function BottomNav() {
     </nav>
   )
 }
-

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * FormatSelector — Formation picker for starting a Draft
  *
@@ -30,11 +29,7 @@ const POSITION_ICONS: Record<string, string> = {
 
 export default function FormatSelector({ formations, selected, onSelect }: FormatSelectorProps) {
   if (!formations || formations.length === 0) {
-    return (
-      <div className="text-center py-6 text-[var(--mm-text-muted)] text-sm">
-        Loading formations...
-      </div>
-    )
+    return <div className="text-center py-6 text-[var(--mm-text-muted)] text-sm">Loading formations...</div>
   }
 
   return (
@@ -50,9 +45,10 @@ export default function FormatSelector({ formations, selected, onSelect }: Forma
             onClick={() => onSelect(formation.id)}
             className={`
               relative text-left p-4 rounded-[var(--radius-lg)] border-2 transition-all duration-200
-              ${isSelected
-                ? 'border-[var(--mm-accent-green)] bg-[var(--mm-accent-green)]/5 shadow-[var(--shadow-glow-green)]'
-                : 'border-[var(--border-subtle)] bg-[var(--mm-bg-secondary)] hover:border-[var(--border-default)] hover:bg-[var(--mm-bg-hover)]'
+              ${
+                isSelected
+                  ? 'border-[var(--mm-accent-green)] bg-[var(--mm-accent-green)]/5 shadow-[var(--shadow-glow-green)]'
+                  : 'border-[var(--border-subtle)] bg-[var(--mm-bg-secondary)] hover:border-[var(--border-default)] hover:bg-[var(--mm-bg-hover)]'
               }
             `}
           >
@@ -84,4 +80,3 @@ export default function FormatSelector({ formations, selected, onSelect }: Forma
     </div>
   )
 }
-

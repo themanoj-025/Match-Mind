@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Mail, Lock, ArrowRight, Eye, EyeOff, AlertCircle } from 'lucide-react'
@@ -17,7 +16,7 @@ export default function LoginPage() {
   // Check for redirect parameter
   const redirectTo = searchParams.get('redirect') || '/feed'
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault()
     setError('')
     if (!email || !password) {
@@ -38,7 +37,7 @@ export default function LoginPage() {
       localStorage.setItem('accessToken', data.accessToken)
       setUser(data.user)
       navigate(redirectTo)
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message)
     } finally {
       setLoading(false)

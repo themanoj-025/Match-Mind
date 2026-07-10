@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * TournamentSwitcher — MatchMind v2 §3.2
  *
@@ -19,9 +18,7 @@ export default function TournamentSwitcher() {
   const navigate = useNavigate()
 
   if (isLoading || !tournaments) {
-    return (
-      <div className="h-10 w-32 bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-md)] animate-pulse" />
-    )
+    return <div className="h-10 w-32 bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-md)] animate-pulse" />
   }
 
   const liveTournaments = tournaments.filter((t) => t.status === 'LIVE')
@@ -72,7 +69,9 @@ export default function TournamentSwitcher() {
         }}
         className="appearance-none bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-primary)] rounded-[var(--radius-md)] px-3 py-1.5 pr-8 text-sm border border-[var(--border-subtle)] focus:outline-none focus:border-[var(--border-focus)] cursor-pointer"
       >
-        <option value="" disabled>Select tournament</option>
+        <option value="" disabled>
+          Select tournament
+        </option>
         {liveTournaments.map((t) => (
           <option key={t.id} value={t.id}>
             {TOURNAMENT_ICONS[t.nav.icon] || '⚽'} {t.shortName} — {t.name}
@@ -86,6 +85,3 @@ export default function TournamentSwitcher() {
     </div>
   )
 }
-
-
-

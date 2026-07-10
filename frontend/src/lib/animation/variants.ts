@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Framer Motion Animation Variants
  * MatchMind v3.0 — Design System Animations

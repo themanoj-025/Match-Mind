@@ -6,7 +6,7 @@ const QUEUE_NAME = 'test-queue'
 
 // Export a queue instance so routes can enqueue jobs
 export const testQueue = new Queue(QUEUE_NAME, {
-  connection: redis,
+  connection: redis as any,
 })
 
 // Create the worker
@@ -23,7 +23,7 @@ export const testWorker = new Worker(
     return { success: true, processedAt: new Date().toISOString() }
   },
   {
-    connection: redis,
+    connection: redis as any,
   },
 )
 

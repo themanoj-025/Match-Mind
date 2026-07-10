@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
@@ -791,10 +790,12 @@ export default function AdminPage() {
                                     onClick={() => {
                                       updateMatchMut.mutate({
                                         id: m.id,
-                                        homeScore: editingMatch!.homeScore,
-                                        awayScore: editingMatch!.awayScore,
-                                        status: editingMatch!.status,
-                                      })
+                                        data: {
+                                          homeScore: editingMatch!.homeScore,
+                                          awayScore: editingMatch!.awayScore,
+                                          status: editingMatch!.status,
+                                        }
+                                      } as any)
                                       setEditingMatch(null)
                                     }}
                                     className={`p-1.5 rounded-[var(--radius-sm)] transition-all ${

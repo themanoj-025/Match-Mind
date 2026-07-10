@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * GSAP + ScrollTrigger Integration
  * MatchMind v3.0 — Scroll-Based Animations

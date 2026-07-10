@@ -1,4 +1,3 @@
-// @ts-nocheck
 // ─── Allow .jsx and .js modules to be imported from TypeScript ──
 // These are progressively migrated to TypeScript; until then,
 // their exports are treated as `any` for type-checking purposes.

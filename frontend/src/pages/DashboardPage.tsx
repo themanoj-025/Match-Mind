@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { Link, useNavigate } from 'react-router-dom'
@@ -81,7 +80,7 @@ export default function DashboardPage() {
               <div className="flex items-center gap-3 shrink-0">
                 {pendingSessions.length > 0 && (
                   <button
-                    onClick={() => navigate(`/draft/${pendingSessions[0].id}`)}
+                    onClick={() => navigate(`/draft/${pendingSessions[0]?.id}`)}
                     className="inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--mm-accent-amber)] text-[var(--mm-text-inverse)] font-semibold rounded-[var(--radius-md)] hover:opacity-90 transition-all text-sm"
                   >
                     <ArrowRight size={16} />

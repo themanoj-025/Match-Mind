@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * SoldStamp — MatchMind
  *
@@ -21,11 +20,7 @@ export default function SoldStamp({ playerName, price, buyerId }: SoldStampProps
       transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.1 }}
       className="text-center"
     >
-      <motion.div
-        className="text-5xl mb-3"
-        animate={{ scale: [1, 1.2, 1] }}
-        transition={{ duration: 0.5, delay: 0.3 }}
-      >
+      <motion.div className="text-5xl mb-3" animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 0.5, delay: 0.3 }}>
         🎉
       </motion.div>
       <motion.h2
@@ -55,4 +50,3 @@ export default function SoldStamp({ playerName, price, buyerId }: SoldStampProps
     </motion.div>
   )
 }
-

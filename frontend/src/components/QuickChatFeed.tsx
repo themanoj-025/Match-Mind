@@ -1,19 +1,88 @@
-// @ts-nocheck
 import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { MessageCircle, X, ChevronUp, Users, Sparkles } from 'lucide-react'
 
 const CHAT_SNIPPETS = [
-  { id: 1, room: 'Man City vs Arsenal', user: 'SportsKing', text: "What a strike from Haaland! 🚀", emoji: '🔥', time: 'just now' },
-  { id: 2, room: 'Lakers vs Celtics', user: 'HoopsMaster', text: 'LeBron still doing this at 40! Unreal.', emoji: '👑', time: '12s ago' },
-  { id: 3, room: 'Djokovic vs Alcaraz', user: 'AcePredictor', text: 'Best match of the tournament so far', emoji: '🎾', time: '28s ago' },
-  { id: 4, room: 'Man City vs Arsenal', user: 'GoalPredictor', text: '2-1 written all over this 🔮', emoji: '🎯', time: '45s ago' },
-  { id: 5, room: 'NFL Draft Live', user: 'GridironGuru', text: 'Patriots on the clock! 👀', emoji: '🏈', time: '1m ago' },
-  { id: 6, room: 'CSK vs MI', user: 'CricketKing', text: 'DHONI FINISHES OFF IN STYLE! 🏏', emoji: '💥', time: '1m ago' },
-  { id: 7, room: 'Champions League', user: 'EuroFooty', text: 'What a night at the Bernabeu!', emoji: '⚽', time: '2m ago' },
-  { id: 8, room: 'Real Madrid vs Barca', user: 'ElClasicoFan', text: 'Vamos! 3-0 up at halftime 🔥', emoji: '🔥', time: '2m ago' },
-  { id: 9, room: 'Premier League', user: 'FootyLover', text: 'Title race is going to the wire!', emoji: '🏆', time: '3m ago' },
-  { id: 10, room: 'NBA Playoffs', user: 'BallHandler', text: 'Game 7 energy is different 🏀', emoji: '💪', time: '3m ago' },
+  {
+    id: 1,
+    room: 'Man City vs Arsenal',
+    user: 'SportsKing',
+    text: 'What a strike from Haaland! 🚀',
+    emoji: '🔥',
+    time: 'just now',
+  },
+  {
+    id: 2,
+    room: 'Lakers vs Celtics',
+    user: 'HoopsMaster',
+    text: 'LeBron still doing this at 40! Unreal.',
+    emoji: '👑',
+    time: '12s ago',
+  },
+  {
+    id: 3,
+    room: 'Djokovic vs Alcaraz',
+    user: 'AcePredictor',
+    text: 'Best match of the tournament so far',
+    emoji: '🎾',
+    time: '28s ago',
+  },
+  {
+    id: 4,
+    room: 'Man City vs Arsenal',
+    user: 'GoalPredictor',
+    text: '2-1 written all over this 🔮',
+    emoji: '🎯',
+    time: '45s ago',
+  },
+  {
+    id: 5,
+    room: 'NFL Draft Live',
+    user: 'GridironGuru',
+    text: 'Patriots on the clock! 👀',
+    emoji: '🏈',
+    time: '1m ago',
+  },
+  {
+    id: 6,
+    room: 'CSK vs MI',
+    user: 'CricketKing',
+    text: 'DHONI FINISHES OFF IN STYLE! 🏏',
+    emoji: '💥',
+    time: '1m ago',
+  },
+  {
+    id: 7,
+    room: 'Champions League',
+    user: 'EuroFooty',
+    text: 'What a night at the Bernabeu!',
+    emoji: '⚽',
+    time: '2m ago',
+  },
+  {
+    id: 8,
+    room: 'Real Madrid vs Barca',
+    user: 'ElClasicoFan',
+    text: 'Vamos! 3-0 up at halftime 🔥',
+    emoji: '🔥',
+    time: '2m ago',
+  },
+  {
+    id: 9,
+    room: 'Premier League',
+    user: 'FootyLover',
+    text: 'Title race is going to the wire!',
+    emoji: '🏆',
+    time: '3m ago',
+  },
+  {
+    id: 10,
+    room: 'NBA Playoffs',
+    user: 'BallHandler',
+    text: 'Game 7 energy is different 🏀',
+    emoji: '💪',
+    time: '3m ago',
+  },
 ]
 
 export default function QuickChatFeed() {
@@ -25,10 +94,10 @@ export default function QuickChatFeed() {
   useEffect(() => {
     if (!isOpen) return
     const interval = setInterval(() => {
-      const remaining = CHAT_SNIPPETS.filter(s => !snippets.find(x => x.id === s.id))
+      const remaining = CHAT_SNIPPETS.filter((s) => !snippets.find((x) => x.id === s.id))
       if (remaining.length > 0) {
         const newSnippet = remaining[Math.floor(Math.random() * remaining.length)]
-        setSnippets(prev => [newSnippet, ...prev].slice(0, 8))
+        setSnippets((prev) => [newSnippet, ...prev].slice(0, 8) as any)
       }
     }, 4000)
     return () => clearInterval(interval)
@@ -85,20 +154,14 @@ export default function QuickChatFeed() {
                     className="px-4 py-2.5 border-b border-[var(--border-subtle)] last:border-0 hover:bg-[var(--mm-bg-hover)]/50 transition-colors"
                   >
                     <div className="flex items-center gap-2 mb-0.5">
-                      <span className="caption font-semibold text-[var(--mm-accent-green)]">
-                        {snippet.user}
-                      </span>
+                      <span className="caption font-semibold text-[var(--mm-accent-green)]">{snippet.user}</span>
                       <span className="caption text-[var(--mm-text-muted)]">in</span>
                       <span className="caption font-medium text-[var(--mm-text-secondary)] truncate">
                         {snippet.room}
                       </span>
-                      <span className="caption text-[var(--mm-text-muted)] ml-auto shrink-0">
-                        {snippet.time}
-                      </span>
+                      <span className="caption text-[var(--mm-text-muted)] ml-auto shrink-0">{snippet.time}</span>
                     </div>
-                    <p className="body text-[var(--mm-text-secondary)]">
-                      {snippet.text}
-                    </p>
+                    <p className="body text-[var(--mm-text-secondary)]">{snippet.text}</p>
                   </motion.div>
                 ))}
               </AnimatePresence>
@@ -109,9 +172,7 @@ export default function QuickChatFeed() {
               <span className="caption text-[var(--mm-text-muted)] flex items-center gap-1">
                 <Sparkles size={12} /> Live from active rooms
               </span>
-              <span className="caption text-[var(--mm-accent-green)] font-medium">
-                {snippets.length} messages
-              </span>
+              <span className="caption text-[var(--mm-accent-green)] font-medium">{snippets.length} messages</span>
             </div>
           </motion.div>
         )}
@@ -119,4 +180,3 @@ export default function QuickChatFeed() {
     </>
   )
 }
-

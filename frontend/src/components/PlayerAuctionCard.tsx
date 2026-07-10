@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * PlayerAuctionCard — MatchMind
  *
@@ -49,9 +48,8 @@ export default function PlayerAuctionCard({
   onTimerExpired,
 }: PlayerAuctionCardProps) {
   const isMyBid = auctionState.currentBidderId === myUserId
-  const minBidIncrement = auctionState.currentBid < 50 ? 5
-    : auctionState.currentBid < 100 ? 10
-    : auctionState.currentBid < 200 ? 25 : 50
+  const minBidIncrement =
+    auctionState.currentBid < 50 ? 5 : auctionState.currentBid < 100 ? 10 : auctionState.currentBid < 200 ? 25 : 50
 
   return (
     <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-active)] rounded-[var(--radius-xl)] p-6 sm:p-8 relative overflow-hidden">
@@ -73,11 +71,7 @@ export default function PlayerAuctionCard({
 
       {/* Timer */}
       <div className="absolute top-4 right-4 z-10">
-        <AuctionTimer
-          timerEndsAt={auctionState.timerEndsAt}
-          phase={auctionState.phase}
-          onExpired={onTimerExpired}
-        />
+        <AuctionTimer timerEndsAt={auctionState.timerEndsAt} phase={auctionState.phase} onExpired={onTimerExpired} />
       </div>
 
       {/* Player identity */}
@@ -96,9 +90,7 @@ export default function PlayerAuctionCard({
           <span className="caption text-[var(--mm-text-muted)]">{player.nationality}</span>
         </div>
 
-        <div className="caption text-[var(--mm-text-muted)] mb-4">
-          Base price: 🪙 ${player.basePrice}
-        </div>
+        <div className="caption text-[var(--mm-text-muted)] mb-4">Base price: 🪙 ${player.basePrice}</div>
       </div>
 
       {/* Current bid section */}
@@ -113,13 +105,9 @@ export default function PlayerAuctionCard({
               You are the highest bidder!
             </div>
           ) : auctionState.currentBidderId ? (
-            <div className="text-[var(--mm-text-secondary)] caption">
-              Highest bidder
-            </div>
+            <div className="text-[var(--mm-text-secondary)] caption">Highest bidder</div>
           ) : (
-            <div className="text-[var(--mm-text-muted)] caption">
-              Opening bid — be the first!
-            </div>
+            <div className="text-[var(--mm-text-muted)] caption">Opening bid — be the first!</div>
           )}
         </div>
       )}
@@ -178,4 +166,3 @@ export default function PlayerAuctionCard({
     </div>
   )
 }
-
