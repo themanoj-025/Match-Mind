@@ -41,7 +41,8 @@ logs/
 # ════════════════════════════════════════════════════════════════
 #  IDE & EDITOR
 # ════════════════════════════════════════════════════════════════
-.vscode/
+.vscode/*
+!.vscode/settings.json
 .idea/
 *.swp
 *.swo
@@ -71,6 +72,7 @@ backend/prisma/*.tsbuildinfo
 .cache/
 
 .gemini/
+.cursorrules
 
 CLAUDE.md
 start.bat
