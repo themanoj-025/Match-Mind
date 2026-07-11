@@ -6,9 +6,7 @@ import { motion } from 'framer-motion'
 
 export default function NotFoundPage() {
   return (
-    <motion.div
-      className="min-h-screen flex items-center justify-center px-4"
-    >
+    <motion.div className="min-h-screen flex items-center justify-center px-4">
       <Helmet>
         <title>404 — Page Not Found | MatchMind</title>
       </Helmet>
@@ -23,11 +21,7 @@ export default function NotFoundPage() {
         >
           ⚽
         </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           <h1 className="display-l mb-3">OFFSIDE.</h1>
           <p className="heading-2 text-[var(--mm-accent-red)] mb-4">PAGE NOT FOUND.</p>
           <p className="body-large text-[var(--mm-text-secondary)] mb-8">
@@ -52,4 +46,3 @@ export default function NotFoundPage() {
     </motion.div>
   )
 }
-

@@ -1,7 +1,22 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, User, Mail, Lock, Bell, Shield, Moon, Trash2, Sparkles, CreditCard, ExternalLink, CheckCircle, XCircle, Loader } from 'lucide-react'
+import {
+  ArrowLeft,
+  User,
+  Mail,
+  Lock,
+  Bell,
+  Shield,
+  Moon,
+  Trash2,
+  Sparkles,
+  CreditCard,
+  ExternalLink,
+  CheckCircle,
+  XCircle,
+  Loader,
+} from 'lucide-react'
 import { useStripeStatus } from '../hooks/useApi'
 
 export default function SettingsPage() {
@@ -26,27 +41,39 @@ export default function SettingsPage() {
 
   const sections = [
     {
-      icon: User, label: 'Profile', desc: 'Avatar, display name, bio, favourite sports',
+      icon: User,
+      label: 'Profile',
+      desc: 'Avatar, display name, bio, favourite sports',
       link: '/profile/me',
     },
     {
-      icon: Mail, label: 'Account', desc: 'Email, password, connected accounts',
+      icon: Mail,
+      label: 'Account',
+      desc: 'Email, password, connected accounts',
       link: null,
     },
     {
-      icon: Bell, label: 'Notifications', desc: 'Push/email toggles per event type',
+      icon: Bell,
+      label: 'Notifications',
+      desc: 'Push/email toggles per event type',
       link: '/profile/me/notifications',
     },
     {
-      icon: Shield, label: 'Privacy', desc: 'Public/private profile, prediction history',
+      icon: Shield,
+      label: 'Privacy',
+      desc: 'Public/private profile, prediction history',
       link: null,
     },
     {
-      icon: Moon, label: 'Appearance', desc: 'Theme: Dark / Light / AMOLED Black',
+      icon: Moon,
+      label: 'Appearance',
+      desc: 'Theme: Dark / Light / AMOLED Black',
       link: null,
     },
     {
-      icon: Trash2, label: 'Danger Zone', desc: 'Delete account permanently',
+      icon: Trash2,
+      label: 'Danger Zone',
+      desc: 'Delete account permanently',
       link: null,
     },
   ]
@@ -54,7 +81,10 @@ export default function SettingsPage() {
   return (
     <motion.div className="min-h-screen pt-16 pb-20 md:pb-8">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6">
-        <Link to="/profile/me" className="flex items-center gap-1.5 text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] body mb-6 transition-colors">
+        <Link
+          to="/profile/me"
+          className="flex items-center gap-1.5 text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] body mb-6 transition-colors"
+        >
           <ArrowLeft size={16} /> Back to Profile
         </Link>
         <h1 className="heading-1 mb-6">Settings</h1>
@@ -109,7 +139,9 @@ export default function SettingsPage() {
                   {portalLoading ? (
                     <Loader size={14} className="animate-spin" />
                   ) : (
-                    <><ExternalLink size={14} /> Manage</>
+                    <>
+                      <ExternalLink size={14} /> Manage
+                    </>
                   )}
                 </button>
               ) : (
@@ -126,7 +158,12 @@ export default function SettingsPage() {
           {/* Pro expiry */}
           {(proStatus as any)?.proExpiresAt && (
             <p className="caption text-[var(--mm-text-muted)] mt-2 ml-[52px]">
-              Expires {new Date((proStatus as any).proExpiresAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+              Expires{' '}
+              {new Date((proStatus as any).proExpiresAt).toLocaleDateString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric',
+              })}
             </p>
           )}
         </motion.div>
@@ -171,4 +208,3 @@ export default function SettingsPage() {
     </motion.div>
   )
 }
-

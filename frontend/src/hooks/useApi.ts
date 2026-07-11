@@ -170,11 +170,12 @@ export function useCreateRoom() {
       name: string
       totalBudget: number
       rosterRules: { GK: number; DEF: number; MID: number; FWD: number; total: number }
-    }) => fetchJSON('/api/rooms', {
-      method: 'POST',
-      headers: authedHeaders(),
-      body: JSON.stringify(data),
-    }),
+    }) =>
+      fetchJSON('/api/rooms', {
+        method: 'POST',
+        headers: authedHeaders(),
+        body: JSON.stringify(data),
+      }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['rooms'] }),
   })
 }
@@ -207,7 +208,8 @@ export function useAuctionState(roomId?: string) {
 export function useFranchise(roomId: string, userId?: string) {
   return useQuery<RosterEntry[]>({
     queryKey: keys.franchise(roomId, userId),
-    queryFn: () => fetchJSON<RosterEntry[]>(`/api/rooms/${roomId}/franchises/${userId || 'me'}`, { headers: authedHeaders() }),
+    queryFn: () =>
+      fetchJSON<RosterEntry[]>(`/api/rooms/${roomId}/franchises/${userId || 'me'}`, { headers: authedHeaders() }),
     enabled: !!roomId,
     staleTime: 10000,
   })
@@ -268,7 +270,8 @@ export function useUser(id?: string) {
 export function useCheckUsername(username?: string) {
   return useQuery<{ available: boolean }>({
     queryKey: keys.checkUsername(username),
-    queryFn: () => fetchJSON<{ available: boolean }>(`/api/users/check-username?username=${encodeURIComponent(username!)}`),
+    queryFn: () =>
+      fetchJSON<{ available: boolean }>(`/api/users/check-username?username=${encodeURIComponent(username!)}`),
     enabled: !!username && username.length >= 3,
     staleTime: 5000,
   })
@@ -461,7 +464,14 @@ export function useMatchTimeline(_id?: string) {
 export function useCreatePrediction() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (data: { matchId: string; homeGoals: number; awayGoals: number; btts?: boolean; totalGoalsOU?: string; totalGoalsLine?: number }) =>
+    mutationFn: (data: {
+      matchId: string
+      homeGoals: number
+      awayGoals: number
+      btts?: boolean
+      totalGoalsOU?: string
+      totalGoalsLine?: number
+    }) =>
       fetchJSON('/api/predictions', {
         method: 'POST',
         headers: authedHeaders(),
@@ -485,17 +495,23 @@ export function useSearch(_query?: string) {
 
 export function useFollowUser() {
   return useMutation({
-    mutationFn: (_userId: string) => fetchJSON(`/api/users/${_userId}/follow`, {
-      method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
-    }),
+    mutationFn: (_userId: string) =>
+      fetchJSON(`/api/users/${_userId}/follow`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      }),
   })
 }
 
 export function useUnfollowUser() {
   return useMutation({
-    mutationFn: (_userId: string) => fetchJSON(`/api/users/${_userId}/unfollow`, {
-      method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
-    }),
+    mutationFn: (_userId: string) =>
+      fetchJSON(`/api/users/${_userId}/unfollow`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      }),
   })
 }
 
@@ -638,7 +654,8 @@ export interface DraftPoolValidationResponse {
 export function useAdminDraftPoolValidation() {
   return useQuery<DraftPoolValidationResponse>({
     queryKey: ['admin', 'draft', 'pool-validation'],
-    queryFn: () => fetchJSON<DraftPoolValidationResponse>('/api/admin/draft/pool-validation', { headers: authedHeaders() }),
+    queryFn: () =>
+      fetchJSON<DraftPoolValidationResponse>('/api/admin/draft/pool-validation', { headers: authedHeaders() }),
     staleTime: 30000,
   })
 }
@@ -712,4 +729,3 @@ export function useRevalidateDraftPool() {
     },
   })
 }
-

@@ -14,17 +14,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Helmet } from 'react-helmet-async'
-import {
-  ArrowLeft,
-  Play,
-  Check,
-  Loader2,
-  AlertCircle,
-  Zap,
-  Users,
-  Gavel,
-  Trophy,
-} from 'lucide-react'
+import { ArrowLeft, Play, Check, Loader2, AlertCircle, Zap, Users, Gavel, Trophy } from 'lucide-react'
 import {
   useDraftSession,
   useStartDraft,
@@ -173,7 +163,9 @@ export default function DraftSessionPage() {
         <div className="text-center">
           <AlertCircle size={40} className="mx-auto mb-3 text-[var(--mm-text-muted)]" />
           <h2 className="heading-2 mb-1">Session Not Found</h2>
-          <p className="body text-[var(--mm-text-secondary)] mb-4">This draft session doesn't exist or you don't have access.</p>
+          <p className="body text-[var(--mm-text-secondary)] mb-4">
+            This draft session doesn't exist or you don't have access.
+          </p>
           <Link to="/dashboard" className="text-[var(--mm-accent-green)] hover:underline">
             Back to Dashboard
           </Link>
@@ -209,12 +201,17 @@ export default function DraftSessionPage() {
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-full)] text-xs font-medium">
               <span className="text-[var(--mm-text-secondary)]">{session.formation}</span>
               <span className="text-[var(--mm-text-muted)]">·</span>
-              <span className={`font-semibold ${
-                isDrafting ? 'text-[var(--mm-accent-green)]' :
-                isSquadComplete ? 'text-[var(--mm-accent-amber)]' :
-                isRunActive ? 'text-[var(--mm-accent-purple)]' :
-                'text-[var(--mm-text-muted)]'
-              }`}>
+              <span
+                className={`font-semibold ${
+                  isDrafting
+                    ? 'text-[var(--mm-accent-green)]'
+                    : isSquadComplete
+                      ? 'text-[var(--mm-accent-amber)]'
+                      : isRunActive
+                        ? 'text-[var(--mm-accent-purple)]'
+                        : 'text-[var(--mm-text-muted)]'
+                }`}
+              >
                 {session.status.replace(/_/g, ' ')}
               </span>
             </div>
@@ -239,15 +236,14 @@ export default function DraftSessionPage() {
                           Pick {nextRound.round.slotIndex + 1} — {nextRound.round.position}
                         </p>
                         <p className="text-xs text-[var(--mm-text-muted)]">
-                          Round {nextRound.round.slotIndex + 1} of {nextRound.round.players.length > 0 ? `${sessionData?.picks?.length || 0 + 1} picks made` : '?'}
+                          Round {nextRound.round.slotIndex + 1} of{' '}
+                          {nextRound.round.players.length > 0
+                            ? `${sessionData?.picks?.length || 0 + 1} picks made`
+                            : '?'}
                         </p>
                       </div>
                     </div>
-                    <DraftTimer
-                      expiresAt={nextRound.round.expiresAt}
-                      totalSeconds={20}
-                      onExpired={handleAutoPick}
-                    />
+                    <DraftTimer expiresAt={nextRound.round.expiresAt} totalSeconds={20} onExpired={handleAutoPick} />
                   </div>
                 )}
 
@@ -289,11 +285,7 @@ export default function DraftSessionPage() {
                       disabled={commitSquad.isPending}
                       className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] font-semibold rounded-[var(--radius-md)] hover:opacity-90 transition-all disabled:opacity-50"
                     >
-                      {commitSquad.isPending ? (
-                        <Loader2 size={18} className="animate-spin" />
-                      ) : (
-                        <Check size={18} />
-                      )}
+                      {commitSquad.isPending ? <Loader2 size={18} className="animate-spin" /> : <Check size={18} />}
                       Commit Squad
                     </button>
                   </div>
@@ -336,7 +328,8 @@ export default function DraftSessionPage() {
                   </p>
                   {session.synergyScore > 0 && (
                     <p className="text-sm text-[var(--mm-accent-green)] mb-4">
-                      Synergy Bonus: +{session.synergyScore}% · Formation Bonus: {session.formationBonusApplied ? '+5%' : 'None'}
+                      Synergy Bonus: +{session.synergyScore}% · Formation Bonus:{' '}
+                      {session.formationBonusApplied ? '+5%' : 'None'}
                     </p>
                   )}
 
@@ -345,11 +338,7 @@ export default function DraftSessionPage() {
                     disabled={enterRun.isPending}
                     className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[var(--mm-accent-green)] to-[var(--mm-accent-blue)] text-[var(--mm-text-inverse)] font-semibold rounded-[var(--radius-md)] hover:opacity-90 transition-all disabled:opacity-50 shadow-lg"
                   >
-                    {enterRun.isPending ? (
-                      <Loader2 size={18} className="animate-spin" />
-                    ) : (
-                      <Play size={18} />
-                    )}
+                    {enterRun.isPending ? <Loader2 size={18} className="animate-spin" /> : <Play size={18} />}
                     Enter Draft Run
                   </button>
                 </div>
@@ -363,12 +352,14 @@ export default function DraftSessionPage() {
                 {/* Show roster in complete state too */}
                 <RosterPreview
                   formationName={session.formation}
-                  slots={formations?.find((f) => f.id === session.formation)?.slots || [
-                    { position: 'GK', count: 1 },
-                    { position: 'DEF', count: 4 },
-                    { position: 'MID', count: 4 },
-                    { position: 'FWD', count: 2 },
-                  ]}
+                  slots={
+                    formations?.find((f) => f.id === session.formation)?.slots || [
+                      { position: 'GK', count: 1 },
+                      { position: 'DEF', count: 4 },
+                      { position: 'MID', count: 4 },
+                      { position: 'FWD', count: 2 },
+                    ]
+                  }
                   benchSlots={formations?.find((f) => f.id === session.formation)?.benchSlots || 7}
                   picks={picks.map((p) => ({
                     ...p,
@@ -397,14 +388,18 @@ export default function DraftSessionPage() {
               <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-xl)] p-4">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-semibold text-sm text-[var(--mm-text-primary)]">Draft Summary</h3>
-                  <span className="text-xs text-[var(--mm-text-muted)]">{picks.filter((p) => p.pickedPlayerId).length} / {picks.length} slots</span>
+                  <span className="text-xs text-[var(--mm-text-muted)]">
+                    {picks.filter((p) => p.pickedPlayerId).length} / {picks.length} slots
+                  </span>
                 </div>
                 <div className="grid grid-cols-4 gap-2 text-center">
                   {['GK', 'DEF', 'MID', 'FWD'].map((pos) => {
                     const count = picks.filter((p) => p.position === pos && p.pickedPlayerId).length
                     return (
                       <div key={pos} className="bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-md)] p-2">
-                        <div className="text-lg">{['🧤', '🛡️', '🎯', '⚽'][['GK', 'DEF', 'MID', 'FWD'].indexOf(pos)]}</div>
+                        <div className="text-lg">
+                          {['🧤', '🛡️', '🎯', '⚽'][['GK', 'DEF', 'MID', 'FWD'].indexOf(pos)]}
+                        </div>
                         <div className="text-xs font-bold text-[var(--mm-text-primary)]">{count}</div>
                         <div className="text-[10px] text-[var(--mm-text-muted)]">{pos}</div>
                       </div>
@@ -415,12 +410,14 @@ export default function DraftSessionPage() {
 
               <RosterPreview
                 formationName={session.formation}
-                slots={formations?.find((f) => f.id === session.formation)?.slots || [
-                  { position: 'GK', count: 1 },
-                  { position: 'DEF', count: 4 },
-                  { position: 'MID', count: 4 },
-                  { position: 'FWD', count: 2 },
-                ]}
+                slots={
+                  formations?.find((f) => f.id === session.formation)?.slots || [
+                    { position: 'GK', count: 1 },
+                    { position: 'DEF', count: 4 },
+                    { position: 'MID', count: 4 },
+                    { position: 'FWD', count: 2 },
+                  ]
+                }
                 benchSlots={formations?.find((f) => f.id === session.formation)?.benchSlots || 7}
                 picks={picks.map((p) => ({
                   ...p,
@@ -469,26 +466,21 @@ function StartDraftFlow({
           </p>
         </div>
 
-        <FormatSelector
-          formations={formations}
-          selected={selectedFormation}
-          onSelect={onSelectFormation}
-        />
+        <FormatSelector formations={formations} selected={selectedFormation} onSelect={onSelectFormation} />
 
         <button
           onClick={onStart}
           disabled={!selectedFormation || isStarting}
           className="mt-6 w-full py-3 bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] font-semibold rounded-[var(--radius-md)] hover:opacity-90 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
-          {isStarting ? (
-            <Loader2 size={18} className="animate-spin" />
-          ) : (
-            <Play size={18} />
-          )}
-          {isStarting ? 'Starting Draft...' : selectedFormation ? `Start ${selectedFormation} Draft` : 'Select a Formation'}
+          {isStarting ? <Loader2 size={18} className="animate-spin" /> : <Play size={18} />}
+          {isStarting
+            ? 'Starting Draft...'
+            : selectedFormation
+              ? `Start ${selectedFormation} Draft`
+              : 'Select a Formation'}
         </button>
       </div>
     </div>
   )
 }
-

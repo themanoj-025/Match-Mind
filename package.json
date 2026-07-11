@@ -19,7 +19,9 @@
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
-      "prettier --write --ignore-unknown"
+      "eslint --fix",
+      "prettier --write --ignore-unknown",
+      "bash -c 'npm run typecheck'"
     ],
     "*.{json,md,yml,yaml}": [
       "prettier --write --ignore-unknown"

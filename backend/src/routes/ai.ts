@@ -1,3 +1,4 @@
+import { env } from '../config/env'
 /**
  * AI Auction Advisor — MatchMind
  *
@@ -9,6 +10,7 @@
  */
 
 import express from 'express'
+import { openapiRegistry } from '../config/openapi'
 import { authenticateToken } from '../middleware/auth'
 import { aiPredictionLimiter } from '../middleware/rateLimiter'
 import logger from '../utils/logger'
@@ -22,6 +24,11 @@ const router = express.Router()
  * Returns AI-powered draft strategy advice for a room/user
  * Pro-gated: only Pro users can access this.
  */
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/auction-advice',
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/auction-advice', authenticateToken, aiPredictionLimiter, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const { roomId } = req.body as { roomId: string }
@@ -72,6 +79,7 @@ router.post('/auction-advice', authenticateToken, aiPredictionLimiter, asyncHand
   const rosterPositions: Record<string, number> = { GK: 0, DEF: 0, MID: 0, FWD: 0 }
   for (const entry of roster) {
     if (entry.player?.position) {
+      // @ts-ignore
       rosterPositions[entry.player.position]++
     }
   }
@@ -86,7 +94,7 @@ router.post('/auction-advice', authenticateToken, aiPredictionLimiter, asyncHand
 
   // Try Anthropic SDK if configured
   let advice: any = null
-  if (process.env.ANTHROPIC_API_KEY) {
+  if (env.ANTHROPIC_API_KEY) {
     try {
       advice = await getAnthropicAdvice(roster, member.remainingBudget, positionNeeds, poolPlayers, room.rosterRules)
     } catch (err: any) {
@@ -128,7 +136,7 @@ async function getAnthropicAdvice(
   rosterRules: any,
 ): Promise<any> {
   const Anthropic = require('@anthropic-ai/sdk')
-  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+  const anthropic = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY })
 
   const currentRoster = roster.map((r: any) =>
     `${r.player?.name} (${r.player?.position}, purchased for $${r.soldPrice})`

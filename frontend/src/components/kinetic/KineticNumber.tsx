@@ -1,9 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { motion } from 'framer-motion'
-import {
-  kineticNumberRollVariants,
-  prefersReducedMotion,
-} from '../../lib/kinetic'
+import { kineticNumberRollVariants, prefersReducedMotion } from '../../lib/kinetic'
 
 type AnimationMode = 'roll' | 'flip' | 'count' | 'scale'
 
@@ -66,10 +63,7 @@ export default function KineticNumber({
   const mountedRef = useRef(false)
   const reduced = prefersReducedMotion()
 
-  const defaultFormatter = useCallback(
-    (n: number) => Math.floor(n).toLocaleString(),
-    []
-  )
+  const defaultFormatter = useCallback((n: number) => Math.floor(n).toLocaleString(), [])
   const fmt = formatter || defaultFormatter
 
   // ── Cleanup rAF on unmount ──
@@ -155,11 +149,14 @@ export default function KineticNumber({
   const digits = useMemo(() => {
     const numStr = String(Math.floor(displayValue))
     if (padDigits !== undefined) {
-      return numStr.padStart(padDigits, '0').split('').map((d, i) => ({
-        char: d,
-        pos: i,
-        key: `dig-${i}`,
-      }))
+      return numStr
+        .padStart(padDigits, '0')
+        .split('')
+        .map((d, i) => ({
+          char: d,
+          pos: i,
+          key: `dig-${i}`,
+        }))
     }
     return numStr.split('').map((d, i) => ({
       char: d,
@@ -170,10 +167,7 @@ export default function KineticNumber({
 
   // ── Render digits with roll animation ──
   const renderDigits = () => (
-    <span
-      className="kinetic-number-digits"
-      style={{ display: 'inline-flex', overflow: 'hidden' }}
-    >
+    <span className="kinetic-number-digits" style={{ display: 'inline-flex', overflow: 'hidden' }}>
       {digits.map(({ char, key }) => (
         <motion.span
           key={key}
@@ -214,4 +208,3 @@ export default function KineticNumber({
     </Tag>
   )
 }
-

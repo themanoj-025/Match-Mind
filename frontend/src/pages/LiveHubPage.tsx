@@ -26,7 +26,7 @@ export default function LiveHubPage() {
   const dateStr = today.toISOString().split('T')[0]
 
   const { data: liveMatches = [], isLoading: matchesLoading } = useMatches(
-    activeSport === 'all' ? undefined : activeSport
+    activeSport === 'all' ? undefined : activeSport,
   )
   const { data: topUsers = [] } = useLeaderboard('global')
 
@@ -39,15 +39,23 @@ export default function LiveHubPage() {
 
   const liveMatchList: Match[] = (liveMatches as any[]).filter((m: Match) => m.status === 'SIMULATING')
   const upcomingList: Match[] = (liveMatches as any[]).filter((m: Match) => m.status === 'SCHEDULED')
-  const finishedList: Match[] = (liveMatches as any[]).filter((m: Match) => m.status === 'FINISHED' || m.status === 'COMPLETED')
+  const finishedList: Match[] = (liveMatches as any[]).filter(
+    (m: Match) => m.status === 'FINISHED' || m.status === 'COMPLETED',
+  )
 
   return (
     <div className="min-h-screen pt-16 pb-20 md:pb-8">
       <Helmet>
         <title>Live Matches & Scores — Football, NBA, NFL, Tennis, Cricket, Hockey | MatchMind</title>
-        <meta name="description" content={`Watch live sports matches in real-time. ${liveMatchList.length} matches live now across football, basketball, NFL, tennis, cricket, and hockey. Live scores, stats, and chat.`} />
+        <meta
+          name="description"
+          content={`Watch live sports matches in real-time. ${liveMatchList.length} matches live now across football, basketball, NFL, tennis, cricket, and hockey. Live scores, stats, and chat.`}
+        />
         <meta property="og:title" content="Live Matches & Scores — MatchMind" />
-        <meta property="og:description" content={`Watch live sports. ${liveMatchList.length} matches in play right now. ${upcomingList.length} upcoming fixtures. Predict, compete, and chat.`} />
+        <meta
+          property="og:description"
+          content={`Watch live sports. ${liveMatchList.length} matches in play right now. ${upcomingList.length} upcoming fixtures. Predict, compete, and chat.`}
+        />
         <meta property="og:image" content="https://matchmind.gg/og-live.jpg" />
         <meta property="og:image:alt" content="Live Matches — MatchMind" />
         <meta property="og:type" content="website" />
@@ -85,14 +93,20 @@ export default function LiveHubPage() {
 
         {/* Date Navigator */}
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => setDateOffset((d) => d - 1)} className="p-2 rounded-[var(--radius-md)] bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] transition-colors">
+          <button
+            onClick={() => setDateOffset((d) => d - 1)}
+            className="p-2 rounded-[var(--radius-md)] bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] transition-colors"
+          >
             <ChevronLeft size={18} />
           </button>
           <div className="flex items-center gap-2 bg-[var(--mm-bg-tertiary)] px-4 py-2 rounded-[var(--radius-md)]">
             <Calendar size={16} className="text-[var(--mm-accent-green)]" />
             <span className="body font-medium">{getTodayLabel()}</span>
           </div>
-          <button onClick={() => setDateOffset((d) => d + 1)} className="p-2 rounded-[var(--radius-md)] bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] transition-colors">
+          <button
+            onClick={() => setDateOffset((d) => d + 1)}
+            className="p-2 rounded-[var(--radius-md)] bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] transition-colors"
+          >
             <ChevronRight size={18} />
           </button>
         </div>
@@ -108,14 +122,16 @@ export default function LiveHubPage() {
                 <span className="caption text-[var(--mm-text-muted)]">({liveMatchList.length} matches)</span>
               </div>
               <div className="grid sm:grid-cols-2 gap-4">
-                {liveMatchList.length > 0 ? liveMatchList.map((match) => (
-                  <MatchCard
-                    key={match.id}
-                    match={match as any}
-                    onEnterRoom={() => navigate(`/live/${match.id}`)}
-                    onPredict={() => navigate(`/predictions/new/${match.id}`)}
-                  />
-                )) : (
+                {liveMatchList.length > 0 ? (
+                  liveMatchList.map((match) => (
+                    <MatchCard
+                      key={match.id}
+                      match={match as any}
+                      onEnterRoom={() => navigate(`/live/${match.id}`)}
+                      onPredict={() => navigate(`/predictions/new/${match.id}`)}
+                    />
+                  ))
+                ) : (
                   <div className="col-span-full text-center py-12 bg-[var(--mm-bg-secondary)] rounded-[var(--radius-lg)] border border-[var(--border-subtle)] overflow-hidden relative">
                     {/* Radar scanning animation */}
                     <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -123,12 +139,17 @@ export default function LiveHubPage() {
                         <div className="absolute inset-0 rounded-full border border-[var(--mm-accent-green)]/20 animate-glow-pulse" />
                         <div className="absolute inset-4 rounded-full border border-[var(--mm-accent-green)]/15" />
                         <div className="absolute inset-8 rounded-full border border-[var(--mm-accent-green)]/10" />
-                        <div className="absolute top-1/2 left-1/2 w-1 h-20 bg-gradient-to-t from-[var(--mm-accent-green)]/40 to-transparent origin-bottom animate-spin" style={{ animationDuration: '3s' }} />
+                        <div
+                          className="absolute top-1/2 left-1/2 w-1 h-20 bg-gradient-to-t from-[var(--mm-accent-green)]/40 to-transparent origin-bottom animate-spin"
+                          style={{ animationDuration: '3s' }}
+                        />
                       </div>
                     </div>
                     <div className="relative z-10">
                       <span className="text-5xl block mb-4">📡</span>
-                      <p className="body-large text-[var(--mm-text-secondary)] font-semibold">The pitches are quiet right now...</p>
+                      <p className="body-large text-[var(--mm-text-secondary)] font-semibold">
+                        The pitches are quiet right now...
+                      </p>
                       <p className="body text-[var(--mm-text-muted)] mt-1">Scanning for upcoming action</p>
                     </div>
                   </div>
@@ -146,16 +167,25 @@ export default function LiveHubPage() {
               {upcomingList.length > 0 ? (
                 <div className="grid sm:grid-cols-2 gap-4">
                   {upcomingList.slice(0, 4).map((match) => {
-                    const timeUntil = match.scheduledAt ? Math.floor((new Date(match.scheduledAt).getTime() - new Date().getTime()) / 3600000) : null
+                    const timeUntil = match.scheduledAt
+                      ? Math.floor((new Date(match.scheduledAt).getTime() - new Date().getTime()) / 3600000)
+                      : null
                     return (
-                      <div key={match.id} className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] overflow-hidden hover:border-[var(--border-active)] transition-all group">
+                      <div
+                        key={match.id}
+                        className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] overflow-hidden hover:border-[var(--border-active)] transition-all group"
+                      >
                         <div className="p-4">
                           <div className="flex items-center justify-between mb-3">
-                            <span className="caption text-[var(--mm-text-muted)]">{match.competition || 'Upcoming'}</span>
+                            <span className="caption text-[var(--mm-text-muted)]">
+                              {match.competition || 'Upcoming'}
+                            </span>
                             {timeUntil !== null && (
                               <div className="flex items-center gap-1 px-2 py-1 bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-sm)]">
                                 <Clock size={12} className="text-[var(--mm-accent-amber)]" />
-                                <span className="caption font-semibold text-[var(--mm-accent-amber)]">{timeUntil}h</span>
+                                <span className="caption font-semibold text-[var(--mm-accent-amber)]">
+                                  {timeUntil}h
+                                </span>
                               </div>
                             )}
                           </div>
@@ -221,22 +251,33 @@ export default function LiveHubPage() {
           {/* Sidebar */}
           <aside className="w-full lg:w-72 shrink-0">
             <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4 mb-4">
-              <h3 className="caption font-semibold text-[var(--mm-text-muted)] uppercase tracking-wider mb-3">Top Predictors Online</h3>
+              <h3 className="caption font-semibold text-[var(--mm-text-muted)] uppercase tracking-wider mb-3">
+                Top Predictors Online
+              </h3>
               {topUsers.slice(0, 3).map((p: any, i: number) => (
                 <div key={i} className="flex items-center gap-2 py-1.5">
                   <span className="caption text-[var(--mm-text-muted)] w-5">{i + 1}</span>
                   <span className="body flex-1">{p.name || p.displayName || p.username}</span>
-                  <span className="caption text-[var(--mm-accent-amber)]">🪙{(p.points || p.totalPoints || 0).toLocaleString()}</span>
+                  <span className="caption text-[var(--mm-accent-amber)]">
+                    🪙{(p.points || p.totalPoints || 0).toLocaleString()}
+                  </span>
                 </div>
               ))}
               {topUsers.length === 0 && !matchesLoading && (
                 <div className="text-center py-4 text-[var(--mm-text-muted)] caption">No data yet</div>
               )}
-              <Link to="/leaderboard" className="block mt-3 caption text-[var(--mm-accent-green)] font-medium hover:underline">View all</Link>
+              <Link
+                to="/leaderboard"
+                className="block mt-3 caption text-[var(--mm-accent-green)] font-medium hover:underline"
+              >
+                View all
+              </Link>
             </div>
 
             <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4">
-              <h3 className="caption font-semibold text-[var(--mm-text-muted)] uppercase tracking-wider mb-3">Trending Rooms</h3>
+              <h3 className="caption font-semibold text-[var(--mm-text-muted)] uppercase tracking-wider mb-3">
+                Trending Rooms
+              </h3>
               {[
                 { match: 'Man City vs Arsenal', viewers: '1,247' },
                 { match: 'Lakers vs Celtics', viewers: '982' },
@@ -257,23 +298,33 @@ export default function LiveHubPage() {
 
             {/* Hot Predictions */}
             <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4">
-              <h3 className="caption font-semibold text-[var(--mm-text-muted)] uppercase tracking-wider mb-3 flex items-center gap-1.5"><Flame size={14} className="text-[var(--mm-accent-red)]" /> Hot Predictions</h3>
+              <h3 className="caption font-semibold text-[var(--mm-text-muted)] uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <Flame size={14} className="text-[var(--mm-accent-red)]" /> Hot Predictions
+              </h3>
               <div className="flex flex-col gap-3">
-                {upcomingList.length > 0 ? upcomingList.slice(0, 3).map((match, i) => (
-                  <div key={match.id || i} className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-[var(--mm-bg-tertiary)] flex items-center justify-center text-xs font-bold text-[var(--mm-text-muted)]">{i + 1}</div>
-                    <div className="flex-1 min-w-0">
-                      <span className="body truncate block">{match.homeTeam} vs {match.awayTeam}</span>
-                      <span className="caption text-[var(--mm-text-muted)]">🔥 {Math.floor(Math.random() * 200 + 50)} predictions</span>
+                {upcomingList.length > 0 ? (
+                  upcomingList.slice(0, 3).map((match, i) => (
+                    <div key={match.id || i} className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-[var(--mm-bg-tertiary)] flex items-center justify-center text-xs font-bold text-[var(--mm-text-muted)]">
+                        {i + 1}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <span className="body truncate block">
+                          {match.homeTeam} vs {match.awayTeam}
+                        </span>
+                        <span className="caption text-[var(--mm-text-muted)]">
+                          🔥 {Math.floor(Math.random() * 200 + 50)} predictions
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => navigate(`/predictions/new/${match.id}`)}
+                        className="px-2 py-1 text-[10px] font-semibold bg-[var(--mm-accent-green)]/10 text-[var(--mm-accent-green)] rounded-[var(--radius-sm)] hover:bg-[var(--mm-accent-green)] hover:text-[var(--mm-text-inverse)] transition-all"
+                      >
+                        Predict
+                      </button>
                     </div>
-                    <button
-                      onClick={() => navigate(`/predictions/new/${match.id}`)}
-                      className="px-2 py-1 text-[10px] font-semibold bg-[var(--mm-accent-green)]/10 text-[var(--mm-accent-green)] rounded-[var(--radius-sm)] hover:bg-[var(--mm-accent-green)] hover:text-[var(--mm-text-inverse)] transition-all"
-                    >
-                      Predict
-                    </button>
-                  </div>
-                )) : (
+                  ))
+                ) : (
                   <div className="text-center py-3 text-[var(--mm-text-muted)] caption">No predictions data yet</div>
                 )}
               </div>
@@ -284,4 +335,3 @@ export default function LiveHubPage() {
     </div>
   )
 }
-

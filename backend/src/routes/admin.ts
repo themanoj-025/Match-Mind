@@ -1,3 +1,4 @@
+import { env } from '../config/env'
 import express from 'express'
 import { authenticateToken } from '../middleware/auth'
 import { requireAdmin } from '../middleware/requireAdmin'
@@ -7,6 +8,7 @@ import asyncHandler from '../middleware/asyncHandler'
 import logger from '../utils/logger'
 import type { AuthenticatedRequest } from '../middleware/auth'
 import { validateTournamentDraftPool } from '../lib/validateDraftPool'
+import { openapiRegistry } from "../config/openapi";
 
 const router = express.Router()
 
@@ -34,6 +36,12 @@ function getAdminService(req: AuthenticatedRequest) {
  * GET /api/admin/stats
  * Returns aggregated dashboard metrics via AdminService
  */
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/stats',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/stats', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const stats = await getAdminService(req).getDashboardStats()
 
@@ -64,6 +72,12 @@ router.get('/stats', asyncHandler(async (req: AuthenticatedRequest, res) => {
  * GET /api/admin/users
  * List users with pagination and search
  */
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/users',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/users', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const page = parseInt(req.query.page as string) || 1
@@ -110,6 +124,12 @@ router.get('/users', asyncHandler(async (req: AuthenticatedRequest, res) => {
  * GET /api/admin/users/:id
  * Get detailed user info
  */
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/users/:id',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/users/:id', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const user = await prisma.user.findUnique({
@@ -133,6 +153,12 @@ router.get('/users/:id', asyncHandler(async (req: AuthenticatedRequest, res) => 
  * PATCH /api/admin/users/:id
  * Update user fields
  */
+
+openapiRegistry.registerPath({
+  method: 'patch',
+  path: '/users/:id',
+  responses: { 200: { description: 'Success' } }
+})
 router.patch('/users/:id', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const { role, tier, username, email, displayName } = req.body as {
@@ -163,6 +189,12 @@ router.patch('/users/:id', asyncHandler(async (req: AuthenticatedRequest, res) =
  * DELETE /api/admin/users/:id
  * Soft-delete user (sets isDeleted flag instead of permanent removal).
  */
+
+openapiRegistry.registerPath({
+  method: 'delete',
+  path: '/users/:id',
+  responses: { 200: { description: 'Success' } }
+})
 router.delete('/users/:id', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   await prisma.user.update({
@@ -177,6 +209,12 @@ router.delete('/users/:id', asyncHandler(async (req: AuthenticatedRequest, res) 
  * POST /api/admin/users/:id/toggle-pro
  * Toggle Pro status for a user
  */
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/users/:id/toggle-pro',
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/users/:id/toggle-pro', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const user = await prisma.user.findUnique({ where: { id: req.params.id }, select: { isPro: true } })
@@ -204,6 +242,12 @@ router.post('/users/:id/toggle-pro', asyncHandler(async (req: AuthenticatedReque
  * GET /api/admin/fixtures
  * List all fixtures with pagination
  */
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/fixtures',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/fixtures', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const page = parseInt(req.query.page as string) || 1
@@ -230,6 +274,12 @@ router.get('/fixtures', asyncHandler(async (req: AuthenticatedRequest, res) => {
  * PATCH /api/admin/fixtures/:id
  * Update fixture details (score, status)
  */
+
+openapiRegistry.registerPath({
+  method: 'patch',
+  path: '/fixtures/:id',
+  responses: { 200: { description: 'Success' } }
+})
 router.patch('/fixtures/:id', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const { homeScore, awayScore, status } = req.body as {
@@ -258,6 +308,12 @@ router.patch('/fixtures/:id', asyncHandler(async (req: AuthenticatedRequest, res
  * GET /api/admin/reports
  * List reports with pagination and status filter
  */
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/reports',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/reports', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const page = parseInt(req.query.page as string) || 1
@@ -285,6 +341,12 @@ router.get('/reports', asyncHandler(async (req: AuthenticatedRequest, res) => {
  * PATCH /api/admin/reports/:id
  * Resolve or dismiss a report
  */
+
+openapiRegistry.registerPath({
+  method: 'patch',
+  path: '/reports/:id',
+  responses: { 200: { description: 'Success' } }
+})
 router.patch('/reports/:id', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const { status } = req.body as { status?: string } // 'resolved' | 'dismissed'
@@ -314,6 +376,12 @@ router.patch('/reports/:id', asyncHandler(async (req: AuthenticatedRequest, res)
  * GET /api/admin/activity-log
  * Returns recent admin actions with pagination
  */
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/activity-log',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/activity-log', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const page = parseInt(req.query.page as string) || 1
@@ -337,9 +405,15 @@ router.get('/activity-log', asyncHandler(async (req: AuthenticatedRequest, res) 
  * GET /api/admin/settings
  * Get feature flags and system settings
  */
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/settings',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/settings', (_req, res) => {
   // Parse draft-enabled tournaments from env (comma-separated ids, e.g. "fifa-wc-2026,uefa-ucl-2026-27")
-  const draftEnabledRaw = process.env.DRAFT_ENABLED_TOURNAMENTS || ''
+  const draftEnabledRaw = env.DRAFT_ENABLED_TOURNAMENTS || ''
   const draftEnabledTournaments = draftEnabledRaw
     .split(',')
     .map((s) => s.trim())
@@ -347,11 +421,11 @@ router.get('/settings', (_req, res) => {
 
   res.json({
     settings: [
-      { flag: 'AI Hints', key: 'FLAG_AI_HINTS', enabled: process.env.FLAG_AI_HINTS !== 'false' },
-      { flag: 'Pro Gate AI', key: 'FLAG_PRO_GATE_AI', enabled: process.env.FLAG_PRO_GATE_AI !== 'false' },
-      { flag: 'Chat GIFs', key: 'FLAG_CHAT_GIFS', enabled: process.env.FLAG_CHAT_GIFS !== 'false' },
-      { flag: 'Leaderboard Realtime', key: 'FLAG_LB_REALTIME', enabled: process.env.FLAG_LB_REALTIME === 'true' },
-      { flag: 'Direct Messages', key: 'FLAG_DM', enabled: process.env.FLAG_DM === 'true' },
+      { flag: 'AI Hints', key: 'FLAG_AI_HINTS', enabled: env.FLAG_AI_HINTS !== 'false' },
+      { flag: 'Pro Gate AI', key: 'FLAG_PRO_GATE_AI', enabled: env.FLAG_PRO_GATE_AI !== 'false' },
+      { flag: 'Chat GIFs', key: 'FLAG_CHAT_GIFS', enabled: env.FLAG_CHAT_GIFS !== 'false' },
+      { flag: 'Leaderboard Realtime', key: 'FLAG_LB_REALTIME', enabled: env.FLAG_LB_REALTIME === 'true' },
+      { flag: 'Direct Messages', key: 'FLAG_DM', enabled: env.FLAG_DM === 'true' },
       { flag: 'Draft Mode', key: 'DRAFT_ENABLED_TOURNAMENTS', enabled: draftEnabledTournaments.length > 0, tournaments: draftEnabledTournaments },
     ],
   })
@@ -363,6 +437,12 @@ router.get('/settings', (_req, res) => {
  * Uses the shared validateDraftPoolLib module — no subprocess needed.
  * Refuses to enable if validation fails (§6.4).
  */
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/settings/draft-mode/:tournamentId/:action',
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/settings/draft-mode/:tournamentId/:action', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const tournamentId = String(req.params.tournamentId)
   const action = String(req.params.action)
@@ -382,10 +462,10 @@ router.post('/settings/draft-mode/:tournamentId/:action', asyncHandler(async (re
     }
 
     // Add to env-controlled list (in production this would update a DB/config store)
-    const current = (process.env.DRAFT_ENABLED_TOURNAMENTS || '').split(',').map((s) => s.trim()).filter(Boolean)
+    const current = (env.DRAFT_ENABLED_TOURNAMENTS || '').split(',').map((s) => s.trim()).filter(Boolean)
     if (!current.includes(tournamentId)) {
       current.push(tournamentId)
-      process.env.DRAFT_ENABLED_TOURNAMENTS = current.join(',')
+      env.DRAFT_ENABLED_TOURNAMENTS = current.join(',')
     }
 
     getAdminService(req).logAction(req.userId!, 'DRAFT_MODE_ENABLED', tournamentId, 'tournament', {
@@ -398,8 +478,8 @@ router.post('/settings/draft-mode/:tournamentId/:action', asyncHandler(async (re
       validation: validationResult,
     })
   } else if (action === 'disable') {
-    const current = (process.env.DRAFT_ENABLED_TOURNAMENTS || '').split(',').map((s) => s.trim()).filter(Boolean)
-    process.env.DRAFT_ENABLED_TOURNAMENTS = current.filter((id) => id !== tournamentId).join(',')
+    const current = (env.DRAFT_ENABLED_TOURNAMENTS || '').split(',').map((s) => s.trim()).filter(Boolean)
+    env.DRAFT_ENABLED_TOURNAMENTS = current.filter((id) => id !== tournamentId).join(',')
 
     getAdminService(req).logAction(req.userId!, 'DRAFT_MODE_DISABLED', tournamentId, 'tournament', {})
 
@@ -422,6 +502,12 @@ router.post('/settings/draft-mode/:tournamentId/:action', asyncHandler(async (re
  * Validates Draft Mode readiness for all tournaments in the registry.
  * Runs the same validation logic as the CLI script.
  */
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/draft/pool-validation',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/draft/pool-validation', asyncHandler(async (_req: AuthenticatedRequest, res) => {
   const { TOURNAMENTS } = require('../config/tournaments')
   const results = TOURNAMENTS.map((t: any) => {
@@ -433,7 +519,7 @@ router.get('/draft/pool-validation', asyncHandler(async (_req: AuthenticatedRequ
       status: t.status,
       iconCount: 0, // populated below
       playerCount: 0,
-      enabled: (process.env.DRAFT_ENABLED_TOURNAMENTS || '').split(',').map((s: string) => s.trim()).filter(Boolean).includes(t.id),
+      enabled: (env.DRAFT_ENABLED_TOURNAMENTS || '').split(',').map((s: string) => s.trim()).filter(Boolean).includes(t.id),
     }
   })
 
@@ -458,6 +544,12 @@ router.get('/draft/pool-validation', asyncHandler(async (_req: AuthenticatedRequ
  * GET /api/admin/draft/icons
  * Lists all ICON-rarity players across all tournaments.
  */
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/draft/icons',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/draft/icons', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const fs = require('fs')
   const path = require('path')
@@ -490,6 +582,12 @@ router.get('/draft/icons', asyncHandler(async (req: AuthenticatedRequest, res) =
  * Toggle the isEligibleForIcon flag on a player.
  * After toggling, rarity tiers must be recomputed via revalidate.
  */
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/draft/icons/:playerId/toggle',
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/draft/icons/:playerId/toggle', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const fs = require('fs')
   const path = require('path')
@@ -547,6 +645,12 @@ router.post('/draft/icons/:playerId/toggle', asyncHandler(async (req: Authentica
  * Re-validates the pool and re-computes rarity tiers for a single tournament or all.
  * Calls the same logic as computeRarityTiers.ts then validateDraftPool.ts.
  */
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/draft/revalidate',
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/draft/revalidate', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const tournamentId = req.body.tournamentId as string | undefined
 

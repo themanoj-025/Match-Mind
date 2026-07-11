@@ -106,10 +106,7 @@ export function animateLeaderboard(containerEl: HTMLElement): gsap.core.Tween | 
  * @param barEl - The bar element
  * @param targetWidth - e.g. "55%"
  */
-export function animateStatBar(
-  barEl: HTMLElement,
-  targetWidth: string,
-): gsap.core.Tween {
+export function animateStatBar(barEl: HTMLElement, targetWidth: string): gsap.core.Tween {
   return gsap.fromTo(
     barEl,
     { width: '0%' },
@@ -188,4 +185,3 @@ export function killAllScrollTriggers(): void {
 
 // Re-export gsap for consumer convenience
 export { gsap }
-

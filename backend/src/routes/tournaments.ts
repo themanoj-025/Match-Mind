@@ -1,26 +1,51 @@
 import express from 'express'
 import asyncHandler from '../middleware/asyncHandler'
 import { getTournament, listLive, listAnnounced, listVisible } from '../config/tournaments'
+import { openapiRegistry } from "../config/openapi";
 
 const router = express.Router()
 
 // GET /api/tournaments — returns LIVE + ANNOUNCED tournaments (visible to end users)
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/', asyncHandler(async (_req, res) => {
   const tournaments = listVisible()
   res.json(tournaments)
 }))
 
 // GET /api/tournaments/live — returns only LIVE tournaments (for room creation, etc.)
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/live',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/live', asyncHandler(async (_req, res) => {
   res.json(listLive())
 }))
 
 // GET /api/tournaments/announced — returns only ANNOUNCED tournaments (coming soon)
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/announced',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/announced', asyncHandler(async (_req, res) => {
   res.json(listAnnounced())
 }))
 
 // GET /api/tournaments/:id — returns a single tournament or 404
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/:id',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/:id', asyncHandler(async (req, res) => {
   const tournament = getTournament(req.params.id as string)
   if (!tournament) {

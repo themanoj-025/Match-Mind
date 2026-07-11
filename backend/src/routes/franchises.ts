@@ -2,10 +2,17 @@ import express from 'express'
 import { authenticateToken } from '../middleware/auth'
 import asyncHandler from '../middleware/asyncHandler'
 import type { AuthenticatedRequest } from '../middleware/auth'
+import { openapiRegistry } from "../config/openapi";
 
 const router = express.Router()
 
 // GET /api/rooms/:roomId/franchises/:userId — view roster (read-only for other users)
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/:roomId/franchises/:userId',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/:roomId/franchises/:userId', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const roomId = req.params.roomId as string
@@ -30,6 +37,12 @@ router.get('/:roomId/franchises/:userId', authenticateToken, asyncHandler(async 
 }))
 
 // PATCH /api/rooms/:roomId/franchises/me/captain — set captain and vice-captain (current user)
+
+openapiRegistry.registerPath({
+  method: 'patch',
+  path: '/:roomId/franchises/me/captain',
+  responses: { 200: { description: 'Success' } }
+})
 router.patch('/:roomId/franchises/me/captain', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const roomId = req.params.roomId as string

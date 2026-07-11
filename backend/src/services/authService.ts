@@ -1,3 +1,4 @@
+import { env } from '../config/env'
 /**
  * Auth Service — MatchMind
  *
@@ -27,8 +28,8 @@ export interface TokenPair {
  * The version is looked up from the user record on each verify call.
  */
 export function generateTokens(userId: string, tokenVersion?: number): TokenPair {
-  const jwtSecret = process.env.JWT_SECRET
-  const refreshSecret = process.env.JWT_REFRESH_SECRET
+  const jwtSecret = env.JWT_SECRET
+  const refreshSecret = env.JWT_REFRESH_SECRET
 
   if (!jwtSecret || !refreshSecret) {
     throw new Error('JWT secrets not configured')
@@ -148,7 +149,7 @@ export class AuthService {
     // Generate and send verification email
     const verificationToken = jwt.sign(
       { userId: user.id, purpose: 'email-verification' },
-      process.env.JWT_SECRET!,
+      env.JWT_SECRET!,
       { expiresIn: '24h' }
     )
     await sendVerificationEmail(email, verificationToken)
@@ -208,7 +209,7 @@ export class AuthService {
    * Refresh an expired access token using a valid refresh token.
    */
   async refreshToken(refreshToken: string): Promise<TokenPair> {
-    const refreshSecret = process.env.JWT_REFRESH_SECRET
+    const refreshSecret = env.JWT_REFRESH_SECRET
     if (!refreshSecret) {
       throw new AuthError('Refresh token secret not configured', 'CONFIG_ERROR', 500)
     }
@@ -233,7 +234,7 @@ export class AuthService {
    * Generate a password reset token for a user.
    */
   async generatePasswordResetToken(email: string): Promise<void> {
-    if (!process.env.JWT_RESET_SECRET) {
+    if (!env.JWT_RESET_SECRET) {
       logger.error({ event: 'auth.password_reset_secret_missing' }, 'JWT_RESET_SECRET not configured — cannot generate reset tokens')
       return
     }
@@ -241,7 +242,7 @@ export class AuthService {
     if (user) {
       const resetToken = jwt.sign(
         { userId: user.id, purpose: 'password-reset' },
-        process.env.JWT_RESET_SECRET,
+        env.JWT_RESET_SECRET,
         { expiresIn: '1h' }
       )
       await sendPasswordResetEmail(email, resetToken)

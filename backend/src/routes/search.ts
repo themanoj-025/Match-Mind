@@ -7,10 +7,17 @@
 
 import express from 'express'
 import asyncHandler from '../middleware/asyncHandler'
+import { openapiRegistry } from "../config/openapi";
 
 const router = express.Router()
 
 // GET /api/search?q= — search users and players
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/', asyncHandler(async (req, res) => {
   const prisma = req.app.get('prisma')
   const { q } = req.query as { q?: string }

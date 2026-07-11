@@ -48,8 +48,8 @@ export interface Player {
   position: 'GK' | 'DEF' | 'MID' | 'FWD'
   basePrice: number
   photoUrl?: string
-  rarityTier?: 'BRONZE' | 'SILVER' | 'GOLD' | 'ICON'  // computed (§1.3)
-  isEligibleForIcon?: boolean  // admin gate (§1.3)
+  rarityTier?: 'BRONZE' | 'SILVER' | 'GOLD' | 'ICON' // computed (§1.3)
+  isEligibleForIcon?: boolean // admin gate (§1.3)
 }
 
 // ─── Draft Mode — Types (§1.9, §2) ──────────────────────
@@ -227,49 +227,49 @@ export interface Fixture {
 }
 
 export interface MatchStats {
-  possession: [number, number];
-  shots: [number, number];
-  shotsOnTarget: [number, number];
-  corners: [number, number];
-  fouls: [number, number];
-  yellowCards: [number, number];
-  xg: [number, number];
+  possession: [number, number]
+  shots: [number, number]
+  shotsOnTarget: [number, number]
+  corners: [number, number]
+  fouls: [number, number]
+  yellowCards: [number, number]
+  xg: [number, number]
 }
 
 export interface Lineups {
-  home: { formation: string; players: string[] };
-  away: { formation: string; players: string[] };
+  home: { formation: string; players: string[] }
+  away: { formation: string; players: string[] }
 }
 
 export interface H2H {
-  homeWins: number;
-  draws: number;
-  awayWins: number;
-  lastMeetings: { date: string; score: string }[];
+  homeWins: number
+  draws: number
+  awayWins: number
+  lastMeetings: { date: string; score: string }[]
 }
 
 export interface TimelineEvent {
-  minute: number;
-  type: string;
-  team: string;
-  description: string;
-  scorer?: string;
+  minute: number
+  type: string
+  team: string
+  description: string
+  scorer?: string
 }
 
 export interface Match {
-  id: string;
-  homeTeam: string;
-  awayTeam: string;
-  homeScore: number;
-  awayScore: number;
-  status: string;
-  minute: number;
-  competition: string;
-  sport: string;
-  stadium: string;
-  homeTeamLogo: string | null;
-  awayTeamLogo: string | null;
-  scheduledAt: string | null;
+  id: string
+  homeTeam: string
+  awayTeam: string
+  homeScore: number
+  awayScore: number
+  status: string
+  minute: number
+  competition: string
+  sport: string
+  stadium: string
+  homeTeamLogo: string | null
+  awayTeamLogo: string | null
+  scheduledAt: string | null
 }
 
 export interface PlayerMatchStat {
@@ -395,4 +395,3 @@ export interface StripeStatus {
   subscriptionStatus?: string
   currentPeriodEnd?: string
 }
-

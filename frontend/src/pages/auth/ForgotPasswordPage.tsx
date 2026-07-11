@@ -30,9 +30,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <motion.div
-      className="min-h-screen flex items-center justify-center px-4"
-    >
+    <motion.div className="min-h-screen flex items-center justify-center px-4">
       <Helmet>
         <title>Forgot Password — MatchMind</title>
       </Helmet>
@@ -60,8 +58,8 @@ export default function ForgotPasswordPage() {
                 </div>
                 <h1 className="heading-2 mb-2">Check Your Inbox</h1>
                 <p className="body text-[var(--mm-text-secondary)] mb-6">
-                  If an account exists for <strong className="text-[var(--mm-text-primary)]">{email}</strong>,
-                  we've sent a password reset link.
+                  If an account exists for <strong className="text-[var(--mm-text-primary)]">{email}</strong>, we've
+                  sent a password reset link.
                 </p>
                 <Link
                   to="/login"
@@ -137,4 +135,3 @@ export default function ForgotPasswordPage() {
     </motion.div>
   )
 }
-

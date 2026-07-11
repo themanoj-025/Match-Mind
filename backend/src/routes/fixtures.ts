@@ -5,10 +5,17 @@ import asyncHandler from '../middleware/asyncHandler'
 import { computeFantasyPoints } from '../services/fantasyPoints'
 import type { AuthenticatedRequest } from '../middleware/auth'
 import logger from '../utils/logger'
+import { openapiRegistry } from "../config/openapi";
 
 const router = express.Router()
 
 // GET /api/fixtures — list fixtures for a tournament
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/', asyncHandler(async (req, res) => {
   const prisma = req.app.get('prisma')
   const { tournamentId } = req.query as { tournamentId?: string }
@@ -26,6 +33,12 @@ router.get('/', asyncHandler(async (req, res) => {
 }))
 
 // GET /api/fixtures/:id — single fixture with player stats
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/:id',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/:id', asyncHandler(async (req, res) => {
   const prisma = req.app.get('prisma')
   const fixture = await prisma.fixture.findUnique({
@@ -43,6 +56,12 @@ router.get('/:id', asyncHandler(async (req, res) => {
 }))
 
 // POST /api/admin/fixtures — create fixture (admin only)
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/',
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/', authenticateToken, requireAdmin, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const fixture = await prisma.fixture.create({ data: req.body })
@@ -50,6 +69,12 @@ router.post('/', authenticateToken, requireAdmin, asyncHandler(async (req: Authe
 }))
 
 // POST /api/admin/fixtures/:id/player-stats — enter player match stats (admin)
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/:id/player-stats',
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/:id/player-stats', authenticateToken, requireAdmin, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const { playerStats } = req.body as {
@@ -82,6 +107,12 @@ router.post('/:id/player-stats', authenticateToken, requireAdmin, asyncHandler(a
 }))
 
 // POST /api/admin/fixtures/:id/finalize — lock stats, compute fantasy points, update leaderboards (admin)
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/:id/finalize',
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/:id/finalize', authenticateToken, requireAdmin, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
 

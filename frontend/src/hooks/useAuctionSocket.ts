@@ -12,7 +12,13 @@ const WS_URL = import.meta.env.VITE_WS_URL || 'http://localhost:4000'
 
 interface AuctionSocketCallbacks {
   onStateSync?: (state: AuctionState) => void
-  onNewBid?: (data: { playerId: string; amount: number; bidderId: string; timerEndsAt: string; version: number }) => void
+  onNewBid?: (data: {
+    playerId: string
+    amount: number
+    bidderId: string
+    timerEndsAt: string
+    version: number
+  }) => void
   onPlayerSold?: (data: { roomId: string; playerId: string; buyerId: string; price: number }) => void
   onPlayerUnsold?: (data: { roomId: string; playerId: string }) => void
   onAuctionPhaseChange?: (data: { roomId: string; state: AuctionState }) => void
@@ -24,10 +30,7 @@ interface AuctionSocketCallbacks {
   onChatMessage?: (message: any) => void
 }
 
-export function useAuctionSocket(
-  roomId: string | undefined,
-  callbacks: AuctionSocketCallbacks,
-) {
+export function useAuctionSocket(roomId: string | undefined, callbacks: AuctionSocketCallbacks) {
   const socketRef = useRef<Socket | null>(null)
   const callbacksRef = useRef(callbacks)
   callbacksRef.current = callbacks
@@ -102,21 +105,29 @@ export function useAuctionSocket(
     }
   }, [roomId])
 
-  const placeBid = useCallback((playerId: string, amount: number, expectedVersion: number) => {
-    if (!socketRef.current || !roomId) return
-    socketRef.current.emit('PLACE_BID', { roomId, playerId, amount, expectedVersion })
-  }, [roomId])
+  const placeBid = useCallback(
+    (playerId: string, amount: number, expectedVersion: number) => {
+      if (!socketRef.current || !roomId) return
+      socketRef.current.emit('PLACE_BID', { roomId, playerId, amount, expectedVersion })
+    },
+    [roomId],
+  )
 
-  const sendChat = useCallback((text: string, gifUrl?: string) => {
-    if (!socketRef.current || !roomId) return
-    socketRef.current.emit('SEND_MESSAGE', { roomId: `room:${roomId}`, text, gifUrl })
-  }, [roomId])
+  const sendChat = useCallback(
+    (text: string, gifUrl?: string) => {
+      if (!socketRef.current || !roomId) return
+      socketRef.current.emit('SEND_MESSAGE', { roomId: `room:${roomId}`, text, gifUrl })
+    },
+    [roomId],
+  )
 
-  const toggleStar = useCallback((playerId: string) => {
-    if (!socketRef.current || !roomId) return
-    socketRef.current.emit('TOGGLE_STAR', { roomId, playerId })
-  }, [roomId])
+  const toggleStar = useCallback(
+    (playerId: string) => {
+      if (!socketRef.current || !roomId) return
+      socketRef.current.emit('TOGGLE_STAR', { roomId, playerId })
+    },
+    [roomId],
+  )
 
   return { placeBid, sendChat, toggleStar }
 }
-

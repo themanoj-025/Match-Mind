@@ -1,3 +1,4 @@
+import { env } from '../config/env'
 /**
  * CSRF Protection — Double-Submit Cookie Pattern
  *
@@ -37,7 +38,7 @@ function setCsrfCookie(res: Response, token: string): void {
   res.cookie(COOKIE_NAME, token, {
     httpOnly: false,   // must be readable by JS
     sameSite: 'strict',
-    secure: process.env.NODE_ENV === 'production',
+    secure: env.NODE_ENV === 'production',
     path: '/',
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
   })

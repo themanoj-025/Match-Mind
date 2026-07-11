@@ -7,6 +7,3 @@ declare module '*.jsx' {
   const component: ComponentType<any>
   export default component
 }
-
-
-

@@ -1,3 +1,4 @@
+import { env } from '../config/env'
 /**
  * Email Service — MatchMind
  *
@@ -14,14 +15,14 @@ import logger from '../utils/logger'
 let resendClient: any = null
 try {
   const { Resend } = require('resend')
-  if (process.env.RESEND_API_KEY) {
-    resendClient = new Resend(process.env.RESEND_API_KEY)
+  if (env.RESEND_API_KEY) {
+    resendClient = new Resend(env.RESEND_API_KEY)
   }
 } catch {
   // resend not installed — fall back to logging
 }
 
-const FROM_EMAIL = process.env.EMAIL_FROM || 'noreply@matchmind.gg'
+const FROM_EMAIL = env.EMAIL_FROM || 'noreply@matchmind.gg'
 
 /**
  * Send an email verification link.
@@ -31,7 +32,7 @@ export async function sendVerificationEmail(
   to: string,
   verificationToken: string,
 ): Promise<void> {
-  const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/verify-email?token=${verificationToken}`
+  const verificationUrl = `${env.FRONTEND_URL || 'http://localhost:3000'}/verify-email?token=${verificationToken}`
 
   if (!resendClient) {
     logger.info(
@@ -82,7 +83,7 @@ export async function sendPasswordResetEmail(
   to: string,
   resetToken: string,
 ): Promise<void> {
-  const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`
+  const resetUrl = `${env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`
 
   if (!resendClient) {
     logger.info(

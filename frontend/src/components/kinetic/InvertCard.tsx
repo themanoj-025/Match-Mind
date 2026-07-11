@@ -54,7 +54,7 @@ export default function InvertCard({
   const reduced = prefersReducedMotion()
 
   const isFlipped = controlledFlipped !== undefined ? controlledFlipped : internalFlipped
-  const isManuallyFlipped = trigger === 'manual' ? (controlledFlipped || false) : isFlipped
+  const isManuallyFlipped = trigger === 'manual' ? controlledFlipped || false : isFlipped
 
   const handleFlip = useCallback(() => {
     if (disabled || trigger !== 'click') return
@@ -172,4 +172,3 @@ export default function InvertCard({
     </div>
   )
 }
-

@@ -25,22 +25,24 @@ export default function LeaderboardPage() {
     { id: 'sport', label: 'By Sport' },
   ]
 
-  const { data: topUsers = [] } = useLeaderboard(
-    period === 'week' ? 'week' : period === 'month' ? 'global' : 'global'
-  )
-  const { data: sportUsers = [] } = useLeaderboardSport(
-    period === 'sport' ? 'football' : undefined
-  )
+  const { data: topUsers = [] } = useLeaderboard(period === 'week' ? 'week' : period === 'month' ? 'global' : 'global')
+  const { data: sportUsers = [] } = useLeaderboardSport(period === 'sport' ? 'football' : undefined)
 
-  const displayUsers: LeaderboardEntry[] = period === 'sport' ? (sportUsers || []) : (topUsers || [])
+  const displayUsers: LeaderboardEntry[] = period === 'sport' ? sportUsers || [] : topUsers || []
 
   return (
     <div className="min-h-screen pt-16 pb-20 md:pb-8">
       <Helmet>
         <title>Leaderboard — Top Predictors This Week | MatchMind</title>
-        <meta name="description" content="Global prediction leaderboard. SportsKing leads with 8,420 pts and 78% accuracy. Compare your stats and climb the ranks." />
+        <meta
+          name="description"
+          content="Global prediction leaderboard. SportsKing leads with 8,420 pts and 78% accuracy. Compare your stats and climb the ranks."
+        />
         <meta property="og:title" content="Leaderboard — Top Predictors | MatchMind" />
-        <meta property="og:description" content="Top predictors: SportsKing (8,420 pts), GoalPredictor (7,910 pts), HoopsMaster (7,650 pts). Can you beat them?" />
+        <meta
+          property="og:description"
+          content="Top predictors: SportsKing (8,420 pts), GoalPredictor (7,910 pts), HoopsMaster (7,650 pts). Can you beat them?"
+        />
         <meta property="og:image" content="https://matchmind.gg/og-leaderboard.jpg" />
         <meta property="og:image:alt" content="Leaderboard — MatchMind" />
         <meta property="og:type" content="website" />
@@ -82,7 +84,9 @@ export default function LeaderboardPage() {
               </div>
             </div>
           </div>
-          <Link to="/predictions" className="body text-[var(--mm-accent-green)] font-medium hover:underline">View predictions</Link>
+          <Link to="/predictions" className="body text-[var(--mm-accent-green)] font-medium hover:underline">
+            View predictions
+          </Link>
         </div>
 
         {/* TOP 3 Podium */}
@@ -156,7 +160,12 @@ export default function LeaderboardPage() {
               </div>
               <div className="text-center py-6 text-[var(--mm-text-muted)]">
                 <p className="body">Follow friends to compare</p>
-                <Link to="/explore" className="caption text-[var(--mm-accent-green)] font-medium mt-1 inline-block hover:underline">Discover users</Link>
+                <Link
+                  to="/explore"
+                  className="caption text-[var(--mm-accent-green)] font-medium mt-1 inline-block hover:underline"
+                >
+                  Discover users
+                </Link>
               </div>
             </div>
 
@@ -181,4 +190,3 @@ export default function LeaderboardPage() {
     </div>
   )
 }
-

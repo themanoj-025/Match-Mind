@@ -1,3 +1,4 @@
+import { env } from '../config/env'
 /**
  * draftGate.ts — MatchMind v4 §6.4
  *
@@ -17,7 +18,7 @@ import { AppError } from '../utils/AppError'
  * Reads from DRAFT_ENABLED_TOURNAMENTS env variable (comma-separated).
  */
 export function getDraftEnabledTournaments(): string[] {
-  const raw = process.env.DRAFT_ENABLED_TOURNAMENTS || ''
+  const raw = env.DRAFT_ENABLED_TOURNAMENTS || ''
   return raw
     .split(',')
     .map((s) => s.trim())

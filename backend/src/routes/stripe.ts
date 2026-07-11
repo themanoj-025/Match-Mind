@@ -1,3 +1,4 @@
+import { env } from '../config/env'
 import express from 'express'
 import { authenticateToken } from '../middleware/auth'
 import { validate } from '../middleware/validate'
@@ -7,6 +8,7 @@ import { withBreaker } from '../middleware/circuitBreaker'
 import logger from '../utils/logger'
 import type { AuthenticatedRequest } from '../middleware/auth'
 import { idempotent } from '../middleware/idempotency'
+import { openapiRegistry } from "../config/openapi";
 
 const router = express.Router()
 
@@ -14,6 +16,13 @@ const router = express.Router()
  * POST /api/stripe/create-checkout
  * Creates a Stripe Checkout Session for Pro subscription
  */
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/create-checkout',
+  request: { body: { content: { 'application/json': { schema: createCheckoutSchema } } } },
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/create-checkout', idempotent(), authenticateToken, validate(createCheckoutSchema), asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const { plan } = req.body as { plan: string } // 'monthly' | 'annual'
@@ -28,15 +37,15 @@ router.post('/create-checkout', idempotent(), authenticateToken, validate(create
   const session = await withBreaker('stripe', async () => {
     let stripe: any
     try {
-      stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
+      stripe = require('stripe')(env.STRIPE_SECRET_KEY)
     } catch {
       logger.info({ event: 'stripe.not_configured', userId: req.userId }, 'Stripe API key not configured, returning mock URL')
       return null
     }
 
     const priceId = plan === 'annual'
-      ? process.env.STRIPE_PRICE_ANNUAL
-      : process.env.STRIPE_PRICE_MONTHLY
+      ? env.STRIPE_PRICE_ANNUAL
+      : env.STRIPE_PRICE_MONTHLY
 
     if (!priceId) {
       throw new Error('Stripe price ID not configured')
@@ -47,8 +56,8 @@ router.post('/create-checkout', idempotent(), authenticateToken, validate(create
       customer_email: existingSub ? undefined : user.email,
       mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/profile/me/settings?pro=activated`,
-      cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/pricing?cancelled=true`,
+      success_url: `${env.FRONTEND_URL || 'http://localhost:3000'}/profile/me/settings?pro=activated`,
+      cancel_url: `${env.FRONTEND_URL || 'http://localhost:3000'}/pricing?cancelled=true`,
       metadata: { userId: user.id },
       ...(existingSub?.stripeCustomerId ? {} : {
         customer_creation: 'always',
@@ -71,14 +80,20 @@ router.post('/create-checkout', idempotent(), authenticateToken, validate(create
  * POST /api/stripe/webhook
  * Stripe webhook handler — listens for subscription lifecycle events
  */
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/webhook',
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/webhook', async (req, res) => {
   const sig = req.headers['stripe-signature'] as string
   let event: any
 
   try {
-    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
+    const stripe = require('stripe')(env.STRIPE_SECRET_KEY)
     const body = Buffer.isBuffer(req.body) ? req.body : JSON.stringify(req.body)
-    event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET)
+    event = stripe.webhooks.constructEvent(body, sig, env.STRIPE_WEBHOOK_SECRET)
   } catch (err: any) {
     logger.error({ event: 'stripe.webhook_verification_failed', err: err.message }, 'Stripe webhook signature verification failed')
     return res.status(400).send(`Webhook Error: ${err.message}`)
@@ -97,7 +112,7 @@ router.post('/webhook', async (req, res) => {
 
       if (subscriptionId && customerId) {
         try {
-          const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
+          const stripe = require('stripe')(env.STRIPE_SECRET_KEY)
           const sub = await stripe.subscriptions.retrieve(subscriptionId)
 
           await prisma.subscription.upsert({
@@ -209,6 +224,12 @@ router.post('/webhook', async (req, res) => {
  * POST /api/stripe/create-portal-session
  * Creates a Stripe Customer Portal session for managing billing
  */
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/create-portal-session',
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/create-portal-session', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const sub = await prisma.subscription.findUnique({ where: { userId: req.userId } })
@@ -219,14 +240,14 @@ router.post('/create-portal-session', authenticateToken, asyncHandler(async (req
 
   let stripe: any
   try {
-    stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
+    stripe = require('stripe')(env.STRIPE_SECRET_KEY)
   } catch {
-    return res.json({ url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/pricing` })
+    return res.json({ url: `${env.FRONTEND_URL || 'http://localhost:3000'}/pricing` })
   }
 
   const portalSession = await stripe.billingPortal.sessions.create({
     customer: sub.stripeCustomerId,
-    return_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/profile/me/settings`,
+    return_url: `${env.FRONTEND_URL || 'http://localhost:3000'}/profile/me/settings`,
   })
 
   res.json({ url: portalSession.url })
@@ -236,6 +257,12 @@ router.post('/create-portal-session', authenticateToken, asyncHandler(async (req
  * GET /api/stripe/status
  * Returns the current user's subscription status
  */
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/status',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/status', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
 

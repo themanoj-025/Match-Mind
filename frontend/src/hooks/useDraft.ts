@@ -28,8 +28,7 @@ export const draftKeys = {
   nextRound: (id?: string): readonly string[] => ['draft', 'sessions', id ?? '', 'next-round'] as const,
   tickets: (tournamentId?: string): readonly string[] =>
     tournamentId ? (['draft', 'tickets', tournamentId] as const) : (['draft', 'tickets'] as const),
-  runStatus: (sessionId?: string): readonly string[] =>
-    ['draft', 'runs', sessionId ?? '', 'status'] as const,
+  runStatus: (sessionId?: string): readonly string[] => ['draft', 'runs', sessionId ?? '', 'status'] as const,
 }
 
 // ─── Formation Types (matching API) ─────────────────────
@@ -303,4 +302,3 @@ export function useResolveMatchday() {
     },
   })
 }
-

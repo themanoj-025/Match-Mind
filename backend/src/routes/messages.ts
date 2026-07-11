@@ -4,6 +4,7 @@ import { validate } from '../middleware/validate'
 import { sendMessageSchema } from '../config/schemas'
 import asyncHandler from '../middleware/asyncHandler'
 import type { AuthenticatedRequest } from '../middleware/auth'
+import { openapiRegistry } from "../config/openapi";
 
 const router = express.Router()
 
@@ -19,6 +20,12 @@ function getDMRoomId(a: string, b: string): string {
  * GET /api/messages/conversations
  * List all users the current user has DMed with, with the latest message preview.
  */
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/conversations',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/conversations', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const userId = req.userId!
@@ -94,6 +101,12 @@ router.get('/conversations', authenticateToken, asyncHandler(async (req: Authent
  * GET /api/messages/:userId
  * Get direct messages between current user and another user.
  */
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/:userId',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/:userId', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const { userId: targetUserId } = req.params
@@ -130,6 +143,13 @@ router.get('/:userId', authenticateToken, asyncHandler(async (req: Authenticated
  * POST /api/messages/:userId
  * Send a direct message to another user.
  */
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/:userId',
+  request: { body: { content: { 'application/json': { schema: sendMessageSchema } } } },
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/:userId', authenticateToken, validate(sendMessageSchema), asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const { text, gifUrl } = req.body as { text?: string; gifUrl?: string }
@@ -183,6 +203,12 @@ router.post('/:userId', authenticateToken, validate(sendMessageSchema), asyncHan
  * PATCH /api/messages/read/:userId
  * Mark all messages from a specific user as read.
  */
+
+openapiRegistry.registerPath({
+  method: 'patch',
+  path: '/read/:userId',
+  responses: { 200: { description: 'Success' } }
+})
 router.patch('/read/:userId', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const { userId: targetUserId } = req.params

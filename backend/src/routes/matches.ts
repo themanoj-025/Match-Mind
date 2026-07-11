@@ -8,10 +8,17 @@
 
 import express from 'express'
 import asyncHandler from '../middleware/asyncHandler'
+import { openapiRegistry } from "../config/openapi";
 
 const router = express.Router()
 
 // GET /api/matches — redirect to fixtures
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/', asyncHandler(async (req, res) => {
   const prisma = req.app.get('prisma')
   const fixtures = await prisma.fixture.findMany({
@@ -22,6 +29,12 @@ router.get('/', asyncHandler(async (req, res) => {
 }))
 
 // GET /api/matches/:id — redirect to fixture by ID
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/:id',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/:id', asyncHandler(async (req, res) => {
   const prisma = req.app.get('prisma')
   const fixture = await prisma.fixture.findUnique({ where: { id: req.params.id } })

@@ -1,3 +1,4 @@
+import { env } from '../config/env'
 import express from 'express'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
@@ -12,6 +13,7 @@ import { createRepositories } from '../repositories/index'
 import asyncHandler from '../middleware/asyncHandler'
 import logger from '../utils/logger'
 import type { AuthenticatedRequest } from '../middleware/auth'
+import { openapiRegistry } from "../config/openapi";
 
 const router = express.Router()
 
@@ -23,9 +25,22 @@ function getAuthService(req: AuthenticatedRequest) {
 }
 
 // GET /api/auth/csrf-token — retrieve CSRF token (no auth required)
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/csrf-token',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/csrf-token', csrfTokenHandler)
 
 // POST /api/auth/signup
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/signup',
+  request: { body: { content: { 'application/json': { schema: signupSchema } } } },
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/signup', validate(signupSchema), asyncHandler(async (req, res) => {
   const { username, email, password } = req.body
 
@@ -37,6 +52,13 @@ router.post('/signup', validate(signupSchema), asyncHandler(async (req, res) => 
 }))
 
 // POST /api/auth/login
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/login',
+  request: { body: { content: { 'application/json': { schema: loginSchema } } } },
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/login', validate(loginSchema), asyncHandler(async (req, res) => {
   const { email, password } = req.body
 
@@ -48,6 +70,12 @@ router.post('/login', validate(loginSchema), asyncHandler(async (req, res) => {
 }))
 
 // POST /api/auth/logout — revoke tokens (invalidates all sessions)
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/logout',
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/logout', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   await revokeTokens(req.userId!, prisma)
@@ -57,6 +85,12 @@ router.post('/logout', authenticateToken, asyncHandler(async (req: Authenticated
 }))
 
 // POST /api/auth/logout-all — revoke all tokens for this user
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/logout-all',
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/logout-all', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   await revokeTokens(req.userId!, prisma)
@@ -66,9 +100,21 @@ router.post('/logout-all', authenticateToken, asyncHandler(async (req: Authentic
 }))
 
 // GET /api/auth/google - OAuth redirect
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/google',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }) as any)
 
 // GET /api/auth/google/cb
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/google/cb',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/google/cb', passport.authenticate('google', { session: false }), (req, res) => {
   const prisma = req.app ? req.app.get('prisma') : null
   const googleUser = (req as any).user
@@ -76,10 +122,16 @@ router.get('/google/cb', passport.authenticate('google', { session: false }), (r
   const tokens = generateTokens(googleUser.id, googleUser.tokenVersion)
   setAuthCookies(res, tokens)
   // Also set a CSRF token cookie for the client
-  res.redirect(`${process.env.FRONTEND_URL}/feed`)
+  res.redirect(`${env.FRONTEND_URL}/feed`)
 })
 
 // POST /api/auth/refresh
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/refresh',
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/refresh', asyncHandler(async (req, res) => {
   const token = req.cookies?.refreshToken || req.body?.refreshToken
   if (!token) {
@@ -94,6 +146,13 @@ router.post('/refresh', asyncHandler(async (req, res) => {
 }))
 
 // POST /api/auth/forgot-password
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/forgot-password',
+  request: { body: { content: { 'application/json': { schema: forgotPasswordSchema } } } },
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/forgot-password', validate(forgotPasswordSchema), asyncHandler(async (req, res) => {
   const { email } = req.body
   await getAuthService(req).generatePasswordResetToken(email)
@@ -101,13 +160,20 @@ router.post('/forgot-password', validate(forgotPasswordSchema), asyncHandler(asy
 }))
 
 // POST /api/auth/reset-password
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/reset-password',
+  request: { body: { content: { 'application/json': { schema: resetPasswordSchema } } } },
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/reset-password', validate(resetPasswordSchema), asyncHandler(async (req, res) => {
   const prisma = req.app.get('prisma')
   const { token, password } = req.body
 
   let decoded: { userId: string; purpose: string }
   try {
-    decoded = jwt.verify(token, process.env.JWT_RESET_SECRET!) as any
+    decoded = jwt.verify(token, env.JWT_RESET_SECRET!) as any
   } catch (err) {
     return res.status(400).json({
       error: { code: 'INVALID_TOKEN', message: 'Reset token is invalid or expired' },
@@ -141,13 +207,20 @@ router.post('/reset-password', validate(resetPasswordSchema), asyncHandler(async
 }))
 
 // POST /api/auth/verify-email
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/verify-email',
+  request: { body: { content: { 'application/json': { schema: verifyEmailSchema } } } },
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/verify-email', validate(verifyEmailSchema), asyncHandler(async (req, res) => {
   const prisma = req.app.get('prisma')
   const { token } = req.body
 
   let decoded: { userId: string; purpose: string }
   try {
-    decoded = jwt.verify(token, process.env.JWT_SECRET!) as any
+    decoded = jwt.verify(token, env.JWT_SECRET!) as any
   } catch (err) {
     return res.status(400).json({
       error: { code: 'INVALID_TOKEN', message: 'Verification token is invalid or expired' },
@@ -170,6 +243,12 @@ router.post('/verify-email', validate(verifyEmailSchema), asyncHandler(async (re
 }))
 
 // POST /api/auth/resend-verification
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/resend-verification',
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/resend-verification', (_req, res) => {
   res.json({ message: 'Verification email resent.' })
 })

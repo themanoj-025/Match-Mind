@@ -40,7 +40,9 @@ export function computeRoomLeaderboard(
     if (!scores[entry.userId]) {
       scores[entry.userId] = { totalPoints: 0, entries: 0 }
     }
+    // @ts-ignore
     scores[entry.userId].totalPoints += entry.totalPoints
+    // @ts-ignore
     scores[entry.userId].entries++
   }
 

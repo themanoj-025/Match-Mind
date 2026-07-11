@@ -19,7 +19,14 @@ const tierRingColors: Record<string, string> = {
   LEGEND: 'ring-orange-500',
 }
 
-export default function UserAvatar({ src, name, tier, isOnline = false, size = 'md', className = '' }: UserAvatarProps) {
+export default function UserAvatar({
+  src,
+  name,
+  tier,
+  isOnline = false,
+  size = 'md',
+  className = '',
+}: UserAvatarProps) {
   const sizeClasses: Record<string, string> = {
     sm: 'w-7 h-7 text-xs',
     md: 'w-9 h-9 text-sm',
@@ -32,11 +39,16 @@ export default function UserAvatar({ src, name, tier, isOnline = false, size = '
 
   return (
     <div className={`relative inline-flex shrink-0 ${className}`}>
-      <div className={`${sizeClass} rounded-full bg-[var(--mm-bg-tertiary)] flex items-center justify-center overflow-hidden ring-2 ${ringColor} ring-offset-2 ring-offset-[var(--mm-bg-primary)]`}>
+      <div
+        className={`${sizeClass} rounded-full bg-[var(--mm-bg-tertiary)] flex items-center justify-center overflow-hidden ring-2 ${ringColor} ring-offset-2 ring-offset-[var(--mm-bg-primary)]`}
+      >
         {src ? (
           <img src={src} alt={name || 'User'} className="w-full h-full object-cover" />
         ) : (
-          <User size={size === 'sm' ? 12 : size === 'md' ? 16 : size === 'lg' ? 22 : 30} className="text-[var(--mm-text-muted)]" />
+          <User
+            size={size === 'sm' ? 12 : size === 'md' ? 16 : size === 'lg' ? 22 : 30}
+            className="text-[var(--mm-text-muted)]"
+          />
         )}
       </div>
       {isOnline && (
@@ -45,4 +57,3 @@ export default function UserAvatar({ src, name, tier, isOnline = false, size = '
     </div>
   )
 }
-

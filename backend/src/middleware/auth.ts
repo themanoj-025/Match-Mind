@@ -1,3 +1,4 @@
+import { env } from '../config/env'
 import jwt from 'jsonwebtoken'
 import type { Request, Response, NextFunction } from 'express'
 
@@ -40,7 +41,7 @@ export const authenticateToken = async (req: AuthenticatedRequest, res: Response
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string; tokenVersion?: number }
+    const decoded = jwt.verify(token, env.JWT_SECRET!) as { userId: string; tokenVersion?: number }
     req.userId = decoded.userId
 
     // Verify token hasn't been revoked (tokenVersion matches)
@@ -67,7 +68,7 @@ export const optionalAuth = (req: AuthenticatedRequest, _res: Response, next: Ne
 
   if (token) {
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string; tokenVersion?: number }
+      const decoded = jwt.verify(token, env.JWT_SECRET!) as { userId: string; tokenVersion?: number }
       req.userId = decoded.userId
     } catch (err) {
       // Ignore invalid tokens for optional auth

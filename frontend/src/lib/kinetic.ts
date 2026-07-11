@@ -249,11 +249,7 @@ export const kineticScoreVariants: Variants = {
 
 export const kineticGlowVariants: Variants = {
   animate: {
-    textShadow: [
-      '0 0 8px rgba(0, 230, 118, 0.3)',
-      '0 0 20px rgba(0, 230, 118, 0.6)',
-      '0 0 8px rgba(0, 230, 118, 0.3)',
-    ],
+    textShadow: ['0 0 8px rgba(0, 230, 118, 0.3)', '0 0 20px rgba(0, 230, 118, 0.6)', '0 0 8px rgba(0, 230, 118, 0.3)'],
     transition: {
       duration: 2,
       repeat: Infinity,
@@ -277,7 +273,7 @@ export function animateKineticValue(
   from: number,
   to: number,
   duration: number = 0.8,
-  formatter: (n: number) => string = (n) => Math.floor(n).toLocaleString()
+  formatter: (n: number) => string = (n) => Math.floor(n).toLocaleString(),
 ): () => void {
   let cancelled = false
   const start = performance.now()
@@ -296,7 +292,9 @@ export function animateKineticValue(
   }
 
   requestAnimationFrame(tick)
-  return () => { cancelled = true }
+  return () => {
+    cancelled = true
+  }
 }
 
 // ── Utility: Parse kinetic number string ───────────────
@@ -324,4 +322,3 @@ export function kineticGradientForSport(sport: string): string {
   }
   return gradients[sport] || 'linear-gradient(135deg, #00E676, #00BFA5)'
 }
-

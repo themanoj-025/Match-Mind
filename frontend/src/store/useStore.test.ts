@@ -11,14 +11,28 @@ describe('useStore — Chat Message Cap', () => {
 
   it('adds chat messages to a room', () => {
     // @ts-ignore
-    useStore.getState().addChatMessage('room1', { id: '1', user: { id: '1', name: 'test', avatar: null }, text: 'Hello', createdAt: '10:00' })
+    useStore
+      .getState()
+      .addChatMessage('room1', {
+        id: '1',
+        user: { id: '1', name: 'test', avatar: null },
+        text: 'Hello',
+        createdAt: '10:00',
+      })
     let state = useStore.getState()
     expect(state.chatMessages['room1']?.length).toBe(1)
     expect(state.chatMessages['room1']?.[0].text).toBe('Hello')
 
     // Add another
     // @ts-ignore
-    useStore.getState().addChatMessage('room1', { id: '2', user: { id: '1', name: 'test', avatar: null }, text: 'World', createdAt: '10:01' })
+    useStore
+      .getState()
+      .addChatMessage('room1', {
+        id: '2',
+        user: { id: '1', name: 'test', avatar: null },
+        text: 'World',
+        createdAt: '10:01',
+      })
     state = useStore.getState()
     expect(state.chatMessages['room1']?.length).toBe(2)
     expect(state.chatMessages['room1']?.map((m: any) => m.id)).toEqual(['1', '2'])
@@ -94,9 +108,16 @@ describe('useStore — Chat Message Cap', () => {
   it('evicts old messages over 500 limit', () => {
     for (let i = 0; i < 505; i++) {
       // @ts-ignore
-      useStore.getState().addChatMessage('room-limit', { id: String(i), user: { id: '1', name: 'test', avatar: null }, text: `Msg ${i}`, createdAt: '10:00' })
+      useStore
+        .getState()
+        .addChatMessage('room-limit', {
+          id: String(i),
+          user: { id: '1', name: 'test', avatar: null },
+          text: `Msg ${i}`,
+          createdAt: '10:00',
+        })
     }
-    
+
     const state = useStore.getState()
     expect(state.chatMessages['room-limit']?.length).toBe(500)
     // The first 5 should be evicted

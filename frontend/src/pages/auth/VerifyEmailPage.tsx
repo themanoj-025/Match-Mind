@@ -53,9 +53,7 @@ export default function VerifyEmailPage() {
   }
 
   return (
-    <motion.div
-      className="min-h-screen flex items-center justify-center px-4"
-    >
+    <motion.div className="min-h-screen flex items-center justify-center px-4">
       <Helmet>
         <title>Verify Email — MatchMind</title>
       </Helmet>
@@ -80,7 +78,12 @@ export default function VerifyEmailPage() {
             )}
 
             {status === 'verified' && (
-              <motion.div key="verified" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
+              <motion.div
+                key="verified"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center"
+              >
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--mm-accent-green)]/10 flex items-center justify-center">
                   <CheckCircle size={32} className="text-[var(--mm-accent-green)]" />
                 </div>
@@ -90,18 +93,32 @@ export default function VerifyEmailPage() {
             )}
 
             {status === 'error' && (
-              <motion.div key="error" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
+              <motion.div
+                key="error"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center"
+              >
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--mm-accent-red)]/10 flex items-center justify-center">
                   <AlertCircle size={32} className="text-[var(--mm-accent-red)]" />
                 </div>
                 <h1 className="heading-2 mb-2">Invalid Link</h1>
-                <p className="body text-[var(--mm-text-secondary)] mb-6">This verification link is invalid or has expired.</p>
-                <Link to="/signup" className="text-[var(--mm-accent-green)] body font-medium hover:underline">Sign up again</Link>
+                <p className="body text-[var(--mm-text-secondary)] mb-6">
+                  This verification link is invalid or has expired.
+                </p>
+                <Link to="/signup" className="text-[var(--mm-accent-green)] body font-medium hover:underline">
+                  Sign up again
+                </Link>
               </motion.div>
             )}
 
             {status === 'pending' && (
-              <motion.div key="pending" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
+              <motion.div
+                key="pending"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center"
+              >
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--mm-accent-amber)]/10 flex items-center justify-center">
                   <Mail size={32} className="text-[var(--mm-accent-amber)]" />
                 </div>
@@ -109,9 +126,7 @@ export default function VerifyEmailPage() {
                 <p className="body text-[var(--mm-text-secondary)] mb-2">
                   We sent a verification email. Click the link to activate your account.
                 </p>
-                <p className="caption text-[var(--mm-text-muted)] mb-6">
-                  Didn't receive it? Check your spam folder.
-                </p>
+                <p className="caption text-[var(--mm-text-muted)] mb-6">Didn't receive it? Check your spam folder.</p>
                 <button
                   onClick={handleResend}
                   disabled={cooldown > 0}
@@ -128,4 +143,3 @@ export default function VerifyEmailPage() {
     </motion.div>
   )
 }
-

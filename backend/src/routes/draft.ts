@@ -48,6 +48,7 @@ import {
 import { getDraftEnabledTournaments } from '../middleware/draftGate'
 import { draftLimiter } from '../middleware/rateLimiter'
 import logger from '../utils/logger'
+import { openapiRegistry } from "../config/openapi";
 
 const router = express.Router()
 
@@ -56,6 +57,13 @@ router.use(authenticateToken)
 
 // ─── POST /api/draft/start (§1.2) ───────────────────────
 
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/start',
+  request: { body: { content: { 'application/json': { schema: draftStartSchema } } } },
+  responses: { 200: { description: 'Success' } }
+})
 router.post(
   '/start',
   draftLimiter,
@@ -106,6 +114,12 @@ router.post(
 
 // ─── GET /api/draft/formations ─────────────────────────
 
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/formations',
+  responses: { 200: { description: 'Success' } }
+})
 router.get(
   '/formations',
   asyncHandler(async (_req, res) => {
@@ -116,6 +130,12 @@ router.get(
 
 // ─── GET /api/draft/mine (§1.10) ───────────────────────
 
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/mine',
+  responses: { 200: { description: 'Success' } }
+})
 router.get(
   '/mine',
   asyncHandler(async (req: AuthenticatedRequest, res) => {
@@ -127,6 +147,12 @@ router.get(
 
 // ─── GET /api/draft/tickets (§1.10) ─────────────────────
 
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/tickets',
+  responses: { 200: { description: 'Success' } }
+})
 router.get(
   '/tickets',
   asyncHandler(async (req: AuthenticatedRequest, res) => {
@@ -162,6 +188,12 @@ router.get(
 
 // ─── GET /api/draft/:sessionId (§1.10) ──────────────────
 
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/:sessionId',
+  responses: { 200: { description: 'Success' } }
+})
 router.get(
   '/:sessionId',
   asyncHandler(async (req: AuthenticatedRequest, res) => {
@@ -213,6 +245,12 @@ router.get(
 
 // ─── GET /api/draft/:sessionId/next-round (§1.10) ──────
 
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/:sessionId/next-round',
+  responses: { 200: { description: 'Success' } }
+})
 router.get(
   '/:sessionId/next-round',
   asyncHandler(async (req: AuthenticatedRequest, res) => {
@@ -238,6 +276,13 @@ router.get(
 
 // ─── POST /api/draft/:sessionId/pick (§1.10) ───────────
 
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/:sessionId/pick',
+  request: { body: { content: { 'application/json': { schema: draftPickSchema } } } },
+  responses: { 200: { description: 'Success' } }
+})
 router.post(
   '/:sessionId/pick',
   validate(draftPickSchema),
@@ -270,6 +315,12 @@ router.post(
 
 // ─── POST /api/draft/:sessionId/commit (§1.10) ─────────
 
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/:sessionId/commit',
+  responses: { 200: { description: 'Success' } }
+})
 router.post(
   '/:sessionId/commit',
   asyncHandler(async (req: AuthenticatedRequest, res) => {
@@ -302,6 +353,12 @@ router.post(
 
 // ─── POST /api/draft/:sessionId/enter-run (§2.1) ──────
 
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/:sessionId/enter-run',
+  responses: { 200: { description: 'Success' } }
+})
 router.post(
   '/:sessionId/enter-run',
   asyncHandler(async (req: AuthenticatedRequest, res) => {
@@ -329,6 +386,12 @@ router.post(
 
 // ─── GET /api/draft/:sessionId/run-status (§2.3) ──────
 
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/:sessionId/run-status',
+  responses: { 200: { description: 'Success' } }
+})
 router.get(
   '/:sessionId/run-status',
   asyncHandler(async (req: AuthenticatedRequest, res) => {
@@ -348,6 +411,12 @@ router.get(
 
 // ─── POST /api/draft/:sessionId/resolve-matchday (§2.2) ──
 
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/:sessionId/resolve-matchday',
+  responses: { 200: { description: 'Success' } }
+})
 router.post(
   '/:sessionId/resolve-matchday',
   asyncHandler(async (req: AuthenticatedRequest, res) => {

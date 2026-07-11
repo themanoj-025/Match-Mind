@@ -30,4 +30,3 @@ ReactDOM.createRoot(rootElement).render(
     </HelmetProvider>
   </React.StrictMode>,
 )
-

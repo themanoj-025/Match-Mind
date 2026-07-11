@@ -27,7 +27,13 @@ export default function ResetPasswordPage() {
 
   const strength = getStrength(password)
   const strengthLabels = ['', 'Weak', 'Fair', 'Good', 'Strong']
-  const strengthColors = ['', 'var(--mm-accent-red)', 'var(--mm-accent-amber)', 'var(--mm-accent-blue)', 'var(--mm-accent-green)']
+  const strengthColors = [
+    '',
+    'var(--mm-accent-red)',
+    'var(--mm-accent-amber)',
+    'var(--mm-accent-blue)',
+    'var(--mm-accent-green)',
+  ]
 
   const handleSubmit = async (e: any) => {
     e.preventDefault()
@@ -59,9 +65,7 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <motion.div
-      className="min-h-screen flex items-center justify-center px-4"
-    >
+    <motion.div className="min-h-screen flex items-center justify-center px-4">
       <Helmet>
         <title>Reset Password — MatchMind</title>
       </Helmet>
@@ -76,18 +80,32 @@ export default function ResetPasswordPage() {
 
           <AnimatePresence mode="wait">
             {status === 'invalid' && (
-              <motion.div key="invalid" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
+              <motion.div
+                key="invalid"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center"
+              >
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--mm-accent-red)]/10 flex items-center justify-center">
                   <AlertCircle size={32} className="text-[var(--mm-accent-red)]" />
                 </div>
                 <h1 className="heading-2 mb-2">Invalid Link</h1>
-                <p className="body text-[var(--mm-text-secondary)] mb-6">This password reset link is invalid or has expired.</p>
-                <Link to="/forgot-password" className="text-[var(--mm-accent-green)] body font-medium hover:underline">Request a new link</Link>
+                <p className="body text-[var(--mm-text-secondary)] mb-6">
+                  This password reset link is invalid or has expired.
+                </p>
+                <Link to="/forgot-password" className="text-[var(--mm-accent-green)] body font-medium hover:underline">
+                  Request a new link
+                </Link>
               </motion.div>
             )}
 
             {status === 'success' && (
-              <motion.div key="success" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
+              <motion.div
+                key="success"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center"
+              >
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--mm-accent-green)]/10 flex items-center justify-center">
                   <CheckCircle size={32} className="text-[var(--mm-accent-green)]" />
                 </div>
@@ -110,7 +128,12 @@ export default function ResetPasswordPage() {
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label htmlFor="password" className="caption font-medium text-[var(--mm-text-secondary)] block mb-1.5">New password</label>
+                    <label
+                      htmlFor="password"
+                      className="caption font-medium text-[var(--mm-text-secondary)] block mb-1.5"
+                    >
+                      New password
+                    </label>
                     <div className="relative">
                       <input
                         id="password"
@@ -139,7 +162,9 @@ export default function ResetPasswordPage() {
                             <div
                               key={level}
                               className="h-1 flex-1 rounded-full transition-all duration-300"
-                              style={{ background: strength >= level ? strengthColors[strength] : 'var(--mm-bg-tertiary)' }}
+                              style={{
+                                background: strength >= level ? strengthColors[strength] : 'var(--mm-bg-tertiary)',
+                              }}
                             />
                           ))}
                         </div>
@@ -151,7 +176,12 @@ export default function ResetPasswordPage() {
                   </div>
 
                   <div>
-                    <label htmlFor="confirm-password" className="caption font-medium text-[var(--mm-text-secondary)] block mb-1.5">Confirm password</label>
+                    <label
+                      htmlFor="confirm-password"
+                      className="caption font-medium text-[var(--mm-text-secondary)] block mb-1.5"
+                    >
+                      Confirm password
+                    </label>
                     <input
                       id="confirm-password"
                       type="password"
@@ -170,9 +200,14 @@ export default function ResetPasswordPage() {
                     className="w-full bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] body font-semibold py-3 rounded-[var(--radius-md)] hover:shadow-[var(--shadow-glow-green)] disabled:opacity-50 transition-all duration-300 flex items-center justify-center gap-2"
                   >
                     {status === 'loading' ? (
-                      <><span className="w-4 h-4 border-2 border-[var(--mm-text-inverse)] border-t-transparent rounded-full animate-spin" /> Updating...</>
+                      <>
+                        <span className="w-4 h-4 border-2 border-[var(--mm-text-inverse)] border-t-transparent rounded-full animate-spin" />{' '}
+                        Updating...
+                      </>
                     ) : (
-                      <><Lock size={16} /> Update Password</>
+                      <>
+                        <Lock size={16} /> Update Password
+                      </>
                     )}
                   </button>
                 </form>
@@ -184,4 +219,3 @@ export default function ResetPasswordPage() {
     </motion.div>
   )
 }
-

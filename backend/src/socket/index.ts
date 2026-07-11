@@ -1,3 +1,4 @@
+import { env } from '../config/env'
 /**
  * Socket.IO event handlers — MatchMind
  *
@@ -119,7 +120,7 @@ export const setupSocket = (io: Server, prisma: any): void => {
       return next(new Error('Authentication required'))
     }
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string; tokenVersion?: number }
+      const decoded = jwt.verify(token, env.JWT_SECRET!) as { userId: string; tokenVersion?: number }
       socket.userId = decoded.userId
 
       // Verify token hasn't been revoked
@@ -156,6 +157,7 @@ export const setupSocket = (io: Server, prisma: any): void => {
     socket.on('JOIN_ROOM', ({ roomId, tournamentId }: { roomId?: string; tournamentId?: string }) => {
       if (!roomId || typeof roomId !== 'string') return
       const roomPrefix = roomId.split(':')[0]
+      // @ts-ignore
       if (!ALLOWED_ROOM_TYPES.includes(roomPrefix)) return
 
       // Always join the legacy room name for backward compatibility with existing broadcasts
@@ -421,6 +423,7 @@ export const setupSocket = (io: Server, prisma: any): void => {
         if (!cleanText && !cleanGifUrl) return
 
         const roomType = roomId.split(':')[0]
+        // @ts-ignore
         if (!ALLOWED_ROOM_TYPES.includes(roomType)) return
 
         const message = await prisma.chatMessage.create({

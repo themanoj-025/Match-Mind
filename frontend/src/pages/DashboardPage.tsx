@@ -19,9 +19,7 @@ export default function DashboardPage() {
   const pendingSessions = (draftSessions || []).filter(
     (s: DraftSession) => s.status === 'DRAFTING' || s.status === 'SQUAD_COMPLETE',
   )
-  const activeRuns = (draftSessions || []).filter(
-    (s: DraftSession) => s.status === 'RUN_IN_PROGRESS',
-  )
+  const activeRuns = (draftSessions || []).filter((s: DraftSession) => s.status === 'RUN_IN_PROGRESS')
 
   useEffect(() => {
     fetch('/api/rooms/mine', { credentials: 'include' })
@@ -33,9 +31,8 @@ export default function DashboardPage() {
       .catch(() => setLoading(false))
   }, [])
 
-  const filteredRooms = activeTournament === 'all'
-    ? rooms
-    : rooms.filter((r: any) => r.tournamentId === activeTournament)
+  const filteredRooms =
+    activeTournament === 'all' ? rooms : rooms.filter((r: any) => r.tournamentId === activeTournament)
 
   // Find first live tournament for Draft Mode entry
   const firstLiveTournament = liveTournaments[0]
@@ -169,26 +166,35 @@ export default function DashboardPage() {
               <div
                 key={room.id}
                 className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5 hover:border-[var(--mm-accent-green)]/40 transition-all cursor-pointer group relative overflow-hidden"
-                style={{
-                  '--tournament-primary': tournaments?.find((tr: any) => tr.id === room.tournamentId)?.theme?.primary || '#0B3D91',
-                  '--tournament-accent': tournaments?.find((tr: any) => tr.id === room.tournamentId)?.theme?.accent || '#D4AF37',
-                } as any}
+                style={
+                  {
+                    '--tournament-primary':
+                      tournaments?.find((tr: any) => tr.id === room.tournamentId)?.theme?.primary || '#0B3D91',
+                    '--tournament-accent':
+                      tournaments?.find((tr: any) => tr.id === room.tournamentId)?.theme?.accent || '#D4AF37',
+                  } as any
+                }
                 onClick={() => {
-                  const path = room.status === 'LOBBY'
-                    ? `/rooms/${room.id}/lobby`
-                    : room.status === 'DRAFTING' || room.status === 'PAUSED'
-                      ? `/rooms/${room.id}/auction`
-                      : `/rooms/${room.id}/franchise/me`
+                  const path =
+                    room.status === 'LOBBY'
+                      ? `/rooms/${room.id}/lobby`
+                      : room.status === 'DRAFTING' || room.status === 'PAUSED'
+                        ? `/rooms/${room.id}/auction`
+                        : `/rooms/${room.id}/franchise/me`
                   navigate(path)
                 }}
               >
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="heading-3">{room.name}</h3>
-                  <span className={`caption px-2 py-0.5 rounded-[var(--radius-sm)] font-medium ${
-                    room.status === 'LOBBY' ? 'bg-[var(--mm-accent-blue)]/10 text-[var(--mm-accent-blue)]' :
-                    room.status === 'DRAFTING' ? 'bg-[var(--mm-accent-green)]/10 text-[var(--mm-accent-green)]' :
-                    'bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-muted)]'
-                  }`}>
+                  <span
+                    className={`caption px-2 py-0.5 rounded-[var(--radius-sm)] font-medium ${
+                      room.status === 'LOBBY'
+                        ? 'bg-[var(--mm-accent-blue)]/10 text-[var(--mm-accent-blue)]'
+                        : room.status === 'DRAFTING'
+                          ? 'bg-[var(--mm-accent-green)]/10 text-[var(--mm-accent-green)]'
+                          : 'bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-muted)]'
+                    }`}
+                  >
                     {room.status}
                   </span>
                 </div>
@@ -207,4 +213,3 @@ export default function DashboardPage() {
     </div>
   )
 }
-

@@ -1,5 +1,14 @@
 import { create } from 'zustand'
-import type { User, Notification, Room, AuctionState, RosterEntry, LeaderboardEntry, ChatMessage as ChatMessageType, Player } from '../lib/types'
+import type {
+  User,
+  Notification,
+  Room,
+  AuctionState,
+  RosterEntry,
+  LeaderboardEntry,
+  ChatMessage as ChatMessageType,
+  Player,
+} from '../lib/types'
 
 interface StoreState {
   // Auth
@@ -77,15 +86,16 @@ const useStore = create<StoreState>((set) => ({
   user: null,
   isAuthenticated: false,
   setUser: (user) => set({ user, isAuthenticated: !!user }),
-  logout: () => set({
-    user: null,
-    isAuthenticated: false,
-    activeRooms: [],
-    currentAuctionState: null,
-    myRoster: [],
-    notifications: [],
-    unreadCount: 0,
-  }),
+  logout: () =>
+    set({
+      user: null,
+      isAuthenticated: false,
+      activeRooms: [],
+      currentAuctionState: null,
+      myRoster: [],
+      notifications: [],
+      unreadCount: 0,
+    }),
 
   // ── UI State ──────────────────────────────────────
   isNavOpen: false,
@@ -183,9 +193,7 @@ const useStore = create<StoreState>((set) => ({
     })),
   markNotificationRead: (id) =>
     set((state) => ({
-      notifications: state.notifications.map((n) =>
-        n.id === id ? { ...n, isRead: true } : n
-      ),
+      notifications: state.notifications.map((n) => (n.id === id ? { ...n, isRead: true } : n)),
       unreadCount: Math.max(0, state.unreadCount - 1),
     })),
   setNotifications: (notifications) =>
@@ -229,4 +237,3 @@ const useStore = create<StoreState>((set) => ({
 }))
 
 export default useStore
-

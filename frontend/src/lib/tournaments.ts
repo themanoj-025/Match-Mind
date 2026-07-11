@@ -1,6 +1,6 @@
 /**
  * Tournament Configuration — Frontend (v2)
- * 
+ *
  * Fetch tournaments from the API/registry rather than hardcoding them.
  * This file provides the client-side helpers and defaults.
  */
@@ -67,10 +67,18 @@ export function getTournamentCSSVars(tournament?: Tournament): React.CSSProperti
 export function formatDateRange(tournament: Tournament): string {
   if (!tournament.dateRange.start && !tournament.dateRange.end) return 'TBD'
   const start = tournament.dateRange.start
-    ? new Date(tournament.dateRange.start + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    ? new Date(tournament.dateRange.start + 'T00:00:00Z').toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      })
     : ''
   const end = tournament.dateRange.end
-    ? new Date(tournament.dateRange.end + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    ? new Date(tournament.dateRange.end + 'T00:00:00Z').toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      })
     : ''
   if (start && end) return `${start} – ${end}`
   return start || end
@@ -88,4 +96,3 @@ export const TOURNAMENT_ICONS: Record<string, string> = {
   'trophy-women': '🏆',
   'continent-samerica': '🌎',
 }
-

@@ -7,10 +7,17 @@
 
 import express from 'express'
 import asyncHandler from '../middleware/asyncHandler'
+import { openapiRegistry } from "../config/openapi";
 
 const router = express.Router()
 
 // GET /api/players — list players for a tournament (football only)
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/', asyncHandler(async (req, res) => {
   const prisma = req.app.get('prisma')
   const { tournamentId } = req.query as { tournamentId?: string }
@@ -27,6 +34,12 @@ router.get('/', asyncHandler(async (req, res) => {
 }))
 
 // GET /api/players/:id — player details
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/:id',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/:id', asyncHandler(async (req, res) => {
   const prisma = req.app.get('prisma')
   const player = await prisma.player.findUnique({ where: { id: req.params.id } })

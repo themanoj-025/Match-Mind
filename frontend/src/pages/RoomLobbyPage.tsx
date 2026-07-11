@@ -17,9 +17,15 @@ export default function RoomLobbyPage() {
   useEffect(() => {
     if (!roomId) return
     fetch(`/api/rooms/${roomId}`, { credentials: 'include' })
-      .then(r => r.json())
-      .then(data => { setRoom(data); setLoading(false) })
-      .catch(() => { setLoading(false); setError('Failed to load room') })
+      .then((r) => r.json())
+      .then((data) => {
+        setRoom(data)
+        setLoading(false)
+      })
+      .catch(() => {
+        setLoading(false)
+        setError('Failed to load room')
+      })
   }, [roomId])
 
   const copyInviteCode = () => {
@@ -45,17 +51,23 @@ export default function RoomLobbyPage() {
 
   const isHost = room?.hostId === user?.id
 
-  if (loading) return (
-    <div className="min-h-screen pt-16 flex items-center justify-center">
-      <div className="w-10 h-10 border-2 border-[var(--mm-accent-green)] border-t-transparent rounded-full animate-spin" />
-    </div>
-  )
+  if (loading)
+    return (
+      <div className="min-h-screen pt-16 flex items-center justify-center">
+        <div className="w-10 h-10 border-2 border-[var(--mm-accent-green)] border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
 
   return (
     <div className="min-h-screen pt-16 pb-20">
-      <Helmet><title>{room?.name || 'Lobby'} — MatchMind</title></Helmet>
+      <Helmet>
+        <title>{room?.name || 'Lobby'} — MatchMind</title>
+      </Helmet>
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6">
-        <button onClick={() => navigate('/dashboard')} className="flex items-center gap-1.5 body text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] mb-6 transition-colors">
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="flex items-center gap-1.5 body text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] mb-6 transition-colors"
+        >
           <ArrowLeft size={16} /> Back to Dashboard
         </button>
 
@@ -66,14 +78,27 @@ export default function RoomLobbyPage() {
               <p className="body text-[var(--mm-text-secondary)] mt-1">Waiting for players to join...</p>
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-md)]">
-              <button onClick={copyInviteCode} className="flex items-center gap-1.5 body text-[var(--mm-accent-green)] hover:underline">
-                {copied ? <><Check size={16} /> Copied!</> : <><Copy size={16} /> {room?.inviteCode}</>}
+              <button
+                onClick={copyInviteCode}
+                className="flex items-center gap-1.5 body text-[var(--mm-accent-green)] hover:underline"
+              >
+                {copied ? (
+                  <>
+                    <Check size={16} /> Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy size={16} /> {room?.inviteCode}
+                  </>
+                )}
               </button>
             </div>
           </div>
 
           {error && (
-            <div className="mb-4 bg-[var(--mm-accent-red)]/10 border border-[var(--border-error)] rounded-[var(--radius-md)] p-3 body text-[var(--mm-accent-red)]">{error}</div>
+            <div className="mb-4 bg-[var(--mm-accent-red)]/10 border border-[var(--border-error)] rounded-[var(--radius-md)] p-3 body text-[var(--mm-accent-red)]">
+              {error}
+            </div>
           )}
 
           {/* Members */}
@@ -83,14 +108,19 @@ export default function RoomLobbyPage() {
             </h3>
             <div className="space-y-2">
               {room?.members?.map((member: any) => (
-                <div key={member.id} className="flex items-center gap-3 p-3 bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-md)]">
+                <div
+                  key={member.id}
+                  className="flex items-center gap-3 p-3 bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-md)]"
+                >
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--mm-accent-green)] to-[var(--mm-accent-blue)] flex items-center justify-center text-[var(--mm-text-inverse)] font-bold text-sm">
                     {member.user?.displayName?.charAt(0) || '?'}
                   </div>
                   <div className="flex-1">
                     <span className="body font-medium">{member.user?.displayName || member.user?.username}</span>
                     {member.role === 'host' && (
-                      <span className="caption ml-2 px-2 py-0.5 bg-[var(--mm-accent-purple)]/10 text-[var(--mm-accent-purple)] rounded-[var(--radius-sm)]">Host</span>
+                      <span className="caption ml-2 px-2 py-0.5 bg-[var(--mm-accent-purple)]/10 text-[var(--mm-accent-purple)] rounded-[var(--radius-sm)]">
+                        Host
+                      </span>
                     )}
                   </div>
                   <span className="caption text-[var(--mm-text-muted)]">🪙 ${member.remainingBudget}</span>
@@ -119,4 +149,3 @@ export default function RoomLobbyPage() {
     </div>
   )
 }
-

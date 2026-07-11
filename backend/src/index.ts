@@ -1,5 +1,6 @@
+import { env } from './config/env'
 // ─── Sentry instrumentation (must be first) ────────────────────────────
-if (process.env.SENTRY_DSN) {
+if (env.SENTRY_DSN) {
   require('../instrument')
 }
 
@@ -14,33 +15,31 @@ import passport from 'passport'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
 import { PrismaClient } from '@prisma/client'
+import swaggerUi from 'swagger-ui-express'
+import { generateOpenAPI } from './config/openapi'
 import { requestId } from './middleware/requestId'
 
 // ─── Validate required environment variables ──────────────────────────
 import logger from './utils/logger'
 
-const REQUIRED_ENV_VARS = ['JWT_SECRET', 'JWT_REFRESH_SECRET', 'JWT_RESET_SECRET', 'DATABASE_URL', 'REDIS_URL']
-for (const envVar of REQUIRED_ENV_VARS) {
-  if (!process.env[envVar]) {
-    logger.fatal({ event: 'startup.env_missing', envVar }, `Required environment variable ${envVar} is not set.`)
-    process.exit(1)
-  }
-}
+// Environment is validated automatically via import of `env`
 
 // Verify all JWT secrets are distinct — fail fast on identical secrets
 const jwtSecrets = {
-  JWT_SECRET: process.env.JWT_SECRET!,
-  JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET!,
-  JWT_RESET_SECRET: process.env.JWT_RESET_SECRET!,
+  JWT_SECRET: env.JWT_SECRET,
+  JWT_REFRESH_SECRET: env.JWT_REFRESH_SECRET,
+  JWT_RESET_SECRET: env.JWT_RESET_SECRET,
 }
 
-const secretKeys = Object.keys(jwtSecrets)
+const secretKeys = Object.keys(jwtSecrets) as (keyof typeof jwtSecrets)[]
 for (let i = 0; i < secretKeys.length; i++) {
   for (let j = i + 1; j < secretKeys.length; j++) {
-    if (jwtSecrets[secretKeys[i] as keyof typeof jwtSecrets] === jwtSecrets[secretKeys[j] as keyof typeof jwtSecrets]) {
+    const key1 = secretKeys[i]
+    const key2 = secretKeys[j]
+    if (key1 && key2 && jwtSecrets[key1] === jwtSecrets[key2]) {
       logger.fatal(
-        { event: 'startup.identical_secrets', secrets: [secretKeys[i], secretKeys[j]] },
-        `JWT secrets ${secretKeys[i]} and ${secretKeys[j]} are identical. They must be distinct.`,
+        { event: 'startup.env_invalid', key1, key2 },
+        `CRITICAL SECURITY ERROR: ${key1} and ${key2} cannot be identical.`
       )
       process.exit(1)
     }
@@ -48,7 +47,19 @@ for (let i = 0; i < secretKeys.length; i++) {
 }
 
 // Initialize Postgres Database with Prisma
-const prisma = new PrismaClient()
+// Hardening: Enforce connection pooling limits and statement timeouts
+const dbUrl = new URL(env.DATABASE_URL)
+if (!dbUrl.searchParams.has('connection_limit')) dbUrl.searchParams.set('connection_limit', '20')
+if (!dbUrl.searchParams.has('pool_timeout')) dbUrl.searchParams.set('pool_timeout', '10')
+if (!dbUrl.searchParams.has('statement_timeout')) dbUrl.searchParams.set('statement_timeout', '10000') // 10s
+
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: dbUrl.toString(),
+    },
+  },
+})
 let dbInitialized = false
 
 async function initDatabase(): Promise<void> {
@@ -103,13 +114,13 @@ app.use(requestId)
 app.use(compression())
 
 // ─── CORS must be first so preflight OPTIONS requests are handled before any other middleware ───
-const corsMiddleware = cors({ origin: process.env.FRONTEND_URL || 'http://localhost:3000', credentials: true })
+const corsMiddleware = cors({ origin: env.FRONTEND_URL || 'http://localhost:3000', credentials: true })
 app.use(corsMiddleware)
 
 const httpServer = createServer(app)
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: env.FRONTEND_URL || 'http://localhost:3000',
     credentials: true,
   },
 })
@@ -184,6 +195,16 @@ app.use(csrfProtection)
 // Make prisma accessible
 app.set('prisma', prisma)
 app.set('io', io)
+
+// ─── API Documentation (OpenAPI / Swagger) ───────────────────
+app.get('/openapi.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json')
+  res.send(generateOpenAPI())
+})
+
+if (env.NODE_ENV !== 'production') {
+  app.use('/docs', swaggerUi.serve, swaggerUi.setup(generateOpenAPI()))
+}
 
 // ─── API Routes ───────────────────────────────────────────────────────
 app.use('/api/auth/login', authLimiter)
@@ -283,7 +304,7 @@ async function tickAuctionTimers(): Promise<void> {
           room.id,
           async (roomId: string) => {
             const state = await prisma.auctionState.findUnique({ where: { roomId } })
-            return state || null
+            return state ? (state as any) : null
           },
           async (roomId: string, state: any) => {
             await prisma.auctionState.update({ where: { roomId }, data: { ...state } })
@@ -359,13 +380,13 @@ function stopAuctionTimer(): void {
   }
 }
 
-const PORT = parseInt(process.env.PORT || '4000', 10)
+const PORT = parseInt(env.PORT || '4000', 10)
 
 // Start database then server
 initDatabase().then(() => {
   httpServer.listen(PORT, () => {
     logger.info(
-      { event: 'server.start', port: PORT, env: process.env.NODE_ENV || 'development' },
+      { event: 'server.start', port: PORT, env: env.NODE_ENV || 'development' },
       `MatchMind API server running on port ${PORT}`,
     )
   })

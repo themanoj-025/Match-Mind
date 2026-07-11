@@ -101,9 +101,7 @@ function MessageBubble({ message, isOwn }: any) {
         {message.type === 'gif' && message.gifUrl ? (
           <img src={message.gifUrl} alt="GIF" className="max-w-full rounded-[var(--radius-sm)]" loading="lazy" />
         ) : (
-          <p className="body text-[var(--mm-text-primary)] break-words whitespace-pre-wrap">
-            {message.text}
-          </p>
+          <p className="body text-[var(--mm-text-primary)] break-words whitespace-pre-wrap">{message.text}</p>
         )}
         <div className={`flex items-center gap-1 mt-0.5 ${isOwn ? 'justify-end' : 'justify-start'}`}>
           <span
@@ -134,13 +132,20 @@ function TypingIndicator({ users, currentUserId }: any) {
   return (
     <div className="flex items-center gap-2 px-4 py-1.5">
       <div className="flex items-center gap-0.5">
-        <span className="w-1.5 h-1.5 rounded-full bg-[var(--mm-text-muted)] animate-bounce" style={{ animationDelay: '0ms' }} />
-        <span className="w-1.5 h-1.5 rounded-full bg-[var(--mm-text-muted)] animate-bounce" style={{ animationDelay: '150ms' }} />
-        <span className="w-1.5 h-1.5 rounded-full bg-[var(--mm-text-muted)] animate-bounce" style={{ animationDelay: '300ms' }} />
+        <span
+          className="w-1.5 h-1.5 rounded-full bg-[var(--mm-text-muted)] animate-bounce"
+          style={{ animationDelay: '0ms' }}
+        />
+        <span
+          className="w-1.5 h-1.5 rounded-full bg-[var(--mm-text-muted)] animate-bounce"
+          style={{ animationDelay: '150ms' }}
+        />
+        <span
+          className="w-1.5 h-1.5 rounded-full bg-[var(--mm-text-muted)] animate-bounce"
+          style={{ animationDelay: '300ms' }}
+        />
       </div>
-      <span className="caption text-[var(--mm-text-muted)] italic">
-        Typing...
-      </span>
+      <span className="caption text-[var(--mm-text-muted)] italic">Typing...</span>
     </div>
   )
 }
@@ -259,8 +264,6 @@ export default function MessagesPage() {
 
   // ─── Use React Query hooks ────────────────────────
 
-
-
   // Sync conversations from React Query
   useEffect(() => {
     if (conversationsData) {
@@ -295,13 +298,9 @@ export default function MessagesPage() {
       }).catch(() => {})
 
       // Update unread count locally
-      setConversations((prev) =>
-        prev.map((c) =>
-          c.roomId === conv.roomId ? { ...c, unreadCount: 0 } : c
-        )
-      )
+      setConversations((prev) => prev.map((c) => (c.roomId === conv.roomId ? { ...c, unreadCount: 0 } : c)))
     },
-    [isMobile]
+    [isMobile],
   )
 
   // ─── Send message ─────────────────────────────────
@@ -421,7 +420,11 @@ export default function MessagesPage() {
               <div className="px-4 py-12">
                 <EmptyState
                   title="No messages yet"
-                  description={searchQuery ? 'No conversations match your search' : 'Start a conversation with someone from the leaderboard or their profile'}
+                  description={
+                    searchQuery
+                      ? 'No conversations match your search'
+                      : 'Start a conversation with someone from the leaderboard or their profile'
+                  }
                 />
               </div>
             ) : (
@@ -465,11 +468,12 @@ export default function MessagesPage() {
                     <span className="body font-semibold text-[var(--mm-text-primary)] truncate">
                       {activeConv.otherUser?.displayName || activeConv.otherUser?.username}
                     </span>
-                    {activeConv.otherUser?.tier && (
-                      <TierBadge tier={activeConv.otherUser.tier} size="sm" />
-                    )}
+                    {activeConv.otherUser?.tier && <TierBadge tier={activeConv.otherUser.tier} size="sm" />}
                     {activeConv.otherUser?.isPro && (
-                      <span className="caption px-1.5 py-0.5 rounded-[var(--radius-sm)] text-[var(--mm-accent-purple)] border border-[var(--border-pro)] font-medium" style={{ fontSize: '10px' }}>
+                      <span
+                        className="caption px-1.5 py-0.5 rounded-[var(--radius-sm)] text-[var(--mm-accent-purple)] border border-[var(--border-pro)] font-medium"
+                        style={{ fontSize: '10px' }}
+                      >
                         PRO
                       </span>
                     )}
@@ -502,11 +506,7 @@ export default function MessagesPage() {
                 ) : (
                   <>
                     {messages.map((msg) => (
-                      <MessageBubble
-                        key={msg.id}
-                        message={msg}
-                        isOwn={msg.userId === user?.id}
-                      />
+                      <MessageBubble key={msg.id} message={msg} isOwn={msg.userId === user?.id} />
                     ))}
                     <TypingIndicator users={typingUsers} currentUserId={user?.id} />
                     <div ref={messagesEndRef} />
@@ -534,11 +534,7 @@ export default function MessagesPage() {
                     className="p-2.5 rounded-[var(--radius-md)] bg-[var(--mm-accent-green)] text-[var(--mm-bg-primary)] hover:bg-[var(--mm-accent-green-dim)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                     aria-label="Send message"
                   >
-                    {sending ? (
-                      <Loader2 size={18} className="animate-spin" />
-                    ) : (
-                      <Send size={18} />
-                    )}
+                    {sending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
                   </button>
                 </div>
               </div>
@@ -560,4 +556,3 @@ export default function MessagesPage() {
     </div>
   )
 }
-

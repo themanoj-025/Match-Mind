@@ -9,6 +9,7 @@ import logger from '../utils/logger'
 import { computeRoomLeaderboard } from '../services/leaderboardService'
 import { createRoomLimiter, joinRoomLimiter } from '../middleware/rateLimiter'
 import { idempotent } from '../middleware/idempotency'
+import { openapiRegistry } from "../config/openapi";
 
 const router = express.Router()
 
@@ -45,6 +46,13 @@ function generateInviteCode(): string {
 // ─── Routes ─────────────────────────────────────────────
 
 // POST /api/rooms — create room (host, rate-limited, idempotent)
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/',
+  request: { body: { content: { 'application/json': { schema: createRoomSchema } } } },
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/', idempotent(), createRoomLimiter, authenticateToken, validate(createRoomSchema), asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const { name, tournamentId, totalBudget, rosterRules } = req.body as z.infer<typeof createRoomSchema>
@@ -112,6 +120,12 @@ router.post('/', idempotent(), createRoomLimiter, authenticateToken, validate(cr
 }))
 
 // GET /api/rooms/mine — list user's rooms
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/mine',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/mine', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const memberships = await prisma.roomMember.findMany({
@@ -126,6 +140,12 @@ router.get('/mine', authenticateToken, asyncHandler(async (req: AuthenticatedReq
 }))
 
 // GET /api/rooms/:id — get single room with members and auction state
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/:id',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/:id', asyncHandler(async (req, res) => {
   const prisma = req.app.get('prisma')
   const roomId = req.params.id as string
@@ -145,6 +165,12 @@ router.get('/:id', asyncHandler(async (req, res) => {
 }))
 
 // GET /api/rooms/:id/members — list members with ready status
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/:id/members',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/:id/members', asyncHandler(async (req, res) => {
   const prisma = req.app.get('prisma')
   const roomId = req.params.id as string
@@ -167,6 +193,13 @@ router.get('/:id/members', asyncHandler(async (req, res) => {
 }))
 
 // POST /api/rooms/:id/join — join room via invite code
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/:id/join',
+  request: { body: { content: { 'application/json': { schema: joinRoomSchema } } } },
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/:id/join', joinRoomLimiter, authenticateToken, validate(joinRoomSchema), asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const roomId = req.params.id as string
@@ -216,6 +249,12 @@ router.post('/:id/join', joinRoomLimiter, authenticateToken, validate(joinRoomSc
 }))
 
 // PATCH /api/rooms/:id/ready — toggle ready status in lobby
+
+openapiRegistry.registerPath({
+  method: 'patch',
+  path: '/:id/ready',
+  responses: { 200: { description: 'Success' } }
+})
 router.patch('/:id/ready', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const roomId = req.params.id as string
@@ -255,6 +294,12 @@ router.patch('/:id/ready', authenticateToken, asyncHandler(async (req: Authentic
 }))
 
 // POST /api/rooms/:id/regenerate-invite — host regenerates invite code
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/:id/regenerate-invite',
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/:id/regenerate-invite', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const roomId = req.params.id as string
@@ -285,6 +330,12 @@ router.post('/:id/regenerate-invite', authenticateToken, asyncHandler(async (req
 }))
 
 // GET /api/rooms/:id/leaderboard — per-room fantasy leaderboard (derived view)
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/:id/leaderboard',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/:id/leaderboard', asyncHandler(async (req, res) => {
   const prisma = req.app.get('prisma')
   const roomId = req.params.id as string

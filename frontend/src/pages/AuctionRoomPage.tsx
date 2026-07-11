@@ -37,34 +37,40 @@ export default function AuctionRoomPage() {
   useEffect(() => {
     if (!roomId) return
     Promise.all([
-      fetch(`/api/rooms/${roomId}`, { credentials: 'include' }).then(r => r.json()),
-      fetch(`/api/players`, { credentials: 'include' }).then(r => r.json()),
-    ]).then(([roomData, playersData]) => {
-      setRoom(roomData)
-      const playerMap: Record<string, Player> = {}
-      ;(Array.isArray(playersData) ? playersData : []).forEach((p: Player) => { playerMap[p.id] = p })
-      setPlayers(playerMap)
+      fetch(`/api/rooms/${roomId}`, { credentials: 'include' }).then((r) => r.json()),
+      fetch(`/api/players`, { credentials: 'include' }).then((r) => r.json()),
+    ])
+      .then(([roomData, playersData]) => {
+        setRoom(roomData)
+        const playerMap: Record<string, Player> = {}
+        ;(Array.isArray(playersData) ? playersData : []).forEach((p: Player) => {
+          playerMap[p.id] = p
+        })
+        setPlayers(playerMap)
 
-      if (roomData.auctionState) {
-        setCurrentAuctionState(roomData.auctionState)
-      }
+        if (roomData.auctionState) {
+          setCurrentAuctionState(roomData.auctionState)
+        }
 
-      // Find my membership
-      if (user && roomData.members) {
-        const myMembership = roomData.members.find((m: RoomMember) => m.userId === user.id)
-        if (myMembership) setMyBudget(myMembership.remainingBudget)
-      }
+        // Find my membership
+        if (user && roomData.members) {
+          const myMembership = roomData.members.find((m: RoomMember) => m.userId === user.id)
+          if (myMembership) setMyBudget(myMembership.remainingBudget)
+        }
 
-      setLoading(false)
-    }).catch(() => setLoading(false))
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
   }, [roomId])
 
   // ─── Load my roster ────────────────────────────────────
   const loadMyRoster = useCallback(() => {
     if (!roomId || !user) return
     fetch(`/api/rooms/${roomId}/franchises/${user.id}`, { credentials: 'include' })
-      .then(r => r.json())
-      .then(data => { setMyRoster(data.roster || []) })
+      .then((r) => r.json())
+      .then((data) => {
+        setMyRoster(data.roster || [])
+      })
       .catch(() => {})
   }, [roomId, user])
 
@@ -92,37 +98,51 @@ export default function AuctionRoomPage() {
     setCurrentAuctionState(state)
   }, [])
 
-  const onNewBid = useCallback((data: any) => {
-    setCurrentAuctionState(((prev: any) => prev ? {
-      ...prev,
-      currentBid: data.amount,
-      currentBidderId: data.bidderId,
-      timerEndsAt: data.timerEndsAt,
-      version: data.version,
-    } : null) as any)
+  const onNewBid = useCallback(
+    (data: any) => {
+      setCurrentAuctionState(((prev: any) =>
+        prev
+          ? {
+              ...prev,
+              currentBid: data.amount,
+              currentBidderId: data.bidderId,
+              timerEndsAt: data.timerEndsAt,
+              version: data.version,
+            }
+          : null) as any)
 
-    setBidHistory(h => [{
-      id: `${data.playerId}-${Date.now()}-${++bidCounter}`,
-      roomId: roomId || '',
-      playerId: data.playerId,
-      userId: data.bidderId,
-      amount: data.amount,
-      timestamp: new Date().toISOString(),
-      version: data.version,
-    }, ...h].slice(0, 50))
-  }, [roomId])
+      setBidHistory((h) =>
+        [
+          {
+            id: `${data.playerId}-${Date.now()}-${++bidCounter}`,
+            roomId: roomId || '',
+            playerId: data.playerId,
+            userId: data.bidderId,
+            amount: data.amount,
+            timestamp: new Date().toISOString(),
+            version: data.version,
+          },
+          ...h,
+        ].slice(0, 50),
+      )
+    },
+    [roomId],
+  )
 
-  const onPlayerSold = useCallback((data: any) => {
-    setCurrentAuctionState(((prev: any) => prev ? { ...prev, phase: 'SOLD' } : null) as any)
-    // Refresh budget and roster after sale
-    if (data.buyerId === user?.id) {
-      setMyBudget(prev => prev - (data.price || 0))
-    }
-    setTimeout(() => loadMyRoster(), 500)
-  }, [user, loadMyRoster])
+  const onPlayerSold = useCallback(
+    (data: any) => {
+      setCurrentAuctionState(((prev: any) => (prev ? { ...prev, phase: 'SOLD' } : null)) as any)
+      // Refresh budget and roster after sale
+      if (data.buyerId === user?.id) {
+        setMyBudget((prev) => prev - (data.price || 0))
+      }
+      setTimeout(() => loadMyRoster(), 500)
+    },
+    [user, loadMyRoster],
+  )
 
   const onPlayerUnsold = useCallback(() => {
-    setCurrentAuctionState(((prev: any) => prev ? { ...prev, phase: 'UNSOLD' } : null) as any)
+    setCurrentAuctionState(((prev: any) => (prev ? { ...prev, phase: 'UNSOLD' } : null)) as any)
   }, [])
 
   const onAuctionPhaseChange = useCallback((data: any) => {
@@ -130,11 +150,11 @@ export default function AuctionRoomPage() {
   }, [])
 
   const onAuctionFinished = useCallback(() => {
-    setCurrentAuctionState(((prev: any) => prev ? { ...prev, phase: 'FINISHED' } : null) as any)
+    setCurrentAuctionState(((prev: any) => (prev ? { ...prev, phase: 'FINISHED' } : null)) as any)
   }, [])
 
   const onReAuctionStarted = useCallback(() => {
-    setCurrentAuctionState(((prev: any) => prev ? { ...prev, phase: 'RE_AUCTION' } : null) as any)
+    setCurrentAuctionState(((prev: any) => (prev ? { ...prev, phase: 'RE_AUCTION' } : null)) as any)
   }, [])
 
   const onAuctionPaused = useCallback(() => {
@@ -166,16 +186,19 @@ export default function AuctionRoomPage() {
   })
 
   // ─── Bid handler ───────────────────────────────────────
-  const handleBid = useCallback((amount: number) => {
-    if (!currentPlayerId || !currentAuctionState) return
-    placeBid(currentPlayerId, amount, currentAuctionState.version)
-  }, [currentPlayerId, currentAuctionState, placeBid])
+  const handleBid = useCallback(
+    (amount: number) => {
+      if (!currentPlayerId || !currentAuctionState) return
+      placeBid(currentPlayerId, amount, currentAuctionState.version)
+    },
+    [currentPlayerId, currentAuctionState, placeBid],
+  )
 
   // ─── Star toggle ───────────────────────────────────────
   const handleToggleStar = useCallback(() => {
     if (!currentPlayerId) return
     socketToggleStar(currentPlayerId)
-    setStarredPlayers(prev => {
+    setStarredPlayers((prev) => {
       const next = new Set(prev)
       if (next.has(currentPlayerId)) next.delete(currentPlayerId)
       else next.add(currentPlayerId)
@@ -184,15 +207,18 @@ export default function AuctionRoomPage() {
   }, [currentPlayerId, socketToggleStar])
 
   // ─── Loading state ────────────────────────────────────
-  if (loading) return (
-    <div className="min-h-screen pt-16 flex items-center justify-center">
-      <div className="w-10 h-10 border-2 border-[var(--mm-accent-green)] border-t-transparent rounded-full animate-spin" />
-    </div>
-  )
+  if (loading)
+    return (
+      <div className="min-h-screen pt-16 flex items-center justify-center">
+        <div className="w-10 h-10 border-2 border-[var(--mm-accent-green)] border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
 
   return (
     <TournamentThemeWrapper tournamentId={room?.tournamentId} className="min-h-screen pt-16 pb-20">
-      <Helmet><title>{room?.name || 'Auction'} — MatchMind</title></Helmet>
+      <Helmet>
+        <title>{room?.name || 'Auction'} — MatchMind</title>
+      </Helmet>
 
       {/* ── Top bar ─────────────────────────────────────── */}
       <div className="bg-[var(--mm-bg-secondary)] border-b border-[var(--border-subtle)] sticky top-16 z-30">
@@ -209,13 +235,15 @@ export default function AuctionRoomPage() {
               <h2 className="heading-3">{room?.name || 'Auction Room'}</h2>
               <span className="caption text-[var(--mm-text-muted)]">
                 Phase:{' '}
-                <span className={`font-semibold ${
-                  currentAuctionState?.phase === 'PLAYER_LIVE'
-                    ? 'text-[var(--mm-accent-green)]'
-                    : currentAuctionState?.phase === 'FINISHED'
-                      ? 'text-[var(--mm-accent-amber)]'
-                      : 'text-[var(--mm-text-secondary)]'
-                }`}>
+                <span
+                  className={`font-semibold ${
+                    currentAuctionState?.phase === 'PLAYER_LIVE'
+                      ? 'text-[var(--mm-accent-green)]'
+                      : currentAuctionState?.phase === 'FINISHED'
+                        ? 'text-[var(--mm-accent-amber)]'
+                        : 'text-[var(--mm-text-secondary)]'
+                  }`}
+                >
                   {currentAuctionState?.phase || 'IDLE'}
                 </span>
               </span>
@@ -225,9 +253,11 @@ export default function AuctionRoomPage() {
             <span className="caption text-[var(--mm-text-secondary)] flex items-center gap-1">
               <Users size={14} /> {room?.members?.length || 0}
             </span>
-            <span className={`caption flex items-center gap-1 font-semibold ${
-              myBudget < 50 ? 'text-[var(--mm-accent-red)]' : 'text-[var(--mm-accent-amber)]'
-            }`}>
+            <span
+              className={`caption flex items-center gap-1 font-semibold ${
+                myBudget < 50 ? 'text-[var(--mm-accent-red)]' : 'text-[var(--mm-accent-amber)]'
+              }`}
+            >
               🪙 ${myBudget}
             </span>
           </div>
@@ -254,9 +284,7 @@ export default function AuctionRoomPage() {
             <div className="bg-[var(--mm-bg-secondary)] rounded-[var(--radius-xl)] p-12 text-center border border-[var(--border-subtle)]">
               <Gavel size={48} className="mx-auto mb-4 text-[var(--mm-text-muted)] opacity-30" />
               <h2 className="heading-2 mb-2">Waiting for Auction</h2>
-              <p className="body text-[var(--mm-text-secondary)]">
-                The host will start the auction shortly.
-              </p>
+              <p className="body text-[var(--mm-text-secondary)]">The host will start the auction shortly.</p>
             </div>
           )}
 
@@ -332,10 +360,7 @@ export default function AuctionRoomPage() {
 
         {/* Right sidebar: Activity Feed */}
         <div className="space-y-4">
-          <AuctionActivityFeed
-            bids={bidHistory}
-            players={players}
-          />
+          <AuctionActivityFeed bids={bidHistory} players={players} />
 
           {/* Quick chat area */}
           <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4">
@@ -352,4 +377,3 @@ export default function AuctionRoomPage() {
     </TournamentThemeWrapper>
   )
 }
-

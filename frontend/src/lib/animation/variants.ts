@@ -138,4 +138,3 @@ export const reactionPopVariants: Variants = {
   animate: { scale: 1, transition: { type: 'spring', stiffness: 500, damping: 30 } },
   tap: { scale: 1.2, transition: { duration: 0.1 } },
 }
-

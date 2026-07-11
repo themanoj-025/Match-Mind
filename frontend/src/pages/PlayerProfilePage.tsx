@@ -13,25 +13,31 @@ export default function PlayerProfilePage() {
 
   useEffect(() => {
     if (!playerId) return
-    Promise.all([
-      fetch(`/api/players/${playerId}`, { credentials: 'include' }).then(r => r.json()),
-    ]).then(([playerData]) => {
-      setPlayer(playerData)
-      setLoading(false)
-    }).catch(() => setLoading(false))
+    Promise.all([fetch(`/api/players/${playerId}`, { credentials: 'include' }).then((r) => r.json())])
+      .then(([playerData]) => {
+        setPlayer(playerData)
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
   }, [playerId])
 
-  if (loading) return (
-    <div className="min-h-screen pt-16 flex items-center justify-center">
-      <div className="w-10 h-10 border-2 border-[var(--mm-accent-green)] border-t-transparent rounded-full animate-spin" />
-    </div>
-  )
+  if (loading)
+    return (
+      <div className="min-h-screen pt-16 flex items-center justify-center">
+        <div className="w-10 h-10 border-2 border-[var(--mm-accent-green)] border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
 
   return (
     <div className="min-h-screen pt-16 pb-20">
-      <Helmet><title>{player?.name || 'Player'} — MatchMind</title></Helmet>
+      <Helmet>
+        <title>{player?.name || 'Player'} — MatchMind</title>
+      </Helmet>
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6">
-        <button onClick={() => navigate(-1)} className="flex items-center gap-1.5 body text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] mb-6 transition-colors">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-1.5 body text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] mb-6 transition-colors"
+        >
           <ArrowLeft size={16} /> Back
         </button>
 
@@ -44,7 +50,9 @@ export default function PlayerProfilePage() {
               <div>
                 <h1 className="heading-1">{player.name}</h1>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="caption px-3 py-0.5 bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-full)] font-semibold">{player.position}</span>
+                  <span className="caption px-3 py-0.5 bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-full)] font-semibold">
+                    {player.position}
+                  </span>
                   <span className="caption text-[var(--mm-text-secondary)]">{player.club}</span>
                   <span className="caption text-[var(--mm-text-muted)]">{player.nationality}</span>
                 </div>
@@ -109,4 +117,3 @@ export default function PlayerProfilePage() {
     </div>
   )
 }
-

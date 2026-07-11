@@ -1,10 +1,73 @@
 import React, { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
-import { Users, Trophy, BarChart3, Activity, AlertCircle, DollarSign, TrendingUp, Settings, Flag, MessageSquare, Search, ChevronDown, Trash2, Crown, Loader, Save, X, Edit3, Eye, Calendar, Target, Users2, Shield, Clock, UserX, Repeat, CheckCheck, Zap, ShieldCheck, RefreshCw } from 'lucide-react'
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, LineChart, Line, AreaChart, Area } from 'recharts'
+import {
+  Users,
+  Trophy,
+  BarChart3,
+  Activity,
+  AlertCircle,
+  DollarSign,
+  TrendingUp,
+  Settings,
+  Flag,
+  MessageSquare,
+  Search,
+  ChevronDown,
+  Trash2,
+  Crown,
+  Loader,
+  Save,
+  X,
+  Edit3,
+  Eye,
+  Calendar,
+  Target,
+  Users2,
+  Shield,
+  Clock,
+  UserX,
+  Repeat,
+  CheckCheck,
+  Zap,
+  ShieldCheck,
+  RefreshCw,
+} from 'lucide-react'
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  PieChart,
+  Pie,
+  Cell,
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+} from 'recharts'
 import { cardStaggerItem } from '../lib/animation/variants'
-import { useAdminStats, useAdminUsers, useAdminMatches, useAdminReports, useAdminSettings, useTogglePro, useDeleteUser, useUpdateReport, useUpdateMatch, useAdminUserDetail, useAdminActivityLog, useAdminDraftPoolValidation, useAdminDraftIcons, useToggleDraftMode, useToggleIconEligibility, useRevalidateDraftPool } from '../hooks/useApi'
+import {
+  useAdminStats,
+  useAdminUsers,
+  useAdminMatches,
+  useAdminReports,
+  useAdminSettings,
+  useTogglePro,
+  useDeleteUser,
+  useUpdateReport,
+  useUpdateMatch,
+  useAdminUserDetail,
+  useAdminActivityLog,
+  useAdminDraftPoolValidation,
+  useAdminDraftIcons,
+  useToggleDraftMode,
+  useToggleIconEligibility,
+  useRevalidateDraftPool,
+} from '../hooks/useApi'
 
 const adminTabs = [
   { id: 'overview', label: 'Overview' },
@@ -17,12 +80,54 @@ const adminTabs = [
 ]
 
 const kpiData = [
-  { label: 'Total Users', value: '12,847', icon: Users, change: '+12%', changeType: 'up', color: 'var(--mm-accent-green)' },
-  { label: 'Monthly Active', value: '8,234', icon: Activity, change: '+8%', changeType: 'up', color: 'var(--mm-accent-blue)' },
-  { label: 'Active Auctions', value: '24', icon: Trophy, change: '+18%', changeType: 'up', color: 'var(--mm-accent-amber)' },
-  { label: 'Pro Subscribers', value: '1,247', icon: TrendingUp, change: '+15%', changeType: 'up', color: 'var(--mm-accent-purple)' },
-  { label: 'Revenue MTD', value: '$12,400', icon: DollarSign, change: '+8%', changeType: 'up', color: 'var(--mm-accent-green)' },
-  { label: 'Error Rate', value: '0.12%', icon: AlertCircle, change: '-0.02%', changeType: 'down', color: 'var(--mm-accent-green)' },
+  {
+    label: 'Total Users',
+    value: '12,847',
+    icon: Users,
+    change: '+12%',
+    changeType: 'up',
+    color: 'var(--mm-accent-green)',
+  },
+  {
+    label: 'Monthly Active',
+    value: '8,234',
+    icon: Activity,
+    change: '+8%',
+    changeType: 'up',
+    color: 'var(--mm-accent-blue)',
+  },
+  {
+    label: 'Active Auctions',
+    value: '24',
+    icon: Trophy,
+    change: '+18%',
+    changeType: 'up',
+    color: 'var(--mm-accent-amber)',
+  },
+  {
+    label: 'Pro Subscribers',
+    value: '1,247',
+    icon: TrendingUp,
+    change: '+15%',
+    changeType: 'up',
+    color: 'var(--mm-accent-purple)',
+  },
+  {
+    label: 'Revenue MTD',
+    value: '$12,400',
+    icon: DollarSign,
+    change: '+8%',
+    changeType: 'up',
+    color: 'var(--mm-accent-green)',
+  },
+  {
+    label: 'Error Rate',
+    value: '0.12%',
+    icon: AlertCircle,
+    change: '-0.02%',
+    changeType: 'down',
+    color: 'var(--mm-accent-green)',
+  },
 ]
 
 const signupData = [
@@ -35,10 +140,7 @@ const signupData = [
   { day: 'Sun', signups: 420, predictions: 19000 },
 ]
 
-const sportData = [
-  { name: 'Football', value: 100, color: '#2ECC40' },
-]
-
+const sportData = [{ name: 'Football', value: 100, color: '#2ECC40' }]
 
 // ─── Draft Mode Admin Tab ────────────────────────────────────
 const DRAFT_SUB_TABS = [
@@ -94,7 +196,11 @@ function AdminDraftModeTab() {
           <span className="caption text-[var(--mm-text-muted)] block">Tournaments</span>
         </div>
         <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4">
-          <span className={`heading-2 ${passedCount === tournaments.length ? 'text-[var(--mm-accent-green)]' : 'text-[var(--mm-accent-red)]'}`}>{passedCount}/{tournaments.length}</span>
+          <span
+            className={`heading-2 ${passedCount === tournaments.length ? 'text-[var(--mm-accent-green)]' : 'text-[var(--mm-accent-red)]'}`}
+          >
+            {passedCount}/{tournaments.length}
+          </span>
           <span className="caption text-[var(--mm-text-muted)] block">Pools Passed</span>
         </div>
         <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4">
@@ -111,9 +217,12 @@ function AdminDraftModeTab() {
       <div className="flex gap-1 mb-2 bg-[var(--mm-bg-secondary)] rounded-[var(--radius-md)] p-1 border border-[var(--border-subtle)] w-fit">
         {DRAFT_SUB_TABS.map((tab) => (
           <button
-            key={tab.id} onClick={() => setSubTab(tab.id)}
+            key={tab.id}
+            onClick={() => setSubTab(tab.id)}
             className={`px-4 py-2 rounded-[var(--radius-sm)] caption whitespace-nowrap transition-all ${
-              subTab === tab.id ? 'bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] font-semibold' : 'text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)]'
+              subTab === tab.id
+                ? 'bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] font-semibold'
+                : 'text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)]'
             }`}
           >
             {tab.label}
@@ -162,16 +271,24 @@ function AdminDraftModeTab() {
                     {/* Tournament header */}
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <span className={`w-3 h-3 rounded-full ${t.passed ? 'bg-[var(--mm-accent-green)]' : 'bg-[var(--mm-accent-red)]'}`} />
+                        <span
+                          className={`w-3 h-3 rounded-full ${t.passed ? 'bg-[var(--mm-accent-green)]' : 'bg-[var(--mm-accent-red)]'}`}
+                        />
                         <div>
                           <span className="body font-semibold">{t.tournamentName}</span>
                           <span className="caption text-[var(--mm-text-muted)] ml-2">{t.shortName}</span>
                         </div>
-                        <span className={`caption px-2 py-0.5 rounded-[var(--radius-sm)] font-medium ${
-                          t.status === 'LIVE' ? 'bg-[var(--mm-accent-green)]/10 text-[var(--mm-accent-green)]' :
-                          t.status === 'ANNOUNCED' ? 'bg-[var(--mm-accent-amber)]/10 text-[var(--mm-accent-amber)]' :
-                          'bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-muted)]'
-                        }`}>{t.status}</span>
+                        <span
+                          className={`caption px-2 py-0.5 rounded-[var(--radius-sm)] font-medium ${
+                            t.status === 'LIVE'
+                              ? 'bg-[var(--mm-accent-green)]/10 text-[var(--mm-accent-green)]'
+                              : t.status === 'ANNOUNCED'
+                                ? 'bg-[var(--mm-accent-amber)]/10 text-[var(--mm-accent-amber)]'
+                                : 'bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-muted)]'
+                          }`}
+                        >
+                          {t.status}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="caption text-[var(--mm-text-muted)]">{t.playerCount || 0} players</span>
@@ -180,13 +297,22 @@ function AdminDraftModeTab() {
                         <button
                           onClick={() => handleToggle(t.tournamentId, t.enabled ? 'disable' : 'enable')}
                           disabled={isToggling || (!t.passed && !t.enabled)}
-                          title={!t.passed && !t.enabled ? 'Pool validation must pass first' : t.enabled ? 'Disable Draft Mode' : 'Enable Draft Mode'}
+                          title={
+                            !t.passed && !t.enabled
+                              ? 'Pool validation must pass first'
+                              : t.enabled
+                                ? 'Disable Draft Mode'
+                                : 'Enable Draft Mode'
+                          }
                           className={`relative w-11 h-6 rounded-full transition-colors ${
                             t.enabled ? 'bg-[var(--mm-accent-green)]' : 'bg-[var(--mm-bg-tertiary)]'
                           } ${!t.passed && !t.enabled ? 'opacity-40 cursor-not-allowed' : ''}`}
-                          role="switch" aria-checked={t.enabled}
+                          role="switch"
+                          aria-checked={t.enabled}
                         >
-                          <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${t.enabled ? 'translate-x-5.5 left-[2px]' : 'translate-x-0.5'}`} />
+                          <span
+                            className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${t.enabled ? 'translate-x-5.5 left-[2px]' : 'translate-x-0.5'}`}
+                          />
                         </button>
                       </div>
                     </div>
@@ -194,17 +320,25 @@ function AdminDraftModeTab() {
                     {/* Errors, warnings, infos */}
                     {t.errors.length > 0 && (
                       <div className="mb-2 p-3 bg-[var(--mm-accent-red)]/5 rounded-[var(--radius-md)] border border-[var(--mm-accent-red)]/20">
-                        <span className="caption font-semibold text-[var(--mm-accent-red)] block mb-1">❌ {t.errors.length} Error(s)</span>
+                        <span className="caption font-semibold text-[var(--mm-accent-red)] block mb-1">
+                          ❌ {t.errors.length} Error(s)
+                        </span>
                         {t.errors.map((err, i) => (
-                          <span key={i} className="caption text-[var(--mm-text-secondary)] block ml-3">• {err}</span>
+                          <span key={i} className="caption text-[var(--mm-text-secondary)] block ml-3">
+                            • {err}
+                          </span>
                         ))}
                       </div>
                     )}
                     {t.warnings.length > 0 && (
                       <div className="mb-2 p-3 bg-[var(--mm-accent-amber)]/5 rounded-[var(--radius-md)] border border-[var(--mm-accent-amber)]/20">
-                        <span className="caption font-semibold text-[var(--mm-accent-amber)] block mb-1">⚠️ {t.warnings.length} Warning(s)</span>
+                        <span className="caption font-semibold text-[var(--mm-accent-amber)] block mb-1">
+                          ⚠️ {t.warnings.length} Warning(s)
+                        </span>
                         {t.warnings.map((w, i) => (
-                          <span key={i} className="caption text-[var(--mm-text-secondary)] block ml-3">• {w}</span>
+                          <span key={i} className="caption text-[var(--mm-text-secondary)] block ml-3">
+                            • {w}
+                          </span>
                         ))}
                       </div>
                     )}
@@ -212,7 +346,9 @@ function AdminDraftModeTab() {
                       <div className="p-3 bg-[var(--mm-accent-blue)]/5 rounded-[var(--radius-md)] border border-[var(--mm-accent-blue)]/20">
                         <span className="caption font-semibold text-[var(--mm-accent-blue)] block mb-1">ℹ️ Info</span>
                         {t.infos.map((info, i) => (
-                          <span key={i} className="caption text-[var(--mm-text-secondary)] block ml-3">• {info}</span>
+                          <span key={i} className="caption text-[var(--mm-text-secondary)] block ml-3">
+                            • {info}
+                          </span>
                         ))}
                       </div>
                     )}
@@ -266,7 +402,10 @@ function AdminDraftModeTab() {
                       const isPending = toggleIconMut.isPending && toggleIconMut.variables === p.id
                       const isIcon = p.rarityTier === 'ICON'
                       return (
-                        <tr key={p.id} className="border-b border-[var(--border-subtle)] last:border-0 hover:bg-[var(--mm-bg-hover)]/30">
+                        <tr
+                          key={p.id}
+                          className="border-b border-[var(--border-subtle)] last:border-0 hover:bg-[var(--mm-bg-hover)]/30"
+                        >
                           <td className="py-3 px-3">
                             <div className="flex items-center gap-2">
                               {p.photoUrl ? (
@@ -281,25 +420,39 @@ function AdminDraftModeTab() {
                           </td>
                           <td className="py-3 px-3 caption text-[var(--mm-text-secondary)]">{p.tournamentId}</td>
                           <td className="py-3 px-3">
-                            <span className={`caption px-2 py-0.5 rounded-[var(--radius-sm)] font-medium ${
-                              p.position === 'GK' ? 'bg-blue-500/10 text-blue-400' :
-                              p.position === 'DEF' ? 'bg-green-500/10 text-green-400' :
-                              p.position === 'MID' ? 'bg-amber-500/10 text-amber-400' :
-                              'bg-red-500/10 text-red-400'
-                            }`}>{p.position}</span>
+                            <span
+                              className={`caption px-2 py-0.5 rounded-[var(--radius-sm)] font-medium ${
+                                p.position === 'GK'
+                                  ? 'bg-blue-500/10 text-blue-400'
+                                  : p.position === 'DEF'
+                                    ? 'bg-green-500/10 text-green-400'
+                                    : p.position === 'MID'
+                                      ? 'bg-amber-500/10 text-amber-400'
+                                      : 'bg-red-500/10 text-red-400'
+                              }`}
+                            >
+                              {p.position}
+                            </span>
                           </td>
                           <td className="py-3 px-3 body text-[var(--mm-text-secondary)]">{p.club}</td>
                           <td className="py-3 px-3 body text-[var(--mm-accent-amber)]">${p.basePrice}</td>
                           <td className="py-3 px-3">
-                            <span className="caption font-bold" style={{ color: (RARITY_COLORS as Record<string, string>)[p.rarityTier] || '#fff' }}>
+                            <span
+                              className="caption font-bold"
+                              style={{ color: (RARITY_COLORS as Record<string, string>)[p.rarityTier] || '#fff' }}
+                            >
                               {p.rarityTier}
                             </span>
                           </td>
                           <td className="py-3 px-3">
                             {p.isEligibleForIcon ? (
-                              <span className="caption bg-[var(--mm-accent-green)]/10 text-[var(--mm-accent-green)] px-2 py-0.5 rounded-[var(--radius-sm)] font-medium">Yes</span>
+                              <span className="caption bg-[var(--mm-accent-green)]/10 text-[var(--mm-accent-green)] px-2 py-0.5 rounded-[var(--radius-sm)] font-medium">
+                                Yes
+                              </span>
                             ) : (
-                              <span className="caption bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-muted)] px-2 py-0.5 rounded-[var(--radius-sm)]">No</span>
+                              <span className="caption bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-muted)] px-2 py-0.5 rounded-[var(--radius-sm)]">
+                                No
+                              </span>
                             )}
                           </td>
                           <td className="py-3 px-3">
@@ -307,10 +460,11 @@ function AdminDraftModeTab() {
                               onClick={() => handleIconToggle(p.id)}
                               disabled={isPending}
                               className={`flex items-center gap-1 px-3 py-1.5 caption font-semibold rounded-[var(--radius-sm)] transition-all ${
-                                isPending ? 'opacity-50 cursor-not-allowed' :
-                                p.isEligibleForIcon
-                                  ? 'bg-[var(--mm-accent-red)]/10 text-[var(--mm-accent-red)] hover:bg-[var(--mm-accent-red)]/20'
-                                  : 'bg-[var(--mm-accent-purple)]/10 text-[var(--mm-accent-purple)] hover:bg-[var(--mm-accent-purple)]/20'
+                                isPending
+                                  ? 'opacity-50 cursor-not-allowed'
+                                  : p.isEligibleForIcon
+                                    ? 'bg-[var(--mm-accent-red)]/10 text-[var(--mm-accent-red)] hover:bg-[var(--mm-accent-red)]/20'
+                                    : 'bg-[var(--mm-accent-purple)]/10 text-[var(--mm-accent-purple)] hover:bg-[var(--mm-accent-purple)]/20'
                               }`}
                             >
                               {isPending ? (
@@ -353,7 +507,9 @@ export default function AdminPage() {
   // Escape key closes the user detail modal
   React.useEffect(() => {
     if (!detailUserId) return
-    const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setDetailUserId(null) }
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setDetailUserId(null)
+    }
     document.body.style.overflow = 'hidden'
     window.addEventListener('keydown', handleKey)
     return () => {
@@ -383,18 +539,64 @@ export default function AdminPage() {
   const settings = adminSettingsData?.settings || []
   const logs = activityLogData?.logs || []
 
-  const apiStats = adminStatsData ? [
-    { label: 'Total Users', value: adminStatsData.totalUsers?.toLocaleString() || '0', icon: Users, change: `+${adminStatsData.newUsersThisWeek || 0}`, changeType: 'up', color: 'var(--mm-accent-green)' },
-    { label: 'Monthly Active', value: adminStatsData.monthlyActive?.toLocaleString() || '0', icon: Activity, change: `+${adminStatsData.mauGrowth || 0}%`, changeType: 'up', color: 'var(--mm-accent-blue)' },
-    { label: 'Predictions Today', value: adminStatsData.predictionsToday?.toLocaleString() || '0', icon: Trophy, change: `+${adminStatsData.predGrowth || 0}%`, changeType: 'up', color: 'var(--mm-accent-amber)' },
-    { label: 'Pro Subscribers', value: adminStatsData.proCount?.toLocaleString() || '0', icon: TrendingUp, change: `+${adminStatsData.proGrowth || 0}%`, changeType: 'up', color: 'var(--mm-accent-purple)' },
-    { label: 'Revenue MTD', value: adminStatsData.revenue ? `$${adminStatsData.revenue.toLocaleString()}` : '$0', icon: DollarSign, change: `+${adminStatsData.revGrowth || 0}%`, changeType: 'up', color: 'var(--mm-accent-green)' },
-    { label: 'Error Rate', value: adminStatsData.errorRate ? `${adminStatsData.errorRate}%` : '0%', icon: AlertCircle, change: `-${adminStatsData.errorRateChange || 0}%`, changeType: 'down', color: 'var(--mm-accent-green)' },
-  ] : kpiData
+  const apiStats = adminStatsData
+    ? [
+        {
+          label: 'Total Users',
+          value: adminStatsData.totalUsers?.toLocaleString() || '0',
+          icon: Users,
+          change: `+${adminStatsData.newUsersThisWeek || 0}`,
+          changeType: 'up',
+          color: 'var(--mm-accent-green)',
+        },
+        {
+          label: 'Monthly Active',
+          value: adminStatsData.monthlyActive?.toLocaleString() || '0',
+          icon: Activity,
+          change: `+${adminStatsData.mauGrowth || 0}%`,
+          changeType: 'up',
+          color: 'var(--mm-accent-blue)',
+        },
+        {
+          label: 'Predictions Today',
+          value: adminStatsData.predictionsToday?.toLocaleString() || '0',
+          icon: Trophy,
+          change: `+${adminStatsData.predGrowth || 0}%`,
+          changeType: 'up',
+          color: 'var(--mm-accent-amber)',
+        },
+        {
+          label: 'Pro Subscribers',
+          value: adminStatsData.proCount?.toLocaleString() || '0',
+          icon: TrendingUp,
+          change: `+${adminStatsData.proGrowth || 0}%`,
+          changeType: 'up',
+          color: 'var(--mm-accent-purple)',
+        },
+        {
+          label: 'Revenue MTD',
+          value: adminStatsData.revenue ? `$${adminStatsData.revenue.toLocaleString()}` : '$0',
+          icon: DollarSign,
+          change: `+${adminStatsData.revGrowth || 0}%`,
+          changeType: 'up',
+          color: 'var(--mm-accent-green)',
+        },
+        {
+          label: 'Error Rate',
+          value: adminStatsData.errorRate ? `${adminStatsData.errorRate}%` : '0%',
+          icon: AlertCircle,
+          change: `-${adminStatsData.errorRateChange || 0}%`,
+          changeType: 'down',
+          color: 'var(--mm-accent-green)',
+        },
+      ]
+    : kpiData
 
   return (
     <motion.div className="min-h-screen pt-16 pb-20">
-      <Helmet><title>Admin Dashboard — MatchMind</title></Helmet>
+      <Helmet>
+        <title>Admin Dashboard — MatchMind</title>
+      </Helmet>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <h1 className="heading-1 mb-6">Admin Dashboard</h1>
 
@@ -402,9 +604,12 @@ export default function AdminPage() {
         <div className="flex gap-1 mb-6 bg-[var(--mm-bg-secondary)] rounded-[var(--radius-md)] p-1 border border-[var(--border-subtle)] overflow-x-auto">
           {adminTabs.map((tab) => (
             <button
-              key={tab.id} onClick={() => setActiveTab(tab.id)}
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2.5 rounded-[var(--radius-sm)] body whitespace-nowrap transition-all ${
-                activeTab === tab.id ? 'bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] font-semibold' : 'text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)]'
+                activeTab === tab.id
+                  ? 'bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] font-semibold'
+                  : 'text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)]'
               }`}
             >
               {tab.label}
@@ -420,14 +625,24 @@ export default function AdminPage() {
               {kpiData.map((kpi, i) => {
                 const Icon = kpi.icon
                 return (
-                  <motion.div key={i} variants={cardStaggerItem} initial="initial" animate="animate" className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4">
+                  <motion.div
+                    key={i}
+                    variants={cardStaggerItem}
+                    initial="initial"
+                    animate="animate"
+                    className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4"
+                  >
                     <div className="flex items-center justify-between mb-2">
                       <Icon size={18} className="text-[var(--mm-text-muted)]" />
-                      <span className={`caption font-medium ${kpi.changeType === 'up' ? 'text-[var(--mm-accent-green)]' : 'text-[var(--mm-accent-red)]'}`}>
+                      <span
+                        className={`caption font-medium ${kpi.changeType === 'up' ? 'text-[var(--mm-accent-green)]' : 'text-[var(--mm-accent-red)]'}`}
+                      >
                         {kpi.change}
                       </span>
                     </div>
-                    <span className="heading-2" style={{ color: kpi.color }}>{kpi.value}</span>
+                    <span className="heading-2" style={{ color: kpi.color }}>
+                      {kpi.value}
+                    </span>
                     <span className="caption text-[var(--mm-text-muted)] block">{kpi.label}</span>
                   </motion.div>
                 )
@@ -444,7 +659,14 @@ export default function AdminPage() {
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" />
                     <XAxis dataKey="day" stroke="var(--mm-text-muted)" fontSize={12} />
                     <YAxis stroke="var(--mm-text-muted)" fontSize={12} />
-                    <Tooltip contentStyle={{ background: 'var(--mm-bg-secondary)', border: '1px solid var(--border-default)', borderRadius: '8px', color: 'var(--mm-text-primary)' }} />
+                    <Tooltip
+                      contentStyle={{
+                        background: 'var(--mm-bg-secondary)',
+                        border: '1px solid var(--border-default)',
+                        borderRadius: '8px',
+                        color: 'var(--mm-text-primary)',
+                      }}
+                    />
                     <Bar dataKey="signups" fill="var(--mm-accent-green)" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
@@ -455,19 +677,35 @@ export default function AdminPage() {
                 <h3 className="heading-3 mb-4">Prediction Sport Distribution</h3>
                 <ResponsiveContainer width="100%" height={250}>
                   <PieChart>
-                    <Pie data={sportData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={3} dataKey="value">
+                    <Pie
+                      data={sportData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={100}
+                      paddingAngle={3}
+                      dataKey="value"
+                    >
                       {sportData.map((entry, i) => (
                         <Cell key={i} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip contentStyle={{ background: 'var(--mm-bg-secondary)', border: '1px solid var(--border-default)', borderRadius: '8px' }} />
+                    <Tooltip
+                      contentStyle={{
+                        background: 'var(--mm-bg-secondary)',
+                        border: '1px solid var(--border-default)',
+                        borderRadius: '8px',
+                      }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="flex flex-wrap justify-center gap-3 mt-2">
                   {sportData.map((s, i) => (
                     <div key={i} className="flex items-center gap-1.5">
                       <span className="w-2.5 h-2.5 rounded-full" style={{ background: s.color }} />
-                      <span className="caption text-[var(--mm-text-muted)]">{s.name} {s.value}%</span>
+                      <span className="caption text-[var(--mm-text-muted)]">
+                        {s.name} {s.value}%
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -476,10 +714,14 @@ export default function AdminPage() {
 
             {/* Alerts */}
             <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-xl)] p-5">
-              <h3 className="heading-3 mb-4 flex items-center gap-2"><AlertCircle size={18} className="text-[var(--mm-accent-amber)]" /> Alerts</h3>
+              <h3 className="heading-3 mb-4 flex items-center gap-2">
+                <AlertCircle size={18} className="text-[var(--mm-accent-amber)]" /> Alerts
+              </h3>
               <div className="space-y-2">
                 <div className="flex items-center justify-between p-3 bg-[var(--mm-accent-red)]/5 rounded-[var(--radius-md)] border border-[var(--border-error)]/30">
-                  <span className="body text-[var(--mm-text-secondary)]"><span className="text-[var(--mm-accent-red)] font-semibold">12</span> unresolved reports</span>
+                  <span className="body text-[var(--mm-text-secondary)]">
+                    <span className="text-[var(--mm-accent-red)] font-semibold">12</span> unresolved reports
+                  </span>
                   <button className="caption text-[var(--mm-accent-green)] font-medium hover:underline">View →</button>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-[var(--mm-accent-amber)]/5 rounded-[var(--radius-md)] border border-[var(--mm-accent-amber)]/20">
@@ -495,12 +737,20 @@ export default function AdminPage() {
         {activeTab === 'users' && (
           <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-xl)] p-5">
             <div className="flex items-center justify-between gap-4 mb-4">
-              <h3 className="heading-3">User Management <span className="caption text-[var(--mm-text-muted)]">({usersTotal} total)</span></h3>
+              <h3 className="heading-3">
+                User Management <span className="caption text-[var(--mm-text-muted)]">({usersTotal} total)</span>
+              </h3>
               <div className="relative">
                 <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--mm-text-muted)]" />
                 <input
-                  type="text" value={userSearch} onChange={(e) => { setUserSearch(e.target.value); setUserPage(1) }}
-                  placeholder="Search users..." className="bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-primary)] body rounded-[var(--radius-md)] pl-9 pr-3 py-2 border border-[var(--border-subtle)] focus:border-[var(--border-focus)] focus:outline-none w-48"
+                  type="text"
+                  value={userSearch}
+                  onChange={(e) => {
+                    setUserSearch(e.target.value)
+                    setUserPage(1)
+                  }}
+                  placeholder="Search users..."
+                  className="bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-primary)] body rounded-[var(--radius-md)] pl-9 pr-3 py-2 border border-[var(--border-subtle)] focus:border-[var(--border-focus)] focus:outline-none w-48"
                 />
               </div>
             </div>
@@ -527,7 +777,10 @@ export default function AdminPage() {
                     </thead>
                     <tbody>
                       {users.map((u) => (
-                        <tr key={u.id} className="border-b border-[var(--border-subtle)] last:border-0 hover:bg-[var(--mm-bg-hover)]/30">
+                        <tr
+                          key={u.id}
+                          className="border-b border-[var(--border-subtle)] last:border-0 hover:bg-[var(--mm-bg-hover)]/30"
+                        >
                           <td className="py-3 px-2">
                             <button
                               onClick={() => setDetailUserId(u.id)}
@@ -539,17 +792,25 @@ export default function AdminPage() {
                           </td>
                           <td className="py-3 px-2 body text-[var(--mm-text-secondary)]">{u.email}</td>
                           <td className="py-3 px-2">
-                            <span className={`caption px-2 py-0.5 rounded-[var(--radius-sm)] ${
-                              u.role === 'ADMIN' || u.role === 'SUPERADMIN'
-                                ? 'bg-[var(--mm-accent-purple)]/10 text-[var(--mm-accent-purple)]'
-                                : 'bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-muted)]'
-                            }`}>{u.role}</span>
+                            <span
+                              className={`caption px-2 py-0.5 rounded-[var(--radius-sm)] ${
+                                u.role === 'ADMIN' || u.role === 'SUPERADMIN'
+                                  ? 'bg-[var(--mm-accent-purple)]/10 text-[var(--mm-accent-purple)]'
+                                  : 'bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-muted)]'
+                              }`}
+                            >
+                              {u.role}
+                            </span>
                           </td>
                           <td className="py-3 px-2 body">{u.tier}</td>
                           <td className="py-3 px-2">
-                            {u.isPro
-                              ? <span className="caption bg-[var(--gradient-pro)] text-transparent bg-clip-text font-semibold">Pro</span>
-                              : <span className="caption text-[var(--mm-text-muted)]">—</span>}
+                            {u.isPro ? (
+                              <span className="caption bg-[var(--gradient-pro)] text-transparent bg-clip-text font-semibold">
+                                Pro
+                              </span>
+                            ) : (
+                              <span className="caption text-[var(--mm-text-muted)]">—</span>
+                            )}
                           </td>
                           <td className="py-3 px-2 body text-[var(--mm-text-secondary)]">
                             {new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
@@ -564,7 +825,9 @@ export default function AdminPage() {
                                 <Crown size={14} />
                               </button>
                               <button
-                                onClick={() => { if (confirm('Delete this user?')) deleteUserMut.mutate(u.id) }}
+                                onClick={() => {
+                                  if (confirm('Delete this user?')) deleteUserMut.mutate(u.id)
+                                }}
                                 className="p-1.5 rounded-[var(--radius-sm)] text-[var(--mm-text-muted)] hover:text-[var(--mm-accent-red)] hover:bg-[var(--mm-accent-red)]/10 transition-all"
                                 title="Delete user"
                               >
@@ -582,7 +845,7 @@ export default function AdminPage() {
                 {usersTotalPages > 1 && (
                   <div className="flex items-center justify-center gap-2 mt-4 pt-4 border-t border-[var(--border-subtle)]">
                     <button
-                      onClick={() => setUserPage(p => Math.max(1, p - 1))}
+                      onClick={() => setUserPage((p) => Math.max(1, p - 1))}
                       disabled={userPage <= 1}
                       className="px-3 py-1.5 caption rounded-[var(--radius-sm)] bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-secondary)] disabled:opacity-40 hover:bg-[var(--mm-bg-hover)] transition-all"
                     >
@@ -592,7 +855,7 @@ export default function AdminPage() {
                       Page {userPage} of {usersTotalPages}
                     </span>
                     <button
-                      onClick={() => setUserPage(p => Math.min(usersTotalPages, p + 1))}
+                      onClick={() => setUserPage((p) => Math.min(usersTotalPages, p + 1))}
                       disabled={userPage >= usersTotalPages}
                       className="px-3 py-1.5 caption rounded-[var(--radius-sm)] bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-secondary)] disabled:opacity-40 hover:bg-[var(--mm-bg-hover)] transition-all"
                     >
@@ -638,7 +901,10 @@ export default function AdminPage() {
             ) : (
               <div className="space-y-2">
                 {reports.map((r) => (
-                  <div key={r.id} className="flex items-center justify-between p-3 rounded-[var(--radius-md)] bg-[var(--mm-bg-tertiary)]/50 border border-[var(--border-subtle)]">
+                  <div
+                    key={r.id}
+                    className="flex items-center justify-between p-3 rounded-[var(--radius-md)] bg-[var(--mm-bg-tertiary)]/50 border border-[var(--border-subtle)]"
+                  >
                     <div className="flex items-center gap-3">
                       <span className="w-8 h-8 rounded-full bg-[var(--mm-accent-red)]/10 flex items-center justify-center">
                         <Flag size={14} className="text-[var(--mm-accent-red)]" />
@@ -647,12 +913,18 @@ export default function AdminPage() {
                         <p className="body">
                           <span className="font-semibold">@{r.reporter?.username || 'unknown'}</span>
                           {r.message ? (
-                            <> reported a message: <span className="text-[var(--mm-text-secondary)]">"{r.message.text?.slice(0, 60)}"</span></>
+                            <>
+                              {' '}
+                              reported a message:{' '}
+                              <span className="text-[var(--mm-text-secondary)]">"{r.message.text?.slice(0, 60)}"</span>
+                            </>
                           ) : (
                             <> submitted a report</>
                           )}
                         </p>
-                        <span className="caption text-[var(--mm-text-muted)]">{new Date(r.createdAt).toLocaleString()}</span>
+                        <span className="caption text-[var(--mm-text-muted)]">
+                          {new Date(r.createdAt).toLocaleString()}
+                        </span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -680,12 +952,18 @@ export default function AdminPage() {
         {activeTab === 'matches' && (
           <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-xl)] p-5">
             <div className="flex items-center justify-between gap-4 mb-4">
-              <h3 className="heading-3">Match Management <span className="caption text-[var(--mm-text-muted)]">({adminMatchesData?.total || 0} total)</span></h3>
+              <h3 className="heading-3">
+                Match Management{' '}
+                <span className="caption text-[var(--mm-text-muted)]">({adminMatchesData?.total || 0} total)</span>
+              </h3>
               <div className="flex gap-1 bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-sm)] p-0.5">
                 {['', 'SCHEDULED', 'LIVE', 'HALFTIME', 'FINISHED'].map((s) => (
                   <button
                     key={s || 'all'}
-                    onClick={() => { setMatchStatus(s); setEditingMatch(null) }}
+                    onClick={() => {
+                      setMatchStatus(s)
+                      setEditingMatch(null)
+                    }}
                     className={`px-3 py-1 caption rounded-[var(--radius-sm)] capitalize transition-all ${
                       matchStatus === s
                         ? 'bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] font-semibold'
@@ -721,30 +999,49 @@ export default function AdminPage() {
                     {matches.map((m) => {
                       const isEditing = editingMatch?.id === m.id
                       return (
-                        <tr key={m.id} className={`border-b border-[var(--border-subtle)] last:border-0 transition-colors ${
-                          isEditing ? 'bg-[var(--mm-accent-green)]/5' : 'hover:bg-[var(--mm-bg-hover)]/30'
-                        }`}>
+                        <tr
+                          key={m.id}
+                          className={`border-b border-[var(--border-subtle)] last:border-0 transition-colors ${
+                            isEditing ? 'bg-[var(--mm-accent-green)]/5' : 'hover:bg-[var(--mm-bg-hover)]/30'
+                          }`}
+                        >
                           <td className="py-3 px-2 body">
                             {m.homeTeamName} vs {m.awayTeamName}
                           </td>
-                          <td className="py-3 px-2 body text-[var(--mm-text-secondary)] max-w-[120px] truncate">{m.competition || '—'}</td>
+                          <td className="py-3 px-2 body text-[var(--mm-text-secondary)] max-w-[120px] truncate">
+                            {m.competition || '—'}
+                          </td>
                           {/* Inline-editable Score */}
                           <td className="py-3 px-2">
                             {isEditing ? (
                               <div className="flex items-center gap-1.5">
                                 <input
-                                  type="number" min="0" max="99"
+                                  type="number"
+                                  min="0"
+                                  max="99"
                                   className="w-10 h-8 bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-primary)] body text-center rounded-[var(--radius-sm)] border border-[var(--border-subtle)] focus:border-[var(--border-focus)] focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                                   value={editingMatch!.homeScore ?? ''}
-                                  onChange={(e) => setEditingMatch({ ...editingMatch!, homeScore: e.target.value === '' ? null : Number(e.target.value) })}
+                                  onChange={(e) =>
+                                    setEditingMatch({
+                                      ...editingMatch!,
+                                      homeScore: e.target.value === '' ? null : Number(e.target.value),
+                                    })
+                                  }
                                   placeholder="—"
                                 />
                                 <span className="text-[var(--mm-text-muted)]">—</span>
                                 <input
-                                  type="number" min="0" max="99"
+                                  type="number"
+                                  min="0"
+                                  max="99"
                                   className="w-10 h-8 bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-primary)] body text-center rounded-[var(--radius-sm)] border border-[var(--border-subtle)] focus:border-[var(--border-focus)] focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                                   value={editingMatch!.awayScore ?? ''}
-                                  onChange={(e) => setEditingMatch({ ...editingMatch!, awayScore: e.target.value === '' ? null : Number(e.target.value) })}
+                                  onChange={(e) =>
+                                    setEditingMatch({
+                                      ...editingMatch!,
+                                      awayScore: e.target.value === '' ? null : Number(e.target.value),
+                                    })
+                                  }
                                   placeholder="—"
                                 />
                               </div>
@@ -765,21 +1062,37 @@ export default function AdminPage() {
                                 onChange={(e) => setEditingMatch({ ...editingMatch!, status: e.target.value })}
                               >
                                 {['SCHEDULED', 'LIVE', 'HALFTIME', 'FINISHED', 'POSTPONED', 'CANCELLED'].map((s) => (
-                                  <option key={s} value={s}>{s}</option>
+                                  <option key={s} value={s}>
+                                    {s}
+                                  </option>
                                 ))}
                               </select>
                             ) : (
-                              <span className={`caption px-2 py-0.5 rounded-[var(--radius-sm)] font-medium ${
-                                m.status === 'LIVE' ? 'bg-[var(--mm-accent-green)]/10 text-[var(--mm-accent-green)]' :
-                                m.status === 'FINISHED' ? 'bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-muted)]' :
-                                m.status === 'HALFTIME' ? 'bg-[var(--mm-accent-amber)]/10 text-[var(--mm-accent-amber)]' :
-                                'bg-[var(--mm-accent-blue)]/10 text-[var(--mm-accent-blue)]'
-                              }`}>{m.status}</span>
+                              <span
+                                className={`caption px-2 py-0.5 rounded-[var(--radius-sm)] font-medium ${
+                                  m.status === 'LIVE'
+                                    ? 'bg-[var(--mm-accent-green)]/10 text-[var(--mm-accent-green)]'
+                                    : m.status === 'FINISHED'
+                                      ? 'bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-muted)]'
+                                      : m.status === 'HALFTIME'
+                                        ? 'bg-[var(--mm-accent-amber)]/10 text-[var(--mm-accent-amber)]'
+                                        : 'bg-[var(--mm-accent-blue)]/10 text-[var(--mm-accent-blue)]'
+                                }`}
+                              >
+                                {m.status}
+                              </span>
                             )}
                           </td>
-                          <td className="py-3 px-2 body text-[var(--mm-text-secondary)]">{m._count?.predictions ?? 0}</td>
+                          <td className="py-3 px-2 body text-[var(--mm-text-secondary)]">
+                            {m._count?.predictions ?? 0}
+                          </td>
                           <td className="py-3 px-2 body text-[var(--mm-text-secondary)] whitespace-nowrap">
-                            {new Date(m.scheduledAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                            {new Date(m.scheduledAt).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
                           </td>
                           <td className="py-3 px-2">
                             <div className="flex items-center gap-1.5">
@@ -794,7 +1107,7 @@ export default function AdminPage() {
                                           homeScore: editingMatch!.homeScore,
                                           awayScore: editingMatch!.awayScore,
                                           status: editingMatch!.status,
-                                        }
+                                        },
                                       } as any)
                                       setEditingMatch(null)
                                     }}
@@ -817,12 +1130,14 @@ export default function AdminPage() {
                                 </>
                               ) : (
                                 <button
-                                  onClick={() => setEditingMatch({
-                                    id: m.id,
-                                    homeScore: m.homeScore,
-                                    awayScore: m.awayScore,
-                                    status: m.status,
-                                  })}
+                                  onClick={() =>
+                                    setEditingMatch({
+                                      id: m.id,
+                                      homeScore: m.homeScore,
+                                      awayScore: m.awayScore,
+                                      status: m.status,
+                                    })
+                                  }
                                   className="p-1.5 rounded-[var(--radius-sm)] text-[var(--mm-text-muted)] hover:text-[var(--mm-accent-blue)] hover:bg-[var(--mm-accent-blue)]/10 transition-all"
                                   title="Edit match"
                                 >
@@ -832,8 +1147,8 @@ export default function AdminPage() {
                             </div>
                           </td>
                         </tr>
-                      )})
-                    }
+                      )
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -847,7 +1162,9 @@ export default function AdminPage() {
             <h3 className="heading-3 mb-4 flex items-center gap-2">
               <Activity size={18} className="text-[var(--mm-accent-green)]" />
               Activity Log
-              <span className="caption text-[var(--mm-text-muted)] font-normal">({activityLogData?.total || 0} entries)</span>
+              <span className="caption text-[var(--mm-text-muted)] font-normal">
+                ({activityLogData?.total || 0} entries)
+              </span>
             </h3>
             {activityLoading ? (
               <div className="flex items-center justify-center py-12 text-[var(--mm-text-muted)]">
@@ -857,22 +1174,60 @@ export default function AdminPage() {
               <div className="text-center py-12 text-[var(--mm-text-muted)]">
                 <Activity size={32} className="mx-auto mb-2 opacity-30" />
                 <p className="body">No admin activity yet</p>
-                <p className="caption mt-1">Actions like deleting users, toggling Pro, and resolving reports will appear here.</p>
+                <p className="caption mt-1">
+                  Actions like deleting users, toggling Pro, and resolving reports will appear here.
+                </p>
               </div>
             ) : (
               <div className="space-y-1">
                 {logs.map((log) => {
-                  const actionConfig: Record<string, { icon: typeof Activity; color: string; bg: string; label: string }> = {
-                    USER_DELETED: { icon: UserX, color: 'text-[var(--mm-accent-red)]', bg: 'bg-[var(--mm-accent-red)]/10', label: 'User Deleted' },
-                    PRO_TOGGLED: { icon: Repeat, color: 'text-[var(--mm-accent-purple)]', bg: 'bg-[var(--mm-accent-purple)]/10', label: 'Pro Toggled' },
-                    REPORT_RESOLVED: { icon: CheckCheck, color: 'text-[var(--mm-accent-green)]', bg: 'bg-[var(--mm-accent-green)]/10', label: 'Report Resolved' },
-                    REPORT_DISMISSED: { icon: X, color: 'text-[var(--mm-text-muted)]', bg: 'bg-[var(--mm-bg-tertiary)]', label: 'Report Dismissed' },
-                    MATCH_UPDATED: { icon: Edit3, color: 'text-[var(--mm-accent-blue)]', bg: 'bg-[var(--mm-accent-blue)]/10', label: 'Match Updated' },
+                  const actionConfig: Record<
+                    string,
+                    { icon: typeof Activity; color: string; bg: string; label: string }
+                  > = {
+                    USER_DELETED: {
+                      icon: UserX,
+                      color: 'text-[var(--mm-accent-red)]',
+                      bg: 'bg-[var(--mm-accent-red)]/10',
+                      label: 'User Deleted',
+                    },
+                    PRO_TOGGLED: {
+                      icon: Repeat,
+                      color: 'text-[var(--mm-accent-purple)]',
+                      bg: 'bg-[var(--mm-accent-purple)]/10',
+                      label: 'Pro Toggled',
+                    },
+                    REPORT_RESOLVED: {
+                      icon: CheckCheck,
+                      color: 'text-[var(--mm-accent-green)]',
+                      bg: 'bg-[var(--mm-accent-green)]/10',
+                      label: 'Report Resolved',
+                    },
+                    REPORT_DISMISSED: {
+                      icon: X,
+                      color: 'text-[var(--mm-text-muted)]',
+                      bg: 'bg-[var(--mm-bg-tertiary)]',
+                      label: 'Report Dismissed',
+                    },
+                    MATCH_UPDATED: {
+                      icon: Edit3,
+                      color: 'text-[var(--mm-accent-blue)]',
+                      bg: 'bg-[var(--mm-accent-blue)]/10',
+                      label: 'Match Updated',
+                    },
                   }
-                  const config = actionConfig[log.action] || { icon: Activity, color: 'text-[var(--mm-text-muted)]', bg: 'bg-[var(--mm-bg-tertiary)]', label: log.action }
+                  const config = actionConfig[log.action] || {
+                    icon: Activity,
+                    color: 'text-[var(--mm-text-muted)]',
+                    bg: 'bg-[var(--mm-bg-tertiary)]',
+                    label: log.action,
+                  }
                   const Icon = config.icon
                   return (
-                    <div key={log.id} className="flex items-center gap-3 px-3 py-2.5 rounded-[var(--radius-md)] hover:bg-[var(--mm-bg-hover)]/50 transition-colors">
+                    <div
+                      key={log.id}
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-[var(--radius-md)] hover:bg-[var(--mm-bg-hover)]/50 transition-colors"
+                    >
                       <div className={`w-8 h-8 rounded-full ${config.bg} flex items-center justify-center shrink-0`}>
                         <Icon size={14} className={config.color} />
                       </div>
@@ -892,7 +1247,10 @@ export default function AdminPage() {
                       <div className="flex items-center gap-2 shrink-0">
                         <span className="caption text-[var(--mm-text-muted)] whitespace-nowrap">
                           {new Date(log.createdAt).toLocaleDateString('en-US', {
-                            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
                           })}
                         </span>
                         <span className="p-1 rounded-[var(--radius-sm)] text-[var(--mm-text-muted)]">
@@ -910,22 +1268,30 @@ export default function AdminPage() {
         {/* Settings Tab */}
         {activeTab === 'settings' && (
           <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-xl)] p-5">
-            <h3 className="heading-3 mb-4 flex items-center gap-2"><Settings size={18} /> Feature Flags</h3>
+            <h3 className="heading-3 mb-4 flex items-center gap-2">
+              <Settings size={18} /> Feature Flags
+            </h3>
             {settings.length === 0 ? (
               <div className="text-center py-8 text-[var(--mm-text-muted)]">No feature flags loaded</div>
             ) : (
               <div className="space-y-3">
                 {settings.map((f, i) => (
-                  <div key={i} className="flex items-center justify-between py-2 px-3 rounded-[var(--radius-md)] hover:bg-[var(--mm-bg-hover)]">
+                  <div
+                    key={i}
+                    className="flex items-center justify-between py-2 px-3 rounded-[var(--radius-md)] hover:bg-[var(--mm-bg-hover)]"
+                  >
                     <div>
                       <span className="body font-medium">{f.flag || f.key}</span>
                       <span className="caption text-[var(--mm-text-muted)] ml-2">{f.key}</span>
                     </div>
                     <button
                       className={`relative w-11 h-6 rounded-full transition-colors ${f.enabled ? 'bg-[var(--mm-accent-green)]' : 'bg-[var(--mm-bg-tertiary)]'}`}
-                      role="switch" aria-checked={f.enabled}
+                      role="switch"
+                      aria-checked={f.enabled}
                     >
-                      <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${f.enabled ? 'translate-x-5.5 left-[2px]' : 'translate-x-0.5'}`} />
+                      <span
+                        className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${f.enabled ? 'translate-x-5.5 left-[2px]' : 'translate-x-0.5'}`}
+                      />
                     </button>
                   </div>
                 ))}
@@ -945,7 +1311,9 @@ export default function AdminPage() {
           aria-modal="true"
           aria-label="User details"
           className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-20 pb-8 px-4"
-          onClick={(e) => { if (e.target === e.currentTarget) setDetailUserId(null) }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setDetailUserId(null)
+          }}
         >
           <div className="absolute inset-0 bg-[var(--mm-bg-overlay)] backdrop-blur-sm" />
           <motion.div
@@ -960,7 +1328,9 @@ export default function AdminPage() {
                   {userDetailData?.user?.displayName?.charAt(0) || userDetailData?.user?.username?.charAt(0) || '?'}
                 </div>
                 <div>
-                  <h3 className="heading-3">{userDetailData?.user?.displayName || userDetailData?.user?.username || 'Loading...'}</h3>
+                  <h3 className="heading-3">
+                    {userDetailData?.user?.displayName || userDetailData?.user?.username || 'Loading...'}
+                  </h3>
                   <span className="caption text-[var(--mm-text-muted)]">@{userDetailData?.user?.username}</span>
                 </div>
               </div>
@@ -986,13 +1356,22 @@ export default function AdminPage() {
                     { icon: Eye, label: 'Following', value: userDetailData.user._count?.following ?? 0 },
                     { icon: Shield, label: 'Leagues', value: userDetailData.user._count?.leagues ?? 0 },
                     { icon: Users, label: 'Squads', value: userDetailData.user._count?.squads ?? 0 },
-                    { icon: Calendar, label: 'Joined', value: new Date(userDetailData.user.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) },
+                    {
+                      icon: Calendar,
+                      label: 'Joined',
+                      value: new Date(userDetailData.user.createdAt).toLocaleDateString('en-US', {
+                        month: 'short',
+                        year: 'numeric',
+                      }),
+                    },
                   ].map((stat, i) => {
                     const Icon = stat.icon
                     return (
                       <div key={i} className="bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-md)] p-3 text-center">
                         <Icon size={16} className="mx-auto mb-1 text-[var(--mm-text-muted)]" />
-                        <span className="block font-bold font-[var(--font-display)] text-lg text-[var(--mm-accent-green)]">{stat.value}</span>
+                        <span className="block font-bold font-[var(--font-display)] text-lg text-[var(--mm-accent-green)]">
+                          {stat.value}
+                        </span>
                         <span className="caption text-[var(--mm-text-muted)]">{stat.label}</span>
                       </div>
                     )
@@ -1008,11 +1387,15 @@ export default function AdminPage() {
                     </div>
                     <div>
                       <span className="caption text-[var(--mm-text-muted)] block mb-0.5">Role</span>
-                      <span className={`caption px-2 py-0.5 rounded-[var(--radius-sm)] ${
-                        userDetailData.user.role === 'ADMIN' || userDetailData.user.role === 'SUPERADMIN'
-                          ? 'bg-[var(--mm-accent-purple)]/10 text-[var(--mm-accent-purple)]'
-                          : 'bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-muted)]'
-                      }`}>{userDetailData.user.role}</span>
+                      <span
+                        className={`caption px-2 py-0.5 rounded-[var(--radius-sm)] ${
+                          userDetailData.user.role === 'ADMIN' || userDetailData.user.role === 'SUPERADMIN'
+                            ? 'bg-[var(--mm-accent-purple)]/10 text-[var(--mm-accent-purple)]'
+                            : 'bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-muted)]'
+                        }`}
+                      >
+                        {userDetailData.user.role}
+                      </span>
                     </div>
                     <div>
                       <span className="caption text-[var(--mm-text-muted)] block mb-0.5">Tier</span>
@@ -1022,7 +1405,10 @@ export default function AdminPage() {
                       <span className="caption text-[var(--mm-text-muted)] block mb-0.5">Pro Status</span>
                       {userDetailData.user.isPro ? (
                         <span className="caption bg-[var(--gradient-pro)] text-transparent bg-clip-text font-semibold">
-                          Pro {userDetailData.user.subscription?.status ? `· ${userDetailData.user.subscription.status}` : ''}
+                          Pro{' '}
+                          {userDetailData.user.subscription?.status
+                            ? `· ${userDetailData.user.subscription.status}`
+                            : ''}
                         </span>
                       ) : (
                         <span className="body text-[var(--mm-text-muted)]">Free</span>
@@ -1030,17 +1416,26 @@ export default function AdminPage() {
                     </div>
                     <div>
                       <span className="caption text-[var(--mm-text-muted)] block mb-0.5">Total Points</span>
-                      <span className="body text-[var(--mm-accent-amber)]">🪙 {(userDetailData.user.totalPoints || 0).toLocaleString()}</span>
+                      <span className="body text-[var(--mm-accent-amber)]">
+                        🪙 {(userDetailData.user.totalPoints || 0).toLocaleString()}
+                      </span>
                     </div>
                     <div>
                       <span className="caption text-[var(--mm-text-muted)] block mb-0.5">Prediction Accuracy</span>
-                      <span className="body text-[var(--mm-accent-green)]">🎯 {userDetailData.user.predAccuracy || 0}%</span>
+                      <span className="body text-[var(--mm-accent-green)]">
+                        🎯 {userDetailData.user.predAccuracy || 0}%
+                      </span>
                     </div>
                     <div>
                       <span className="caption text-[var(--mm-text-muted)] block mb-0.5">Last Active</span>
                       <span className="body">
                         {userDetailData.user.lastActiveAt
-                          ? new Date(userDetailData.user.lastActiveAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+                          ? new Date(userDetailData.user.lastActiveAt).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })
                           : '—'}
                       </span>
                     </div>
@@ -1062,11 +1457,15 @@ export default function AdminPage() {
                         </div>
                         <div>
                           <span className="caption text-[var(--mm-text-muted)] block">Status</span>
-                          <span className={`caption px-2 py-0.5 rounded-[var(--radius-sm)] font-medium ${
-                            userDetailData.user.subscription.status === 'ACTIVE'
-                              ? 'bg-[var(--mm-accent-green)]/10 text-[var(--mm-accent-green)]'
-                              : 'bg-[var(--mm-accent-amber)]/10 text-[var(--mm-accent-amber)]'
-                          }`}>{userDetailData.user.subscription.status}</span>
+                          <span
+                            className={`caption px-2 py-0.5 rounded-[var(--radius-sm)] font-medium ${
+                              userDetailData.user.subscription.status === 'ACTIVE'
+                                ? 'bg-[var(--mm-accent-green)]/10 text-[var(--mm-accent-green)]'
+                                : 'bg-[var(--mm-accent-amber)]/10 text-[var(--mm-accent-amber)]'
+                            }`}
+                          >
+                            {userDetailData.user.subscription.status}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -1083,7 +1482,12 @@ export default function AdminPage() {
                     {userDetailData.user.isPro ? 'Revoke Pro' : 'Grant Pro'}
                   </button>
                   <button
-                    onClick={() => { if (confirm('Delete this user?')) { deleteUserMut.mutate(userDetailData.user.id); setDetailUserId(null) } }}
+                    onClick={() => {
+                      if (confirm('Delete this user?')) {
+                        deleteUserMut.mutate(userDetailData.user.id)
+                        setDetailUserId(null)
+                      }
+                    }}
                     className="flex items-center gap-1.5 px-4 py-2 bg-[var(--mm-bg-tertiary)] text-[var(--mm-accent-red)] body font-medium rounded-[var(--radius-md)] hover:bg-[var(--mm-accent-red)]/10 transition-all"
                   >
                     <Trash2 size={14} />
@@ -1102,4 +1506,3 @@ export default function AdminPage() {
     </motion.div>
   )
 }
-

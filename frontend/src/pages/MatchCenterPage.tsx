@@ -14,21 +14,30 @@ export default function MatchCenterPage() {
     if (!matchId) return
     fetch(`/api/fixtures/${matchId}`, { credentials: 'include' })
       .then((r) => r.json())
-      .then((data) => { setFixture(data); setLoading(false) })
+      .then((data) => {
+        setFixture(data)
+        setLoading(false)
+      })
       .catch(() => setLoading(false))
   }, [matchId])
 
-  if (loading) return (
-    <div className="min-h-screen pt-16 flex items-center justify-center">
-      <div className="w-10 h-10 border-2 border-[var(--mm-accent-green)] border-t-transparent rounded-full animate-spin" />
-    </div>
-  )
+  if (loading)
+    return (
+      <div className="min-h-screen pt-16 flex items-center justify-center">
+        <div className="w-10 h-10 border-2 border-[var(--mm-accent-green)] border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
 
   return (
     <div className="min-h-screen pt-16 pb-20">
-      <Helmet><title>{fixture ? `${fixture.homeTeam} vs ${fixture.awayTeam}` : 'Match Center'} — MatchMind</title></Helmet>
+      <Helmet>
+        <title>{fixture ? `${fixture.homeTeam} vs ${fixture.awayTeam}` : 'Match Center'} — MatchMind</title>
+      </Helmet>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
-        <button onClick={() => navigate(-1)} className="flex items-center gap-1.5 body text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] mb-6 transition-colors">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-1.5 body text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] mb-6 transition-colors"
+        >
           <ArrowLeft size={16} /> Back
         </button>
 
@@ -42,11 +51,17 @@ export default function MatchCenterPage() {
                 <div className="text-5xl font-bold text-[var(--mm-accent-green)]">
                   {fixture.homeScore ?? '-'} : {fixture.awayScore ?? '-'}
                 </div>
-                <span className={`caption mt-2 inline-block px-3 py-1 rounded-full ${
-                  fixture.status === 'LIVE' ? 'bg-[var(--mm-accent-green)]/10 text-[var(--mm-accent-green)] animate-live-pulse' :
-                  fixture.status === 'COMPLETED' ? 'bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-muted)]' :
-                  'bg-[var(--mm-accent-blue)]/10 text-[var(--mm-accent-blue)]'
-                }`}>{fixture.status}</span>
+                <span
+                  className={`caption mt-2 inline-block px-3 py-1 rounded-full ${
+                    fixture.status === 'LIVE'
+                      ? 'bg-[var(--mm-accent-green)]/10 text-[var(--mm-accent-green)] animate-live-pulse'
+                      : fixture.status === 'COMPLETED'
+                        ? 'bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-muted)]'
+                        : 'bg-[var(--mm-accent-blue)]/10 text-[var(--mm-accent-blue)]'
+                  }`}
+                >
+                  {fixture.status}
+                </span>
               </div>
               <div className="text-center flex-1">
                 <h2 className="heading-1 text-[var(--mm-text-primary)]">{fixture.awayTeam}</h2>
@@ -54,7 +69,9 @@ export default function MatchCenterPage() {
             </div>
 
             <div className="flex items-center justify-center gap-4 caption text-[var(--mm-text-muted)] mb-6">
-              <span className="flex items-center gap-1"><Calendar size={14} /> {fixture.scheduledAt?.slice(0, 10)}</span>
+              <span className="flex items-center gap-1">
+                <Calendar size={14} /> {fixture.scheduledAt?.slice(0, 10)}
+              </span>
             </div>
 
             {fixture.status === 'COMPLETED' && fixture.playerMatchStats && fixture.playerMatchStats.length > 0 && (
@@ -82,7 +99,13 @@ export default function MatchCenterPage() {
                           <td className="text-center py-2 px-2">{stat.cleanSheet ? '✓' : '-'}</td>
                           <td className="text-center py-2 px-2">{stat.yellowCards || 0}</td>
                           <td className="text-center py-2 px-2">{stat.redCards || 0}</td>
-                          <td className="text-center py-2 px-2 font-semibold text-[var(--mm-accent-green)]">{stat.goals * 6 + stat.assists * 3 + (stat.cleanSheet ? 4 : 0) - stat.yellowCards - stat.redCards * 3}</td>
+                          <td className="text-center py-2 px-2 font-semibold text-[var(--mm-accent-green)]">
+                            {stat.goals * 6 +
+                              stat.assists * 3 +
+                              (stat.cleanSheet ? 4 : 0) -
+                              stat.yellowCards -
+                              stat.redCards * 3}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -101,4 +124,3 @@ export default function MatchCenterPage() {
     </div>
   )
 }
-

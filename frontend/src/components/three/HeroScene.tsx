@@ -31,15 +31,17 @@ export default function HeroSceneWrapper(props: HeroSceneWrapperProps) {
 }
 
 function StaticFallback() {
-  const stars = useMemo(() =>
-    Array.from({ length: 50 }, (_, i) => ({
-      left: `${Math.random() * 100}%`,
-      top: `${Math.random() * 100}%`,
-      size: Math.random() * 3 + 1,
-      delay: Math.random() * 3,
-      duration: 2 + Math.random() * 3,
-    })),
-  [])
+  const stars = useMemo(
+    () =>
+      Array.from({ length: 50 }, (_, i) => ({
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        size: Math.random() * 3 + 1,
+        delay: Math.random() * 3,
+        duration: 2 + Math.random() * 3,
+      })),
+    [],
+  )
 
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
@@ -60,4 +62,3 @@ function StaticFallback() {
     </div>
   )
 }
-

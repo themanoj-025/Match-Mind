@@ -1,3 +1,4 @@
+import { env } from '../config/env'
 /**
  * Rate limiting middleware using express-rate-limit.
  *
@@ -27,7 +28,7 @@ let sharedRedisClient: any = null
 try {
   const redis = require('redis')
   sharedRedisClient = redis.createClient({
-    url: process.env.REDIS_URL || 'redis://localhost:6379',
+    url: env.REDIS_URL || 'redis://localhost:6379',
     enableReadyCheck: false,
   })
   sharedRedisClient.connect().catch(() => {

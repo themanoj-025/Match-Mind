@@ -50,35 +50,47 @@ export default function SearchPage() {
         type: 'matches',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         items: (searchData.matches || []).map((m: any) => ({
-          id: m.id, label: `${m.homeTeamName} vs ${m.awayTeamName}`, icon: '⚽',
-          path: `/live/${m.id}`, meta: `${m.competition} · ${m.status === 'FINISHED' ? `${m.homeScore}-${m.awayScore}` : new Date(m.scheduledAt).toLocaleDateString()}`,
+          id: m.id,
+          label: `${m.homeTeamName} vs ${m.awayTeamName}`,
+          icon: '⚽',
+          path: `/live/${m.id}`,
+          meta: `${m.competition} · ${m.status === 'FINISHED' ? `${m.homeScore}-${m.awayScore}` : new Date(m.scheduledAt).toLocaleDateString()}`,
         })),
       },
       {
         type: 'users',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         items: (searchData.users || []).map((u: any) => ({
-          id: u.id, label: u.displayName || u.username, icon: User,
-          path: `/profile/${u.id}`, meta: `${u.totalPoints || 0} pts · ${u.predAccuracy || 0}% acc`,
+          id: u.id,
+          label: u.displayName || u.username,
+          icon: User,
+          path: `/profile/${u.id}`,
+          meta: `${u.totalPoints || 0} pts · ${u.predAccuracy || 0}% acc`,
         })),
       },
       {
         type: 'teams',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         items: (searchData.teams || []).map((t: any) => ({
-          id: t.id, label: t.name, icon: '🏟️',
-          path: `/teams/${t.id}`, meta: t.sport?.toLowerCase() || 'Sport',
+          id: t.id,
+          label: t.name,
+          icon: '🏟️',
+          path: `/teams/${t.id}`,
+          meta: t.sport?.toLowerCase() || 'Sport',
         })),
       },
       {
         type: 'players',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         items: (searchData.players || []).map((p: any) => ({
-          id: p.id, label: p.name, icon: '🎽',
-          path: `/players/${p.id}`, meta: p.team?.name || 'Free Agent',
+          id: p.id,
+          label: p.name,
+          icon: '🎽',
+          path: `/players/${p.id}`,
+          meta: p.team?.name || 'Free Agent',
         })),
       },
-    ].filter(r => r.items.length > 0)
+    ].filter((r) => r.items.length > 0)
 
     return mapped
   }, [query, searchData])
@@ -91,17 +103,17 @@ export default function SearchPage() {
   const filteredResults = useMemo(() => {
     if (!results) return []
     if (activeTab === 'all') return results
-    return results.filter(r => r.type === activeTab)
+    return results.filter((r) => r.type === activeTab)
   }, [results, activeTab])
 
   // Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault()
-      setSelectedIdx(prev => Math.min(prev + 1, totalResults - 1))
+      setSelectedIdx((prev) => Math.min(prev + 1, totalResults - 1))
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
-      setSelectedIdx(prev => Math.max(prev - 1, 0))
+      setSelectedIdx((prev) => Math.max(prev - 1, 0))
     } else if (e.key === 'Escape') {
       setQuery('')
       inputRef.current?.blur()
@@ -118,7 +130,10 @@ export default function SearchPage() {
         {/* Search Input */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-4 mb-6">
-            <Link to="/explore" className="p-1 text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] transition-colors">
+            <Link
+              to="/explore"
+              className="p-1 text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)] transition-colors"
+            >
               <ArrowLeft size={20} />
             </Link>
             <div className="flex-1 relative">
@@ -134,7 +149,10 @@ export default function SearchPage() {
                 autoComplete="off"
               />
               {query && (
-                <button onClick={() => handleQueryChange('')} className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[var(--mm-text-muted)] hover:text-[var(--mm-text-primary)] transition-colors">
+                <button
+                  onClick={() => handleQueryChange('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[var(--mm-text-muted)] hover:text-[var(--mm-text-primary)] transition-colors"
+                >
                   <X size={18} />
                 </button>
               )}
@@ -169,22 +187,27 @@ export default function SearchPage() {
               <button
                 onClick={() => setActiveTab('all')}
                 className={`px-4 py-2 rounded-[var(--radius-full)] body whitespace-nowrap transition-all ${
-                  activeTab === 'all' ? 'bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] font-semibold' : 'bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-secondary)] hover:bg-[var(--mm-bg-hover)]'
+                  activeTab === 'all'
+                    ? 'bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] font-semibold'
+                    : 'bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-secondary)] hover:bg-[var(--mm-bg-hover)]'
                 }`}
               >
                 All Results ({totalResults})
               </button>
-              {results && results.map((r) => (
-                <button
-                  key={r.type}
-                  onClick={() => setActiveTab(r.type)}
-                  className={`px-4 py-2 rounded-[var(--radius-full)] body whitespace-nowrap transition-all ${
-                    activeTab === r.type ? 'bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] font-semibold' : 'bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-secondary)] hover:bg-[var(--mm-bg-hover)]'
-                  }`}
-                >
-                  {TYPE_LABELS[r.type]} ({r.items.length})
-                </button>
-              ))}
+              {results &&
+                results.map((r) => (
+                  <button
+                    key={r.type}
+                    onClick={() => setActiveTab(r.type)}
+                    className={`px-4 py-2 rounded-[var(--radius-full)] body whitespace-nowrap transition-all ${
+                      activeTab === r.type
+                        ? 'bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] font-semibold'
+                        : 'bg-[var(--mm-bg-tertiary)] text-[var(--mm-text-secondary)] hover:bg-[var(--mm-bg-hover)]'
+                    }`}
+                  >
+                    {TYPE_LABELS[r.type]} ({r.items.length})
+                  </button>
+                ))}
             </div>
 
             {/* Content */}
@@ -221,7 +244,10 @@ export default function SearchPage() {
                               {item.meta && <span className="caption text-[var(--mm-text-muted)]">{item.meta}</span>}
                             </div>
 
-                            <ChevronRight size={16} className="text-[var(--mm-text-muted)] opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <ChevronRight
+                              size={16}
+                              className="text-[var(--mm-text-muted)] opacity-0 group-hover:opacity-100 transition-opacity"
+                            />
                           </Link>
                         )
                       })}
@@ -233,7 +259,9 @@ export default function SearchPage() {
               <div className="text-center py-16 bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-xl)]">
                 <Search size={36} className="mx-auto mb-3 text-[var(--mm-text-muted)]" />
                 <p className="body-large text-[var(--mm-text-muted)]">No results for "{query}"</p>
-                <p className="body text-[var(--mm-text-muted)] mt-1">Try a different search term or browse suggested searches</p>
+                <p className="body text-[var(--mm-text-muted)] mt-1">
+                  Try a different search term or browse suggested searches
+                </p>
               </div>
             )}
           </motion.div>
@@ -242,4 +270,3 @@ export default function SearchPage() {
     </div>
   )
 }
-

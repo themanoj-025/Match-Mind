@@ -2,7 +2,18 @@ import { useState, useEffect, useRef } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useParams, Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Send, Users, BarChart3, Timer, Activity, ChevronLeft, Sparkles, Lock, Trophy, MessageCircle } from 'lucide-react'
+import {
+  Send,
+  Users,
+  BarChart3,
+  Timer,
+  Activity,
+  ChevronLeft,
+  Sparkles,
+  Lock,
+  Trophy,
+  MessageCircle,
+} from 'lucide-react'
 import ScoreDisplay from '../components/ScoreDisplay'
 import LiveBadge from '../components/LiveBadge'
 import ChatMessage from '../components/ChatMessage'
@@ -14,7 +25,13 @@ import type { Match, MatchStats, Lineups, H2H, TimelineEvent, ChatMessage as Cha
 const reactions = ['🔥', '😱', '👏', '😤', '⚽', '🏀']
 
 // ── Animated xG Bar ───────────────────────────────────
-function AnimatedXGBar({ label, home, away, homeColor = 'var(--mm-accent-green)', awayColor = 'var(--mm-accent-amber)' }: {
+function AnimatedXGBar({
+  label,
+  home,
+  away,
+  homeColor = 'var(--mm-accent-green)',
+  awayColor = 'var(--mm-accent-amber)',
+}: {
   label: string
   home: number
   away: number
@@ -30,14 +47,18 @@ function AnimatedXGBar({ label, home, away, homeColor = 'var(--mm-accent-green)'
       <span className="caption text-[var(--mm-text-muted)] text-center">{label}</span>
       <div className="flex items-end gap-2 h-20">
         <div className="flex-1 flex flex-col items-center gap-1">
-          <span className="caption font-bold" style={{ color: homeColor }}>{home.toFixed(1)}</span>
+          <span className="caption font-bold" style={{ color: homeColor }}>
+            {home.toFixed(1)}
+          </span>
           <div
             className="w-full rounded-t-[var(--radius-sm)] transition-all duration-700"
             style={{ height: `${homePct}%`, background: `linear-gradient(180deg, ${homeColor}, ${homeColor}88)` }}
           />
         </div>
         <div className="flex-1 flex flex-col items-center gap-1">
-          <span className="caption font-bold" style={{ color: awayColor }}>{away.toFixed(1)}</span>
+          <span className="caption font-bold" style={{ color: awayColor }}>
+            {away.toFixed(1)}
+          </span>
           <div
             className="w-full rounded-t-[var(--radius-sm)] transition-all duration-700"
             style={{ height: `${awayPct}%`, background: `linear-gradient(180deg, ${awayColor}, ${awayColor}88)` }}
@@ -101,12 +122,14 @@ export default function MatchRoomPage() {
   const { data: timelineData } = useMatchTimeline(matchId)
 
   const handleReact = (messageId: string | number, emoji: string) => {
-    setMessages(prev => prev.map(msg => {
-      if (msg.id !== messageId) return msg
-      const reactionsData = { ...(msg.reactions || {}) }
-      reactionsData[emoji] = (reactionsData[emoji] || 0) + 1
-      return { ...msg, reactions: reactionsData }
-    }))
+    setMessages((prev) =>
+      prev.map((msg) => {
+        if (msg.id !== messageId) return msg
+        const reactionsData = { ...(msg.reactions || {}) }
+        reactionsData[emoji] = (reactionsData[emoji] || 0) + 1
+        return { ...msg, reactions: reactionsData }
+      }),
+    )
   }
 
   const match = (matchData || {
@@ -136,7 +159,13 @@ export default function MatchRoomPage() {
   }) as unknown as MatchStats
 
   const timeline = (timelineData || [
-    { minute: 67, type: 'goal', team: 'home', description: 'J. Alvarez — Assisted by K. De Bruyne', scorer: 'J. Alvarez' },
+    {
+      minute: 67,
+      type: 'goal',
+      team: 'home',
+      description: 'J. Alvarez — Assisted by K. De Bruyne',
+      scorer: 'J. Alvarez',
+    },
     { minute: 42, type: 'goal', team: 'away', description: 'M. Ødegaard — Penalty', scorer: 'M. Ødegaard' },
     { minute: 28, type: 'goal', team: 'home', description: 'E. Haaland — Header from corner', scorer: 'E. Haaland' },
     { minute: 22, type: 'yellow', team: 'away', description: 'D. Rice' },
@@ -144,25 +173,93 @@ export default function MatchRoomPage() {
   ]) as unknown as TimelineEvent[]
 
   const lineups = (lineupsData || {
-    home: { formation: '4-3-3', players: ['Ederson', 'Walker', 'Dias', 'Aké', 'Gvardiol', 'Rodri', 'De Bruyne', 'Silva', 'Foden', 'Haaland', 'Alvarez'] },
-    away: { formation: '4-3-3', players: ['Raya', 'White', 'Saliba', 'Gabriel', 'Zinchenko', 'Rice', 'Ødegaard', 'Havertz', 'Saka', 'Jesus', 'Martinelli'] },
+    home: {
+      formation: '4-3-3',
+      players: [
+        'Ederson',
+        'Walker',
+        'Dias',
+        'Aké',
+        'Gvardiol',
+        'Rodri',
+        'De Bruyne',
+        'Silva',
+        'Foden',
+        'Haaland',
+        'Alvarez',
+      ],
+    },
+    away: {
+      formation: '4-3-3',
+      players: [
+        'Raya',
+        'White',
+        'Saliba',
+        'Gabriel',
+        'Zinchenko',
+        'Rice',
+        'Ødegaard',
+        'Havertz',
+        'Saka',
+        'Jesus',
+        'Martinelli',
+      ],
+    },
   }) as unknown as Lineups
 
-  const h2h = (h2hData || { homeWins: 12, draws: 5, awayWins: 8, lastMeetings: [{ date: 'Sep 2025', score: '2-2' }, { date: 'Mar 2025', score: '1-0' }, { date: 'Oct 2024', score: '2-1' }, { date: 'Apr 2024', score: '0-0' }, { date: 'Jan 2024', score: '1-1' }] }) as unknown as H2H
+  const h2h = (h2hData || {
+    homeWins: 12,
+    draws: 5,
+    awayWins: 8,
+    lastMeetings: [
+      { date: 'Sep 2025', score: '2-2' },
+      { date: 'Mar 2025', score: '1-0' },
+      { date: 'Oct 2024', score: '2-1' },
+      { date: 'Apr 2024', score: '0-0' },
+      { date: 'Jan 2024', score: '1-1' },
+    ],
+  }) as unknown as H2H
 
   // Socket sim: initial chat + goal effect
   useEffect(() => {
     setMessages([
-      { id: 1, user: { name: 'SportsKing', avatar: null }, text: "Come on City!! 💪", timestamp: "66'", reactions: { '🔥': 12, '👏': 5 } },
-      { id: 2, user: { name: 'GoalPredictor', avatar: null }, text: 'What a strike! 🚀', timestamp: "65'", reactions: { '😱': 8 } },
-      { id: 3, user: { name: 'ArsenalFan4Life', avatar: null }, text: 'Still in this! COYG! 🔴', timestamp: "62'", reactions: { '👏': 6 } },
+      {
+        id: 1,
+        user: { name: 'SportsKing', avatar: null },
+        text: 'Come on City!! 💪',
+        timestamp: "66'",
+        reactions: { '🔥': 12, '👏': 5 },
+      },
+      {
+        id: 2,
+        user: { name: 'GoalPredictor', avatar: null },
+        text: 'What a strike! 🚀',
+        timestamp: "65'",
+        reactions: { '😱': 8 },
+      },
+      {
+        id: 3,
+        user: { name: 'ArsenalFan4Life', avatar: null },
+        text: 'Still in this! COYG! 🔴',
+        timestamp: "62'",
+        reactions: { '👏': 6 },
+      },
     ])
 
     // Simulate goal event after 3s
     const goalTimer = setTimeout(() => {
       setShowGoalOverlay(true)
-      setGoalSequence(prev => prev + 1)
-      setMessages(prev => [...prev, { id: Date.now(), user: { name: 'System', avatar: null }, text: '⚽ GOAL! Julian Alvarez (67\')', timestamp: "67'", isSystem: true }])
+      setGoalSequence((prev) => prev + 1)
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          user: { name: 'System', avatar: null },
+          text: "⚽ GOAL! Julian Alvarez (67')",
+          timestamp: "67'",
+          isSystem: true,
+        },
+      ])
       setTimeout(() => setShowGoalOverlay(false), 1500)
     }, 3000)
 
@@ -185,25 +282,31 @@ export default function MatchRoomPage() {
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault()
     if (!message.trim()) return
-    setMessages(prev => [...prev, {
-      id: Date.now(),
-      user: { name: 'You', avatar: null },
-      text: message.trim(),
-      timestamp: `${match.minute}'`,
-      reactions: {},
-    }])
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: Date.now(),
+        user: { name: 'You', avatar: null },
+        text: message.trim(),
+        timestamp: `${match.minute}'`,
+        reactions: {},
+      },
+    ])
     setMessage('')
   }
 
   const handleReaction = (emoji: string) => {
     // Simple reaction toggle
-    setMessages(prev => [...prev, {
-      id: Date.now(),
-      user: { name: 'System', avatar: null },
-      isSystem: true,
-      text: `Reacted with ${emoji}`,
-      timestamp: `${match.minute}'`,
-    }])
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: Date.now(),
+        user: { name: 'System', avatar: null },
+        isSystem: true,
+        text: `Reacted with ${emoji}`,
+        timestamp: `${match.minute}'`,
+      },
+    ])
   }
 
   const statsTabs = [
@@ -223,10 +326,21 @@ export default function MatchRoomPage() {
   return (
     <div className="min-h-screen pt-16 pb-20 md:pb-8">
       <Helmet>
-        <title>{match.homeTeam} vs {match.awayTeam} — Live {match.homeScore}-{match.awayScore} | MatchMind</title>
-        <meta name="description" content={`Live: ${match.homeTeam} ${match.homeScore}-${match.awayScore} ${match.awayTeam} — ${match.competition}. Stats, lineups, chat.`} />
-        <meta property="og:title" content={`${match.homeTeam} vs ${match.awayTeam} — Live ${match.homeScore}-${match.awayScore}`} />
-        <meta property="og:description" content={`${match.competition} ${match.homeTeam} ${match.homeScore}-${match.awayScore} ${match.awayTeam}. ${match.minute}' — ${match.stadium}.`} />
+        <title>
+          {match.homeTeam} vs {match.awayTeam} — Live {match.homeScore}-{match.awayScore} | MatchMind
+        </title>
+        <meta
+          name="description"
+          content={`Live: ${match.homeTeam} ${match.homeScore}-${match.awayScore} ${match.awayTeam} — ${match.competition}. Stats, lineups, chat.`}
+        />
+        <meta
+          property="og:title"
+          content={`${match.homeTeam} vs ${match.awayTeam} — Live ${match.homeScore}-${match.awayScore}`}
+        />
+        <meta
+          property="og:description"
+          content={`${match.competition} ${match.homeTeam} ${match.homeScore}-${match.awayScore} ${match.awayTeam}. ${match.minute}' — ${match.stadium}.`}
+        />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`/live/${matchId}`} />
         <meta name="twitter:card" content="summary_large_image" />
@@ -234,14 +348,14 @@ export default function MatchRoomPage() {
           {JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'SportsEvent',
-            'name': `${match.homeTeam} vs ${match.awayTeam}`,
-            'startDate': new Date().toISOString(),
-            'location': { '@type': 'Place', 'name': match.stadium },
-            'competitor': [
-              { '@type': 'SportsTeam', 'name': match.homeTeam },
-              { '@type': 'SportsTeam', 'name': match.awayTeam }
+            name: `${match.homeTeam} vs ${match.awayTeam}`,
+            startDate: new Date().toISOString(),
+            location: { '@type': 'Place', name: match.stadium },
+            competitor: [
+              { '@type': 'SportsTeam', name: match.homeTeam },
+              { '@type': 'SportsTeam', name: match.awayTeam },
             ],
-            'status': 'https://schema.org/EventActive'
+            status: 'https://schema.org/EventActive',
           })}
         </script>
       </Helmet>
@@ -265,11 +379,7 @@ export default function MatchRoomPage() {
               >
                 ⚽
               </motion.div>
-              <motion.div
-                initial={{ y: 10, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-              >
+              <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
                 <div className="display-l">GOAL!</div>
                 <div className="body-large font-semibold mt-1">Julian Alvarez · 67'</div>
               </motion.div>
@@ -307,7 +417,9 @@ export default function MatchRoomPage() {
               </div>
               <div className="flex items-center gap-1 mt-0.5">
                 <Users size={12} className="text-[var(--mm-text-muted)]" />
-                <span className="caption text-[var(--mm-text-muted)]">{viewerCounts[matchId!]?.toLocaleString() || '1,247'} watching</span>
+                <span className="caption text-[var(--mm-text-muted)]">
+                  {viewerCounts[matchId!]?.toLocaleString() || '1,247'} watching
+                </span>
               </div>
             </div>
 
@@ -331,7 +443,9 @@ export default function MatchRoomPage() {
               key={panel.id}
               onClick={() => setMobilePanel(panel.id)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-md)] body whitespace-nowrap transition-all ${
-                mobilePanel === panel.id ? 'bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] font-semibold' : 'text-[var(--mm-text-secondary)]'
+                mobilePanel === panel.id
+                  ? 'bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] font-semibold'
+                  : 'text-[var(--mm-text-secondary)]'
               }`}
             >
               <Icon size={14} />
@@ -355,7 +469,9 @@ export default function MatchRoomPage() {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-[var(--radius-sm)] body transition-all ${
-                      activeTab === tab.id ? 'bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] font-medium' : 'text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)]'
+                      activeTab === tab.id
+                        ? 'bg-[var(--mm-accent-green)] text-[var(--mm-text-inverse)] font-medium'
+                        : 'text-[var(--mm-text-secondary)] hover:text-[var(--mm-text-primary)]'
                     }`}
                   >
                     <Icon size={16} />
@@ -377,8 +493,14 @@ export default function MatchRoomPage() {
                   className="grid gap-4"
                 >
                   <h3 className="heading-3 mb-2">Match Statistics</h3>
-                  <StatBar homeValue={stats.possession[0]} awayValue={stats.possession[1]} label="Possession" homeColor="var(--mm-accent-green)" awayColor="var(--mm-accent-amber)" />
-                  
+                  <StatBar
+                    homeValue={stats.possession[0]}
+                    awayValue={stats.possession[1]}
+                    label="Possession"
+                    homeColor="var(--mm-accent-green)"
+                    awayColor="var(--mm-accent-amber)"
+                  />
+
                   {/* Stat rows with hover effect */}
                   {[
                     { key: 'shots', label: 'Shots', home: stats.shots, away: stats.shots },
@@ -421,13 +543,19 @@ export default function MatchRoomPage() {
                     <div className="absolute left-3.5 top-2 bottom-2 w-px bg-[var(--border-subtle)]" />
                     {timeline.map((event, i) => (
                       <div key={i} className="relative pb-5 last:pb-0">
-                        <div className={`absolute -left-[18px] w-7 h-7 rounded-full flex items-center justify-center text-xs border-2 border-[var(--mm-bg-secondary)] ${
-                          event.type === 'goal' ? 'bg-[var(--mm-accent-green)]/20 text-[var(--mm-accent-green)]' : 'bg-[var(--mm-accent-amber)]/20 text-[var(--mm-accent-amber)]'
-                        }`}>
+                        <div
+                          className={`absolute -left-[18px] w-7 h-7 rounded-full flex items-center justify-center text-xs border-2 border-[var(--mm-bg-secondary)] ${
+                            event.type === 'goal'
+                              ? 'bg-[var(--mm-accent-green)]/20 text-[var(--mm-accent-green)]'
+                              : 'bg-[var(--mm-accent-amber)]/20 text-[var(--mm-accent-amber)]'
+                          }`}
+                        >
                           {event.type === 'goal' ? '⚽' : '🟨'}
                         </div>
                         <div className="flex items-start gap-2">
-                          <span className="caption font-bold text-[var(--mm-text-muted)] min-w-[2rem]">{event.minute}'</span>
+                          <span className="caption font-bold text-[var(--mm-text-muted)] min-w-[2rem]">
+                            {event.minute}'
+                          </span>
                           <div>
                             <p className="body text-[var(--mm-text-secondary)]">{event.description}</p>
                           </div>
@@ -444,13 +572,18 @@ export default function MatchRoomPage() {
                   <h3 className="heading-3 mb-4">Starting Lineups</h3>
                   <div className="flex items-center gap-2 mb-4">
                     <span className="caption text-[var(--mm-text-muted)]">Formation:</span>
-                    <span className="caption font-semibold text-[var(--mm-text-primary)]">{lineups.home.formation}</span>
+                    <span className="caption font-semibold text-[var(--mm-text-primary)]">
+                      {lineups.home.formation}
+                    </span>
                   </div>
                   <div className="grid sm:grid-cols-2 gap-6">
                     <div>
                       <h4 className="body font-semibold mb-3 text-[var(--mm-accent-green)]">{match.homeTeam}</h4>
                       {lineups.home.players.map((p: string, i: number) => (
-                        <div key={i} className="flex items-center gap-2 py-1 px-2 rounded-[var(--radius-sm)] hover:bg-[var(--mm-bg-hover)] body text-[var(--mm-text-secondary)]">
+                        <div
+                          key={i}
+                          className="flex items-center gap-2 py-1 px-2 rounded-[var(--radius-sm)] hover:bg-[var(--mm-bg-hover)] body text-[var(--mm-text-secondary)]"
+                        >
                           <span className="caption text-[var(--mm-text-muted)] w-5 text-right">{i + 1}.</span>
                           <span>{p}</span>
                         </div>
@@ -459,7 +592,10 @@ export default function MatchRoomPage() {
                     <div>
                       <h4 className="body font-semibold mb-3 text-[var(--mm-accent-amber)]">{match.awayTeam}</h4>
                       {lineups.away.players.map((p: string, i: number) => (
-                        <div key={i} className="flex items-center gap-2 py-1 px-2 rounded-[var(--radius-sm)] hover:bg-[var(--mm-bg-hover)] body text-[var(--mm-text-secondary)]">
+                        <div
+                          key={i}
+                          className="flex items-center gap-2 py-1 px-2 rounded-[var(--radius-sm)] hover:bg-[var(--mm-bg-hover)] body text-[var(--mm-text-secondary)]"
+                        >
                           <span className="caption text-[var(--mm-text-muted)] w-5 text-right">{i + 1}.</span>
                           <span>{p}</span>
                         </div>
@@ -489,7 +625,10 @@ export default function MatchRoomPage() {
                   </div>
                   <span className="caption text-[var(--mm-text-muted)] mb-3 block">Last 5 Meetings</span>
                   {h2h.lastMeetings.map((meeting: any, i: number) => (
-                    <div key={i} className="flex items-center justify-between py-2 border-b border-[var(--border-subtle)] last:border-0">
+                    <div
+                      key={i}
+                      className="flex items-center justify-between py-2 border-b border-[var(--border-subtle)] last:border-0"
+                    >
                       <span className="caption text-[var(--mm-text-muted)]">{meeting.date}</span>
                       <span className="body font-semibold">{meeting.score}</span>
                     </div>
@@ -500,7 +639,9 @@ export default function MatchRoomPage() {
           </div>
 
           {/* RIGHT: Chat + Predictions (60% combined on desktop) */}
-          <div className={`w-full lg:w-[480px] shrink-0 flex flex-col gap-4 ${mobilePanel === 'chat' ? '' : 'hidden lg:flex'}`}>
+          <div
+            className={`w-full lg:w-[480px] shrink-0 flex flex-col gap-4 ${mobilePanel === 'chat' ? '' : 'hidden lg:flex'}`}
+          >
             {/* LIVE CHAT */}
             <div className="bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] overflow-hidden flex flex-col h-[350px] sm:h-[420px]">
               <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-subtle)]">
@@ -516,7 +657,14 @@ export default function MatchRoomPage() {
               {/* Messages - using enhanced ChatMessage component */}
               <div className="flex-1 overflow-y-auto py-2">
                 {messages.map((msg) => (
-                  <ChatMessage key={msg.id} message={msg as any} isOwn={false} onReact={handleReact} onReport={() => {}} onPin={undefined} />
+                  <ChatMessage
+                    key={msg.id}
+                    message={msg as any}
+                    isOwn={false}
+                    onReact={handleReact}
+                    onReport={() => {}}
+                    onPin={undefined}
+                  />
                 ))}
                 <div ref={chatEndRef} />
               </div>
@@ -538,7 +686,12 @@ export default function MatchRoomPage() {
               {/* Input */}
               <form onSubmit={handleSendMessage} className="border-t border-[var(--border-subtle)] p-3">
                 <div className="flex items-center gap-2">
-                  <button type="button" onClick={() => setShowGifPicker(!showGifPicker)} className="p-2 text-[var(--mm-text-muted)] hover:text-[var(--mm-text-secondary)] transition-colors" aria-label="Add GIF">
+                  <button
+                    type="button"
+                    onClick={() => setShowGifPicker(!showGifPicker)}
+                    className="p-2 text-[var(--mm-text-muted)] hover:text-[var(--mm-text-secondary)] transition-colors"
+                    aria-label="Add GIF"
+                  >
                     GIF
                   </button>
                   <input
@@ -562,23 +715,57 @@ export default function MatchRoomPage() {
             </div>
 
             {/* PREDICTION PANEL */}
-            <div className={`bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4 sm:p-5 ${mobilePanel === 'predict' ? '' : 'hidden lg:block'}`}>
+            <div
+              className={`bg-[var(--mm-bg-secondary)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4 sm:p-5 ${mobilePanel === 'predict' ? '' : 'hidden lg:block'}`}
+            >
               <h3 className="body font-semibold mb-4">🔮 What's the final score?</h3>
 
               <div className="flex items-center justify-center gap-2 sm:gap-4 mb-4">
-                <span className="body font-medium text-center text-sm sm:text-base max-w-[80px] truncate">{match.homeTeam}</span>
+                <span className="body font-medium text-center text-sm sm:text-base max-w-[80px] truncate">
+                  {match.homeTeam}
+                </span>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => setPredHome(p => Math.max(0, p - 1))} className="w-8 h-8 sm:w-10 sm:h-10 bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-md)] flex items-center justify-center text-lg font-bold hover:bg-[var(--mm-bg-hover)]" aria-label="Decrease home score">−</button>
-                  <span className="w-8 sm:w-10 text-center font-bold text-2xl sm:text-3xl font-[var(--font-display)] text-[var(--mm-accent-green)]">{predHome}</span>
-                  <button onClick={() => setPredHome(p => Math.min(15, p + 1))} className="w-8 h-8 sm:w-10 sm:h-10 bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-md)] flex items-center justify-center text-lg font-bold hover:bg-[var(--mm-bg-hover)]" aria-label="Increase home score">+</button>
+                  <button
+                    onClick={() => setPredHome((p) => Math.max(0, p - 1))}
+                    className="w-8 h-8 sm:w-10 sm:h-10 bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-md)] flex items-center justify-center text-lg font-bold hover:bg-[var(--mm-bg-hover)]"
+                    aria-label="Decrease home score"
+                  >
+                    −
+                  </button>
+                  <span className="w-8 sm:w-10 text-center font-bold text-2xl sm:text-3xl font-[var(--font-display)] text-[var(--mm-accent-green)]">
+                    {predHome}
+                  </span>
+                  <button
+                    onClick={() => setPredHome((p) => Math.min(15, p + 1))}
+                    className="w-8 h-8 sm:w-10 sm:h-10 bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-md)] flex items-center justify-center text-lg font-bold hover:bg-[var(--mm-bg-hover)]"
+                    aria-label="Increase home score"
+                  >
+                    +
+                  </button>
                 </div>
                 <span className="text-[var(--mm-text-muted)] text-lg">:</span>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => setPredAway(p => Math.max(0, p - 1))} className="w-8 h-8 sm:w-10 sm:h-10 bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-md)] flex items-center justify-center text-lg font-bold hover:bg-[var(--mm-bg-hover)]" aria-label="Decrease away score">−</button>
-                  <span className="w-8 sm:w-10 text-center font-bold text-2xl sm:text-3xl font-[var(--font-display)] text-[var(--mm-accent-amber)]">{predAway}</span>
-                  <button onClick={() => setPredAway(p => Math.min(15, p + 1))} className="w-8 h-8 sm:w-10 sm:h-10 bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-md)] flex items-center justify-center text-lg font-bold hover:bg-[var(--mm-bg-hover)]" aria-label="Increase away score">+</button>
+                  <button
+                    onClick={() => setPredAway((p) => Math.max(0, p - 1))}
+                    className="w-8 h-8 sm:w-10 sm:h-10 bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-md)] flex items-center justify-center text-lg font-bold hover:bg-[var(--mm-bg-hover)]"
+                    aria-label="Decrease away score"
+                  >
+                    −
+                  </button>
+                  <span className="w-8 sm:w-10 text-center font-bold text-2xl sm:text-3xl font-[var(--font-display)] text-[var(--mm-accent-amber)]">
+                    {predAway}
+                  </span>
+                  <button
+                    onClick={() => setPredAway((p) => Math.min(15, p + 1))}
+                    className="w-8 h-8 sm:w-10 sm:h-10 bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-md)] flex items-center justify-center text-lg font-bold hover:bg-[var(--mm-bg-hover)]"
+                    aria-label="Increase away score"
+                  >
+                    +
+                  </button>
                 </div>
-                <span className="body font-medium text-center text-sm sm:text-base max-w-[80px] truncate">{match.awayTeam}</span>
+                <span className="body font-medium text-center text-sm sm:text-base max-w-[80px] truncate">
+                  {match.awayTeam}
+                </span>
               </div>
 
               {/* AI Hint */}
@@ -588,10 +775,13 @@ export default function MatchRoomPage() {
                   <div>
                     <div className="flex items-center gap-2 mb-0.5">
                       <span className="caption font-semibold text-[var(--mm-accent-green)]">AI Suggestion</span>
-                      <span className="caption px-1.5 py-0.5 bg-[var(--mm-bg-hover)] rounded-[var(--radius-sm)] text-[var(--mm-text-muted)]">2-1</span>
+                      <span className="caption px-1.5 py-0.5 bg-[var(--mm-bg-hover)] rounded-[var(--radius-sm)] text-[var(--mm-text-muted)]">
+                        2-1
+                      </span>
                     </div>
                     <p className="caption text-[var(--mm-text-muted)]">
-                      {match.homeTeam} have won 4 of their last 5 at home. <span className="text-[var(--mm-accent-amber)]">68% confidence</span>
+                      {match.homeTeam} have won 4 of their last 5 at home.{' '}
+                      <span className="text-[var(--mm-accent-amber)]">68% confidence</span>
                     </p>
                   </div>
                 </div>
@@ -599,7 +789,8 @@ export default function MatchRoomPage() {
 
               <button className="w-full bg-[var(--gradient-predict)] text-[var(--mm-text-inverse)] body font-semibold py-3 rounded-[var(--radius-md)] hover:shadow-[var(--shadow-glow-amber)] transition-all duration-300 flex items-center justify-center gap-2">
                 <Lock size={16} />
-                Lock In Prediction — 🪙 {predHome !== null && predAway !== null ? 50 + (predHome + predAway > 0 ? 10 : 0) : 0} pts at stake
+                Lock In Prediction — 🪙{' '}
+                {predHome !== null && predAway !== null ? 50 + (predHome + predAway > 0 ? 10 : 0) : 0} pts at stake
               </button>
             </div>
 
@@ -612,7 +803,10 @@ export default function MatchRoomPage() {
                   { time: "42'", label: 'GOAL! Ødegaard', emoji: '⚽' },
                   { time: "28'", label: 'GOAL! Haaland', emoji: '⚽' },
                 ].map((clip, i) => (
-                  <div key={i} className="flex-shrink-0 w-36 bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-md)] p-3 cursor-pointer hover:bg-[var(--mm-bg-hover)] transition-colors">
+                  <div
+                    key={i}
+                    className="flex-shrink-0 w-36 bg-[var(--mm-bg-tertiary)] rounded-[var(--radius-md)] p-3 cursor-pointer hover:bg-[var(--mm-bg-hover)] transition-colors"
+                  >
                     <div className="text-2xl mb-1">{clip.emoji}</div>
                     <span className="caption font-bold text-[var(--mm-accent-green)]">{clip.time}</span>
                     <p className="caption text-[var(--mm-text-secondary)] truncate">{clip.label}</p>
@@ -626,4 +820,3 @@ export default function MatchRoomPage() {
     </div>
   )
 }
-

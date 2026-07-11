@@ -22,6 +22,7 @@ import type { AuthenticatedRequest } from '../middleware/auth'
 import type { AuctionState } from '../services/auctionEngine'
 import logger from '../utils/logger'
 import { auctionActionLimiter } from '../middleware/rateLimiter'
+import { openapiRegistry } from "../config/openapi";
 
 const router = express.Router()
 
@@ -45,6 +46,12 @@ function makeAuctionHelpers(prisma: any) {
 // ─── Auction State ────────────────────────────────────
 
 // GET /api/rooms/:roomId/auction/state — get current auction state
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/:roomId/state',
+  responses: { 200: { description: 'Success' } }
+})
 router.get('/:roomId/state', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const state = await prisma.auctionState.findUnique({ where: { roomId: req.params.roomId as string } })
@@ -57,6 +64,12 @@ router.get('/:roomId/state', authenticateToken, asyncHandler(async (req: Authent
 // ─── Host Controls ──────────────────────────────────────
 
 // POST /api/rooms/:roomId/auction/start — host starts auction
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/:roomId/start',
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/:roomId/start', auctionActionLimiter, authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
 
@@ -104,6 +117,12 @@ router.post('/:roomId/start', auctionActionLimiter, authenticateToken, asyncHand
 }))
 
 // POST /api/rooms/:roomId/auction/next-player
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/:roomId/next-player',
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/:roomId/next-player', auctionActionLimiter, authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const room = await prisma.room.findUnique({ where: { id: req.params.roomId as string } })
@@ -130,6 +149,12 @@ router.post('/:roomId/next-player', auctionActionLimiter, authenticateToken, asy
 }))
 
 // POST /api/rooms/:roomId/auction/force-sold
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/:roomId/force-sold',
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/:roomId/force-sold', auctionActionLimiter, authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const room = await prisma.room.findUnique({ where: { id: req.params.roomId as string } })
@@ -184,6 +209,12 @@ router.post('/:roomId/force-sold', auctionActionLimiter, authenticateToken, asyn
 }))
 
 // POST /api/rooms/:roomId/auction/force-unsold
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/:roomId/force-unsold',
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/:roomId/force-unsold', auctionActionLimiter, authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const room = await prisma.room.findUnique({ where: { id: req.params.roomId as string } })
@@ -206,6 +237,12 @@ router.post('/:roomId/force-unsold', auctionActionLimiter, authenticateToken, as
 }))
 
 // POST /api/rooms/:roomId/auction/re-auction
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/:roomId/re-auction',
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/:roomId/re-auction', auctionActionLimiter, authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const room = await prisma.room.findUnique({ where: { id: req.params.roomId as string } })
@@ -233,6 +270,12 @@ router.post('/:roomId/re-auction', auctionActionLimiter, authenticateToken, asyn
 }))
 
 // POST /api/rooms/:roomId/auction/pause — host pauses auction
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/:roomId/pause',
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/:roomId/pause', auctionActionLimiter, authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const room = await prisma.room.findUnique({ where: { id: req.params.roomId as string } })
@@ -255,6 +298,12 @@ router.post('/:roomId/pause', auctionActionLimiter, authenticateToken, asyncHand
 }))
 
 // POST /api/rooms/:roomId/auction/resume — host resumes auction
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/:roomId/resume',
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/:roomId/resume', auctionActionLimiter, authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const room = await prisma.room.findUnique({ where: { id: req.params.roomId as string } })
@@ -277,6 +326,12 @@ router.post('/:roomId/resume', auctionActionLimiter, authenticateToken, asyncHan
 }))
 
 // POST /api/rooms/:roomId/auction/end
+
+openapiRegistry.registerPath({
+  method: 'post',
+  path: '/:roomId/end',
+  responses: { 200: { description: 'Success' } }
+})
 router.post('/:roomId/end', auctionActionLimiter, authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
   const prisma = req.app.get('prisma')
   const room = await prisma.room.findUnique({ where: { id: req.params.roomId as string } })

@@ -1,3 +1,4 @@
+import { env } from '../config/env'
 /**
  * Centralized error handling middleware.
  *
@@ -20,7 +21,7 @@ export function errorHandler(err: any, req: AuthenticatedRequest, res: Response,
   // Structured error logging with request context
   logger.error({
     event: 'error.unhandled',
-    err: { message: err.message, stack: process.env.NODE_ENV === 'development' ? err.stack : undefined },
+    err: { message: err.message, stack: env.NODE_ENV === 'development' ? err.stack : undefined },
     requestId: (req as any).id,
     method: req.method,
     url: req.originalUrl || req.url,

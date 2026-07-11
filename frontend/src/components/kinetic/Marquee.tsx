@@ -70,10 +70,9 @@ export default function Marquee({
   useEffect(() => {
     if (!pauseWhenNotInView || !containerRef.current) return
 
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsVisible(entry?.isIntersecting ?? false),
-      { threshold: 0.1 }
-    )
+    const observer = new IntersectionObserver(([entry]) => setIsVisible(entry?.isIntersecting ?? false), {
+      threshold: 0.1,
+    })
     observer.observe(containerRef.current)
     return () => observer.disconnect()
   }, [pauseWhenNotInView])
@@ -113,17 +112,25 @@ export default function Marquee({
           width: 'fit-content',
           animationPlayState: playState,
         }}
-        animate={reduced ? {} : {
-          x: [originX, translateX],
-        }}
-        transition={reduced ? {} : {
-          x: {
-            duration: speed,
-            ease: 'linear',
-            repeat: Infinity,
-            repeatType: 'loop',
-          },
-        }}
+        animate={
+          reduced
+            ? {}
+            : {
+                x: [originX, translateX],
+              }
+        }
+        transition={
+          reduced
+            ? {}
+            : {
+                x: {
+                  duration: speed,
+                  ease: 'linear',
+                  repeat: Infinity,
+                  repeatType: 'loop',
+                },
+              }
+        }
       >
         {displayContent().map((item, idx) => (
           <div
@@ -134,12 +141,11 @@ export default function Marquee({
             {renderItem && typeof item === 'object' && item !== null && 'content' in item
               ? renderItem(item as MarqueeItem, idx)
               : typeof item === 'object' && item !== null && 'content' in item
-              ? (item as MarqueeItem).content
-              : item}
+                ? (item as MarqueeItem).content
+                : item}
           </div>
         ))}
       </motion.div>
     </div>
   )
 }
-

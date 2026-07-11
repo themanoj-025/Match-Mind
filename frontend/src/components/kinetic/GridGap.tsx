@@ -1,10 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
-import {
-  gridGapContainerVariants,
-  gridGapItemVariants,
-  prefersReducedMotion,
-} from '../../lib/kinetic'
+import { gridGapContainerVariants, gridGapItemVariants, prefersReducedMotion } from '../../lib/kinetic'
 
 interface GridGapProps {
   /** Grid items */
@@ -108,4 +104,3 @@ export default function GridGap({
     </motion.div>
   )
 }
-
