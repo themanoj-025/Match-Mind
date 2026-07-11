@@ -27,6 +27,12 @@ export default defineConfig({
           if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/')) {
             return 'vendor-react'
           }
+          if (id.includes('node_modules/three') || id.includes('node_modules/@react-three') || id.includes('node_modules/@react-spring')) {
+            return 'vendor-three'
+          }
+          if (id.includes('node_modules/gsap')) {
+            return 'vendor-gsap'
+          }
           if (id.includes('node_modules/lucide-react') || id.includes('node_modules/framer-motion') || id.includes('node_modules/@heroicons')) {
             return 'vendor-ui'
           }

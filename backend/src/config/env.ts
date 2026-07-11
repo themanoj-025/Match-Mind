@@ -15,9 +15,11 @@ const envSchema = z.object({
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
   
-  // Third Party APIs
+  // External APIs (Optional)
   RESEND_API_KEY: z.string().min(1).optional(),
   SPORTRADAR_API_KEY: z.string().min(1).optional(),
+  SUPABASE_URL: z.string().url().optional(),
+  SUPABASE_KEY: z.string().min(1).optional(),
   ANTHROPIC_API_KEY: z.string().optional(),
   
   // Stripe
