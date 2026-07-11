@@ -1,48 +1,40 @@
-# ── Build Stage ──────────────────────────────────────────
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install dependencies first (better layer caching)
+# Copy package.json files
 COPY package.json package-lock.json* ./
-RUN npm ci
+COPY backend/package.json backend/
+COPY frontend/package.json frontend/
 
-# Copy source files
-COPY tsconfig.json ./
-COPY src/ ./src/
-COPY instrument.ts ./
+# Install dependencies (ignoring scripts to prevent postinstall failures during build)
+RUN npm install --ignore-scripts
 
-# ── Production Stage ─────────────────────────────────────
-FROM node:20-alpine AS production
+# Copy source
+COPY backend/ backend/
+
+# Build backend (TypeScript compilation)
+WORKDIR /app/backend
+RUN npm run build
+
+# Production image
+FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-# Install production dependencies only (use install — not ci — so lockfile is optional)
-COPY package.json ./
-RUN npm install --omit=dev && \
-    npm install -g tsx@^4.22.5 && \
-    npm cache clean --force
+# Non-root user setup per Security Volume 8
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nodejs -u 1001 -G nodejs
 
-# Copy source
-COPY --from=builder /app/src ./src
-COPY --from=builder /app/tsconfig.json ./
-COPY --from=builder /app/instrument.ts ./instrument.ts
+COPY --from=builder --chown=nodejs:nodejs /app/backend/package.json ./package.json
+COPY --from=builder --chown=nodejs:nodejs /app/backend/dist ./dist
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
 
-# Create data directory for JSON DB (bind mount in production)
-RUN mkdir -p /app/data && chown -R node:node /app/data
+USER nodejs
 
-# Use non-root user for security
-USER node
-
-# Environment
 ENV NODE_ENV=production
-ENV PORT=4000
+ENV PORT=5000
 
-EXPOSE 4000
+EXPOSE 5000
 
-# Health check (wget is available in node:20-alpine)
-HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:4000/api/health || exit 1
-
-# Run with tsx (handles ESM + TypeScript natively)
-CMD ["tsx", "src/index.ts"]
+CMD ["node", "dist/index.js"]

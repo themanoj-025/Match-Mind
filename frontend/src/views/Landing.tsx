@@ -223,13 +223,13 @@ export const Landing: React.FC = () => {
               MatchMind Drafts brings high-concurrency auction bidding, real-time draft updates, and AI-powered roster suggestions together in a premium sports-broadcast interface.
             </motion.p>
             
-            <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-4 justify-center w-full sm:w-auto mb-16">
-              <Button className="w-full sm:w-auto px-8 py-4 text-sm font-medium bg-accent hover:bg-accent-bright cursor-pointer" onClick={() => navigate('/login')}>
+            <motion.div variants={itemVariants} className="flex flex-col md:flex-row items-center gap-4 justify-center w-full md:w-auto mb-16">
+              <Button className="w-full md:w-auto px-8 py-4 text-sm font-medium bg-accent hover:bg-accent-bright cursor-pointer" onClick={() => navigate('/login')}>
                 Enter Lobby <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
               <Button 
                 variant="ghost" 
-                className="w-full sm:w-auto px-8 py-4 text-sm font-medium border border-white/10 hover:bg-white/[0.02] flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full md:w-auto px-8 py-4 text-sm font-medium border border-white/10 hover:bg-white/[0.02] flex items-center justify-center gap-2 cursor-pointer"
                 onClick={() => scrollToSection('live-drafts')}
               >
                 <Play className="w-4 h-4 fill-current text-live-red animate-pulse" /> Watch Live Draft
@@ -385,7 +385,7 @@ export const Landing: React.FC = () => {
             {/* Flashscore style fixtures list */}
             <div className="border border-white/[0.04] bg-[#0c0d13]/30 backdrop-blur-md rounded-xl overflow-hidden divide-y divide-white/[0.04]">
               {filteredRooms.map((room, index) => (
-                <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 gap-4 hover:bg-white/[0.01] transition-all">
+                <div key={index} className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 gap-4 hover:bg-white/[0.01] transition-all">
                   <div className="flex items-center gap-3">
                     {/* Badge */}
                     <span className="w-8 h-8 rounded-lg bg-white/[0.03] border border-white/[0.06] flex items-center justify-center font-bold text-xs text-foreground-muted">
@@ -399,7 +399,7 @@ export const Landing: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-start">
+                  <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-start">
                     <span className="text-xs font-mono text-foreground-muted">{room.time}</span>
                     <div className="flex items-center gap-2">
                       <span className={`px-2 py-0.5 rounded text-[9px] font-bold tracking-wider ${

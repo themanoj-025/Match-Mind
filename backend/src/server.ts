@@ -57,12 +57,14 @@ app.set('io', io)
 
 // Health check route (before error handler)
 import { publicLimiter } from './middleware/rateLimiter'
+import { redis } from './lib/redis'
 app.get('/api/health', publicLimiter, async (req, res) => {
   const checks: Record<string, any> = {
     status: 'healthy',
     timestamp: new Date().toISOString(),
     checks: {
       database: { status: 'ok', type: 'postgres' },
+      redis: { status: 'ok' },
     },
   }
 
@@ -72,6 +74,19 @@ app.get('/api/health', publicLimiter, async (req, res) => {
   } catch {
     checks.checks.database.status = 'degraded'
     checks.checks.database.error = 'database connection failed'
+    checks.status = 'degraded'
+  }
+
+  // Check Redis connectivity
+  try {
+    if (redis.status === 'ready' || redis.status === 'connect') {
+      await redis.ping()
+    } else {
+      throw new Error('Redis not ready')
+    }
+  } catch {
+    checks.checks.redis.status = 'degraded'
+    checks.checks.redis.error = 'redis connection failed'
     checks.status = 'degraded'
   }
 
@@ -90,7 +105,7 @@ app.use(errorHandler)
 setupSocket(io, prisma)
 
 // Make prisma accessible to services for socket emission
-;(prisma as any)._app = app
+// Removed: (prisma as any)._app = app
 
 // ─── Auction Timer Expiry Check ────────────────────────────────────
 const AUCTION_TICK_INTERVAL_MS = 2000

@@ -4,6 +4,7 @@ import asyncHandler from '../middleware/asyncHandler'
 import { computeRoomLeaderboard } from '../services/leaderboardService'
 import type { AuthenticatedRequest } from '../middleware/auth'
 import logger from '../utils/logger'
+import { getCachedOrFetch } from '../utils/cache'
 import { openapiRegistry } from "../config/openapi";
 
 const router = express.Router()
@@ -19,37 +20,46 @@ router.get('/rooms/:roomId', asyncHandler(async (req, res) => {
   const prisma = req.app.get('prisma')
   const roomId = req.params.roomId as string
 
-  // Get the room to verify it exists
-  const room = await prisma.room.findUnique({
-    where: { id: roomId },
-    select: { id: true, tournamentId: true },
+  const cacheKey = `leaderboard:room:${roomId}`
+  const payload = await getCachedOrFetch(cacheKey, 60, async () => {
+    // Get the room to verify it exists
+    const room = await prisma.room.findUnique({
+      where: { id: roomId },
+      select: { id: true, tournamentId: true },
+    })
+    if (!room) {
+      return { error: 'ROOM_NOT_FOUND' }
+    }
+
+    // Fetch all fantasy points ledger entries for this room
+    const ledger = await prisma.fantasyPointsLedger.findMany({
+      where: { roomId },
+    })
+
+    // Fetch all roster entries for cost calculation
+    const rosters = await prisma.roster.findMany({
+      where: { roomId },
+      select: { userId: true, soldPrice: true },
+    })
+
+    // Compute the leaderboard as a derived view
+    const entries = computeRoomLeaderboard(ledger, roomId, rosters)
+
+    return {
+      roomId: room.id,
+      tournamentId: room.tournamentId,
+      entries,
+      totalFixtures: ledger.length > 0
+        ? new Set(ledger.map((l: any) => l.fixtureId)).size
+        : 0,
+    }
   })
-  if (!room) {
+
+  if (payload.error === 'ROOM_NOT_FOUND') {
     return res.status(404).json({ error: { code: 'ROOM_NOT_FOUND', message: 'Room not found' } })
   }
 
-  // Fetch all fantasy points ledger entries for this room
-  const ledger = await prisma.fantasyPointsLedger.findMany({
-    where: { roomId },
-  })
-
-  // Fetch all roster entries for cost calculation
-  const rosters = await prisma.roster.findMany({
-    where: { roomId },
-    select: { userId: true, soldPrice: true },
-  })
-
-  // Compute the leaderboard as a derived view
-  const entries = computeRoomLeaderboard(ledger, roomId, rosters)
-
-  res.json({
-    roomId: room.id,
-    tournamentId: room.tournamentId,
-    entries,
-    totalFixtures: ledger.length > 0
-      ? new Set(ledger.map((l: any) => l.fixtureId)).size
-      : 0,
-  })
+  res.json(payload)
 }))
 
 // GET /api/leaderboard/global — deprecated, redirects to a default tournament

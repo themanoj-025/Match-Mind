@@ -47,9 +47,9 @@ Browser (React + Vite)
        │                    └─────────┬──────────┘
        │                              │
        │                    ┌─────────┴──────────┐
-       │                    │  JSON Database      │
-       │                    │ (File-based)        │
-       │                    └────────────────────┘
+       │                    │  PostgreSQL DB      │
+       │                    │ (Prisma Client)     │
+       └────────────────────┴─────────────────────┘
 ```
 
 ## Architecture Overview
@@ -57,7 +57,8 @@ Browser (React + Vite)
 - **Frontend**: React SPA with client-side routing via React Router
 - **Backend**: Express REST API + Socket.IO for realtime
 - **State Management**: AppContext on frontend
-- **Database**: Custom JSON file-based database with atomic writes and backups
+- **Database**: PostgreSQL (via Prisma ORM, migrated from legacy JSON DB)
+- **Caching & Mutexes**: Redis for high-frequency auction bids and rate-limiting
 - **Auth**: JWT-based with Passport middleware
 
 ## Layer Breakdown
@@ -90,8 +91,8 @@ Browser (React + Vite)
 6. **Atomic Writes**: JSON DB ensures data integrity
 
 ## Key Architecture Decisions
-- JSON DB for simplicity (no external database dependency)
-- JWT for stateless authentication
-- Socket.IO for realtime auction and chat
-- AppContext for global React state management
-- Tailwind CSS for consistent styling
+- **PostgreSQL via Prisma**: Migrated from a local JSON database to a robust relational model to support high-concurrency tournament traffic.
+- **Redis & Distributed Locks (Mutex)**: Live auction bids use `redlock` mechanisms to strictly prevent race conditions when two managers bid on a player at the exact same millisecond.
+- **JWT**: Stateless authentication to allow horizontal scaling.
+- **Socket.IO**: Realtime bid broadcasting, anti-snipe timers, and chat.
+- **BullMQ**: Background job processing for heavy scoring calculations when matchdays conclude.

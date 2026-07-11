@@ -53,40 +53,63 @@
 
 ### Purpose
 
-MatchMind is a full-stack social sports prediction platform where fans predict match outcomes (win/lose/draw, scores), compete in leagues and on leaderboards, earn points for accuracy, chat in real-time during live matches, and access AI-powered insights. It combines real-time match simulation, social features, gamification, and subscription payments into a single web application.
+MatchMind Drafts is a premium, dark-mode, football-first live auction draft platform where fantasy-league managers bid in real time on players, manage their squad budgets, receive AI-powered squad recommendations, and track their standing on a global leaderboard. It combines real-time WebSockets for high-stakes bidding, social features, gamification, and Pro subscription payments into a single, highly-polished web application.
 
 ### Problem Being Solved
 
-Sports fans enjoy predicting match outcomes with friends, but existing platforms lack the combination of:
-- Real match data integration
-- Social competition (leagues, squads, friend-based leaderboards)
-- Skill-based scoring (confidence multipliers, bonus predictions)
-- Rich engagement features (streaks, tiers, achievements, referrals)
-- Real-time live match rooms with chat
-- AI-powered prediction insights
+Fantasy football managers often resort to clunky, outdated software or generic spreadsheet solutions for their pre-season drafts. Existing platforms lack the combination of:
+- Premium, dark-mode aesthetic akin to a financial trading terminal
+- Ultra-low latency real-time bidding mechanics
+- Squad budget tracking and financial constraints
+- Social competition (leagues, friend-based leaderboards, live chat)
+- AI-powered draft insights to spot undervalued players
 
-MatchMind attempts to solve all of these in a single platform.
+MatchMind Drafts solves all of these with a single, deeply engineered platform.
 
 ### Target Users
 
-- **Casual sports fans** who want to make predictions with friends
-- **Competitive predictors** who want to climb leaderboards and earn recognition
-- **League organizers** who want private prediction competitions
+- **Fantasy Football Managers** who want a premium live draft experience with their friends
+- **Competitive Strategists** who love managing budgets and squad depth
+- **League Organizers** who need a reliable, real-time platform to host their drafts
 - **Pro users** willing to pay for AI insights and premium features
+
+### 🎯 Core Game Mechanics & Features
+
+#### ⏱️ Live Drafts (Auction Room)
+The heart of MatchMind Drafts is the real-time auction room. Using low-latency WebSockets and Redis-backed distributed locks (Mutex), the platform strictly handles race conditions when multiple managers bid on a player at the exact same millisecond. 
+- **Anti-Snipe Timer:** Bids placed in the final seconds reset the countdown timer to prevent last-second sniping.
+- **Dynamic Increments:** Required bid increments scale algorithmically based on the current price of the player.
+
+#### 💰 The Player Pool & Budgets
+Managers are drafted into a room and given a strict **$100M salary cap**. 
+- **Roster Construction:** Each manager must fill a mandatory 15-man squad (2 GK, 5 DEF, 5 MID, 3 FWD).
+- **AI Draft Insights (Pro):** Subscribers get access to real-time AI heuristics powered by Anthropic's Claude to identify undervalued sleepers in the remaining player pool.
+
+#### 🏆 Leaderboards & Fantasy Points
+Post-draft, your squad's real-world performances map to the MatchMind fantasy points ledger.
+- **Room Standings:** Compete directly against your friends in private draft rooms.
+- **Global Standings:** A highly optimized Redis-cached global leaderboard ranks the best managers worldwide.
+
+#### 📜 Rules of the Pitch
+- **Blind Nominations:** The room host or the queue system algorithmically nominates players; you cannot guarantee when your target player will appear.
+- **Budget Lockout:** If a bid would prevent you from affording $1M minimums for your remaining required roster slots, the engine blocks the bid.
 
 ### Business Value
 
 - **Freemium model**: Free tier drives adoption; Pro tier ($4.99/month or $39.99/year) generates revenue via Stripe subscriptions
 - **Network effects**: League and squad features create social stickiness
-- **Engagement loops**: Watch → Predict → Compete → Talk → Earn → Repeat
+- **Engagement loops**: Scout → Bid → Draft → Win → Repeat
 
 ### Current Development Stage
 
-**Phase 4 of 4 — All phases complete per README:**
-- ✅ Phase 1: Foundations (design system, animation, auth pages, landing)
-- ✅ Phase 2: Social Features (chat, leagues, squads, profiles, achievements)
-- ✅ Phase 3: AI & Pro (ProGate, pricing, Stripe, admin dashboard, AI hints)
-- ✅ Phase 4: Scoring Engine (scoring, BullMQ, leaderboard resets, simulations)
+**Phase 7 of 7 — All phases complete as a 2026 Senior Engineering Portfolio Flagship:**
+- ✅ Phase 1: Foundations (dark-mode design system, auth pages, landing)
+- ✅ Phase 2: Social Features (chat, leagues, profiles, achievements)
+- ✅ Phase 3: AI & Pro (pricing, Stripe, admin dashboard, AI hints)
+- ✅ Phase 4: Core Engine (scoring, BullMQ, auction state, leaderboards)
+- ✅ Phase 5: Architecture (PostgreSQL migration, Docker, GitHub Actions)
+- ✅ Phase 6: Observability (Health checks, request tracing, metrics)
+- ✅ Phase 7: Polish (A11y, responsive breakpoints, reduced motion)
 
 ### Production Readiness
 
@@ -154,7 +177,7 @@ See [Project Roadmap](#31-project-roadmap).
 | TypeScript (TSX) | **Frontend: 100% TypeScript** — all pages, components, hooks, store, lib files are `.tsx`/`.ts` |
 | TypeScript | Backend: 100% TypeScript — all routes, middleware, services, workers, socket, workflows, utils, config, lib, repositories |
 | CSS | Frontend (custom design system + kinetic.css) |
-| JSON | Seed data in `backend/src/data/*.json` (25 files)
+| JSON | Config data in `backend/config/*.json`
 | YAML | GitHub Actions workflows, Docker Compose |
 
 ### Frameworks & Libraries
@@ -169,14 +192,14 @@ See [Dependencies](#24-dependencies) for complete listing.
 | **Anthropic Claude** | AI prediction hints | Implemented with heuristic fallback |
 | **Google OAuth** | Social login | Implemented via Passport.js |
 | **Redis** | BullMQ queue backend, rate limiting | Implemented with fallback to memory |
-| **PostgreSQL** | — | Not used — JSON DB is the production database |
+| **PostgreSQL** | Primary relational database | Implemented via Prisma ORM |
 | **Nodemailer** | Email sending | Configured but NOT implemented (tokens logged to console) |
 | **SportRadar API** | Live sports data | `SPORTRADAR_API_KEY` in env.example but NOT implemented in code |
 | **Cloudinary** | Media storage | `CLOUDINARY_URL` in env.example but NOT implemented in code |
 | **Sentry** | Error monitoring | ✅ **Implemented** — Backend (@sentry/node) + Frontend (@sentry/react) |
 | **PostHog** | Analytics | Listed in README but NOT implemented |
 | **Cloudflare** | CDN | Listed in README but NOT implemented |
-| **Supabase** | — | Not implemented — JSON DB is production-ready |
+| **Supabase** | — | Not implemented — PostgreSQL on Railway is used |
 
 > ⚠️ **Note:** Several services listed in the README (`SportRadar API`, `Cloudinary`, `PostHog`, `Cloudflare`, `Supabase`) have associated environment variables in `.env.example` but have **no implementation in the codebase**. They appear to be planned integrations that were not completed or were removed during development.
 > ✅ **Sentry IS now implemented** — both backend (`backend/instrument.ts`) and frontend (`frontend/src/lib/instrument.ts`) are configured.
@@ -195,8 +218,8 @@ See [Dependencies](#24-dependencies) for complete listing.
 | **Middleware Files** | 6 (backend, all .ts) |
 | **Configuration Files** | ~20 |
 | **Documentation Files** | 8 |
-| **Test Files** | 10+ (scoring, auth, predictions, rooms, auction engine, JSON DB atomic writes, leaderboard, e2e room lifecycle, e2e auction lifecycle, useApi, fantasy points) |
-| **JSON Data Files** | 25 (seed data for JSON database) |
+| **Test Files** | 10+ (scoring, auth, auction engine, leaderboard, e2e lifecycle) |
+| **JSON Data Files** | 0 (Migrated to PostgreSQL) |
 | **CI/CD Workflow Files** | 7 (GitHub Actions) |
 | **Script Files** | 3 (backend: assignPlayerPhotos, validateLeagueDataPackage, backup-data) |
 
@@ -207,7 +230,7 @@ See [Dependencies](#24-dependencies) for complete listing.
 | Frontend Views | 5 | View-level components (.tsx) |
 | Frontend Components | 3 | Reusable UI components (.tsx) |
 | Backend Routes | 16 | API route handlers (.ts) |
-| JSON Data Files | 25 | Database collections (JSON files in `backend/src/data/`) |
+| Database Schema | 1 | `backend/prisma/schema.prisma` |
 | Backend Middleware | 10 | Express middleware files (.ts) |
 | Backend Services | 8 | Business logic services (.ts) |
 
@@ -217,12 +240,12 @@ See [Dependencies](#24-dependencies) for complete listing.
 |------|-------------|-------------|
 | `frontend/src/App.tsx` | ~27 lines | Root component with client routing mapping |
 | `backend/src/services/scoring.ts` | ~300 lines | Core scoring engine |
-| `backend/src/lib/jsonDb.ts` | ~450 lines | JSON database adapter (Prisma-API-compatible, production database) |
+| `backend/prisma/schema.prisma` | ~150 lines | PostgreSQL schema definition |
 | `backend/src/services/simulation/simulationEngine.ts` | ~250 lines | Match simulation engine |
 | `backend/src/routes/admin.ts` | ~250 lines | Admin API routes |
 | `backend/src/routes/stripe.ts` | ~230 lines | Stripe webhook + payment routes |
 | `backend/scripts/assignPlayerPhotos.ts` | ~200 lines | Player photo URL assignment script |
-| `backend/src/index.ts` | ~220 lines | Server entry point (TypeScript, uses JSON DB) |
+| `backend/src/index.ts` | ~220 lines | Server entry point (TypeScript, connects to Postgres) |
 
 ---
 

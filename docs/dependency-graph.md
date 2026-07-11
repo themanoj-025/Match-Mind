@@ -103,6 +103,8 @@ frontend/src/main.tsx (Entry)
 | winston / pino | Logging |
 | zod | Schema validation |
 | vitest | Testing |
+| prisma | PostgreSQL ORM |
+| bullmq | Redis-backed job queues |
 
 ### Frontend (`frontend/package.json`)
 | Package | Purpose |
@@ -116,7 +118,7 @@ frontend/src/main.tsx (Entry)
 
 ## Critical Files (Backend)
 - **src/index.ts**: Server entry — orchestrates entire backend
-- **lib/jsonDb.ts**: Core data persistence — touches every entity
+- **prisma/schema.prisma**: Database schema — touches every entity
 - **services/auctionEngine.ts**: Auction logic — critical business engine
 - **services/draftService.ts**: Draft logic — core gameplay
 - **services/fantasyPoints.ts**: Points calculation — scoring integrity
