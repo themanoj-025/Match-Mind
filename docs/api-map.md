@@ -9,7 +9,7 @@
 | POST | `/api/auth/logout` | Revoke tokens, clear auth cookies | JWT |
 | POST | `/api/auth/logout-all` | Revoke all sessions | JWT |
 | GET | `/api/auth/google` | Google OAuth redirect | None |
-| GET | `/api/auth/google/cb` | Google OAuth callback → redirect to /feed | None |
+| GET | `/api/auth/google/cb` | Google OAuth callback → redirect to /lobby | None |
 | POST | `/api/auth/refresh` | Refresh access token via refreshToken | Refresh token |
 | POST | `/api/auth/forgot-password` | Generate password reset token | None |
 | POST | `/api/auth/reset-password` | Consume reset token, update password | Reset token |

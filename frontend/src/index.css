@@ -12,24 +12,31 @@
   --color-foreground-muted: #8A8F98;
   --color-foreground-subtle: rgba(255, 255, 255, 0.60);
 
-  --color-accent: #5E6AD2;
-  --color-accent-bright: #6872D9;
-  --color-accent-glow: rgba(94, 106, 210, 0.3);
+  --color-accent: #6366F1;
+  --color-accent-bright: #818CF8;
+  --color-accent-glow: rgba(99, 102, 241, 0.3);
 
   --color-border-default: rgba(255, 255, 255, 0.06);
   --color-border-hover: rgba(255, 255, 255, 0.10);
-  --color-border-accent: rgba(94, 106, 210, 0.30);
+  --color-border-accent: rgba(99, 102, 241, 0.30);
+
+  /* Football Accent Colors */
+  --color-pitch-green: #22C55E;
+  --color-live-red: #EF4444;
+  --color-card-yellow: #EAB308;
+  --color-gold: #F59E0B;
 
   --font-sans: "Inter", "Geist Sans", system-ui, sans-serif;
   
   --shadow-card: 0 0 0 1px rgba(255,255,255,0.06), 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2);
-  --shadow-card-hover: 0 0 0 1px rgba(255,255,255,0.1), 0 8px 40px rgba(0,0,0,0.5), 0 0 80px rgba(94,106,210,0.1);
-  --shadow-accent: 0 0 0 1px rgba(94,106,210,0.5), 0 4px 12px rgba(94,106,210,0.3), inset 0 1px 0 0 rgba(255,255,255,0.2);
+  --shadow-card-hover: 0 0 0 1px rgba(255,255,255,0.1), 0 8px 40px rgba(0,0,0,0.5), 0 0 80px rgba(99,102,241,0.1);
+  --shadow-accent: 0 0 0 1px rgba(99,102,241,0.5), 0 4px 12px rgba(99,102,241,0.3), inset 0 1px 0 0 rgba(255,255,255,0.2);
   --shadow-inner-highlight: inset 0 1px 0 0 rgba(255,255,255,0.1);
 
   --animate-float: float 10s ease-in-out infinite;
   --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-shimmer: shimmer 2s linear infinite;
+  --animate-marquee: marquee 30s linear infinite;
 
   @keyframes float {
     0%, 100% { transform: translateY(0) rotate(0deg); }
@@ -39,6 +46,11 @@
   @keyframes shimmer {
     0% { background-position: 200% 0; }
     100% { background-position: -200% 0; }
+  }
+
+  @keyframes marquee {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-50%); }
   }
 }
 
@@ -68,7 +80,7 @@
 }
 
 @utility text-gradient-accent {
-  background-image: linear-gradient(to right, #5E6AD2, #818cf8, #5E6AD2);
+  background-image: linear-gradient(to right, #6366F1, #818cf8, #6366F1);
   -webkit-background-clip: text;
   color: transparent;
   background-size: 200% auto;
@@ -79,4 +91,16 @@
   to {
     background-position: 200% center;
   }
+}
+
+/* Football pitch line background overlay utility */
+@utility bg-pitch-lines {
+  background-image: 
+    /* Center Circle */
+    radial-gradient(circle at center, transparent 79px, rgba(255, 255, 255, 0.015) 80px, rgba(255, 255, 255, 0.015) 81px, transparent 82px),
+    /* Halfway line */
+    linear-gradient(to right, transparent calc(50% - 1px), rgba(255, 255, 255, 0.015) calc(50% - 1px), rgba(255, 255, 255, 0.015) calc(50% + 1px), transparent calc(50% + 1px));
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
 }

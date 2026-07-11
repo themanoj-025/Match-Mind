@@ -1,42 +1,14 @@
 # Routes — Match-Mind
 
-## Frontend Routes (React Router — inferred from page components)
+## Frontend Routes (React Router)
 
-### Public Routes
-| Route | Page Component | Purpose | Auth |
-|-------|---------------|---------|------|
-| `/` | LandingPage | Landing / Home | No |
-| `/login` | LoginPage | User login | No |
-| `/signup` | SignupPage | User registration | No |
-| `/forgot-password` | ForgotPasswordPage | Password recovery | No |
-| `/reset-password` | ResetPasswordPage | Password reset | No |
-| `/verify-email` | VerifyEmailPage | Email verification | No |
-| `/pricing` | PricingPage | Subscription plans | No |
-| `/about` | AboutPage | About us | No |
-| `/faq` | FAQPage | FAQ | No |
-| `/search` | SearchPage | Global search | No |
-
-### Protected Routes
-| Route | Page Component | Purpose | Auth |
-|-------|---------------|---------|------|
-| `/dashboard` | DashboardPage | User dashboard | Yes |
-| `/profile` | ProfilePage | User profile | Yes |
-| `/my-profile` | MyProfilePage | My profile settings | Yes |
-| `/settings` | SettingsPage | Account settings | Yes |
-| `/messages` | MessagesPage | Direct messages | Yes |
-| `/notifications` | NotificationsPage | Notifications | Yes |
-| `/achievements` | AchievementsPage | Achievements | Yes |
-| `/leaderboard` | LeaderboardPage | Leaderboard | Yes |
-| `/live-hub` | LiveHubPage | Live match hub | Yes |
-| `/match-center` | MatchCenterPage | Match center | Yes |
-| `/match/:id` | MatchRoomPage | Match detail | Yes |
-| `/players/:id` | PlayerProfilePage | Player detail | Yes |
-| `/franchise` | FranchisePage | User's team | Yes |
-| `/rooms` | RoomLobbyPage | Room lobby | Yes |
-| `/rooms/create` | RoomWizardPage | Create room | Yes |
-| `/rooms/:id` | AuctionRoomPage | Auction room | Yes |
-| `/draft/:sessionId` | DraftSessionPage | Draft session | Yes |
-| `/admin` | AdminPage | Admin panel | Admin |
+| Route | View Component | Purpose | Auth |
+|-------|----------------|---------|------|
+| `/` | Landing | Landing / Home | No |
+| `/login` | Auth | User Authentication (Login & Signup) | No |
+| `/lobby` | Lobby | Room Lobby (Create/join rooms) | Yes |
+| `/room/:roomId` | DraftRoom | Real-time Auction & Draft Room | Yes |
+| `/leaderboard` | Leaderboard | Global Rankings Leaderboard | Yes |
 
 ---
 

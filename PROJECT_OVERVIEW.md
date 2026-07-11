@@ -204,8 +204,8 @@ See [Dependencies](#24-dependencies) for complete listing.
 
 | Module | File Count | Description |
 |--------|------------|-------------|
-| Frontend Pages | 44 | Page-level components (.tsx) |
-| Frontend Components | 48 | Reusable UI components (.tsx, incl. kinetic + three) |
+| Frontend Views | 5 | View-level components (.tsx) |
+| Frontend Components | 3 | Reusable UI components (.tsx) |
 | Backend Routes | 16 | API route handlers (.ts) |
 | JSON Data Files | 25 | Database collections (JSON files in `backend/src/data/`) |
 | Backend Middleware | 10 | Express middleware files (.ts) |
@@ -215,7 +215,7 @@ See [Dependencies](#24-dependencies) for complete listing.
 
 | File | Size (est.) | Description |
 |------|-------------|-------------|
-| `frontend/src/App.tsx` | ~200 lines | Root component with 44+ route definitions |
+| `frontend/src/App.tsx` | ~27 lines | Root component with client routing mapping |
 | `backend/src/services/scoring.ts` | ~300 lines | Core scoring engine |
 | `backend/src/lib/jsonDb.ts` | ~450 lines | JSON database adapter (Prisma-API-compatible, production database) |
 | `backend/src/services/simulation/simulationEngine.ts` | ~250 lines | Match simulation engine |
@@ -330,106 +330,26 @@ backend/
 
 ```
 frontend/
-├── package.json                 # Dependencies: react, framer-motion, zustand, three.js, etc.
-├── vite.config.js               # Vite config: React plugin, Tailwind CSS, proxy, chunk splitting
-├── vercel.json                  # Vercel deployment: build command, API rewrites, headers
-├── eslint.config.js             # ESLint flat config: React hooks, React refresh
-├── index.html                   # HTML entry: SEO meta, Open Graph, PWA manifest, fonts, structured data
-├── public/
-│   ├── manifest.json            # PWA manifest
-│   └── sw.js                    # Service worker
+├── package.json                 # Dependencies: react, framer-motion, tailwindcss, socket.io-client, etc.
+├── vite.config.ts               # Vite configuration with Tailwind CSS support
+├── index.html                   # HTML entry point
 └── src/
-    ├── main.jsx                 # React entry: QueryClient, BrowserRouter, HelmetProvider
-    ├── App.jsx                  # Root: Navbar, BottomNav, LiveTicker, routes (36+), lazy loading, Framer Motion transitions
-    ├── index.css                # Design system: CSS variables, typography, animations, utility classes
-    ├── store/
-    │   └── useStore.ts          # ⭐ TypeScript Zustand store: auth, UI state, live matches, chat, notifications, predictions, leaderboard
-    ├── hooks/
-    │   ├── useApi.ts            # ⭐ TypeScript React Query hooks: 40+ hooks, auto token refresh, singleton refresh pattern
-    │   └── useApi.test.ts       # ⭐ API hook tests (9 test cases: success, error, 401 refresh, redirect, concurrency)
-    ├── components/
-    │   ├── Navbar.jsx           # Top navigation: logo, links, auth buttons, search, notifications, user menu
-    │   ├── BottomNav.jsx        # Mobile bottom navigation bar
-    │   ├── LiveTicker.jsx       # Scrolling ticker of live match scores
-    │   ├── MatchCard.jsx        # Match preview card component
-    │   ├── ScoreDisplay.jsx     # Animated score display (flash on change)
-    │   ├── PredictionCard.jsx   # Prediction result card
-    │   ├── ChatMessage.jsx      # Enhanced chat message with reactions, GIFs, pin, report, tiers
-    │   ├── LeaderboardRow.jsx   # Leaderboard table row
-    │   ├── PointsToast.jsx      # Points earned overlay notification
-    │   ├── SportBadge.jsx       # Sport color-coded badge
-    │   ├── SportIcon.jsx        # Sport icon component
-    │   ├── LiveBadge.jsx        # Pulsing LIVE indicator
-    │   ├── UserAvatar.jsx       # User avatar with tier border styling
-    │   ├── TierBadge.jsx        # Tier badge display
-    │   ├── AchievementBadge.jsx # Achievement badge display
-    │   ├── GamificationStrip.jsx # Gamification progress strip
-    │   ├── NotificationBell.jsx # Unread notification count bell
-    │   ├── QuickChatFeed.jsx    # Global floating chat drawer
-    │   ├── CommandPalette.jsx   # ⌘K command palette
-    │   ├── ProGate.jsx          # Pro content blur overlay with upgrade CTA
-    │   ├── ProgressBar.jsx      # Reusable progress bar
-    │   ├── SkeletonCard.jsx     # Loading skeleton card
-    │   ├── EmptyState.jsx       # Empty state with illustration
-    │   ├── ErrorBoundary.jsx    # React error boundary (catches rendering errors)
-    │   ├── ErrorState.jsx       # Error state display
-    │   ├── ConfirmModal.jsx     # Confirmation modal dialog
-    │   ├── Tooltip.jsx          # Radix tooltip wrapper
-    │   ├── Chip.jsx             # Reusable chip/tag component
-    │   ├── StatBar.jsx          # Statistics bar component
-    │   ├── CommunityPollWidget.jsx # Community poll component
-    │   ├── PremiumLoadingScreen.jsx # Initial loading screen with animation
-    │   └── three/
-    │       ├── HeroScene.jsx     # WebGL detection + lazy loading of Three.js scene
-    │       └── HeroSceneImpl.jsx # Three.js particle field (200 particles, 3D)
-    ├── lib/
-    │   ├── types.ts             # ⭐ Shared TypeScript types (User, Match, Prediction, Leaderboard, etc.)
-    │   ├── kinetic.ts           # ⭐ Kinetic typography motion primitives (Framer Motion variants + utilities)
-    │   ├── kinetic.css          # Kinetic typography styles
-    │   ├── instrument.js        # Sentry frontend instrumentation
-    │   └── animation/
-    │       ├── variants.js      # 18 Framer Motion animation variant sets
-    │       └── gsap.js          # 10 GSAP utility functions
-    └── pages/
-        ├── LandingPage.jsx      # / — Three.js hero, GSAP count-up stats, feature sections
-        ├── LoginPage.jsx        # /login — Framer Motion form, forgot password link
-        ├── SignupPage.jsx       # /signup — Password strength meter, username availability check
-        ├── FeedPage.jsx         # /feed — Personalized match feed for logged-in users
-        ├── LiveHubPage.jsx      # /live — All live/upcoming/finished matches with filtering
-        ├── MatchRoomPage.jsx    # /live/:matchId — 3-panel: stats + chat + predictions
-        ├── ScoresPage.jsx       # /scores — Fixture list by competition
-        ├── PredictionsPage.jsx  # /predictions — Dashboard with prediction stats and history
-        ├── MakePredictionPage.jsx # /predictions/new/:matchId — Score widget, AI hint, markets
-        ├── LeaderboardPage.jsx  # /leaderboard — Global podium + filterable table
-        ├── LeaguesPage.jsx      # /leagues — Private league hub
-        ├── CreateLeaguePage.jsx # /leagues/create — League creation form
-        ├── LeagueRoomPage.jsx   # /leagues/:leagueId — 4-tab: standings, chat, predictions, about
-        ├── SquadsPage.jsx       # /squads — Friend group hub
-        ├── SquadPage.jsx        # /squads/:squadId — 4-tab: rankings, chat, activity, members
-        ├── ExplorePage.jsx      # /explore — Trending matches, sports, competitions
-        ├── HighlightsPage.jsx   # /highlights — Video highlights grid
-        ├── ProfilePage.jsx      # /profile/:userId — Cover banner, stats, 4 tabs
-        ├── MyProfilePage.jsx    # /profile/me — Progress, locked achievements, quick links
-        ├── SettingsPage.jsx     # /profile/me/settings — Pro management, billing portal
-        ├── NotificationsPage.jsx # /profile/me/notifications — Filter tabs, mark read
-        ├── AchievementsPage.jsx # /achievements — Rarity filters, 12 badges, progress
-        ├── ActivityPage.jsx     # /activity — My Activity + Following's Activity
-        ├── MessagesPage.jsx     # /messages — Direct messaging
-        ├── StandingsPage.jsx    # /standings/:sport — League standings table
-        ├── TeamPage.jsx         # /teams/:teamId — Team fixtures + fans
-        ├── PlayerPage.jsx       # /players/:playerId — Player stats
-        ├── SearchPage.jsx       # /search — Global search results
-        ├── AdminPage.jsx        # /admin — KPI cards, Recharts charts, user/matches/reports tables
-        ├── PricingPage.jsx      # /pricing — Monthly/annual toggle, Stripe checkout, FAQ
-        ├── OnboardingPage.jsx   # /onboarding — 4-step wizard: sports → teams → predictors → profile
-        ├── auth/
-        │   ├── ForgotPasswordPage.jsx  # /forgot-password
-        │   ├── ResetPasswordPage.jsx   # /reset-password
-        │   └── VerifyEmailPage.jsx     # /verify-email
-        └── static/
-            ├── AboutPage.jsx    # /about — Mission, GSAP count-up, team grid
-            ├── FAQPage.jsx      # /faq — 6-category searchable accordion
-            └── NotFoundPage.jsx # * — Animated 404 page
+    ├── main.tsx                 # React application entry point
+    ├── App.tsx                  # Root component with routing and providers
+    ├── App.css                  # Custom styling
+    ├── index.css                # Global Tailwind CSS configurations
+    ├── context/
+    │   └── AppContext.tsx       # Global application context provider and auth state management
+    ├── components/              # Common UI components
+    │   ├── Button.tsx
+    │   ├── Card.tsx
+    │   └── Input.tsx
+    └── views/                   # Route-level view components
+        ├── Landing.tsx          # App landing view
+        ├── Auth.tsx             # Login / signup view
+        ├── Lobby.tsx            # Draft rooms lobby view (create/join room)
+        ├── DraftRoom.tsx        # Live draft/auction room console view
+        └── Leaderboard.tsx      # Global standings ranking view
 ```
 
 ---
@@ -1650,8 +1570,8 @@ The `Session` model stores refresh tokens but is **not used** for token validati
 
 | Variable | Purpose | Default | Notes |
 |----------|---------|---------|-------|
-| `PORT` | Backend server port | `4000` | — |
-| `BACKEND_URL` | Backend URL for callbacks | `http://localhost:4000` | Used in Google OAuth |
+| `PORT` | Backend server port | `5000` | — |
+| `BACKEND_URL` | Backend URL for callbacks | `http://localhost:5000` | Used in Google OAuth |
 | `FRONTEND_URL` | Frontend URL for CORS | `http://localhost:3000` | Also used in Stripe redirects |
 | `NODE_ENV` | Environment | `development` | Controls secure cookies, error stack traces |
 | `JWT_REFRESH_SECRET` | Refresh token signing secret | None (process exits if missing) | 🔴 Required — must be distinct from JWT_SECRET |

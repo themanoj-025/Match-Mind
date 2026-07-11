@@ -49,19 +49,11 @@ WATCH → PREDICT → COMPETE → TALK → EARN → REPEAT
 |------------|---------|
 | **React 19 + Vite 8** | UI framework and build tool |
 | **Tailwind CSS v4** | Utility-first styling |
-| **Zustand** | Global state management |
-| **React Query** | Server state & caching |
-| **React Router v6** | Routing with lazy loading |
+| **React Router v7** | Client-side routing |
 | **Socket.io-client** | Real-time WebSocket communication |
-| **Framer Motion** | Page/component animations (18 variant sets) |
-| **GSAP** | Scroll-triggered animations, count-ups, timeline reveals |
-| **Three.js + React Three Fiber** | 3D particle hero scene |
-| **Recharts** | Charts & data visualization (admin dashboard) |
+| **Framer Motion** | View & component transitions |
 | **Lucide React** | Icon library |
-| **react-helmet-async** | SEO meta tags & structured data |
-| **React Hook Form + Zod** | Form validation |
-| **Sonner** | Toast notifications |
-| **@stripe/react-stripe-js** | Stripe Checkout integration |
+| **clsx + tailwind-merge** | Class name utility |
 
 ### Backend
 | Technology | Purpose |
@@ -107,77 +99,24 @@ Match Mind/
 │
 ├── frontend/                         # React + Vite SPA
 │   ├── package.json
-│   ├── vite.config.js
+│   ├── vite.config.ts
 │   └── src/
-│       ├── main.jsx                  # Entry point with providers
-│       ├── App.jsx                   # Root component with routing (36+ routes)
-│       ├── index.css                 # Design system tokens & styles
-│       ├── lib/                      # Shared utilities
-│       │   └── animation/
-│       │       ├── variants.js       # 18 Framer Motion variant sets
-│       │       └── gsap.js           # 10 GSAP utility functions
-│       ├── store/
-│       │   └── useStore.js           # Zustand global store
-│       ├── components/
-│       │   ├── three/
-│       │   │   ├── HeroScene.jsx     # WebGL detection + lazy loading
-│       │   │   └── HeroSceneImpl.jsx # 200-particle 3D field
-│       │   ├── Navbar.jsx            # Top navigation
-│       │   ├── BottomNav.jsx         # Mobile bottom navigation
-│       │   ├── LiveTicker.jsx        # Scrolling live scores ticker
-│       │   ├── ErrorBoundary.jsx     # Error boundary for lazy routes
-│       │   ├── MatchCard.jsx         # Match preview card
-│       │   ├── ScoreDisplay.jsx      # Animated score display
-│       │   ├── SportBadge.jsx        # Sport color-coded badge
-│       │   ├── LiveBadge.jsx         # Pulsing LIVE indicator
-│       │   ├── ChatMessage.jsx       # Enhanced: reactions, GIFs, pin, report, tiers
-│       │   ├── PredictionCard.jsx    # Prediction result card
-│       │   ├── LeaderboardRow.jsx    # Leaderboard table row
-│       │   ├── PointsToast.jsx       # Points earned overlay
-│       │   ├── ProGate.jsx           # Pro content blur + upgrade overlay
-│       │   ├── AchievementBadge.jsx  # Achievement badge display
-│       │   ├── UserAvatar.jsx        # User avatar with tier border
-│       │   ├── SkeletonCard.jsx      # Loading skeleton
-│       │   ├── EmptyState.jsx        # Empty state with illustration
-│       │   ├── NotificationBell.jsx  # Unread notification count
-│       │   └── Tooltip.jsx           # Radix tooltip wrapper
-│       └── pages/
-│           ├── LandingPage.jsx        # / — Three.js hero, GSAP stats
-│           ├── LoginPage.jsx          # /login — Framer Motion, forgot password
-│           ├── SignupPage.jsx         # /signup — Password strength, username check
-│           ├── ForgotPasswordPage.jsx # /forgot-password
-│           ├── ResetPasswordPage.jsx  # /reset-password
-│           ├── VerifyEmailPage.jsx    # /verify-email
-│           ├── OnboardingPage.jsx     # /onboarding — 4-step wizard
-│           ├── PricingPage.jsx        # /pricing — Monthly/annual, Stripe checkout
-│           ├── FeedPage.jsx           # /feed
-│           ├── LiveHubPage.jsx        # /live
-│           ├── MatchRoomPage.jsx      # /live/:matchId — ⭐ 3-panel: stats+chat+preds
-│           ├── ScoresPage.jsx         # /scores
-│           ├── PredictionsPage.jsx    # /predictions
-│           ├── MakePredictionPage.jsx # /predictions/new/:matchId
-│           ├── LeaderboardPage.jsx    # /leaderboard — Podium + table
-│           ├── LeaguesPage.jsx        # /leagues
-│           ├── CreateLeaguePage.jsx   # /leagues/create
-│           ├── LeagueRoomPage.jsx     # /leagues/:leagueId — 4-tab: standings/chat/preds/about
-│           ├── SquadsPage.jsx         # /squads
-│           ├── SquadPage.jsx          # /squads/:squadId — 4-tab: rankings/chat/activity/members
-│           ├── ExplorePage.jsx        # /explore
-│           ├── HighlightsPage.jsx     # /highlights
-│           ├── ProfilePage.jsx        # /profile/:userId — Cover, stats, tabs
-│           ├── MyProfilePage.jsx      # /profile/me — Progress, achievements
-│           ├── SettingsPage.jsx       # /profile/me/settings — Pro management, billing
-│           ├── NotificationsPage.jsx  # /profile/me/notifications — Filter tabs
-│           ├── AchievementsPage.jsx   # /achievements — Rarity filters, 12 badges
-│           ├── ActivityPage.jsx       # /activity — My/Following tabs
-│           ├── StandingsPage.jsx      # /standings/:sport
-│           ├── TeamPage.jsx           # /teams/:teamId
-│           ├── PlayerPage.jsx         # /players/:playerId
-│           ├── SearchPage.jsx         # /search
-│           ├── AdminPage.jsx          # /admin — KPI cards, charts, user/reports tables
-│           ├── AboutPage.jsx          # /about — Mission, GSAP stats
-│           ├── FAQPage.jsx            # /faq — Searchable accordion
-│           └── NotFoundPage.jsx       # * — Animated 404
+│       ├── main.tsx                  # React entry point
+│       ├── App.tsx                   # App routes mapping views
+│       ├── index.css                 # Global styling + Tailwind CSS import
+│       ├── App.css                   # Component-specific styles
+│       ├── context/
+│       │   └── AppContext.tsx        # App state context provider & auth logic
+│       ├── components/               # Common UI elements
+│       │   ├── Button.tsx
+│       │   ├── Card.tsx
+│       │   └── Input.tsx
+│       └── views/                    # View pages
+│           ├── Landing.tsx           # / - App Landing Page
+│           ├── Auth.tsx              # /login - Login / Signup form view
+│           ├── Lobby.tsx             # /lobby - Room lobby view (create/join room)
+│           ├── DraftRoom.tsx         # /room/:roomId - Live draft/auction room console
+│           └── Leaderboard.tsx       # /leaderboard - Global standings view
 │
 └── backend/                          # Node.js + Express 5 API (TypeScript)
     ├── package.json

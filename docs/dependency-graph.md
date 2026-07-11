@@ -78,23 +78,12 @@ backend/src/index.ts (Server Entry)
 ```
 frontend/src/main.tsx (Entry)
   └── App.tsx
-        ├── pages/*.tsx (All page components)
-        │     ├── components/*.tsx (Reusable components)
-        │     │     ├── components/kinetic/*.tsx
-        │     │     └── components/three/*.tsx
-        │     ├── hooks/useApi.ts → API calls
-        │     ├── hooks/useAuctionSocket.ts → Socket.IO
-        │     ├── hooks/useDraft.ts → Draft logic
-        │     └── store/useStore.ts → Zustand state
-        │
-        ├── components/Navbar.tsx
-        ├── components/BottomNav.tsx
+        ├── context/AppContext.tsx (Global state provider & API logic)
+        ├── views/*.tsx (Landing, Auth, Lobby, DraftRoom, Leaderboard)
+        │     ├── components/ (Button, Card, Input)
+        │     └── context/AppContext.tsx
         └── lib/
-              ├── types.ts ──── Shared types
-              ├── tournaments.ts ── Tournament helpers
-              ├── kinetic.ts ────── Kinetic animations
-              ├── instrument.ts ─── Frontend monitoring
-              └── animation/ ────── GSAP + variants
+              └── utils.ts (Tailwind CSS merge helper)
 ```
 
 ## External Dependencies
@@ -120,14 +109,10 @@ frontend/src/main.tsx (Entry)
 |---------|---------|
 | react, react-dom | UI framework |
 | react-router-dom | Client-side routing |
-| zustand | State management |
-| socket.io-client | WebSocket client |
+| lucide-react | Icon library |
+| framer-motion | Animation library |
 | tailwindcss | Utility-first CSS |
-| gsap | Animations |
-| three, @react-three/fiber | 3D rendering |
-| react-query / swr | Data fetching |
-| framer-motion | Motion components |
-| vitest, testing-library | Testing |
+| vitest | Testing |
 
 ## Critical Files (Backend)
 - **src/index.ts**: Server entry — orchestrates entire backend
@@ -140,6 +125,5 @@ frontend/src/main.tsx (Entry)
 
 ## Critical Files (Frontend)
 - **src/App.tsx**: Root component — routes and providers
-- **src/store/useStore.ts**: Global state — used by all pages
-- **src/hooks/useApi.ts**: API client — all backend communication
-- **src/hooks/useAuctionSocket.ts**: Socket client — realtime features
+- **src/context/AppContext.tsx**: Application context provider — handles authentication state, global variables, and alerts
+- **src/views/DraftRoom.tsx**: Real-time bidding console, draft player lists, and AI auction advice display

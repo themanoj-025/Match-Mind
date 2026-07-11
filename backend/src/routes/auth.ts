@@ -122,7 +122,7 @@ router.get('/google/cb', passport.authenticate('google', { session: false }), (r
   const tokens = generateTokens(googleUser.id, googleUser.tokenVersion)
   setAuthCookies(res, tokens)
   // Also set a CSRF token cookie for the client
-  res.redirect(`${env.FRONTEND_URL}/feed`)
+  res.redirect(`${env.FRONTEND_URL}/lobby`)
 })
 
 // POST /api/auth/refresh

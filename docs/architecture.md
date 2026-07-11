@@ -56,7 +56,7 @@ Browser (React + Vite)
 - **Pattern**: Layered architecture (Routes → Services → Repositories → Data)
 - **Frontend**: React SPA with client-side routing via React Router
 - **Backend**: Express REST API + Socket.IO for realtime
-- **State Management**: Zustand on frontend
+- **State Management**: AppContext on frontend
 - **Database**: Custom JSON file-based database with atomic writes and backups
 - **Auth**: JWT-based with Passport middleware
 
@@ -76,11 +76,10 @@ Browser (React + Vite)
 ### Frontend Layers
 | Layer | Directory | Responsibility |
 |-------|-----------|----------------|
-| Pages | pages/ | Route-level page components |
-| Components | components/ | Reusable UI components |
-| Hooks | hooks/ | Custom React hooks (API calls, WebSocket, draft) |
-| Store | store/ | Zustand state management |
-| Lib | lib/ | Types, utilities, animation configs |
+| Views | views/ | Route-level view components (Landing, Auth, Lobby, DraftRoom, Leaderboard) |
+| Components | components/ | Reusable UI components (Button, Card, Input) |
+| Context | context/ | Global state context provider (AppContext) |
+| Lib | lib/ | Utilities |
 
 ## Design Patterns
 1. **Layered Architecture**: Clear separation of concerns
@@ -94,6 +93,5 @@ Browser (React + Vite)
 - JSON DB for simplicity (no external database dependency)
 - JWT for stateless authentication
 - Socket.IO for realtime auction and chat
-- Zustand for lightweight state management
+- AppContext for global React state management
 - Tailwind CSS for consistent styling
-- Three.js for 3D hero scene on landing page
