@@ -99,12 +99,9 @@ export function loadFormations(): Formation[] {
     const path = require('path')
     const raw = fs.readFileSync(path.join(__dirname, '..', 'data', 'formations.json'), 'utf-8')
     _formations = JSON.parse(raw)
-  } catch {
-    // Fallback hardcoded formations
-    _formations = [
-      { id: '4-3-3', name: '4-3-3', slots: [{ position: 'GK', count: 1 }, { position: 'DEF', count: 4 }, { position: 'MID', count: 3 }, { position: 'FWD', count: 3 }], benchSlots: 7 },
-      { id: '4-4-2', name: '4-4-2', slots: [{ position: 'GK', count: 1 }, { position: 'DEF', count: 4 }, { position: 'MID', count: 4 }, { position: 'FWD', count: 2 }], benchSlots: 7 },
-    ]
+  } catch (err: any) {
+    logger.fatal({ event: 'draft.formations_load_failed', err: err.message }, 'Failed to load formations.json from data directory')
+    throw new Error(`CRITICAL_CONFIGURATION_ERROR: Formations data missing or corrupted: ${err.message}`)
   }
   return _formations!
 }

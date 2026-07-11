@@ -3,13 +3,27 @@ import { Redis } from 'ioredis'
 import logger from '../utils/logger'
 
 if (!env.REDIS_URL) {
-  logger.fatal({ event: 'redis.missing_url' }, 'REDIS_URL is strictly required')
-  process.exit(1)
+  if (process.env.NODE_ENV === 'test') {
+    logger.warn({ event: 'redis.missing_url' }, 'REDIS_URL is missing in test mode. Redis commands will be bypassed.')
+  } else {
+    logger.fatal({ event: 'redis.missing_url' }, 'REDIS_URL is strictly required')
+    process.exit(1)
+  }
 }
 
-export const redis = new Redis(env.REDIS_URL, {
-  maxRetriesPerRequest: null, // Required by BullMQ
-})
+export const redis = env.REDIS_URL
+  ? new Redis(env.REDIS_URL, {
+      maxRetriesPerRequest: null, // Required by BullMQ
+    })
+  : ({
+      status: 'disconnected',
+      on: () => {},
+      set: async () => null,
+      get: async () => null,
+      eval: async () => 0,
+      incr: async () => 1,
+      expire: async () => true,
+    } as any)
 
 redis.on('error', (err) => {
   logger.error({ event: 'redis.error', err: err.message }, 'Redis connection error')

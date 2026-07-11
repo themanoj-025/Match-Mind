@@ -9,6 +9,8 @@ import { env } from '../config/env'
  * Security: Requires authentication + Pro check + rate limiting.
  */
 
+import { redis } from '../lib/redis'
+import crypto from 'crypto'
 import express from 'express'
 import { openapiRegistry } from '../config/openapi'
 import { authenticateToken } from '../middleware/auth'
@@ -92,28 +94,58 @@ router.post('/auction-advice', authenticateToken, aiPredictionLimiter, asyncHand
     if (need > 0) positionNeeds[pos] = need
   }
 
-  // Try Anthropic SDK if configured
+  // Try Anthropic SDK if configured (with Redis caching)
+
+  const rosterStr = JSON.stringify(roster.map((r: any) => `${r.playerId || r.id}:${r.soldPrice}`))
+  const poolStr = JSON.stringify(poolPlayers.map((p: any) => p.id).sort())
+  const hashInput = `${rosterStr}:${member.remainingBudget}:${poolStr}`
+  const hash = crypto.createHash('sha256').update(hashInput).digest('hex').substring(0, 16)
+  const cacheKey = `ai:advice:${roomId}:${req.userId}:${hash}`
+
   let advice: any = null
-  if (env.ANTHROPIC_API_KEY) {
+  let cacheHit = false
+
+  const isRedisConnected = redis && (redis.status === 'ready' || redis.status === 'connect')
+  if (isRedisConnected) {
     try {
-      advice = await getAnthropicAdvice(roster, member.remainingBudget, positionNeeds, poolPlayers, room.rosterRules)
+      const cached = await redis.get(cacheKey)
+      if (cached) {
+        advice = JSON.parse(cached)
+        cacheHit = true
+        logger.info({ event: 'ai.advice_cache_hit', roomId, userId: req.userId }, 'AI advice returned from Redis cache')
+      }
     } catch (err: any) {
-      logger.error({ event: 'ai.anthropic_advice_error', roomId, err: err.message }, 'Anthropic API error')
+      logger.error({ event: 'ai.cache_get_error', err: err.message }, 'Failed to read AI advice cache')
     }
   }
 
-  if (advice) {
-    return res.json({
-      isProFeature: false,
-      advice,
-    })
+  if (!advice) {
+    if (env.ANTHROPIC_API_KEY) {
+      try {
+        advice = await getAnthropicAdvice(roster, member.remainingBudget, positionNeeds, poolPlayers, room.rosterRules)
+      } catch (err: any) {
+        logger.error({ event: 'ai.anthropic_advice_error', roomId, err: err.message }, 'Anthropic API error')
+      }
+    }
+
+    if (!advice) {
+      advice = generateHeuristicAdvice(roster, member.remainingBudget, positionNeeds, poolPlayers)
+    }
+
+    if (advice && isRedisConnected) {
+      try {
+        await redis.set(cacheKey, JSON.stringify(advice), 'EX', 600) // 10 minutes cache
+        logger.info({ event: 'ai.advice_cached', roomId, userId: req.userId }, 'AI advice cached in Redis')
+      } catch (err: any) {
+        logger.error({ event: 'ai.cache_set_error', err: err.message }, 'Failed to write AI advice cache')
+      }
+    }
   }
 
-  // Fallback heuristic advice
-  advice = generateHeuristicAdvice(roster, member.remainingBudget, positionNeeds, poolPlayers)
   res.json({
     isProFeature: false,
     advice,
+    cacheHit,
   })
 }))
 

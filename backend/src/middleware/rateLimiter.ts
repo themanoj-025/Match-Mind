@@ -12,12 +12,14 @@ import { env } from '../config/env'
  * Shares one Redis client across all limiters when available.
  * Falls back to in-memory store if Redis is unavailable.
  */
+import logger from '../utils/logger'
 import rateLimit from 'express-rate-limit'
 import type { Request, Response, NextFunction } from 'express'
 
 let RedisStore: any = null
 try {
-  RedisStore = require('rate-limit-redis')
+  const rlr = require('rate-limit-redis')
+  RedisStore = rlr.default || rlr.RedisStore || rlr
 } catch {
   // Fall back to built-in memory store
 }
@@ -25,19 +27,150 @@ try {
 // ─── Shared Redis client (created once, reused by all limiters) ─────
 
 let sharedRedisClient: any = null
+let redisStoreBacking = 'local-fallback'
+
 try {
   const redis = require('redis')
   sharedRedisClient = redis.createClient({
     url: env.REDIS_URL || 'redis://localhost:6379',
-    enableReadyCheck: false,
+    socket: {
+      reconnectStrategy: (retries: number) => {
+        // Exponential backoff capped at 3000ms
+        const delay = Math.min(retries * 100, 3000)
+        logger.info({ event: 'redis.reconnect_strategy', retries, delay }, `Redis reconnect attempt ${retries}; waiting ${delay}ms`)
+        return delay
+      }
+    }
   })
-  sharedRedisClient.connect().catch(() => {
-    sharedRedisClient = null
-    console.warn('[rateLimiter] Redis connection failed — rate limiting falling back to in-memory store')
+
+  sharedRedisClient.on('connect', () => {
+    logger.info({ event: 'redis.connecting' }, 'Redis client connecting...')
   })
-} catch {
+
+  sharedRedisClient.on('ready', () => {
+    redisStoreBacking = 'redis'
+    logger.info({ event: 'redis.ready', storeBacking: redisStoreBacking }, 'Redis client ready. Rate limiting using Redis store.')
+  })
+
+  sharedRedisClient.on('error', (err: any) => {
+    logger.error({ event: 'redis.error', err: err.message }, `Redis client error: ${err.message}`)
+  })
+
+  sharedRedisClient.on('end', () => {
+    redisStoreBacking = 'local-fallback'
+    logger.warn({ event: 'redis.end', storeBacking: redisStoreBacking }, 'Redis connection closed. Rate limiting falling back to local memory.')
+  })
+
+  sharedRedisClient.on('reconnecting', () => {
+    logger.info({ event: 'redis.reconnecting' }, 'Redis client reconnecting...')
+  })
+
+  sharedRedisClient.connect().catch((err: any) => {
+    logger.warn({ event: 'redis.initial_connection_failed', err: err.message }, 'Redis initial connection failed; rate limiting using local memory.')
+  })
+} catch (err: any) {
   sharedRedisClient = null
-  console.warn('[rateLimiter] Redis client initialization failed — rate limiting falling back to in-memory store')
+  logger.warn({ event: 'redis.initialization_failed', err: err.message }, 'Redis client initialization failed; rate limiting using local memory.')
+}
+
+// ─── Fallback In-Memory Store ──────────────────────────────
+
+class MemoryStoreFallback {
+  private hits = new Map<string, { count: number; expiresAt: number }>()
+  private windowMs: number
+
+  constructor(windowMs: number) {
+    this.windowMs = windowMs
+  }
+
+  async increment(key: string): Promise<{ totalHits: number; resetTime: Date }> {
+    const now = Date.now()
+    const record = this.hits.get(key)
+
+    if (!record || now > record.expiresAt) {
+      const expiresAt = now + this.windowMs
+      this.hits.set(key, { count: 1, expiresAt })
+      return { totalHits: 1, resetTime: new Date(expiresAt) }
+    }
+
+    record.count += 1
+    return { totalHits: record.count, resetTime: new Date(record.expiresAt) }
+  }
+
+  async decrement(key: string): Promise<void> {
+    const record = this.hits.get(key)
+    if (record) {
+      record.count = Math.max(0, record.count - 1)
+    }
+  }
+
+  async resetKey(key: string): Promise<void> {
+    this.hits.delete(key)
+  }
+}
+
+// ─── Hybrid Store (Dynamic Failover/Failback) ──────────────
+
+class HybridStore {
+  private redisStore: any
+  private memoryStore: MemoryStoreFallback
+
+  constructor(options: { prefix?: string; windowMs: number }) {
+    if (RedisStore) {
+      this.redisStore = new RedisStore({
+        sendCommand: async (...args: any[]) => {
+          if (sharedRedisClient && sharedRedisClient.isOpen && redisStoreBacking === 'redis') {
+            return sharedRedisClient.sendCommand(args[0])
+          }
+          throw new Error('Redis client disconnected or offline')
+        },
+        ...(options.prefix ? { prefix: options.prefix } : {}),
+      })
+    }
+    this.memoryStore = new MemoryStoreFallback(options.windowMs)
+  }
+
+  async increment(key: string): Promise<{ totalHits: number; resetTime: Date }> {
+    if (RedisStore && sharedRedisClient && sharedRedisClient.isOpen && redisStoreBacking === 'redis') {
+      try {
+        return await this.redisStore.increment(key)
+      } catch (err: any) {
+        logger.error(
+          { event: 'redis.rate_limit_fallback_active', key, err: err.message },
+          'Redis rate limit store increment failed — falling back to local memory store'
+        )
+      }
+    }
+    return this.memoryStore.increment(key)
+  }
+
+  async decrement(key: string): Promise<void> {
+    if (RedisStore && sharedRedisClient && sharedRedisClient.isOpen && redisStoreBacking === 'redis') {
+      try {
+        return await this.redisStore.decrement(key)
+      } catch (err: any) {
+        logger.error(
+          { event: 'redis.rate_limit_fallback_active_decrement', key, err: err.message },
+          'Redis rate limit store decrement failed — falling back to local memory store'
+        )
+      }
+    }
+    return this.memoryStore.decrement(key)
+  }
+
+  async resetKey(key: string): Promise<void> {
+    if (RedisStore && sharedRedisClient && sharedRedisClient.isOpen && redisStoreBacking === 'redis') {
+      try {
+        return await this.redisStore.resetKey(key)
+      } catch (err: any) {
+        logger.error(
+          { event: 'redis.rate_limit_fallback_active_reset', key, err: err.message },
+          'Redis rate limit store resetKey failed — falling back to local memory store'
+        )
+      }
+    }
+    return this.memoryStore.resetKey(key)
+  }
 }
 
 interface LimiterOptions {
@@ -51,24 +184,18 @@ interface LimiterOptions {
 // ─── Factory: creates a rate limiter with optional Redis backing ─────
 
 function createLimiter(options: LimiterOptions) {
-  let store: any = undefined // default memory store
-
-  if (RedisStore && sharedRedisClient) {
-    try {
-      store = new RedisStore({
-        sendCommand: (...args: any[]) => sharedRedisClient.sendCommand(args),
-        ...(options.prefix ? { prefix: options.prefix } : {}),
-      })
-    } catch {
-      // fallback to memory store
-    }
-  }
+  const windowMs = options.windowMs || 60 * 1000
+  const store = new HybridStore({
+    prefix: options.prefix,
+    windowMs
+  })
 
   return rateLimit({
-    windowMs: options.windowMs || 60 * 1000,
+    windowMs,
     max: options.max || 100,
     standardHeaders: true,
     legacyHeaders: false,
+    validate: { ip: false },
     message: {
       error: {
         code: 'RATE_LIMIT_EXCEEDED',

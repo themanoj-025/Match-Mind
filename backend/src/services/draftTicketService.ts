@@ -104,9 +104,23 @@ export async function consumeTicket(
   tournamentId: string,
   isPro: boolean,
 ): Promise<{ success: boolean; remaining: number; reason?: string }> {
-  const record = await getOrCreateTicketRecord(prisma, userId, tournamentId, isPro)
+  // Ensure ticket record exists (initializes allocations or resets window if expired)
+  await getOrCreateTicketRecord(prisma, userId, tournamentId, isPro)
 
-  if (record.remaining <= 0) {
+  // Atomic decrement check-and-decrement
+  const updateResult = await prisma.draftTicket.updateMany({
+    where: {
+      userId,
+      tournamentId,
+      remaining: { gt: 0 },
+    },
+    data: {
+      remaining: { decrement: 1 },
+    },
+  })
+
+  if (updateResult.count === 0) {
+    const record = await getOrCreateTicketRecord(prisma, userId, tournamentId, isPro)
     const resetsAt = new Date(record.resetsAt)
     const hoursLeft = Math.ceil((resetsAt.getTime() - Date.now()) / (1000 * 60 * 60))
     return {
@@ -118,27 +132,19 @@ export async function consumeTicket(
     }
   }
 
-  // Consume one ticket
-  record.remaining -= 1
-  record.sourceLog.push({ reason: 'draft_start', delta: -1, at: now() })
-
-  await prisma.draftTicket.update({
+  // Fetch updated record to get current balance
+  const updated = await prisma.draftTicket.findUnique({
     where: { userId_tournamentId: { userId, tournamentId } },
-    data: {
-      remaining: record.remaining,
-      lastResetAt: record.lastResetAt,
-      resetsAt: record.resetsAt,
-    },
   })
 
   logger.info({
     event: 'draft.ticket_consumed',
     userId,
     tournamentId,
-    remaining: record.remaining,
+    remaining: updated?.remaining ?? 0,
   })
 
-  return { success: true, remaining: record.remaining }
+  return { success: true, remaining: updated?.remaining ?? 0 }
 }
 
 // ─── Get Ticket Balance ─────────────────────────────────

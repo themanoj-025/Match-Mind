@@ -269,6 +269,8 @@ model Prediction {
   @@index([userId])
   @@index([matchId])
   @@index([status])
+  @@index([userId, status])
+  @@index([matchId, status])
 }
 
 model Follow {

@@ -1,313 +1,82 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,600;1,400&display=block');
 @import "tailwindcss";
-@import "./lib/kinetic.css";
 
 @theme {
-  --color-mm-bg-primary: #F9F9F7;
-  --color-mm-text-primary: #111111;
-  --color-mm-text-secondary: #525252;
-  --color-mm-text-muted: #737373;
-  --color-mm-text-inverse: #F9F9F7;
-  --color-mm-accent-red: #CC0000;
+  --color-background-deep: #020203;
+  --color-background-base: #050506;
+  --color-background-elevated: #0a0a0c;
   
-  --color-mm-bg-secondary: #F5F5F5;
-  --color-mm-bg-tertiary: #E5E5E0;
-  --color-mm-bg-hover: #F5F5F5;
-  --color-border-subtle: #E5E5E0;
-  --color-border-default: #111111;
+  --color-surface: rgba(255, 255, 255, 0.05);
+  --color-surface-hover: rgba(255, 255, 255, 0.08);
+
+  --color-foreground: #EDEDEF;
+  --color-foreground-muted: #8A8F98;
+  --color-foreground-subtle: rgba(255, 255, 255, 0.60);
+
+  --color-accent: #5E6AD2;
+  --color-accent-bright: #6872D9;
+  --color-accent-glow: rgba(94, 106, 210, 0.3);
+
+  --color-border-default: rgba(255, 255, 255, 0.06);
+  --color-border-hover: rgba(255, 255, 255, 0.10);
+  --color-border-accent: rgba(94, 106, 210, 0.30);
+
+  --font-sans: "Inter", "Geist Sans", system-ui, sans-serif;
   
-  --font-serif: 'Playfair Display', serif;
-  --font-body: 'Lora', serif;
-  --font-sans: 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  
-  --radius-xs: 0px;
-  --radius-sm: 0px;
-  --radius-md: 0px;
-  --radius-lg: 0px;
-  --radius-xl: 0px;
-  --radius-full: 0px;
+  --shadow-card: 0 0 0 1px rgba(255,255,255,0.06), 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2);
+  --shadow-card-hover: 0 0 0 1px rgba(255,255,255,0.1), 0 8px 40px rgba(0,0,0,0.5), 0 0 80px rgba(94,106,210,0.1);
+  --shadow-accent: 0 0 0 1px rgba(94,106,210,0.5), 0 4px 12px rgba(94,106,210,0.3), inset 0 1px 0 0 rgba(255,255,255,0.2);
+  --shadow-inner-highlight: inset 0 1px 0 0 rgba(255,255,255,0.1);
+
+  --animate-float: float 10s ease-in-out infinite;
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-shimmer: shimmer 2s linear infinite;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(1deg); }
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
 }
 
-:root {
-  /* Legacy Custom properties mapped to Newsprint */
-  --mm-bg-primary: #F9F9F7;
-  --mm-bg-secondary: #F5F5F5;
-  --mm-bg-tertiary: #E5E5E0;
-  --mm-bg-overlay: rgba(249, 249, 247, 0.95);
-  --mm-bg-hover: #F5F5F5;
-  --mm-bg-active: #E5E5E0;
-
-  --mm-accent-green: #CC0000;
-  --mm-accent-amber: #CC0000;
-  --mm-accent-red: #CC0000;
-  --mm-accent-blue: #111111;
-  --mm-accent-purple: #111111;
-
-  --mm-text-primary: #111111;
-  --mm-text-secondary: #525252;
-  --mm-text-muted: #737373;
-  --mm-text-inverse: #F9F9F7;
-  --mm-text-link: #111111;
-  --mm-text-success: #CC0000;
-  --mm-text-error: #CC0000;
-  --mm-text-warning: #CC0000;
-
-  --border-subtle: #E5E5E0;
-  --border-default: #111111;
-  --border-active: #111111;
-
-  --shadow-card: none;
-  --shadow-elevated: none;
-  --shadow-modal: 4px 4px 0px 0px #111111;
-  
-  --radius-xs: 0px;
-  --radius-sm: 0px;
-  --radius-md: 0px;
-  --radius-lg: 0px;
-  --radius-xl: 0px;
-  --radius-full: 0px;
-
-  --font-display: 'Playfair Display', serif;
-  --font-body: 'Lora', serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  --font-sans: 'Inter', sans-serif;
-  
-  --gradient-live: #111111;
-  --gradient-predict: #111111;
-  --gradient-pro: #111111;
-  --gradient-card-hover: #F5F5F5;
-
-  /* Fluid Typography Tokens */
-  --fs-display-xl: clamp(2.75rem, 4vw + 1.5rem, 7rem);
-  --fs-display-l:  clamp(2.25rem, 3vw + 1.25rem, 5rem);
-  --fs-heading-1:  clamp(1.75rem, 1.4vw + 1.2rem, 3rem);
-  --fs-heading-2:  clamp(1.375rem, 1vw + 1rem, 2.25rem);
-  --fs-heading-3:  clamp(1.125rem, 0.6vw + 0.9rem, 1.5rem);
-  --fs-body-large: clamp(1rem, 0.3vw + 0.9rem, 1.25rem);
-  --fs-body:       clamp(0.9375rem, 0.2vw + 0.875rem, 1.0625rem);
-  --fs-caption:    clamp(0.75rem, 0.15vw + 0.7rem, 0.875rem);
-
-  /* Spacing Scale */
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-5: 1.25rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-  --space-10: 2.5rem;
-  --space-12: 3rem;
+@layer base {
+  body {
+    background-color: var(--color-background-base);
+    color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@utility bg-ambient-layer-1 {
+  background: radial-gradient(ellipse at top, #0a0a0f 0%, #050506 50%, #020203 100%);
 }
 
-html {
-  scroll-behavior: smooth;
+@utility bg-grid-overlay {
+  background-size: 64px 64px;
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
 }
 
-body {
-  font-family: var(--font-body);
-  background-color: var(--mm-bg-primary);
-  color: var(--mm-text-primary);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  min-height: 100vh;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23111111' fill-opacity='0.04' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
+@utility text-gradient {
+  background-image: linear-gradient(to bottom, #ffffff, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.7));
+  -webkit-background-clip: text;
+  color: transparent;
 }
 
-#root {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+@utility text-gradient-accent {
+  background-image: linear-gradient(to right, #5E6AD2, #818cf8, #5E6AD2);
+  -webkit-background-clip: text;
+  color: transparent;
+  background-size: 200% auto;
+  animation: textShine 3s linear infinite;
 }
 
-h1, h2, h3, h4, h5, h6, .text-fluid-hero, .text-fluid-display, .text-fluid-h1, .text-fluid-h2, .text-fluid-h3, .heading-1, .heading-2, .heading-3 {
-  text-wrap: balance;
-  max-width: 20ch;
-}
-
-p, .body, .body-large {
-  text-wrap: pretty;
-  max-width: 65ch;
-}
-
-.container {
-  width: 100%;
-  max-width: 1440px;
-  margin-inline: auto;
-  padding-inline: clamp(1rem, 4vw, 3rem);
-}
-
-/* Typography Classes */
-@utility text-fluid-hero {
-  font-family: var(--font-display);
-  font-size: var(--fs-display-xl);
-  letter-spacing: -0.04em;
-  line-height: 1.05;
-  font-weight: 900;
-}
-
-@utility text-fluid-display {
-  font-family: var(--font-display);
-  font-size: var(--fs-display-l);
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-  font-weight: 900;
-}
-
-@utility text-fluid-h1 {
-  font-family: var(--font-display);
-  font-size: var(--fs-heading-1);
-  letter-spacing: -0.01em;
-  line-height: 1.15;
-  font-weight: 700;
-}
-
-@utility text-fluid-h2 {
-  font-family: var(--font-display);
-  font-size: var(--fs-heading-2);
-  line-height: 1.2;
-  font-weight: 700;
-}
-
-@utility text-fluid-h3 {
-  font-family: var(--font-display);
-  font-size: var(--fs-heading-3);
-  line-height: 1.3;
-  font-weight: 700;
-}
-
-/* Restored Legacy Classes mapped to Fluid */
-.heading-1 {
-  font-family: var(--font-display);
-  font-size: var(--fs-heading-1);
-  letter-spacing: -0.01em;
-  line-height: 1.15;
-  font-weight: 700;
-}
-
-.heading-2 {
-  font-family: var(--font-display);
-  font-size: var(--fs-heading-2);
-  line-height: 1.2;
-  font-weight: 700;
-}
-
-.heading-3 {
-  font-family: var(--font-display);
-  font-size: var(--fs-heading-3);
-  line-height: 1.3;
-  font-weight: 700;
-}
-
-.body-large {
-  font-size: var(--fs-body-large);
-  font-weight: 400;
-  line-height: 1.6;
-}
-
-.body {
-  font-size: var(--fs-body);
-  font-weight: 400;
-  line-height: 1.6;
-}
-
-.caption {
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1.4;
-}
-
-.overline {
-  font-size: 12px;
-  font-family: var(--font-mono);
-  font-weight: 500;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  line-height: 1.4;
-}
-
-.mono {
-  font-family: var(--font-mono);
-  font-size: 13px;
-}
-
-/* Custom Newsprint Utilities */
-.sharp-corners {
-  border-radius: 0px !important;
-}
-
-.hard-shadow-hover {
-  transition: all 0.2s ease-out;
-}
-
-.hard-shadow-hover:hover {
-  box-shadow: 4px 4px 0px 0px #111111;
-  transform: translate(-2px, -2px);
-}
-
-.newsprint-texture {
-  position: relative;
-}
-.newsprint-texture::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(0deg, transparent 98%, rgba(0,0,0,0.02) 100%),
-    linear-gradient(90deg, transparent 98%, rgba(0,0,0,0.02) 100%);
-  background-size: 3px 3px;
-  pointer-events: none;
-  opacity: 0.5;
-}
-
-/* Utility to override animations for old neon components */
-.skeleton {
-  background: var(--mm-bg-tertiary);
-  animation: none;
-  border-radius: 0;
-}
-
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-  background: var(--mm-bg-primary);
-  border-left: 1px solid #111111;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--mm-bg-primary);
-}
-
-::-webkit-scrollbar-thumb {
-  background: #111111;
-  border: 1px solid var(--mm-bg-primary);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #525252;
-}
-
-.scrollbar-none {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.scrollbar-none::-webkit-scrollbar {
-  display: none;
-}
-
-:focus-visible {
-  outline: 2px solid #111111;
-  outline-offset: 2px;
-}
-
-::selection {
-  background: #CC0000;
-  color: #F9F9F7;
+@keyframes textShine {
+  to {
+    background-position: 200% center;
+  }
 }

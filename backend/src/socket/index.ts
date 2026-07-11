@@ -24,56 +24,64 @@ import logger from '../utils/logger'
 
 const ALLOWED_ROOM_TYPES = ['match', 'squad', 'sport', 'room', 'dm']
 
-// ─── Connection rate limiter: per-IP, max 10 new connections/sec ─────
-const connectionRateMap = new Map<string, number[]>()
-const CONNECTION_RATE_LIMIT = 10       // max connections
-const CONNECTION_RATE_WINDOW = 1000     // per 1 second
+import { redis } from '../lib/redis'
 
-function checkConnectionRate(ip: string): boolean {
+// Fallback in-memory maps for when Redis is offline
+const connectionRateMap = new Map<string, number[]>()
+const bidRateTrackers = new Map<string, number[]>()
+
+async function checkRateLimitRedis(key: string, limit: number, windowSec: number): Promise<boolean> {
+  const isRedisConnected = redis.status === 'ready' || redis.status === 'connect'
+  if (!isRedisConnected) {
+    return false // Fallback to memory
+  }
+  try {
+    const current = await redis.incr(key)
+    if (current === 1) {
+      await redis.expire(key, windowSec)
+    }
+    return current <= limit
+  } catch (err: any) {
+    logger.error({ event: 'redis.rate_limit_error', key, err: err.message }, 'Failed to check rate limit in Redis')
+    return false
+  }
+}
+
+async function checkConnectionRate(ip: string): Promise<boolean> {
+  const redisKey = `ratelimit:connection:${ip}`
+  const isRedisConnected = redis.status === 'ready' || redis.status === 'connect'
+  if (isRedisConnected) {
+    return checkRateLimitRedis(redisKey, 10, 1)
+  }
+
+  // Fallback to in-memory check
   const now = Date.now()
   let timestamps = connectionRateMap.get(ip) || []
-  timestamps = timestamps.filter((t) => now - t < CONNECTION_RATE_WINDOW)
-  if (timestamps.length >= CONNECTION_RATE_LIMIT) {
+  timestamps = timestamps.filter((t) => now - t < 1000)
+  if (timestamps.length >= 10) {
     return false
   }
   timestamps.push(now)
   connectionRateMap.set(ip, timestamps)
-
-  // Cleanup stale entries periodically
-  if (connectionRateMap.size > 10000) {
-    for (const [key, vals] of connectionRateMap.entries()) {
-      const valid = vals.filter((t) => now - t < CONNECTION_RATE_WINDOW)
-      if (valid.length === 0) connectionRateMap.delete(key)
-      else connectionRateMap.set(key, valid)
-    }
-  }
   return true
 }
 
-// ─── Per-socket bid rate limiter (5/sec per socket) ─────────────────
-/**
- * Creates a rate-limited wrapper for the PLACE_BID handler.
- * Uses a Map keyed by socket ID to track timestamps.
- * This is more robust than the old prependListener approach.
- */
-const bidRateTrackers = new Map<string, number[]>()
-const BID_RATE_LIMIT = 5
-const BID_RATE_WINDOW = 1000
+async function checkBidRate(socketId: string): Promise<boolean> {
+  const redisKey = `ratelimit:bid:${socketId}`
+  const isRedisConnected = redis.status === 'ready' || redis.status === 'connect'
+  if (isRedisConnected) {
+    return checkRateLimitRedis(redisKey, 5, 1)
+  }
 
-function checkBidRate(socketId: string): boolean {
+  // Fallback to in-memory check
   const now = Date.now()
   let timestamps = bidRateTrackers.get(socketId) || []
-  timestamps = timestamps.filter((t) => now - t < BID_RATE_WINDOW)
-  if (timestamps.length >= BID_RATE_LIMIT) {
+  timestamps = timestamps.filter((t) => now - t < 1000)
+  if (timestamps.length >= 5) {
     return false
   }
   timestamps.push(now)
   bidRateTrackers.set(socketId, timestamps)
-
-  // Cleanup on disconnect
-  if (timestamps.length > 20) {
-    timestamps.splice(0, timestamps.length - 20)
-  }
   return true
 }
 
@@ -88,10 +96,14 @@ function makeAuctionHelpers(prisma: any) {
       return state as AuctionState | null
     },
     saveAuctionState: async (roomId: string, state: AuctionState) => {
-      await prisma.auctionState.update({
-        where: { roomId },
+      const expectedVersion = state.version - 1
+      const result = await prisma.auctionState.updateMany({
+        where: { roomId, version: expectedVersion },
         data: { ...state },
       })
+      if (result.count === 0) {
+        throw new Error('OPTIMISTIC_CONCURRENCY_CONFLICT')
+      }
     },
     getRoom: async (roomId: string) => prisma.room.findUnique({ where: { id: roomId } }),
     getPlayer: async (playerId: string) => prisma.player.findUnique({ where: { id: playerId } }),
@@ -110,7 +122,7 @@ export const setupSocket = (io: Server, prisma: any): void => {
   io.use(async (socket: AuthenticatedSocket, next) => {
     // Connection rate limiting (per IP)
     const ip = socket.handshake.address || 'unknown'
-    if (!checkConnectionRate(ip)) {
+    if (!(await checkConnectionRate(ip))) {
       logger.warn({ event: 'socket.rate_limited', ip }, 'Socket connection rate limited')
       return next(new Error('Too many connections. Please slow down.'))
     }
@@ -231,7 +243,7 @@ export const setupSocket = (io: Server, prisma: any): void => {
         }
 
         // Per-socket bid rate limiting (5/sec)
-        if (!checkBidRate(socket.id)) {
+        if (!(await checkBidRate(socket.id))) {
           socket.emit('BID_REJECTED', { code: 'RATE_LIMITED', message: 'Too many bids. Slow down.' })
           return
         }

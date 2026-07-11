@@ -9,7 +9,7 @@
  *   (pool exhausted + unsold exhausted) → FINISHED
  */
 
-import { Mutex } from 'async-mutex'
+import { acquireLock } from './lockService'
 import {
   BID_INCREMENTS,
   AUCTION_DEFAULT_TIMER_SECONDS,
@@ -54,15 +54,15 @@ export interface BidResult {
   newState?: AuctionState
 }
 
-// ─── Per-room mutexes ────────────────────────────────────
+// ─── Lock Helper ─────────────────────────────────────────
 
-const roomMutexes = new Map<string, Mutex>()
-
-function getRoomMutex(roomId: string): Mutex {
-  if (!roomMutexes.has(roomId)) {
-    roomMutexes.set(roomId, new Mutex())
+async function runWithLock<T>(roomId: string, fn: () => Promise<T>): Promise<T> {
+  const lock = await acquireLock(`lock:auction:${roomId}`)
+  try {
+    return await fn()
+  } finally {
+    await lock.release()
   }
-  return roomMutexes.get(roomId)!
 }
 
 // ─── Required Increment ──────────────────────────────────
@@ -154,9 +154,7 @@ export async function processBid(
   saveBid: (bid: any) => Promise<void>,
   getPlayerPool: (roomId: string) => Promise<any[]>,
 ): Promise<BidResult> {
-  const mutex = getRoomMutex(bid.roomId)
-
-  return mutex.runExclusive(async () => {
+  return runWithLock(bid.roomId, async () => {
     // 1. Re-read state fresh from DB (never trust in-memory cache)
     const state = await getAuctionState(bid.roomId)
     if (!state) return { accepted: false, reason: 'ROOM_NOT_FOUND' }
@@ -260,9 +258,7 @@ export async function sellCurrentPlayer(
   getAuctionState: (roomId: string) => Promise<AuctionState | null>,
   saveAuctionState: (roomId: string, state: AuctionState) => Promise<void>,
 ): Promise<AuctionState | null> {
-  const mutex = getRoomMutex(roomId)
-
-  return mutex.runExclusive(async () => {
+  return runWithLock(roomId, async () => {
     const state = await getAuctionState(roomId)
     if (!state || state.phase !== 'PLAYER_LIVE') return null
 
@@ -284,9 +280,7 @@ export async function unsoldCurrentPlayer(
   getAuctionState: (roomId: string) => Promise<AuctionState | null>,
   saveAuctionState: (roomId: string, state: AuctionState) => Promise<void>,
 ): Promise<AuctionState | null> {
-  const mutex = getRoomMutex(roomId)
-
-  return mutex.runExclusive(async () => {
+  return runWithLock(roomId, async () => {
     const state = await getAuctionState(roomId)
     if (!state || state.phase !== 'PLAYER_LIVE') return null
 
@@ -316,9 +310,7 @@ export async function moveToNextPlayer(
   getAuctionState: (roomId: string) => Promise<AuctionState | null>,
   saveAuctionState: (roomId: string, state: AuctionState) => Promise<void>,
 ): Promise<AuctionState | null> {
-  const mutex = getRoomMutex(roomId)
-
-  return mutex.runExclusive(async () => {
+  return runWithLock(roomId, async () => {
     const state = await getAuctionState(roomId)
     if (!state) return null
 
@@ -392,9 +384,7 @@ export async function checkAuctionTimer(
   deductBudget: (roomId: string, userId: string, amount: number) => Promise<void>,
   createRosterEntry: (entry: { roomId: string; userId: string; playerId: string; soldPrice: number }) => Promise<void>,
 ): Promise<{ action: string; state: AuctionState | null } | null> {
-  const mutex = getRoomMutex(roomId)
-
-  return mutex.runExclusive(async () => {
+  return runWithLock(roomId, async () => {
     const state = await getAuctionState(roomId)
     if (!state || state.phase !== 'PLAYER_LIVE') return null
     if (!state.timerEndsAt) return null
@@ -527,9 +517,7 @@ export async function startReAuction(
   getAuctionState: (roomId: string) => Promise<AuctionState | null>,
   saveAuctionState: (roomId: string, state: AuctionState) => Promise<void>,
 ): Promise<AuctionState | null> {
-  const mutex = getRoomMutex(roomId)
-
-  return mutex.runExclusive(async () => {
+  return runWithLock(roomId, async () => {
     const state = await getAuctionState(roomId)
     if (!state || state.phase !== 'RE_AUCTION') return null
 

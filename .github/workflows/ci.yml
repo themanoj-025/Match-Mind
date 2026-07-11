@@ -68,4 +68,6 @@ jobs:
           npm run check-api
           
       - name: Run Tests
-        run: npm run test
+        run: |
+          cd backend
+          npm run test:ci

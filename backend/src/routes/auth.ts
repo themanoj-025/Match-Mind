@@ -186,7 +186,8 @@ router.post('/reset-password', validate(resetPasswordSchema), asyncHandler(async
     })
   }
 
-  const user = await prisma.user.findUnique({ where: { id: decoded.userId } })
+  const { userRepository } = createRepositories(prisma)
+  const user = await userRepository.findById(decoded.userId)
   if (!user) {
     return res.status(400).json({
       error: { code: 'USER_NOT_FOUND', message: 'User not found' },
@@ -194,13 +195,11 @@ router.post('/reset-password', validate(resetPasswordSchema), asyncHandler(async
   }
 
   const passwordHash = await bcrypt.hash(password, 12)
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { passwordHash },
+  const nextTokenVersion = (user.tokenVersion ?? 0) + 1
+  await userRepository.update(user.id, {
+    passwordHash,
+    tokenVersion: nextTokenVersion,
   })
-
-  // Revoke all tokens after password reset
-  await revokeTokens(user.id, prisma)
 
   logger.info({ event: 'auth.password_reset_completed', userId: user.id }, 'Password reset completed')
   res.json({ message: 'Password has been updated. Please log in with your new password.' })
@@ -233,10 +232,8 @@ router.post('/verify-email', validate(verifyEmailSchema), asyncHandler(async (re
     })
   }
 
-  const user = await prisma.user.update({
-    where: { id: decoded.userId },
-    data: { emailVerified: true },
-  })
+  const { userRepository } = createRepositories(prisma)
+  const user = await userRepository.update(decoded.userId, { emailVerified: true })
 
   logger.info({ event: 'auth.email_verified', userId: user.id }, 'Email verified')
   res.json({ message: 'Email verified successfully.' })

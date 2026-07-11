@@ -35,10 +35,14 @@ function makeAuctionHelpers(prisma: any) {
       return state as AuctionState | null
     },
     saveAuctionState: async (roomId: string, state: AuctionState) => {
-      await prisma.auctionState.update({
-        where: { roomId },
+      const expectedVersion = state.version - 1
+      const result = await prisma.auctionState.updateMany({
+        where: { roomId, version: expectedVersion },
         data: { ...state },
       })
+      if (result.count === 0) {
+        throw new Error('OPTIMISTIC_CONCURRENCY_CONFLICT')
+      }
     },
   }
 }
