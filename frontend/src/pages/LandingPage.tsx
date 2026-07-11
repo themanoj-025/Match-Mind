@@ -22,21 +22,7 @@ export default function LandingPage() {
 
   return (
     <div className="landing-blueprint bg-background text-on-background selection:bg-secondary selection:text-white">
-      <header className="w-full top-0 sticky bg-background border-b-2 border-primary z-50">
-        <div className="flex justify-between items-center px-grid-unit md:px-section-margin py-4 max-w-container-max-width mx-auto">
-          <div className="flex items-center gap-4">
-            <span className="material-symbols-outlined cursor-pointer hover:bg-secondary hover:text-on-secondary transition-colors duration-150 p-1">menu</span>
-            <div className="font-headline-lg text-headline-lg font-black text-primary italic border-b-4 border-secondary leading-none">MATCHMIND</div>
-          </div>
-          <nav className="hidden md:flex gap-8 items-center">
-            <a className="font-label-caps text-label-caps text-secondary font-bold" href="#">HOW IT WORKS</a>
-            <a className="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary transition-colors" href="#">PRICING</a>
-            <a className="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary transition-colors" href="#">LOG IN</a>
-            <button className="bg-primary text-on-primary px-4 py-2 font-label-caps text-label-caps active:translate-y-0.5 transition-transform">SUBSCRIBE</button>
-          </nav>
-        </div>
-      </header>
-      
+
       <main className="max-w-container-max-width mx-auto">
         {/* HERO / INTRO SECTION */}
         <section className="grid grid-cols-1 md:grid-cols-12 px-grid-unit md:px-section-margin py-12 md:py-20 border-b-2 border-primary">
@@ -76,12 +62,7 @@ export default function LandingPage() {
 
         {/* LIVE TICKER */}
         <div className="ticker-wrap py-2 border-b-2 border-primary">
-          <div className="ticker font-label-mono text-label-mono text-on-primary uppercase flex gap-12">
-            <span><span className="text-secondary">●</span> LIVE STATS</span>
-            <span>3 TOURNAMENTS</span>
-            <span>500+ PLAYERS TO DRAFT</span>
-            <span>1000+ ACTIVE MANAGERS</span>
-            <span>2 SUPPORTED LEAGUES</span>
+          <div className="ticker font-label-mono text-label-mono text-on-primary uppercase flex gap-12 w-max">
             <span><span className="text-secondary">●</span> LIVE STATS</span>
             <span>3 TOURNAMENTS</span>
             <span>500+ PLAYERS TO DRAFT</span>
@@ -104,38 +85,46 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-0 border-r border-on-primary-container">
             {/* STEP 01 */}
             <div className="p-8 border-l border-b md:border-b-0 border-on-primary-container hover:bg-secondary transition-colors duration-300 group">
-              <div className="flex justify-between items-start mb-8">
+              <div className="mb-8">
                 <span className="material-symbols-outlined text-4xl group-hover:scale-110 transition-transform">groups</span>
-                <span className="font-headline-sm text-headline-sm text-secondary group-hover:text-white">01</span>
               </div>
-              <h4 className="font-headline-md text-headline-md mb-4 uppercase">Create Room</h4>
+              <h4 className="font-headline-md text-headline-md mb-4 uppercase flex items-center gap-3">
+                <span className="font-headline-sm text-headline-sm text-secondary group-hover:text-white">01</span>
+                Create Room
+              </h4>
               <p className="font-body-md text-body-md opacity-80">Pick your tournament, set custom budget rules, and invite your fiercest rivals to the table.</p>
             </div>
             {/* STEP 02 */}
             <div className="p-8 border-l border-b md:border-b-0 border-on-primary-container hover:bg-secondary transition-colors duration-300 group">
-              <div className="flex justify-between items-start mb-8">
+              <div className="mb-8">
                 <span className="material-symbols-outlined text-4xl group-hover:scale-110 transition-transform">timer</span>
-                <span className="font-headline-sm text-headline-sm text-secondary group-hover:text-white">02</span>
               </div>
-              <h4 className="font-headline-md text-headline-md mb-4 uppercase">Live Auction</h4>
+              <h4 className="font-headline-md text-headline-md mb-4 uppercase flex items-center gap-3">
+                <span className="font-headline-sm text-headline-sm text-secondary group-hover:text-white">02</span>
+                Live Auction
+              </h4>
               <p className="font-body-md text-body-md opacity-80">Bid on superstars under the digital hammer. Every second counts. Beware the anti-sniping clock.</p>
             </div>
             {/* STEP 03 */}
             <div className="p-8 border-l border-b md:border-b-0 border-on-primary-container hover:bg-secondary transition-colors duration-300 group">
-              <div className="flex justify-between items-start mb-8">
+              <div className="mb-8">
                 <span className="material-symbols-outlined text-4xl group-hover:scale-110 transition-transform" style={{ fontVariationSettings: "'FILL' 1" }}>shield</span>
-                <span className="font-headline-sm text-headline-sm text-secondary group-hover:text-white">03</span>
               </div>
-              <h4 className="font-headline-md text-headline-md mb-4 uppercase">Build Squad</h4>
+              <h4 className="font-headline-md text-headline-md mb-4 uppercase flex items-center gap-3">
+                <span className="font-headline-sm text-headline-sm text-secondary group-hover:text-white">03</span>
+                Build Squad
+              </h4>
               <p className="font-body-md text-body-md opacity-80">Set your Captain (2x) and Vice-Captain (1.5x). Manage your roster through transfers and strategic drops.</p>
             </div>
             {/* STEP 04 */}
             <div className="p-8 border-l border-on-primary-container hover:bg-secondary transition-colors duration-300 group">
-              <div className="flex justify-between items-start mb-8">
+              <div className="mb-8">
                 <span className="material-symbols-outlined text-4xl group-hover:scale-110 transition-transform" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                <span className="font-headline-sm text-headline-sm text-secondary group-hover:text-white">04</span>
               </div>
-              <h4 className="font-headline-md text-headline-md mb-4 uppercase">Track & Win</h4>
+              <h4 className="font-headline-md text-headline-md mb-4 uppercase flex items-center gap-3">
+                <span className="font-headline-sm text-headline-sm text-secondary group-hover:text-white">04</span>
+                Track & Win
+              </h4>
               <p className="font-body-md text-body-md opacity-80">Watch live as your players accumulate points from real-world performance. Dominate the index.</p>
             </div>
           </div>

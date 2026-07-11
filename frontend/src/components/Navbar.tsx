@@ -28,43 +28,95 @@ export default function Navbar() {
 
   if (!isAuthenticated) {
     return (
-      <nav className="sticky top-0 z-50 bg-[#F9F9F7] border-b-2 border-[#111111] newsprint-texture">
-        <div className="container">
-          <div className="flex items-center justify-between h-20">
-            {logoBlock}
+      <>
+        <nav className="sticky top-0 z-50 bg-[#F9F9F7] border-b-2 border-[#111111] newsprint-texture">
+          <div className="container">
+            <div className="flex items-center justify-between h-20">
+              <div className="flex items-center gap-6">
+                <button
+                  onClick={toggleNav}
+                  className="md:hidden p-2 text-[#111111] border border-transparent hover:border-[#111111] sharp-corners transition-colors"
+                >
+                  {isNavOpen ? <X size={24} strokeWidth={1.5} /> : <Menu size={24} strokeWidth={1.5} />}
+                </button>
+                <div className="hidden sm:block">{logoBlock}</div>
+                <div className="sm:hidden">{logoBlock}</div>
+              </div>
 
-            <div className="hidden md:flex items-center gap-8">
-              <Link
-                to="/how-it-works"
-                className="font-mono text-xs uppercase tracking-widest text-[#111111] hover:underline underline-offset-4 decoration-2 decoration-[#CC0000]"
-              >
-                How It Works
-              </Link>
-              <Link
-                to="/pricing"
-                className="font-mono text-xs uppercase tracking-widest text-[#111111] hover:underline underline-offset-4 decoration-2 decoration-[#CC0000]"
-              >
-                Pricing
-              </Link>
-            </div>
+              <div className="hidden md:flex items-center gap-8">
+                <Link
+                  to="/how-it-works"
+                  className="font-mono text-xs uppercase tracking-widest text-[#111111] hover:underline underline-offset-4 decoration-2 decoration-[#CC0000]"
+                >
+                  How It Works
+                </Link>
+                <Link
+                  to="/pricing"
+                  className="font-mono text-xs uppercase tracking-widest text-[#111111] hover:underline underline-offset-4 decoration-2 decoration-[#CC0000]"
+                >
+                  Pricing
+                </Link>
+              </div>
 
-            <div className="flex items-center gap-4">
-              <Link
-                to="/login"
-                className="font-mono text-xs uppercase tracking-widest text-[#111111] hover:underline underline-offset-4 decoration-2 decoration-[#CC0000] px-4 py-2"
-              >
-                Log In
-              </Link>
-              <Link
-                to="/signup"
-                className="bg-[#111111] text-[#F9F9F7] border border-transparent hover:bg-white hover:text-[#111111] hover:border-[#111111] sharp-corners px-6 py-3 font-mono text-xs uppercase tracking-widest transition-all duration-200"
-              >
-                Subscribe
-              </Link>
+              <div className="flex items-center gap-4">
+                <Link
+                  to="/login"
+                  className="font-mono text-xs uppercase tracking-widest text-[#111111] hover:underline underline-offset-4 decoration-2 decoration-[#CC0000] px-4 py-2"
+                >
+                  Log In
+                </Link>
+                <Link
+                  to="/signup"
+                  className="hidden md:inline-block bg-[#111111] text-[#F9F9F7] border border-transparent hover:bg-white hover:text-[#111111] hover:border-[#111111] sharp-corners px-6 py-3 font-mono text-xs uppercase tracking-widest transition-all duration-200"
+                >
+                  Subscribe
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+        {isNavOpen && (
+          <div className="fixed inset-0 z-40 md:hidden" onClick={toggleNav}>
+            <div className="absolute inset-0 bg-[#F9F9F7]/90 backdrop-blur-sm" />
+            <div
+              className="absolute top-20 left-0 w-80 bg-[#F9F9F7] h-[calc(100%-5rem)] border-r-2 border-[#111111] p-8 newsprint-texture"
+              onClick={(e: React.MouseEvent) => e.stopPropagation()}
+            >
+              <div className="flex flex-col gap-4">
+                <Link
+                  to="/how-it-works"
+                  className="flex items-center gap-4 px-4 py-4 border border-transparent hover:border-[#111111] hover:bg-white font-mono text-sm uppercase tracking-widest sharp-corners transition-colors"
+                  onClick={toggleNav}
+                >
+                  How It Works
+                </Link>
+                <Link
+                  to="/pricing"
+                  className="flex items-center gap-4 px-4 py-4 border border-transparent hover:border-[#111111] hover:bg-white font-mono text-sm uppercase tracking-widest sharp-corners transition-colors"
+                  onClick={toggleNav}
+                >
+                  Pricing
+                </Link>
+                <div className="border-t-2 border-[#111111] my-4" />
+                <Link
+                  to="/login"
+                  className="flex items-center gap-4 px-4 py-4 border border-transparent hover:border-[#111111] hover:bg-white font-mono text-sm uppercase tracking-widest sharp-corners transition-colors"
+                  onClick={toggleNav}
+                >
+                  Log In
+                </Link>
+                <Link
+                  to="/signup"
+                  className="flex items-center justify-center gap-4 px-4 py-4 bg-[#111111] text-[#F9F9F7] hover:bg-white hover:text-[#111111] hover:border-[#111111] border border-transparent font-mono text-sm uppercase tracking-widest sharp-corners transition-colors"
+                  onClick={toggleNav}
+                >
+                  Subscribe
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+      </>
     )
   }
 
