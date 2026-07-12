@@ -43,8 +43,8 @@ async function checkRateLimitRedis(key: string, limit: number, windowSec: number
       await redis.expire(key, windowSec)
     }
     return current <= limit
-  } catch (err: any) {
-    logger.error({ event: 'redis.rate_limit_error', key, err: err.message }, 'Failed to check rate limit in Redis')
+  } catch (err: unknown) {
+    logger.error({ event: 'redis.rate_limit_error', key, err: (err as Error).message }, 'Failed to check rate limit in Redis')
     return false
   }
 }
@@ -238,8 +238,8 @@ export const setupSocket = (io: Server, prisma: any): void => {
         if (state) {
           socket.emit('ROOM_STATE_SYNC', { auctionState: state })
         }
-      } catch (err: any) {
-        logger.error({ event: 'socket.sync_state_error', roomId, err: err.message }, 'Failed to sync state on reconnect')
+      } catch (err: unknown) {
+        logger.error({ event: 'socket.sync_state_error', roomId, err: (err as Error).message }, 'Failed to sync state on reconnect')
       }
     })
 
@@ -311,8 +311,8 @@ export const setupSocket = (io: Server, prisma: any): void => {
             message: result.reason || 'Bid rejected',
           })
         }
-      } catch (err: any) {
-        logger.error({ event: 'socket.bid_error', userId: socket.userId, err: err.message }, 'PLACE_BID error')
+      } catch (err: unknown) {
+        logger.error({ event: 'socket.bid_error', userId: socket.userId, err: (err as Error).message }, 'PLACE_BID error')
         socket.emit('BID_REJECTED', { code: 'INTERNAL_ERROR', message: 'Failed to process bid' })
       }
     })
@@ -405,8 +405,8 @@ export const setupSocket = (io: Server, prisma: any): void => {
             await scheduleAuctionTimer(data.roomId, newState.timerEndsAt)
           }
         }
-      } catch (err: any) {
-        logger.error({ event: 'socket.host_action_error', userId: socket.userId, err: err.message }, 'HOST_ACTION error')
+      } catch (err: unknown) {
+        logger.error({ event: 'socket.host_action_error', userId: socket.userId, err: (err as Error).message }, 'HOST_ACTION error')
         socket.emit('HOST_ACTION_REJECTED', { code: 'INTERNAL_ERROR', message: 'Failed to process action' })
       }
     })
@@ -422,8 +422,8 @@ export const setupSocket = (io: Server, prisma: any): void => {
         } else {
           await prisma.starredPlayer.create({ data: { userId: socket.userId, roomId, playerId } })
         }
-      } catch (err: any) {
-        logger.error({ event: 'socket.toggle_star_error', userId: socket.userId, err: err.message })
+      } catch (err: unknown) {
+        logger.error({ event: 'socket.toggle_star_error', userId: socket.userId, err: (err as Error).message })
       }
     })
 
@@ -477,8 +477,8 @@ export const setupSocket = (io: Server, prisma: any): void => {
         })
 
         io.to(roomId).emit('CHAT_MESSAGE', message)
-      } catch (err: any) {
-        logger.error({ event: 'socket.send_message_error', userId: socket.userId, err: err.message }, 'SEND_MESSAGE error')
+      } catch (err: unknown) {
+        logger.error({ event: 'socket.send_message_error', userId: socket.userId, err: (err as Error).message }, 'SEND_MESSAGE error')
         socket.emit('CHAT_ERROR', { message: 'Failed to send message' })
       }
     })

@@ -44,8 +44,8 @@ export function requireDraftEnabled(
   next: NextFunction,
 ): void {
   const tournamentId =
-    (req.params as any).tournamentId ||
-    (req.body as any)?.tournamentId
+    (req.params as unknown).tournamentId ||
+    (req.body as unknown)?.tournamentId
 
   if (!tournamentId) {
     return next(

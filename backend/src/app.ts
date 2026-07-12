@@ -115,10 +115,10 @@ app.use(globalLimiter)
 app.use(
   pinoHttp({
     logger,
-    customProps: (req: any) => ({
+    customProps: (req: express.Request) => ({
       requestId: req.id,
     }),
-  } as any),
+  } as unknown),
 )
 
 // Stripe webhook needs raw body BEFORE express.json() consumes it
@@ -143,25 +143,25 @@ if (env.NODE_ENV !== 'production') {
 }
 
 // ─── API Routes ───────────────────────────────────────────────────────
-app.use('/api/auth/login', authLimiter)
-app.use('/api/auth/signup', authLimiter)
-app.use('/api/auth/forgot-password', passwordResetLimiter)
-app.use('/api/auth/reset-password', passwordResetLimiter)
-app.use('/api/auth', authRoutes)
-app.use('/api/tournaments', tournamentRoutes)
-app.use('/api/players', playerRoutes)
-app.use('/api/rooms', roomRoutes)
-app.use('/api/rooms', auctionRoutes) // /api/rooms/:roomId/auction/*
-app.use('/api/rooms', franchiseRoutes) // /api/rooms/:roomId/franchises/*
-app.use('/api/fixtures', fixtureRoutes)
-app.use('/api/leaderboard', leaderboardRoutes)
-app.use('/api/users', userRoutes)
-app.use('/api/messages', messageRoutes)
-app.use('/api/search', searchRoutes)
-app.use('/api/admin', adminRoutes)
-app.use('/api/stripe', stripeRoutes)
-app.use('/api/ai', aiRoutes)
-app.use('/api/draft', draftRoutes)
+app.use('/api/v1/auth/login', authLimiter)
+app.use('/api/v1/auth/signup', authLimiter)
+app.use('/api/v1/auth/forgot-password', passwordResetLimiter)
+app.use('/api/v1/auth/reset-password', passwordResetLimiter)
+app.use('/api/v1/auth', authRoutes)
+app.use('/api/v1/tournaments', tournamentRoutes)
+app.use('/api/v1/players', playerRoutes)
+app.use('/api/v1/rooms', roomRoutes)
+app.use('/api/v1/rooms', auctionRoutes) // /api/rooms/:roomId/auction/*
+app.use('/api/v1/rooms', franchiseRoutes) // /api/rooms/:roomId/franchises/*
+app.use('/api/v1/fixtures', fixtureRoutes)
+app.use('/api/v1/leaderboard', leaderboardRoutes)
+app.use('/api/v1/users', userRoutes)
+app.use('/api/v1/messages', messageRoutes)
+app.use('/api/v1/search', searchRoutes)
+app.use('/api/v1/admin', adminRoutes)
+app.use('/api/v1/stripe', stripeRoutes)
+app.use('/api/v1/ai', aiRoutes)
+app.use('/api/v1/draft', draftRoutes)
 
 
 // ─── Prometheus metrics endpoint ────────────────────────────────
@@ -169,18 +169,18 @@ import { metricsMiddleware, metricsEndpoint } from './middleware/metrics'
 app.use(metricsMiddleware)
 app.get(
   '/api/metrics',
-  asyncHandler(async (_req: express.Request, res: express.Response) => {
+  async (_req: express.Request, res: express.Response) => {
     const metrics = await metricsEndpoint()
     res.setHeader('Content-Type', 'text/plain')
     res.send(metrics)
-  }),
+  }
 )
 
 // ─── Global Error Handler ─────────────────────────────────────────────
 import { DomainError } from './errors/DomainError'
 
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  logger.error({ event: 'app.unhandled_error', err: err.message, stack: err.stack, path: req.path }, 'Unhandled exception')
+app.use((err: unknown, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  logger.error({ event: 'app.unhandled_error', err: (err as Error).message, stack: err.stack, path: req.path }, 'Unhandled exception')
 
   if (res.headersSent) {
     return next(err)
@@ -188,7 +188,7 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 
   if (err instanceof DomainError) {
     return res.status(400).json({
-      error: { code: err.name, message: err.message },
+      error: { code: err.name, message: (err as Error).message },
     })
   }
 

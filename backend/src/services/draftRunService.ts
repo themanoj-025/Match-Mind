@@ -514,12 +514,12 @@ async function resolveNextRound(
       benchmarkPoints,
       breakdown,
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     logger.error({
       event: 'draft_run.resolve_error',
       sessionId,
       fixtureId: fixture?.id,
-      error: err.message,
+      error: (err as Error).message,
     })
     return null
   }

@@ -30,7 +30,7 @@ export const Lobby: React.FC = () => {
 
   const fetchRooms = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/rooms', {
+      const response = await fetch('http://localhost:5000/api/v1/rooms', {
         credentials: 'include'
       })
       const data = await response.json()
@@ -56,7 +56,7 @@ export const Lobby: React.FC = () => {
     setLoading(true)
 
     try {
-      const response = await fetch(`${env.API_URL}/api/rooms`, {
+      const response = await fetch(`${env.API_URL}/api/v1/rooms`, {
         method: 'POST',
         credentials: 'include',
         headers: {

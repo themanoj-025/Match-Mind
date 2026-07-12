@@ -21,10 +21,10 @@ async function checkTokenVersion(userId: string, tokenVersion: number, prisma: a
     })
     if (!user) return false
     return (user.tokenVersion ?? 0) === tokenVersion
-  } catch (err: any) {
+  } catch (err: unknown) {
     // Fail closed to prevent bypasses during database outages/transient errors
     logger.fatal(
-      { event: 'auth.token_version_db_failure', userId, err: err.message },
+      { event: 'auth.token_version_db_failure', userId, err: (err as Error).message },
       'Token version DB lookup failed. Denying access (fail closed) to prevent security bypass.'
     )
     return false
@@ -50,7 +50,7 @@ export const authenticateToken = async (req: AuthenticatedRequest, res: Response
     req.userId = decoded.userId
 
     // Verify token hasn't been revoked (tokenVersion matches)
-    const prisma = (req as any).container.resolve('prisma')
+    const prisma = (req as unknown).container.resolve('prisma')
     if (prisma && decoded.tokenVersion !== undefined) {
       const isValid = await checkTokenVersion(decoded.userId, decoded.tokenVersion, prisma)
       if (!isValid) {
@@ -78,7 +78,7 @@ export const optionalAuth = async (req: AuthenticatedRequest, _res: Response, ne
   if (token) {
     try {
       const decoded = jwt.verify(token, env.JWT_SECRET!) as { userId: string; tokenVersion?: number }
-      const prisma = (req as any).container.resolve('prisma')
+      const prisma = (req as unknown).container.resolve('prisma')
       if (prisma && decoded.tokenVersion !== undefined) {
         const isValid = await checkTokenVersion(decoded.userId, decoded.tokenVersion, prisma)
         if (isValid) {

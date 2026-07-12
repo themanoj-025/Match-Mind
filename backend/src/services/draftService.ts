@@ -99,9 +99,9 @@ export function loadFormations(): Formation[] {
     const path = require('path')
     const raw = fs.readFileSync(path.join(__dirname, '..', 'data', 'formations.json'), 'utf-8')
     _formations = JSON.parse(raw)
-  } catch (err: any) {
-    logger.fatal({ event: 'draft.formations_load_failed', err: err.message }, 'Failed to load formations.json from data directory')
-    throw new Error(`CRITICAL_CONFIGURATION_ERROR: Formations data missing or corrupted: ${err.message}`)
+  } catch (err: unknown) {
+    logger.fatal({ event: 'draft.formations_load_failed', err: (err as Error).message }, 'Failed to load formations.json from data directory')
+    throw new Error(`CRITICAL_CONFIGURATION_ERROR: Formations data missing or corrupted: ${(err as Error).message}`)
   }
   return _formations!
 }

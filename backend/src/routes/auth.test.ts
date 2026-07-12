@@ -292,11 +292,11 @@ async function createTestApp(prismaMock: MockPrisma) {
     }
     if (err.isAppError) {
       return res.status(err.statusCode || 400).json({
-        error: { code: err.code || 'APP_ERROR', message: err.message },
+        error: { code: err.code || 'APP_ERROR', message: (err as Error).message },
       })
     }
     console.error('TEST ERROR:', err);
-    res.status(500).json({ error: { code: 'TEST_ERROR', message: err.message } })
+    res.status(500).json({ error: { code: 'TEST_ERROR', message: (err as Error).message } })
   })
 
   return app

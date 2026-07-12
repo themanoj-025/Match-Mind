@@ -50,6 +50,7 @@ export async function acquireLock(
   // Attempt lock acquisition with retries
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
+  // @ts-ignore
       const result = await redis.set(key, token, 'NX', 'PX', ttlMs)
       if (result === 'OK') {
         return {
@@ -63,14 +64,14 @@ export async function acquireLock(
                 return 0
               end
             `
-            await redis.eval(releaseScript, 1, key, token).catch((err: any) => {
-              logger.error({ event: 'lock.release_failed', key, err: err.message }, 'Failed to release lock')
+            await redis.eval(releaseScript, 1, key, token).catch((err: unknown) => {
+              logger.error({ event: 'lock.release_failed', key, err: (err as Error).message }, 'Failed to release lock')
             })
           }
         }
       }
-    } catch (err: any) {
-      logger.error({ event: 'lock.acquire_error', key, err: err.message }, 'Error attempting to acquire lock in Redis')
+    } catch (err: unknown) {
+      logger.error({ event: 'lock.acquire_error', key, err: (err as Error).message }, 'Error attempting to acquire lock in Redis')
     }
 
     if (attempt < retries) {

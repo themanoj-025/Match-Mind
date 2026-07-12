@@ -22,7 +22,7 @@ export const Leaderboard: React.FC = () => {
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        const response = await fetch(`${env.API_URL}/api/leaderboard`, {
+        const response = await fetch(`${env.API_URL}/api/v1/leaderboard`, {
           credentials: 'include'
         })
         const data = await response.json()

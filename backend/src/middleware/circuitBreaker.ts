@@ -93,7 +93,7 @@ export async function withBreaker<T>(
     logger.warn({
       event: 'circuit_breaker.fallback',
       service: serviceName,
-      err: err instanceof Error ? err.message : String(err),
+      err: err instanceof Error ? (err as Error).message : String(err),
     }, `Call failed for ${serviceName} — returning null`)
     return null
   }

@@ -22,19 +22,19 @@ export const useAuthStore = create<AuthState>((set) => ({
   setUser: (user) => set({ user }),
   fetchUser: async () => {
     try {
-      const response = await fetch(`${env.API_URL}/api/auth/me`, {
+      const response = await fetch(`${env.API_URL}/api/v1/auth/me`, {
         credentials: 'include',
       })
       if (response.ok) {
         const data = await response.json()
         set({ user: data.user, isLoading: false })
       } else {
-        const refreshRes = await fetch(`${env.API_URL}/api/auth/refresh`, {
+        const refreshRes = await fetch(`${env.API_URL}/api/v1/auth/refresh`, {
           method: 'POST',
           credentials: 'include',
         })
         if (refreshRes.ok) {
-          const retryRes = await fetch(`${env.API_URL}/api/auth/me`, {
+          const retryRes = await fetch(`${env.API_URL}/api/v1/auth/me`, {
             credentials: 'include',
           })
           if (retryRes.ok) {
@@ -52,7 +52,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
   logout: async () => {
     try {
-      await fetch(`${env.API_URL}/api/auth/logout`, {
+      await fetch(`${env.API_URL}/api/v1/auth/logout`, {
         method: 'POST',
         credentials: 'include',
       })

@@ -83,7 +83,7 @@ export function metricsMiddleware(req: Request, res: Response, next: NextFunctio
     httpRequestCount.inc({ method: req.method, route, status_code: res.statusCode })
     httpRequestDuration.observe({ method: req.method, route, status_code: res.statusCode }, duration)
     return originalEnd(...args)
-  } as any
+  } as unknown
 
   next()
 }

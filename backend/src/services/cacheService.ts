@@ -22,8 +22,8 @@ export class CacheService {
         return JSON.parse(data) as T
       }
       return null
-    } catch (err: any) {
-      logger.error({ event: 'cache.get_error', key, err: err.message }, 'Failed to read from cache')
+    } catch (err: unknown) {
+      logger.error({ event: 'cache.get_error', key, err: (err as Error).message }, 'Failed to read from cache')
       return null
     }
   }
@@ -33,8 +33,8 @@ export class CacheService {
 
     try {
       await this.redis.set(key, JSON.stringify(value), 'EX', ttlSeconds)
-    } catch (err: any) {
-      logger.error({ event: 'cache.set_error', key, err: err.message }, 'Failed to set cache')
+    } catch (err: unknown) {
+      logger.error({ event: 'cache.set_error', key, err: (err as Error).message }, 'Failed to set cache')
     }
   }
 
@@ -68,8 +68,8 @@ export class CacheService {
         await this.redis.del(...keysToDelete)
         logger.info({ event: 'cache.invalidated', pattern, count: keysToDelete.length }, 'Invalidated cache keys')
       }
-    } catch (err: any) {
-      logger.error({ event: 'cache.invalidate_error', pattern, err: err.message }, 'Failed to invalidate cache by pattern')
+    } catch (err: unknown) {
+      logger.error({ event: 'cache.invalidate_error', pattern, err: (err as Error).message }, 'Failed to invalidate cache by pattern')
     }
   }
 
@@ -78,8 +78,8 @@ export class CacheService {
 
     try {
       await this.redis.del(key)
-    } catch (err: any) {
-      logger.error({ event: 'cache.delete_error', key, err: err.message }, 'Failed to delete cache key')
+    } catch (err: unknown) {
+      logger.error({ event: 'cache.delete_error', key, err: (err as Error).message }, 'Failed to delete cache key')
     }
   }
 }

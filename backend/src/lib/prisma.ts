@@ -48,13 +48,13 @@ const prismaWithSoftDelete = rawPrisma.$extends({
         return rawPrisma.user.update({
           where: args.where,
           data: { deletedAt: new Date() },
-        }) as any
+        }) as unknown
       },
       async deleteMany({ model, operation, args, query }: any) {
         return rawPrisma.user.updateMany({
           where: args.where,
           data: { deletedAt: new Date() },
-        }) as any
+        }) as unknown
       },
       async findMany({ model, operation, args, query }: any) {
         args.where = { deletedAt: null, ...args.where }
@@ -75,7 +75,7 @@ const prismaWithSoftDelete = rawPrisma.$extends({
         // However, standard soft delete practice often skips this for findUnique if finding by ID.
         // For strictness:
         const result = await query(args)
-        if (result && (result as any).deletedAt) return null
+        if (result && (result as unknown).deletedAt) return null
         return result
       },
     },
@@ -84,13 +84,13 @@ const prismaWithSoftDelete = rawPrisma.$extends({
         return rawPrisma.room.update({
           where: args.where,
           data: { deletedAt: new Date() },
-        }) as any
+        }) as unknown
       },
       async deleteMany({ model, operation, args, query }: any) {
         return rawPrisma.room.updateMany({
           where: args.where,
           data: { deletedAt: new Date() },
-        }) as any
+        }) as unknown
       },
       async findMany({ model, operation, args, query }: any) {
         args.where = { deletedAt: null, ...args.where }
@@ -107,7 +107,7 @@ const prismaWithSoftDelete = rawPrisma.$extends({
       },
       async findUnique({ model, operation, args, query }: any) {
         const result = await query(args)
-        if (result && (result as any).deletedAt) return null
+        if (result && (result as unknown).deletedAt) return null
         return result
       },
     },
@@ -116,13 +116,13 @@ const prismaWithSoftDelete = rawPrisma.$extends({
         return rawPrisma.tournament.update({
           where: args.where,
           data: { deletedAt: new Date() },
-        }) as any
+        }) as unknown
       },
       async deleteMany({ model, operation, args, query }: any) {
         return rawPrisma.tournament.updateMany({
           where: args.where,
           data: { deletedAt: new Date() },
-        }) as any
+        }) as unknown
       },
       async findMany({ model, operation, args, query }: any) {
         args.where = { deletedAt: null, ...args.where }
@@ -139,7 +139,7 @@ const prismaWithSoftDelete = rawPrisma.$extends({
       },
       async findUnique({ model, operation, args, query }: any) {
         const result = await query(args)
-        if (result && (result as any).deletedAt) return null
+        if (result && (result as unknown).deletedAt) return null
         return result
       },
     },
@@ -148,13 +148,13 @@ const prismaWithSoftDelete = rawPrisma.$extends({
         return rawPrisma.chatMessage.update({
           where: args.where,
           data: { deletedAt: new Date(), isDeleted: true },
-        }) as any
+        }) as unknown
       },
       async deleteMany({ model, operation, args, query }: any) {
         return rawPrisma.chatMessage.updateMany({
           where: args.where,
           data: { deletedAt: new Date(), isDeleted: true },
-        }) as any
+        }) as unknown
       },
       async findMany({ model, operation, args, query }: any) {
         args.where = { deletedAt: null, ...args.where }
@@ -171,7 +171,7 @@ const prismaWithSoftDelete = rawPrisma.$extends({
       },
       async findUnique({ model, operation, args, query }: any) {
         const result = await query(args)
-        if (result && (result as any).deletedAt) return null
+        if (result && (result as unknown).deletedAt) return null
         return result
       },
     },

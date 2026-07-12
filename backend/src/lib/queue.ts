@@ -24,7 +24,7 @@ export const auctionQueueOptions: QueueOptions = {
 export const auctionQueue = new Queue('auction-timer', auctionQueueOptions)
 
 auctionQueue.on('error', (err) => {
-  logger.error({ event: 'queue.auction.error', err: err.message })
+  logger.error({ event: 'queue.auction.error', err: (err as Error).message })
 })
 
 export async function scheduleAuctionTimer(roomId: string, timerEndsAt: string) {

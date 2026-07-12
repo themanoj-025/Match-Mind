@@ -68,7 +68,7 @@ export class PrismaUserRepository implements IUserRepository {
   }
 
   async update(id: string, data: Partial<UserData>): Promise<UserData> {
-    return this.prisma.user.update({ where: { id }, data: data as any }) as unknown as UserData
+    return this.prisma.user.update({ where: { id }, data: data as unknown }) as unknown as UserData
   }
 
   async delete(id: string): Promise<void> {
@@ -90,7 +90,7 @@ export class PrismaUserRepository implements IUserRepository {
   }
 
   async updateMany(where: Record<string, unknown>, data: Partial<UserData>): Promise<{ count: number }> {
-    return this.prisma.user.updateMany({ where, data: data as any })
+    return this.prisma.user.updateMany({ where, data: data as unknown })
   }
 
   async updateSports(userId: string, sports: string[]): Promise<void> {
@@ -151,7 +151,7 @@ export class PrismaMatchRepository implements IMatchRepository {
   }
 
   async update(id: string, data: Partial<MatchData>): Promise<MatchData> {
-    return this.prisma.fixture.update({ where: { id }, data: data as any }) as unknown as MatchData
+    return this.prisma.fixture.update({ where: { id }, data: data as unknown }) as unknown as MatchData
   }
 
   async count(where?: Record<string, unknown>): Promise<number> {
@@ -203,7 +203,7 @@ export class PrismaPredictionRepository implements IPredictionRepository {
         matchId: data.matchId,
         homeGoals: data.homeGoals,
         awayGoals: data.awayGoals,
-        status: (data.status ?? 'PENDING') as any,
+        status: (data.status ?? 'PENDING') as unknown,
         firstScorerId: data.firstScorerId ?? null,
         totalGoalsOU: data.totalGoalsOU ?? null,
         totalGoalsLine: data.totalGoalsLine ?? null,
@@ -213,14 +213,14 @@ export class PrismaPredictionRepository implements IPredictionRepository {
   }
 
   async update(id: string, data: Partial<PredictionData>): Promise<PredictionData> {
-    return this.prisma.prediction.update({ where: { id }, data: data as any }) as unknown as PredictionData
+    return this.prisma.prediction.update({ where: { id }, data: data as unknown }) as unknown as PredictionData
   }
 
   async updateMany(
     where: { matchId?: string; status?: string },
     data: Partial<PredictionData>,
   ): Promise<{ count: number }> {
-    return this.prisma.prediction.updateMany({ where: where as any, data: data as any })
+    return this.prisma.prediction.updateMany({ where: where as unknown, data: data as unknown })
   }
 }
 
@@ -304,7 +304,7 @@ export class PrismaReportRepository implements IReportRepository {
   }
 
   async count(where?: Record<string, unknown>): Promise<number> {
-    return this.prisma.report.count({ where: where as any })
+    return this.prisma.report.count({ where: where as unknown })
   }
 
   async findMany(opts: {
@@ -313,11 +313,11 @@ export class PrismaReportRepository implements IReportRepository {
     take?: number
     skip?: number
   }): Promise<unknown[]> {
-    return this.prisma.report.findMany(opts as any)
+    return this.prisma.report.findMany(opts as unknown)
   }
 
   async update(id: string, data: Record<string, unknown>): Promise<unknown> {
-    return this.prisma.report.update({ where: { id }, data: data as any })
+    return this.prisma.report.update({ where: { id }, data: data as unknown })
   }
 }
 
@@ -330,7 +330,7 @@ export class PrismaAdminLogRepository implements IAdminLogRepository {
   }
 
   async create(data: Record<string, unknown>): Promise<unknown> {
-    return (this.prisma as any).adminLog.create({
+    return (this.prisma as unknown).adminLog.create({
       data: {
         adminId: data.adminId as string,
         action: data.action as string,
@@ -342,11 +342,11 @@ export class PrismaAdminLogRepository implements IAdminLogRepository {
   }
 
   async findMany(opts: { orderBy?: Record<string, 'asc' | 'desc'>; take?: number; skip?: number }): Promise<unknown[]> {
-    return (this.prisma as any).adminLog.findMany(opts)
+    return (this.prisma as unknown).adminLog.findMany(opts)
   }
 
   async count(where?: Record<string, unknown>): Promise<number> {
-    return (this.prisma as any).adminLog.count({ where })
+    return (this.prisma as unknown).adminLog.count({ where })
   }
 }
 

@@ -192,7 +192,7 @@ export const DraftRoom: React.FC = () => {
     setLoadingAi(true)
     setAiOpen(true)
     try {
-      const response = await fetch(`${env.API_URL}/api/ai/auction-advice`, {
+      const response = await fetch(`${env.API_URL}/api/v1/ai/auction-advice`, {
         method: 'POST',
         credentials: 'include',
         headers: {

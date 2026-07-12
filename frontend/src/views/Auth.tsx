@@ -22,7 +22,7 @@ export const Auth: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    const endpoint = isLogin ? '/api/auth/login' : '/api/auth/signup'
+    const endpoint = isLogin ? '/api/v1/auth/login' : '/api/v1/auth/signup'
     const payload = isLogin ? { email, password } : { username, email, password }
 
     try {
@@ -49,7 +49,7 @@ export const Auth: React.FC = () => {
   }
 
   const handleGoogleLogin = () => {
-    window.location.href = `${env.API_URL}/api/auth/google`
+    window.location.href = `${env.API_URL}/api/v1/auth/google`
   }
 
   return (

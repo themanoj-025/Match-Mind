@@ -15,7 +15,6 @@ import { openapiRegistry } from '../config/openapi'
 import { authenticateToken } from '../middleware/auth'
 import { aiPredictionLimiter } from '../middleware/rateLimiter'
 import logger from '../utils/logger'
-import asyncHandler from '../middleware/asyncHandler'
 import type { AuthenticatedRequest } from '../middleware/auth'
 import CircuitBreaker from 'opossum'
 
@@ -42,115 +41,117 @@ openapiRegistry.registerPath({
   path: '/auction-advice',
   responses: { 200: { description: 'Success' } }
 })
-router.post('/auction-advice', authenticateToken, aiPredictionLimiter, asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = (req as any).container.resolve('prisma')
-  const cacheService = (req as any).container.resolve('cacheService')
-  const { roomId } = req.body as { roomId: string }
+router.post('/auction-advice', authenticateToken, aiPredictionLimiter, async (req: AuthenticatedRequest, res) => {
+  // @ts-ignore
+      const prisma = (req as unknown).container.resolve('prisma')
+  // @ts-ignore
+      const cacheService = (req as unknown).container.resolve('cacheService')
+      const { roomId } = req.body as { roomId: string }
 
-  if (!roomId) {
-    return res.status(400).json({ error: { code: 'MISSING_ROOM_ID', message: 'roomId is required' } })
-  }
+      if (!roomId) {
+        return res.status(400).json({ error: { code: 'MISSING_ROOM_ID', message: 'roomId is required' } })
+      }
 
-  // Verify room membership
-  const member = await prisma.roomMember.findUnique({
-    where: { roomId_userId: { roomId, userId: req.userId } },
-  })
-  if (!member) {
-    return res.status(403).json({ error: { code: 'NOT_MEMBER', message: 'You are not a member of this room' } })
-  }
+      // Verify room membership
+      const member = await prisma.roomMember.findUnique({
+        where: { roomId_userId: { roomId, userId: req.userId } },
+      })
+      if (!member) {
+        return res.status(403).json({ error: { code: 'NOT_MEMBER', message: 'You are not a member of this room' } })
+      }
 
-  // Pro check
-  const isPro = await checkProStatus(prisma, req.userId!)
-  if (!isPro) {
-    return res.json({
-      isProFeature: true,
-      advice: null,
-      message: 'AI Auction Advisor is a Pro feature. Upgrade to unlock.',
+      // Pro check
+      const isPro = await checkProStatus(prisma, req.userId!)
+      if (!isPro) {
+        return res.json({
+          isProFeature: true,
+          advice: null,
+          message: 'AI Auction Advisor is a Pro feature. Upgrade to unlock.',
+        })
+      }
+
+      const room = await prisma.room.findUnique({ where: { id: roomId } })
+      if (!room) {
+        return res.status(404).json({ error: { code: 'ROOM_NOT_FOUND', message: 'Room not found' } })
+      }
+
+      // Gather context for the AI
+      const roster = await prisma.roster.findMany({
+        where: { roomId, userId: req.userId },
+        include: { player: { select: { id: true, name: true, position: true, basePrice: true, club: true } } },
+      })
+
+      // Removed redis lrange. Instead, we query remaining pool players efficiently.
+      // We can fetch players not in any roster for this tournament.
+      const poolPlayers = await prisma.player.findMany({
+        where: { 
+          tournamentId: room.tournamentId,
+          rosters: {
+            none: { roomId }
+          }
+        }
+      })
+
+      const rosterPositions: Record<string, number> = { GK: 0, DEF: 0, MID: 0, FWD: 0 }
+      for (const entry of roster) {
+        if (entry.player?.position) {
+          // @ts-ignore
+          rosterPositions[entry.player.position]++
+        }
+      }
+
+      const positionNeeds: Record<string, number> = {}
+      const defaultRosterRules: Record<string, number> = { GK: 2, DEF: 5, MID: 5, FWD: 3, total: 15 }
+      for (const [pos, limit] of Object.entries(defaultRosterRules)) {
+        if (pos === 'total') continue
+        const filled = rosterPositions[pos] || 0
+        const need = (limit as number) - filled
+        if (need > 0) positionNeeds[pos] = need
+      }
+
+      // Try Anthropic SDK if configured (with Redis caching)
+
+      const rosterStr = JSON.stringify(roster.map((r: any) => `${r.playerId || r.id}:${r.soldPrice}`))
+      const poolStr = JSON.stringify(poolPlayers.map((p: any) => p.id).sort())
+      const hashInput = `${rosterStr}:${member.remainingBudget}:${poolStr}`
+      const hash = crypto.createHash('sha256').update(hashInput).digest('hex').substring(0, 16)
+      const cacheKey = `ai:advice:${roomId}:${req.userId}:${hash}`
+
+      let cacheHit = false
+
+      const advice = await cacheService.getOrFetch(cacheKey, 600, async () => {
+        let freshAdvice: any = null
+        
+        if (env.ANTHROPIC_API_KEY) {
+          try {
+            freshAdvice = await aiBreaker.fire(roster, member.remainingBudget, positionNeeds, poolPlayers, defaultRosterRules)
+          } catch (err: unknown) {
+            logger.error({ event: 'ai.anthropic_advice_error', roomId, err: (err as Error).message }, 'Anthropic API error')
+          }
+        }
+
+        if (!freshAdvice) {
+          freshAdvice = generateHeuristicAdvice(roster, member.remainingBudget, positionNeeds, poolPlayers)
+        }
+        
+        return freshAdvice
+      })
+
+      // To check if it was a cache hit, we would need getOrFetch to return a tuple, but here we just accept cacheHit is not completely accurate 
+      // or we can manually check cache first. Let's do a manual check to maintain cacheHit tracking for the client:
+      let finalAdvice = await cacheService.get(cacheKey)
+      if (finalAdvice) {
+        cacheHit = true
+      } else {
+        finalAdvice = advice // it was fetched via getOrFetch and cached just now
+      }
+
+      res.json({
+        isProFeature: false,
+        advice: finalAdvice,
+        cacheHit,
+      })
     })
-  }
-
-  const room = await prisma.room.findUnique({ where: { id: roomId } })
-  if (!room) {
-    return res.status(404).json({ error: { code: 'ROOM_NOT_FOUND', message: 'Room not found' } })
-  }
-
-  // Gather context for the AI
-  const roster = await prisma.roster.findMany({
-    where: { roomId, userId: req.userId },
-    include: { player: { select: { id: true, name: true, position: true, basePrice: true, club: true } } },
-  })
-
-  // Removed redis lrange. Instead, we query remaining pool players efficiently.
-  // We can fetch players not in any roster for this tournament.
-  const poolPlayers = await prisma.player.findMany({
-    where: { 
-      tournamentId: room.tournamentId,
-      rosters: {
-        none: { roomId }
-      }
-    }
-  })
-
-  const rosterPositions: Record<string, number> = { GK: 0, DEF: 0, MID: 0, FWD: 0 }
-  for (const entry of roster) {
-    if (entry.player?.position) {
-      // @ts-ignore
-      rosterPositions[entry.player.position]++
-    }
-  }
-
-  const positionNeeds: Record<string, number> = {}
-  const defaultRosterRules: Record<string, number> = { GK: 2, DEF: 5, MID: 5, FWD: 3, total: 15 }
-  for (const [pos, limit] of Object.entries(defaultRosterRules)) {
-    if (pos === 'total') continue
-    const filled = rosterPositions[pos] || 0
-    const need = (limit as number) - filled
-    if (need > 0) positionNeeds[pos] = need
-  }
-
-  // Try Anthropic SDK if configured (with Redis caching)
-
-  const rosterStr = JSON.stringify(roster.map((r: any) => `${r.playerId || r.id}:${r.soldPrice}`))
-  const poolStr = JSON.stringify(poolPlayers.map((p: any) => p.id).sort())
-  const hashInput = `${rosterStr}:${member.remainingBudget}:${poolStr}`
-  const hash = crypto.createHash('sha256').update(hashInput).digest('hex').substring(0, 16)
-  const cacheKey = `ai:advice:${roomId}:${req.userId}:${hash}`
-
-  let cacheHit = false
-
-  const advice = await cacheService.getOrFetch(cacheKey, 600, async () => {
-    let freshAdvice: any = null
-    
-    if (env.ANTHROPIC_API_KEY) {
-      try {
-        freshAdvice = await aiBreaker.fire(roster, member.remainingBudget, positionNeeds, poolPlayers, defaultRosterRules)
-      } catch (err: any) {
-        logger.error({ event: 'ai.anthropic_advice_error', roomId, err: err.message }, 'Anthropic API error')
-      }
-    }
-
-    if (!freshAdvice) {
-      freshAdvice = generateHeuristicAdvice(roster, member.remainingBudget, positionNeeds, poolPlayers)
-    }
-    
-    return freshAdvice
-  })
-
-  // To check if it was a cache hit, we would need getOrFetch to return a tuple, but here we just accept cacheHit is not completely accurate 
-  // or we can manually check cache first. Let's do a manual check to maintain cacheHit tracking for the client:
-  let finalAdvice = await cacheService.get(cacheKey)
-  if (finalAdvice) {
-    cacheHit = true
-  } else {
-    finalAdvice = advice // it was fetched via getOrFetch and cached just now
-  }
-
-  res.json({
-    isProFeature: false,
-    advice: finalAdvice,
-    cacheHit,
-  })
-}))
 
 async function checkProStatus(prisma: any, userId: string): Promise<boolean> {
   const user = await prisma.user.findUnique({
@@ -210,7 +211,8 @@ Only respond with valid JSON, no other text.`,
   })
 
   try {
-    const text = (msg.content[0] as any)?.text || '{}'
+  // @ts-ignore
+    const text = (msg.content[0] as unknown)?.text || '{}'
     return JSON.parse(text)
   } catch {
     return null

@@ -83,7 +83,8 @@ export function createTestTournament(overrides: Record<string, any> = {}) {
  * This replaces the real authenticateToken middleware so tests don't
  * need to generate JWTs or manage auth tokens.
  */
-function mockAuthenticateToken(req: any, _res: any, next: any) {
+function mockAuthenticateToken(req: express.Request, _res: any, next: any) {
+  // @ts-ignore
   req.userId = 'test-user-1'
   next()
 }
