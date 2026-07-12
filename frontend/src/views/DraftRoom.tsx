@@ -9,6 +9,7 @@ import { Card } from '../components/Card'
 import { MessageSquare, Users, DollarSign, Clock, Sparkles, Trophy, ArrowLeft } from 'lucide-react'
 
 import { env } from '../config/env'
+import { useAuctionAdvice } from '../hooks/useAuctionAdvice'
 
 const DraftTimer: React.FC<{ timerEndsAt: string | null }> = ({ timerEndsAt }) => {
   const [timeLeft, setTimeLeft] = useState(0)
@@ -80,7 +81,6 @@ export const DraftRoom: React.FC = () => {
   const [chatInput, setChatInput] = useState('')
   const [bidInput, setBidInput] = useState('')
   const [aiAdvice, setAiAdvice] = useState<any>(null)
-  const [loadingAi, setLoadingAi] = useState(false)
   const [aiOpen, setAiOpen] = useState(false)
 
   const chatEndRef = useRef<HTMLDivElement>(null)
@@ -188,29 +188,21 @@ export const DraftRoom: React.FC = () => {
     setChatInput('')
   }
 
-  const requestAiAdvice = async () => {
-    setLoadingAi(true)
+  const aiAdviceMutation = useAuctionAdvice()
+
+  const requestAiAdvice = () => {
     setAiOpen(true)
-    try {
-      const response = await fetch(`${env.API_URL}/api/v1/ai/auction-advice`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
+    aiAdviceMutation.mutate(
+      { roomId: roomId as string, draftState: {} }, // Pass draft state if needed
+      {
+        onSuccess: (data) => {
+          setAiAdvice(data.advice)
         },
-        body: JSON.stringify({ roomId }),
-      })
-      const data = await response.json()
-      if (response.ok) {
-        setAiAdvice(data.advice)
-      } else {
-        showToast(data.error?.message || 'Failed to fetch AI insights', 'error')
+        onError: (err: any) => {
+          showToast(err.message || 'Failed to fetch AI insights', 'error')
+        }
       }
-    } catch (err) {
-      showToast('Could not fetch advice', 'error')
-    } finally {
-      setLoadingAi(false)
-    }
+    )
   }
 
   return (
@@ -375,7 +367,7 @@ export const DraftRoom: React.FC = () => {
               <button onClick={() => setAiOpen(false)} className="text-foreground-muted hover:text-white cursor-pointer text-sm">Close</button>
             </div>
 
-            {loadingAi ? (
+            {aiAdviceMutation.isPending ? (
               <div className="space-y-4 pt-12 text-center">
                 <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto" />
                 <p className="text-xs text-foreground-muted font-mono">Formulating strategy and evaluating roster needs...</p>
@@ -410,7 +402,7 @@ export const DraftRoom: React.FC = () => {
             )}
           </div>
 
-          <Button onClick={requestAiAdvice} className="w-full py-4 text-xs font-semibold" disabled={loadingAi}>
+          <Button onClick={requestAiAdvice} className="w-full py-4 text-xs font-semibold" disabled={aiAdviceMutation.isPending}>
             Recalculate Strategy
           </Button>
         </div>

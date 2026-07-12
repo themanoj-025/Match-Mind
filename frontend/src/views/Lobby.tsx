@@ -6,82 +6,47 @@ import { Button } from '../components/Button'
 import { Input } from '../components/Input'
 import { Card } from '../components/Card'
 import { Layers, Plus, LogOut, Trophy } from 'lucide-react'
-import { env } from '../config/env'
+import { useRooms, useCreateRoom } from '../hooks/useRooms'
 
-interface Room {
-  id: string
-  name: string
-  status: string
-  type: string
-  totalBudget: number
-  _count?: {
-    members: number
-  }
-}
+
 
 export const Lobby: React.FC = () => {
-  const [rooms, setRooms] = useState<Room[]>([])
   const [newRoomName, setNewRoomName] = useState('')
   const [budget, setBudget] = useState(200)
-  const [loading, setLoading] = useState(false)
   const { user, logout } = useAuthStore()
   const { showToast } = useToastStore()
   const navigate = useNavigate()
 
-  const fetchRooms = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/api/v1/rooms', {
-        credentials: 'include'
-      })
-      const data = await response.json()
-      if (response.ok) {
-        setRooms(data)
-      }
-    } catch (err) {
-      showToast('Failed to load active draft rooms', 'error')
-    }
-  }
+  const { data: rooms = [] } = useRooms()
+  const createRoom = useCreateRoom()
 
   useEffect(() => {
     if (!user) {
       navigate('/login')
-      return
     }
-    fetchRooms()
-  }, [user])
+  }, [user, navigate])
 
-  const handleCreateRoom = async (e: React.FormEvent) => {
+  const handleCreateRoom = (e: React.FormEvent) => {
     e.preventDefault()
     if (!newRoomName) return
-    setLoading(true)
 
-    try {
-      const response = await fetch(`${env.API_URL}/api/v1/rooms`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
+    createRoom.mutate(
+      {
+        name: newRoomName,
+        type: 'room',
+        totalBudget: budget,
+        rosterRules: { GK: 1, DEF: 4, MID: 3, FWD: 3, total: 11 },
+      },
+      {
+        onSuccess: (data) => {
+          showToast('Draft room created!', 'success')
+          navigate(`/room/${data.id}`)
         },
-        body: JSON.stringify({
-          name: newRoomName,
-          type: 'room',
-          totalBudget: budget,
-          rosterRules: { GK: 1, DEF: 4, MID: 3, FWD: 3, total: 11 },
-        }),
-      })
-      const data = await response.json()
-
-      if (!response.ok) {
-        showToast(data.error?.message || 'Failed to create room', 'error')
-      } else {
-        showToast('Draft room created!', 'success')
-        navigate(`/room/${data.id}`)
+        onError: (err: any) => {
+          showToast(err.message || 'Failed to create room', 'error')
+        },
       }
-    } catch (err) {
-      showToast('Connection failed', 'error')
-    } finally {
-      setLoading(false)
-    }
+    )
   }
 
   return (
@@ -167,8 +132,8 @@ export const Lobby: React.FC = () => {
                   required
                 />
               </div>
-              <Button type="submit" className="w-full py-5 mt-6 font-semibold" disabled={loading}>
-                {loading ? 'Creating...' : 'Initialize'}
+              <Button type="submit" className="w-full py-5 mt-6 font-semibold" disabled={createRoom.isPending}>
+                {createRoom.isPending ? 'Creating...' : 'Initialize'}
               </Button>
             </form>
           </Card>

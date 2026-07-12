@@ -1,41 +1,18 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuthStore } from '../store/useAuthStore'
-import { useToastStore } from '../store/useToastStore'
+
+
 import { Card } from '../components/Card'
 import { Trophy, ArrowLeft, Users } from 'lucide-react'
-import { env } from '../config/env'
 
-interface LeaderboardEntry {
-  rank: number
-  username: string
-  points: number
-  draftsCleared: number
-}
+
+import { useLeaderboard } from '../hooks/useLeaderboard'
 
 export const Leaderboard: React.FC = () => {
-  const [entries, setEntries] = useState<LeaderboardEntry[]>([])
-  const { user } = useAuthStore()
-  const { showToast } = useToastStore()
+  
   const navigate = useNavigate()
 
-  useEffect(() => {
-    const fetchLeaderboard = async () => {
-      try {
-        const response = await fetch(`${env.API_URL}/api/v1/leaderboard`, {
-          credentials: 'include'
-        })
-        const data = await response.json()
-        if (response.ok) {
-          // Format leaderboard response
-          setEntries(data.rankings || data || [])
-        }
-      } catch (err) {
-        showToast('Failed to load global rankings', 'error')
-      }
-    }
-    fetchLeaderboard()
-  }, [user])
+  const { data: entries = [] } = useLeaderboard()
 
   return (
     <div className="min-h-screen bg-[#050506] text-foreground relative px-6 py-12">
