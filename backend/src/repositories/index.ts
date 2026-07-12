@@ -20,7 +20,7 @@ import type {
 
 import { PrismaClient } from '@prisma/client'
 
-export type DatabaseClient = PrismaClient
+export type DatabaseClient = any
 
 // ─── User Repository ─────────────────────────────────────
 
@@ -91,6 +91,40 @@ export class PrismaUserRepository implements IUserRepository {
 
   async updateMany(where: Record<string, unknown>, data: Partial<UserData>): Promise<{ count: number }> {
     return this.prisma.user.updateMany({ where, data: data as any })
+  }
+
+  async updateSports(userId: string, sports: string[]): Promise<void> {
+    await this.prisma.userSport.deleteMany({ where: { userId } })
+    if (sports.length > 0) {
+      await this.prisma.userSport.createMany({
+        data: sports.map((sport: string) => ({ userId, sport })),
+      })
+    }
+  }
+
+  async updateTeams(userId: string, teamIds: string[]): Promise<void> {
+    await this.prisma.userTeam.deleteMany({ where: { userId } })
+    if (teamIds.length > 0) {
+      await this.prisma.userTeam.createMany({
+        data: teamIds.map((teamId: string) => ({ userId, teamId })),
+      })
+    }
+  }
+
+  async followUser(followerId: string, followingId: string): Promise<unknown> {
+    return this.prisma.follow.create({ data: { followerId, followingId } })
+  }
+
+  async unfollowUser(followerId: string, followingId: string): Promise<void> {
+    await this.prisma.follow.deleteMany({ where: { followerId, followingId } })
+  }
+
+  async getNotifications(userId: string, take = 50): Promise<unknown[]> {
+    return this.prisma.notification.findMany({ where: { userId }, orderBy: { createdAt: 'desc' }, take })
+  }
+
+  async markNotificationsRead(userId: string): Promise<void> {
+    await this.prisma.notification.updateMany({ where: { userId, isRead: false }, data: { isRead: true } })
   }
 }
 
@@ -215,7 +249,7 @@ export class PrismaLeaderboardRepository implements ILeaderboardRepository {
       take,
     })
 
-    return users.map((u, i) => ({
+    return users.map((u: any, i: number) => ({
       id: u.id,
       username: u.username,
       name: u.displayName || u.username,
@@ -246,7 +280,7 @@ export class PrismaLeaderboardRepository implements ILeaderboardRepository {
       take,
     })
 
-    return users.map((u, i) => ({
+    return users.map((u: any, i: number) => ({
       id: u.id,
       username: u.username,
       name: u.displayName || u.username,

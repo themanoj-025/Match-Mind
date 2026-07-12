@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "description": "🏟️ MatchMind — The Internet's Sports Bar",
+  "workspaces": [
+    "backend",
+    "frontend",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "concurrently -n api,web -c cyan,green \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:up": "docker-compose up -d && node -e \"setTimeout(()=>{}, 5000)\" && cd backend && npx prisma migrate deploy && cd .. && npm run dev",

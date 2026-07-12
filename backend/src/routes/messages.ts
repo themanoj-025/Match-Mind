@@ -27,23 +27,11 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.get('/conversations', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+  const messageService = (req as any).container.resolve('messageService')
   const userId = req.userId!
 
   // Get all DM rooms this user is part of
-  const messages = await prisma.chatMessage.findMany({
-    where: {
-      roomType: 'dm',
-      roomId: { contains: userId },
-      isDeleted: false,
-    },
-    orderBy: { createdAt: 'desc' },
-    include: {
-      user: {
-        select: { id: true, username: true, displayName: true, avatar: true, tier: true },
-      },
-    },
-  })
+  const messages = await messageService.getUserDMMessages(userId)
 
   // Group by roomId and get latest message per conversation
   const roomMap = new Map<string, any>()
@@ -64,10 +52,7 @@ router.get('/conversations', authenticateToken, asyncHandler(async (req: Authent
 
   // Fetch user info for conversation partners
   const otherUserIds = [...roomMap.values()].map((c) => c.otherUserId)
-  const users = await prisma.user.findMany({
-    where: { id: { in: otherUserIds } },
-    select: { id: true, username: true, displayName: true, avatar: true, tier: true, isPro: true },
-  })
+  const users = await messageService.getConversationPartners(otherUserIds)
   const userMap = new Map(users.map((u: any) => [u.id, u]))
 
   // Count unread messages per conversation
@@ -108,33 +93,18 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.get('/:userId', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+  const messageService = (req as any).container.resolve('messageService')
+  const userService = (req as any).container.resolve('userService')
   const { userId: targetUserId } = req.params
   const roomId = getDMRoomId(req.userId!, String(targetUserId))
 
   // Verify the other user exists
-  const otherUser = await prisma.user.findUnique({
-    where: { id: targetUserId },
-    select: { id: true, username: true, displayName: true, avatar: true, tier: true, isPro: true },
-  })
+  const otherUser = await userService.getUser(targetUserId)
   if (!otherUser) {
     return res.status(404).json({ error: { code: 'USER_NOT_FOUND', message: 'User not found' } })
   }
 
-  const messages = await prisma.chatMessage.findMany({
-    where: {
-      roomType: 'dm',
-      roomId,
-      isDeleted: false,
-    },
-    orderBy: { createdAt: 'asc' },
-    take: 100,
-    include: {
-      user: {
-        select: { id: true, username: true, displayName: true, avatar: true, tier: true },
-      },
-    },
-  })
+  const messages = await messageService.getDMs(roomId)
 
   res.json({ messages, otherUser })
 }))
@@ -151,7 +121,8 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.post('/:userId', authenticateToken, validate(sendMessageSchema), asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+  const messageService = (req as any).container.resolve('messageService')
+  const userService = (req as any).container.resolve('userService')
   const { text, gifUrl } = req.body as { text?: string; gifUrl?: string }
   const { userId: targetUserId } = req.params
   const roomId = getDMRoomId(req.userId!, String(targetUserId))
@@ -162,29 +133,12 @@ router.post('/:userId', authenticateToken, validate(sendMessageSchema), asyncHan
   }
 
   // Verify the recipient exists
-  const recipient = await prisma.user.findUnique({
-    where: { id: targetUserId },
-    select: { id: true },
-  })
+  const recipient = await userService.getUser(targetUserId)
   if (!recipient) {
     return res.status(404).json({ error: { code: 'USER_NOT_FOUND', message: 'Recipient not found' } })
   }
 
-  const message = await prisma.chatMessage.create({
-    data: {
-      roomType: 'dm',
-      roomId,
-      userId: req.userId,
-      text: text?.trim() || null,
-      gifUrl: gifUrl || null,
-      type: gifUrl ? 'gif' : 'text',
-    },
-    include: {
-      user: {
-        select: { id: true, username: true, displayName: true, avatar: true, tier: true, isPro: true },
-      },
-    },
-  })
+  const message = await messageService.sendMessage(roomId, req.userId, text || null, gifUrl || null)
 
   // Emit real-time event to both users
   const io = req.app.get('io')
@@ -210,19 +164,11 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.patch('/read/:userId', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+  const messageService = (req as any).container.resolve('messageService')
   const { userId: targetUserId } = req.params
   const roomId = getDMRoomId(req.userId!, String(targetUserId))
 
-  await prisma.chatMessage.updateMany({
-    where: {
-      roomType: 'dm',
-      roomId,
-      userId: targetUserId,
-      isRead: false,
-    },
-    data: { isRead: true },
-  })
+  await messageService.markAsRead(roomId, targetUserId)
 
   res.json({ message: 'Marked as read' })
 }))

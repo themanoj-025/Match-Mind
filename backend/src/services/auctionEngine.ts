@@ -17,6 +17,7 @@ import {
   AUCTION_ANTI_SNIPE_RESET_SECONDS,
 } from '../config/tournaments'
 import logger from '../utils/logger'
+import { redis } from '../lib/redis'
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -35,8 +36,6 @@ export interface AuctionState {
   currentBid: number
   currentBidderId: string | null
   timerEndsAt: string | null
-  poolQueue: string[]
-  unsoldPlayerIds: string[]
   version: number
 }
 
@@ -292,10 +291,11 @@ export async function unsoldCurrentPlayer(
       currentBid: 0,
       currentBidderId: null,
       timerEndsAt: null,
-      unsoldPlayerIds: currentPlayerId
-        ? [...state.unsoldPlayerIds, currentPlayerId]
-        : state.unsoldPlayerIds,
       version: state.version + 1,
+    }
+
+    if (currentPlayerId) {
+      await redis.rpush(`auction:${roomId}:unsold`, currentPlayerId)
     }
 
     await saveAuctionState(roomId, newState)
@@ -314,12 +314,12 @@ export async function moveToNextPlayer(
     const state = await getAuctionState(roomId)
     if (!state) return null
 
-    const queue = [...state.poolQueue]
-    const nextPlayerId = queue.shift()
+    const nextPlayerId = await redis.lpop(`auction:${roomId}:pool`)
 
     if (!nextPlayerId) {
       // Pool is exhausted
-      if (state.unsoldPlayerIds.length > 0) {
+      const unsoldLen = await redis.llen(`auction:${roomId}:unsold`)
+      if (unsoldLen > 0) {
         // Switch to re-auction mode
         const newState: AuctionState = {
           ...state,
@@ -355,7 +355,6 @@ export async function moveToNextPlayer(
       currentBid: 0,
       currentBidderId: null,
       timerEndsAt: new Date(Date.now() + AUCTION_DEFAULT_TIMER_SECONDS * 1000).toISOString(),
-      poolQueue: queue,
       version: state.version + 1,
     }
 
@@ -440,12 +439,12 @@ async function moveToNextPlayerInternal(
   const state = await getAuctionState(roomId)
   if (!state) return null
 
-  const queue = [...state.poolQueue]
-  const nextPlayerId = queue.shift()
+  const nextPlayerId = await redis.lpop(`auction:${roomId}:pool`)
 
   if (!nextPlayerId) {
     // Pool is exhausted
-    if (state.unsoldPlayerIds.length > 0) {
+    const unsoldLen = await redis.llen(`auction:${roomId}:unsold`)
+    if (unsoldLen > 0) {
       // Switch to re-auction mode
       const newState: AuctionState = {
         ...state,
@@ -480,7 +479,6 @@ async function moveToNextPlayerInternal(
     currentBid: 0,
     currentBidderId: null,
     timerEndsAt: new Date(Date.now() + AUCTION_DEFAULT_TIMER_SECONDS * 1000).toISOString(),
-    poolQueue: queue,
     version: state.version + 1,
   }
   await saveAuctionState(roomId, newState)
@@ -501,11 +499,13 @@ async function unsoldCurrentPlayerInternal(
     currentBid: 0,
     currentBidderId: null,
     timerEndsAt: null,
-    unsoldPlayerIds: currentPlayerId
-      ? [...state.unsoldPlayerIds, currentPlayerId]
-      : state.unsoldPlayerIds,
     version: state.version + 1,
   }
+  
+  if (currentPlayerId) {
+    await redis.rpush(`auction:${roomId}:unsold`, currentPlayerId)
+  }
+
   await saveAuctionState(roomId, newState)
   return newState
 }
@@ -521,7 +521,13 @@ export async function startReAuction(
     const state = await getAuctionState(roomId)
     if (!state || state.phase !== 'RE_AUCTION') return null
 
-    const unsold = [...state.unsoldPlayerIds]
+    // Move all unsold to pool queue in Redis
+    const unsoldPlayers = await redis.lrange(`auction:${roomId}:unsold`, 0, -1)
+    if (unsoldPlayers.length > 0) {
+      await redis.rpush(`auction:${roomId}:pool`, ...unsoldPlayers)
+      await redis.del(`auction:${roomId}:unsold`)
+    }
+
     const newState: AuctionState = {
       ...state,
       phase: 'PLAYER_LIVE',
@@ -529,8 +535,6 @@ export async function startReAuction(
       currentBid: 0,
       currentBidderId: null,
       timerEndsAt: null,
-      poolQueue: unsold,
-      unsoldPlayerIds: [],
       version: state.version + 1,
     }
 

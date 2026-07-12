@@ -21,11 +21,15 @@ export const redis = env.REDIS_URL
       set: async () => null,
       get: async () => null,
       eval: async () => 0,
-      incr: async () => 1,
       expire: async () => true,
+      rpush: async () => 1,
+      lpop: async () => null,
+      llen: async () => 0,
+      lrange: async () => [],
+      del: async () => 1,
     } as any)
 
-redis.on('error', (err) => {
+redis.on('error', (err: any) => {
   logger.error({ event: 'redis.error', err: err.message }, 'Redis connection error')
 })
 

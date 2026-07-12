@@ -19,7 +19,7 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.get('/', asyncHandler(async (req, res) => {
-  const prisma = req.app.get('prisma')
+  const prisma = (req as any).container.resolve('prisma')
   const { q } = req.query as { q?: string }
   if (!q || q.trim().length < 2) {
     return res.json({ users: [], players: [] })

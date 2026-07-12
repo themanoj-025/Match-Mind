@@ -24,27 +24,11 @@ import asyncHandler from '../middleware/asyncHandler'
 import { draftStartSchema, draftPickSchema } from '../config/schemas'
 import type { AuthenticatedRequest } from '../middleware/auth'
 import {
-  startDraft,
-  getNextRound,
-  processPick,
-  commitSquad,
-  getSessionState,
-  listUserDrafts,
-  loadFormations,
   type ChoiceRound,
   type DraftSession,
   type DraftPick,
   type SquadPlayer,
 } from '../services/draftService'
-import {
-  enterRun,
-  getRunStatus,
-  resolveNextMatchday,
-} from '../services/draftRunService'
-import {
-  consumeTicket,
-  getTicketBalance,
-} from '../services/draftTicketService'
 import { getDraftEnabledTournaments } from '../middleware/draftGate'
 import { draftLimiter } from '../middleware/rateLimiter'
 import logger from '../utils/logger'
@@ -69,7 +53,9 @@ router.post(
   draftLimiter,
   validate(draftStartSchema),
   asyncHandler(async (req: AuthenticatedRequest, res) => {
-    const prisma = req.app.get('prisma')
+    const draftService = (req as any).container.resolve('draftService')
+    const userService = (req as any).container.resolve('userService')
+    
     const { tournamentId, formation } = req.body as { tournamentId: string; formation: string }
 
     // Verify Draft Mode is enabled for this tournament
@@ -84,19 +70,15 @@ router.post(
     }
 
     // Check if user is Pro
-    const user = await prisma.user.findUnique({
-      where: { id: req.userId },
-      select: { isPro: true },
-    })
+    const user = await userService.getUser(req.userId)
     const isPro = user?.isPro ?? false
 
     // Start draft (consumes ticket internally)
-    const result = await startDraft(
-      prisma,
+    const result = await draftService.startDraft(
       req.userId!,
       tournamentId,
       formation,
-      () => consumeTicket(prisma, req.userId!, tournamentId, isPro),
+      () => draftService.consumeTicket(req.userId!, tournamentId, isPro),
     )
 
     if (!result.success) {
@@ -122,8 +104,9 @@ openapiRegistry.registerPath({
 })
 router.get(
   '/formations',
-  asyncHandler(async (_req, res) => {
-    const formations = loadFormations()
+  asyncHandler(async (req, res) => {
+    const draftService = (req as any).container.resolve('draftService')
+    const formations = draftService.loadFormations()
     res.json(formations)
   }),
 )
@@ -139,8 +122,8 @@ openapiRegistry.registerPath({
 router.get(
   '/mine',
   asyncHandler(async (req: AuthenticatedRequest, res) => {
-    const prisma = req.app.get('prisma')
-    const sessions = await listUserDrafts(prisma, req.userId!)
+    const draftService = (req as any).container.resolve('draftService')
+    const sessions = await draftService.listUserDrafts(req.userId!)
     res.json(sessions)
   }),
 )
@@ -156,17 +139,15 @@ openapiRegistry.registerPath({
 router.get(
   '/tickets',
   asyncHandler(async (req: AuthenticatedRequest, res) => {
-    const prisma = req.app.get('prisma')
+    const draftService = (req as any).container.resolve('draftService')
+    const userService = (req as any).container.resolve('userService')
     const tournamentId = req.query.tournamentId as string | undefined
 
-    const user = await prisma.user.findUnique({
-      where: { id: req.userId },
-      select: { isPro: true },
-    })
+    const user = await userService.getUser(req.userId)
     const isPro = user?.isPro ?? false
 
     if (tournamentId) {
-      const balance = await getTicketBalance(prisma, req.userId!, tournamentId, isPro)
+      const balance = await draftService.getTicketBalance(req.userId!, tournamentId, isPro)
       res.json(balance)
     } else {
       // Return balances for all LIVE tournaments
@@ -174,7 +155,7 @@ router.get(
       const liveTournaments = listLive()
       const balances = await Promise.all(
         liveTournaments.map((t: any) =>
-          getTicketBalance(prisma, req.userId!, t.id, isPro).then((b) => ({
+          draftService.getTicketBalance(req.userId!, t.id, isPro).then((b: any) => ({
             tournamentId: t.id,
             tournamentName: t.name,
             ...b,
@@ -197,8 +178,9 @@ openapiRegistry.registerPath({
 router.get(
   '/:sessionId',
   asyncHandler(async (req: AuthenticatedRequest, res) => {
-    const prisma = req.app.get('prisma')
-    const result = await getSessionState(prisma, req.params.sessionId as string, req.userId!)
+    const draftService = (req as any).container.resolve('draftService')
+    const prisma = (req as any).container.resolve('prisma') // temporary for player fetch
+    const result = await draftService.getSessionState(req.params.sessionId as string, req.userId!)
 
     if (result.error) {
       const status = result.error === 'Session not found' ? 404 : 403
@@ -211,7 +193,7 @@ router.get(
       : []
 
     const playersMap = new Map<string, any>(allPlayers.map((p) => [p.id, p]))
-    const squadWithPlayers = result.squad.map((sp) => {
+    const squadWithPlayers = result.squad.map((sp: any) => {
       const player: any = playersMap.get(sp.playerId)
       return {
         ...sp,
@@ -232,7 +214,7 @@ router.get(
 
     res.json({
       session: result.session,
-      picks: result.picks.map((p) => ({
+      picks: result.picks.map((p: any) => ({
         ...p,
         players: p.offeredPlayerIds
           .map((pid: string) => playersMap.get(pid))
@@ -254,8 +236,8 @@ openapiRegistry.registerPath({
 router.get(
   '/:sessionId/next-round',
   asyncHandler(async (req: AuthenticatedRequest, res) => {
-    const prisma = req.app.get('prisma')
-    const result = await getNextRound(prisma, req.params.sessionId as string, req.userId!)
+    const draftService = (req as any).container.resolve('draftService')
+    const result = await draftService.getNextRound(req.params.sessionId as string, req.userId!)
 
     if (result.error) {
       const status = result.error === 'Session not found' ? 404 : 403
@@ -287,11 +269,10 @@ router.post(
   '/:sessionId/pick',
   validate(draftPickSchema),
   asyncHandler(async (req: AuthenticatedRequest, res) => {
-    const prisma = req.app.get('prisma')
+    const draftService = (req as any).container.resolve('draftService')
     const { slotIndex, pickedPlayerId } = req.body as { slotIndex: number; pickedPlayerId: string }
 
-    const result = await processPick(
-      prisma,
+    const result = await draftService.processPick(
       req.params.sessionId as string,
       req.userId!,
       slotIndex,
@@ -324,8 +305,8 @@ openapiRegistry.registerPath({
 router.post(
   '/:sessionId/commit',
   asyncHandler(async (req: AuthenticatedRequest, res) => {
-    const prisma = req.app.get('prisma')
-    const result = await commitSquad(prisma, req.params.sessionId as string, req.userId!)
+    const draftService = (req as any).container.resolve('draftService')
+    const result = await draftService.commitSquad(req.params.sessionId as string, req.userId!)
 
     if (!result.success) {
       return res.status(400).json({
@@ -362,8 +343,8 @@ openapiRegistry.registerPath({
 router.post(
   '/:sessionId/enter-run',
   asyncHandler(async (req: AuthenticatedRequest, res) => {
-    const prisma = req.app.get('prisma')
-    const result = await enterRun(prisma, req.params.sessionId as string, req.userId!)
+    const draftService = (req as any).container.resolve('draftService')
+    const result = await draftService.enterRun(req.params.sessionId as string, req.userId!)
 
     if (!result.success) {
       return res.status(400).json({
@@ -395,8 +376,8 @@ openapiRegistry.registerPath({
 router.get(
   '/:sessionId/run-status',
   asyncHandler(async (req: AuthenticatedRequest, res) => {
-    const prisma = req.app.get('prisma')
-    const result = await getRunStatus(prisma, req.params.sessionId as string, req.userId!)
+    const draftService = (req as any).container.resolve('draftService')
+    const result = await draftService.getRunStatus(req.params.sessionId as string, req.userId!)
 
     if (!result.success) {
       const status = result.error?.includes('not found') ? 404 : 400
@@ -420,8 +401,8 @@ openapiRegistry.registerPath({
 router.post(
   '/:sessionId/resolve-matchday',
   asyncHandler(async (req: AuthenticatedRequest, res) => {
-    const prisma = req.app.get('prisma')
-    const result = await resolveNextMatchday(prisma, req.params.sessionId as string, req.userId!)
+    const draftService = (req as any).container.resolve('draftService')
+    const result = await draftService.resolveNextMatchday(req.params.sessionId as string, req.userId!)
 
     if (!result.success) {
       return res.status(400).json({

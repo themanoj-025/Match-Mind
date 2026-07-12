@@ -96,3 +96,17 @@ Browser (React + Vite)
 - **JWT**: Stateless authentication to allow horizontal scaling.
 - **Socket.IO**: Realtime bid broadcasting, anti-snipe timers, and chat.
 - **BullMQ**: Background job processing for heavy scoring calculations when matchdays conclude.
+
+## Dependency Injection (Awilix)
+We employ a strict `InjectionMode.PROXY` pattern for resolving dependencies. All services, repositories, and utilities receive an object containing their dependencies injected via the constructor.
+
+### Lifetimes & Memory Leaks
+To prevent memory leaks, we enforce strict lifetime policies in `container.ts`:
+- **Singletons**: Stateless services (`MessageService`, `MatchService`), Database and Redis connections (`prisma`, `redis`).
+- **Scoped**: Services that depend on the request context or specific user state (e.g., `AuthService`, `UserService`). Using `scopePerRequest` in Express automatically creates a localized DI scope per HTTP request, discarding it when the request ends.
+**CRITICAL**: Do NOT bind heavy connections (like Prisma) as Scoped or Transient, as this will result in immediate exhaustion of the database connection pool.
+
+## Read-Replica Readiness
+The architecture is designed to support read-replicas. 
+- While `req.app.get('prisma')` was previously used, all data access now flows through Repositories or Services injected via the DI container.
+- When read-replicas are introduced, the DI container can easily map `prismaReader` and `prismaWriter` into the respective repositories, isolating read-heavy queries (leaderboards, public listings) from transactional writes (auction bids, draft picks).

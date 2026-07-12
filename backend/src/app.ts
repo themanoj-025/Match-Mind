@@ -1,5 +1,4 @@
 import { env } from './config/env'
-import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
@@ -50,7 +49,7 @@ import adminRoutes from './routes/admin'
 import stripeRoutes from './routes/stripe'
 import aiRoutes from './routes/ai'
 import draftRoutes from './routes/draft'
-import testQueueRoutes from './routes/testQueue'
+
 import { globalLimiter, authLimiter, passwordResetLimiter, publicLimiter } from './middleware/rateLimiter'
 import asyncHandler from './middleware/asyncHandler'
 
@@ -66,6 +65,9 @@ app.use(compression())
 const corsMiddleware = cors({ origin: env.FRONTEND_URL || 'http://localhost:3000', credentials: true })
 app.use(corsMiddleware)
 
+import { container } from './container'
+import { scopePerRequest } from 'awilix-express'
+
 // ─── Security headers (Helmet with explicit CSP) — after CORS ──────
 app.use(
   helmet({
@@ -74,12 +76,11 @@ app.use(
         defaultSrc: ["'self'"],
         scriptSrc: [
           "'self'",
-          "'unsafe-inline'",
           "'unsafe-eval'",
           'https://js.stripe.com',
           'https://www.googletagmanager.com',
         ],
-        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+        styleSrc: ["'self'", 'https://fonts.googleapis.com'],
         imgSrc: ["'self'", 'data:', 'https:', 'blob:'],
         fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
         connectSrc: ["'self'", 'https://api.stripe.com', 'https://o*.sentry.io', 'https://sentry.io'],
@@ -95,6 +96,8 @@ app.use(
     },
   }),
 )
+
+app.use(scopePerRequest(container))
 
 // ─── HTTPS redirect — before routes, before rate limiter, after CORS/Helmet ──
 app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -143,6 +146,7 @@ if (env.NODE_ENV !== 'production') {
 app.use('/api/auth/login', authLimiter)
 app.use('/api/auth/signup', authLimiter)
 app.use('/api/auth/forgot-password', passwordResetLimiter)
+app.use('/api/auth/reset-password', passwordResetLimiter)
 app.use('/api/auth', authRoutes)
 app.use('/api/tournaments', tournamentRoutes)
 app.use('/api/players', playerRoutes)
@@ -158,7 +162,7 @@ app.use('/api/admin', adminRoutes)
 app.use('/api/stripe', stripeRoutes)
 app.use('/api/ai', aiRoutes)
 app.use('/api/draft', draftRoutes)
-app.use('/api/test-queue', testQueueRoutes)
+
 
 // ─── Prometheus metrics endpoint ────────────────────────────────
 import { metricsMiddleware, metricsEndpoint } from './middleware/metrics'
@@ -171,5 +175,27 @@ app.get(
     res.send(metrics)
   }),
 )
+
+// ─── Global Error Handler ─────────────────────────────────────────────
+import { DomainError } from './errors/DomainError'
+
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  logger.error({ event: 'app.unhandled_error', err: err.message, stack: err.stack, path: req.path }, 'Unhandled exception')
+
+  if (res.headersSent) {
+    return next(err)
+  }
+
+  if (err instanceof DomainError) {
+    return res.status(400).json({
+      error: { code: err.name, message: err.message },
+    })
+  }
+
+  // Generic 500 for unhandled errors
+  res.status(500).json({
+    error: { code: 'INTERNAL_SERVER_ERROR', message: 'An unexpected error occurred.' },
+  })
+})
 
 export { app }

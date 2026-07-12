@@ -13,7 +13,7 @@ import { env } from '../config/env'
  * Falls back to in-memory store if Redis is unavailable.
  */
 import logger from '../utils/logger'
-import rateLimit from 'express-rate-limit'
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit'
 import type { Request, Response, NextFunction } from 'express'
 
 let RedisStore: any = null
@@ -223,7 +223,7 @@ export const passwordResetLimiter = createLimiter({
   max: 3,
   message: 'Too many password reset requests, please try again after an hour',
   prefix: 'rl:reset:',
-  keyGenerator: (req) => `${req.ip}:${req.body?.email || 'unknown'}`,
+  keyGenerator: (req) => `${(ipKeyGenerator as any)(req, {} as any)}:${req.body?.email || 'unknown'}`,
 })
 
 // Prediction submission: 30 per minute per user (POST only)
@@ -232,7 +232,7 @@ export const predictionLimiter = createLimiter({
   max: 30,
   message: 'Too many prediction submissions, please slow down',
   prefix: 'rl:pred:',
-  keyGenerator: (req) => (req as any).userId || req.ip,
+  keyGenerator: (req) => (req as any).userId || (ipKeyGenerator as any)(req, {} as any),
 })
 
 // Global API default: 100 per minute per IP
@@ -249,7 +249,7 @@ export const aiPredictionLimiter = createLimiter({
   max: 10,
   message: 'Too many AI prediction requests, please try again after an hour',
   prefix: 'rl:ai:',
-  keyGenerator: (req) => (req as any).userId || req.ip,
+  keyGenerator: (req) => (req as any).userId || (ipKeyGenerator as any)(req, {} as any),
 })
 
 // ─── Phase 5: Hardened Limiters ───────────────────────────────
@@ -260,16 +260,17 @@ export const auctionActionLimiter = createLimiter({
   max: 30,
   message: 'Too many auction actions, please slow down',
   prefix: 'rl:auction:',
-  keyGenerator: (req) => (req as any).userId || req.ip,
+  keyGenerator: (req) => (req as any).userId || (ipKeyGenerator as any)(req, {} as any),
 })
 
-// Room creation: 5 per hour per user (prevents spam)
+// Create Room (Host logic inside the route checks the absolute 3-room limit)
+// But we still apply a general anti-spam IP limit just in case.
 export const createRoomLimiter = createLimiter({
-  windowMs: 60 * 60 * 1000,
-  max: 5,
-  message: 'Too many rooms created, please try again after an hour',
-  prefix: 'rl:create-room:',
-  keyGenerator: (req) => (req as any).userId || req.ip,
+  windowMs: 15 * 60 * 1000, // 15 mins
+  max: 20, // max 20 attempts per IP
+  message: 'Too many rooms created recently, please try again later.',
+  prefix: 'rl:createroom:',
+  keyGenerator: (req) => (req as any).userId || (ipKeyGenerator as any)(req, {} as any),
 })
 
 // Room join: 10 per minute per user
@@ -278,7 +279,7 @@ export const joinRoomLimiter = createLimiter({
   max: 10,
   message: 'Too many room join attempts, please slow down',
   prefix: 'rl:join-room:',
-  keyGenerator: (req) => (req as any).userId || req.ip,
+  keyGenerator: (req) => (req as any).userId || (ipKeyGenerator as any)(req, {} as any),
 })
 
 // Static assets / public endpoints: higher limit (200/min/IP) so crawlers & real users aren't blocked
@@ -295,7 +296,7 @@ export const draftLimiter = createLimiter({
   max: 5,
   message: 'Too many draft attempts, please slow down',
   prefix: 'rl:draft:',
-  keyGenerator: (req) => (req as any).userId || req.ip,
+  keyGenerator: (req) => (req as any).userId || (ipKeyGenerator as any)(req, {} as any),
 })
 
 export const isRedisConnected = () => sharedRedisClient !== null && sharedRedisClient.isOpen

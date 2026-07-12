@@ -6,7 +6,7 @@ import { env } from '../config/env'
  * Route handlers become pure HTTP adapters that call this service.
  */
 
-import bcrypt from 'bcryptjs'
+import * as argon2 from 'argon2'
 import jwt from 'jsonwebtoken'
 import type { IUserRepository } from '../repositories/types'
 import logger from '../utils/logger'
@@ -136,7 +136,7 @@ export class AuthService {
     }
 
     // Hash password
-    const passwordHash = await bcrypt.hash(password, 12)
+    const passwordHash = await argon2.hash(password)
 
     // Create user
     const user = await userRepository.create({
@@ -183,7 +183,7 @@ export class AuthService {
       throw new AuthError('Invalid email or password', 'INVALID_CREDENTIALS', 401)
     }
 
-    const valid = await bcrypt.compare(password, user.passwordHash)
+    const valid = await argon2.verify(user.passwordHash, password)
     if (!valid) {
       throw new AuthError('Invalid email or password', 'INVALID_CREDENTIALS', 401)
     }
@@ -214,9 +214,9 @@ export class AuthService {
       throw new AuthError('Refresh token secret not configured', 'CONFIG_ERROR', 500)
     }
 
-    let decoded: { userId: string }
+    let decoded: { userId: string; tokenVersion: number }
     try {
-      decoded = jwt.verify(refreshToken, refreshSecret) as { userId: string }
+      decoded = jwt.verify(refreshToken, refreshSecret) as { userId: string; tokenVersion: number }
     } catch {
       throw new AuthError('Invalid or expired refresh token', 'INVALID_TOKEN', 401)
     }
@@ -226,8 +226,15 @@ export class AuthService {
       throw new AuthError('User not found', 'USER_NOT_FOUND', 401)
     }
 
-    const tokenVersion = await getTokenVersion(user.id, this.deps.userRepository)
-    return generateTokens(user.id, tokenVersion)
+    const currentVersion = await getTokenVersion(user.id, this.deps.userRepository)
+    if (decoded.tokenVersion !== currentVersion) {
+      // Reuse detected — incoming token is from a previous version
+      logger.warn({ event: 'auth.token_reuse_detected', userId: user.id }, 'Token reuse detected, revoking all tokens')
+      await revokeTokens(user.id, this.deps.userRepository)
+      throw new AuthError('Invalid token version (reuse detected)', 'INVALID_TOKEN', 401)
+    }
+
+    return generateTokens(user.id, currentVersion)
   }
 
   /**
@@ -240,14 +247,58 @@ export class AuthService {
     }
     const user = await this.deps.userRepository.findByEmail(email)
     if (user) {
+      // Invalidate existing tokens by bumping tokenVersion when requesting a reset
+      const tokenVersion = await revokeTokens(user.id, this.deps.userRepository)
+
       const resetToken = jwt.sign(
-        { userId: user.id, purpose: 'password-reset' },
+        { userId: user.id, purpose: 'password-reset', tokenVersion },
         env.JWT_RESET_SECRET,
         { expiresIn: '1h' }
       )
       await sendPasswordResetEmail(email, resetToken)
     }
     // Always return success to prevent email enumeration
+  }
+
+  /**
+   * Reset a user's password using a valid reset token.
+   * Enforces tokenVersion matching to prevent token replay attacks.
+   */
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    const resetSecret = env.JWT_RESET_SECRET
+    if (!resetSecret) {
+      throw new AuthError('Reset token secret not configured', 'CONFIG_ERROR', 500)
+    }
+
+    let decoded: { userId: string; purpose: string; tokenVersion?: number }
+    try {
+      decoded = jwt.verify(token, resetSecret) as { userId: string; purpose: string; tokenVersion?: number }
+    } catch {
+      throw new AuthError('This reset link is no longer valid', 'INVALID_TOKEN', 401)
+    }
+
+    if (decoded.purpose !== 'password-reset') {
+      throw new AuthError('This reset link is no longer valid', 'INVALID_TOKEN', 401)
+    }
+
+    const user = await this.deps.userRepository.findById(decoded.userId)
+    if (!user) {
+      throw new AuthError('This reset link is no longer valid', 'INVALID_TOKEN', 401)
+    }
+
+    const currentVersion = await getTokenVersion(user.id, this.deps.userRepository)
+    if (decoded.tokenVersion !== currentVersion) {
+      logger.warn({ event: 'auth.reset_token_reuse_detected', userId: user.id }, 'Reset token reuse detected')
+      throw new AuthError('This reset link is no longer valid', 'INVALID_TOKEN', 401)
+    }
+
+    const passwordHash = await argon2.hash(newPassword)
+    
+    const nextTokenVersion = currentVersion + 1
+    await this.deps.userRepository.update(user.id, {
+      passwordHash,
+      tokenVersion: nextTokenVersion,
+    })
   }
 }
 

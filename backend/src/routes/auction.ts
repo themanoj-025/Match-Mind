@@ -22,7 +22,10 @@ import type { AuthenticatedRequest } from '../middleware/auth'
 import type { AuctionState } from '../services/auctionEngine'
 import logger from '../utils/logger'
 import { auctionActionLimiter } from '../middleware/rateLimiter'
-import { openapiRegistry } from "../config/openapi";
+import { openapiRegistry } from "../config/openapi"
+import { scheduleAuctionTimer } from '../lib/queue'
+import { ConcurrencyError } from '../errors/DomainError'
+import { redis } from '../lib/redis'
 
 const router = express.Router()
 
@@ -41,7 +44,7 @@ function makeAuctionHelpers(prisma: any) {
         data: { ...state },
       })
       if (result.count === 0) {
-        throw new Error('OPTIMISTIC_CONCURRENCY_CONFLICT')
+        throw new ConcurrencyError()
       }
     },
   }
@@ -57,7 +60,7 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.get('/:roomId/state', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+  const prisma = (req as any).container.resolve('prisma')
   const state = await prisma.auctionState.findUnique({ where: { roomId: req.params.roomId as string } })
   if (!state) {
     return res.status(404).json({ error: { code: 'STATE_NOT_FOUND', message: 'Auction state not found' } })
@@ -75,7 +78,7 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.post('/:roomId/start', auctionActionLimiter, authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+  const prisma = (req as any).container.resolve('prisma')
 
   const room = await prisma.room.findUnique({ where: { id: req.params.roomId as string } })
   if (!room) return res.status(404).json({ error: { code: 'ROOM_NOT_FOUND', message: 'Room not found' } })
@@ -104,16 +107,26 @@ router.post('/:roomId/start', auctionActionLimiter, authenticateToken, asyncHand
       currentBid: 0,
       currentBidderId: null,
       timerEndsAt,
-      poolQueue: shuffled.slice(1),
-      unsoldPlayerIds: [],
       version: 1,
     },
   })
+
+  // Populate Redis queue
+  await redis.del(`auction:${room.id}:pool`)
+  await redis.del(`auction:${room.id}:unsold`)
+  const poolQueue = shuffled.slice(1)
+  if (poolQueue.length > 0) {
+    await redis.rpush(`auction:${room.id}:pool`, ...poolQueue)
+  }
 
   // Emit socket event
   const io = req.app.get('io')
   if (io) {
     io.to(`room:${room.id}`).emit('AUCTION_STARTED', { roomId: room.id, state })
+  }
+  
+  if (timerEndsAt) {
+    await scheduleAuctionTimer(room.id, timerEndsAt)
   }
 
   logger.info({ event: 'auction.started', roomId: room.id })
@@ -128,7 +141,7 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.post('/:roomId/next-player', auctionActionLimiter, authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+  const prisma = (req as any).container.resolve('prisma')
   const room = await prisma.room.findUnique({ where: { id: req.params.roomId as string } })
   if (!room)  return res.status(404).json({ error: { code: 'ROOM_NOT_FOUND', message: 'Room not found' } })
   if (room.hostId !== req.userId) return res.status(403).json({ error: { code: 'NOT_HOST', message: 'Only the host can advance' } })
@@ -149,6 +162,10 @@ router.post('/:roomId/next-player', auctionActionLimiter, authenticateToken, asy
     io.to(`room:${room.id}`).emit('AUCTION_PHASE_CHANGE', { roomId: room.id, state: newState })
   }
 
+  if (newState.phase === 'PLAYER_LIVE' && newState.timerEndsAt) {
+    await scheduleAuctionTimer(room.id, newState.timerEndsAt)
+  }
+
   res.json({ state: newState })
 }))
 
@@ -160,7 +177,7 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.post('/:roomId/force-sold', auctionActionLimiter, authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+  const prisma = (req as any).container.resolve('prisma')
   const room = await prisma.room.findUnique({ where: { id: req.params.roomId as string } })
   if (!room) return res.status(404).json({ error: { code: 'ROOM_NOT_FOUND', message: 'Room not found' } })
   if (room.hostId !== req.userId) return res.status(403).json({ error: { code: 'NOT_HOST', message: 'Only the host can force-sell' } })
@@ -220,7 +237,7 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.post('/:roomId/force-unsold', auctionActionLimiter, authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+  const prisma = (req as any).container.resolve('prisma')
   const room = await prisma.room.findUnique({ where: { id: req.params.roomId as string } })
   if (!room) return res.status(404).json({ error: { code: 'ROOM_NOT_FOUND', message: 'Room not found' } })
   if (room.hostId !== req.userId) return res.status(403).json({ error: { code: 'NOT_HOST', message: 'Only the host can force-unsold' } })
@@ -248,7 +265,7 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.post('/:roomId/re-auction', auctionActionLimiter, authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+  const prisma = (req as any).container.resolve('prisma')
   const room = await prisma.room.findUnique({ where: { id: req.params.roomId as string } })
   if (!room) return res.status(404).json({ error: { code: 'ROOM_NOT_FOUND', message: 'Room not found' } })
   if (room.hostId !== req.userId) return res.status(403).json({ error: { code: 'NOT_HOST', message: 'Only the host can start re-auction' } })
@@ -270,6 +287,10 @@ router.post('/:roomId/re-auction', auctionActionLimiter, authenticateToken, asyn
     io.to(`room:${room.id}`).emit('RE_AUCTION_STARTED', { roomId: room.id, state: newState })
   }
 
+  if (newState.phase === 'PLAYER_LIVE' && newState.timerEndsAt) {
+    await scheduleAuctionTimer(room.id, newState.timerEndsAt)
+  }
+
   res.json({ message: 'Re-auction started', state: newState })
 }))
 
@@ -281,7 +302,7 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.post('/:roomId/pause', auctionActionLimiter, authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+  const prisma = (req as any).container.resolve('prisma')
   const room = await prisma.room.findUnique({ where: { id: req.params.roomId as string } })
   if (!room) return res.status(404).json({ error: { code: 'ROOM_NOT_FOUND', message: 'Room not found' } })
   if (room.hostId !== req.userId) return res.status(403).json({ error: { code: 'NOT_HOST', message: 'Only the host can pause the auction' } })
@@ -309,7 +330,7 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.post('/:roomId/resume', auctionActionLimiter, authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+  const prisma = (req as any).container.resolve('prisma')
   const room = await prisma.room.findUnique({ where: { id: req.params.roomId as string } })
   if (!room) return res.status(404).json({ error: { code: 'ROOM_NOT_FOUND', message: 'Room not found' } })
   if (room.hostId !== req.userId) return res.status(403).json({ error: { code: 'NOT_HOST', message: 'Only the host can resume the auction' } })
@@ -337,7 +358,7 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.post('/:roomId/end', auctionActionLimiter, authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+  const prisma = (req as any).container.resolve('prisma')
   const room = await prisma.room.findUnique({ where: { id: req.params.roomId as string } })
   if (!room) return res.status(404).json({ error: { code: 'ROOM_NOT_FOUND', message: 'Room not found' } })
   if (room.hostId !== req.userId) return res.status(403).json({ error: { code: 'NOT_HOST', message: 'Only the host can end the auction' } })

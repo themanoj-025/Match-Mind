@@ -14,14 +14,18 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.get('/:roomId/franchises/:userId', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+  const prisma = (req as any).container.resolve('prisma')
   const roomId = req.params.roomId as string
   const userId = req.params.userId as string
 
   const roster = await prisma.roster.findMany({
     where: { roomId, userId },
     include: { player: { select: { id: true, name: true, position: true, club: true, nationality: true } } },
-    orderBy: { isCaptain: 'desc', isViceCaptain: 'desc', 'player.name': 'asc' },
+    orderBy: [
+      { isCaptain: 'desc' },
+      { isViceCaptain: 'desc' },
+      { player: { name: 'asc' } }
+    ],
   })
 
   const member = await prisma.roomMember.findUnique({
@@ -44,7 +48,7 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.patch('/:roomId/franchises/me/captain', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+  const prisma = (req as any).container.resolve('prisma')
   const roomId = req.params.roomId as string
   const { playerId, isViceCaptain } = req.body as { playerId?: string; isViceCaptain?: boolean }
 

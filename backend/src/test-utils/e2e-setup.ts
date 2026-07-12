@@ -8,10 +8,17 @@
 import express from 'express'
 import cookieParser from 'cookie-parser'
 import passport from 'passport'
-import path from 'path'
+import { execSync } from 'child_process'
 import os from 'os'
 import fs from 'fs'
-import { PrismaClient } from '@prisma/client'
+
+process.env.DATABASE_URL = "postgresql://matchmind:matchmind_test_password@localhost:5433/matchmind_test"
+
+import { prisma } from '../lib/prisma'
+import { env } from '../config/env'
+import path from 'path'
+import { container } from '../container'
+import { scopePerRequest } from 'awilix-express'
 
 // ── Helpers ──────────────────────────────────────────────
 
@@ -84,7 +91,6 @@ function mockAuthenticateToken(req: any, _res: any, next: any) {
 // ── App Factory ──────────────────────────────────────────
 
 export async function createTestApp() {
-  const prisma = new PrismaClient()
 
   // In a real e2e environment with Postgres, we would truncate tables and seed data here
   // For now, assume CI sets up the test database
@@ -93,6 +99,8 @@ export async function createTestApp() {
   app.use(express.json())
   app.use(cookieParser())
   app.use(passport.initialize())
+  
+  app.use(scopePerRequest(container))
 
   // Make prisma accessible
   app.set('prisma', prisma)
@@ -125,6 +133,8 @@ export async function createTestApp() {
   // Error handler
   const { errorHandler } = await import('../middleware/errorHandler')
   app.use(errorHandler)
+
+  console.log("e2e-setup PRISMA URL:", env.DATABASE_URL)
 
   return { app, prisma }
 }

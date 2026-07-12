@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useApp } from '../context/AppContext'
+import { useAuthStore } from '../store/useAuthStore'
+import { useToastStore } from '../store/useToastStore'
 import { Card } from '../components/Card'
 import { Trophy, ArrowLeft, Users } from 'lucide-react'
+import { env } from '../config/env'
 
 interface LeaderboardEntry {
   rank: number
@@ -13,14 +15,15 @@ interface LeaderboardEntry {
 
 export const Leaderboard: React.FC = () => {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([])
-  const { token, showToast } = useApp()
+  const { user } = useAuthStore()
+  const { showToast } = useToastStore()
   const navigate = useNavigate()
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/leaderboard', {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        const response = await fetch(`${env.API_URL}/api/leaderboard`, {
+          credentials: 'include'
         })
         const data = await response.json()
         if (response.ok) {
@@ -32,7 +35,7 @@ export const Leaderboard: React.FC = () => {
       }
     }
     fetchLeaderboard()
-  }, [token])
+  }, [user])
 
   return (
     <div className="min-h-screen bg-[#050506] text-foreground relative px-6 py-12">

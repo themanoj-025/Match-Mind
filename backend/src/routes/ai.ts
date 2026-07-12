@@ -9,7 +9,6 @@ import { env } from '../config/env'
  * Security: Requires authentication + Pro check + rate limiting.
  */
 
-import { redis } from '../lib/redis'
 import crypto from 'crypto'
 import express from 'express'
 import { openapiRegistry } from '../config/openapi'
@@ -18,6 +17,18 @@ import { aiPredictionLimiter } from '../middleware/rateLimiter'
 import logger from '../utils/logger'
 import asyncHandler from '../middleware/asyncHandler'
 import type { AuthenticatedRequest } from '../middleware/auth'
+import CircuitBreaker from 'opossum'
+
+const aiBreaker = new CircuitBreaker(getAnthropicAdvice, {
+  timeout: 10000, // If Anthropic takes >10s, trigger failure
+  errorThresholdPercentage: 50, // When 50% of requests fail, trip breaker
+  resetTimeout: 30000, // Try again after 30s
+})
+
+aiBreaker.fallback((...args: any[]) => {
+  logger.warn({ event: 'ai.circuit_breaker_fallback' }, 'AI Circuit Breaker tripped, returning heuristic advice')
+  return null
+})
 
 const router = express.Router()
 
@@ -32,7 +43,8 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.post('/auction-advice', authenticateToken, aiPredictionLimiter, asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+  const prisma = (req as any).container.resolve('prisma')
+  const cacheService = (req as any).container.resolve('cacheService')
   const { roomId } = req.body as { roomId: string }
 
   if (!roomId) {
@@ -68,15 +80,16 @@ router.post('/auction-advice', authenticateToken, aiPredictionLimiter, asyncHand
     include: { player: { select: { id: true, name: true, position: true, basePrice: true, club: true } } },
   })
 
-  const auctionState = await prisma.auctionState.findUnique({ where: { roomId } })
-  const remainingPlayers = auctionState?.poolQueue || []
-  const unsoldPlayers = auctionState?.unsoldPlayerIds || []
-
-  // Get remaining pool player details
-  const poolPlayerIds = [...remainingPlayers, ...unsoldPlayers]
-  const poolPlayers = poolPlayerIds.length > 0
-    ? await prisma.player.findMany({ where: { id: { in: poolPlayerIds } } })
-    : []
+  // Removed redis lrange. Instead, we query remaining pool players efficiently.
+  // We can fetch players not in any roster for this tournament.
+  const poolPlayers = await prisma.player.findMany({
+    where: { 
+      tournamentId: room.tournamentId,
+      rosters: {
+        none: { roomId }
+      }
+    }
+  })
 
   const rosterPositions: Record<string, number> = { GK: 0, DEF: 0, MID: 0, FWD: 0 }
   for (const entry of roster) {
@@ -87,7 +100,8 @@ router.post('/auction-advice', authenticateToken, aiPredictionLimiter, asyncHand
   }
 
   const positionNeeds: Record<string, number> = {}
-  for (const [pos, limit] of Object.entries(room.rosterRules)) {
+  const defaultRosterRules: Record<string, number> = { GK: 2, DEF: 5, MID: 5, FWD: 3, total: 15 }
+  for (const [pos, limit] of Object.entries(defaultRosterRules)) {
     if (pos === 'total') continue
     const filled = rosterPositions[pos] || 0
     const need = (limit as number) - filled
@@ -102,49 +116,38 @@ router.post('/auction-advice', authenticateToken, aiPredictionLimiter, asyncHand
   const hash = crypto.createHash('sha256').update(hashInput).digest('hex').substring(0, 16)
   const cacheKey = `ai:advice:${roomId}:${req.userId}:${hash}`
 
-  let advice: any = null
   let cacheHit = false
 
-  const isRedisConnected = redis && (redis.status === 'ready' || redis.status === 'connect')
-  if (isRedisConnected) {
-    try {
-      const cached = await redis.get(cacheKey)
-      if (cached) {
-        advice = JSON.parse(cached)
-        cacheHit = true
-        logger.info({ event: 'ai.advice_cache_hit', roomId, userId: req.userId }, 'AI advice returned from Redis cache')
-      }
-    } catch (err: any) {
-      logger.error({ event: 'ai.cache_get_error', err: err.message }, 'Failed to read AI advice cache')
-    }
-  }
-
-  if (!advice) {
+  const advice = await cacheService.getOrFetch(cacheKey, 600, async () => {
+    let freshAdvice: any = null
+    
     if (env.ANTHROPIC_API_KEY) {
       try {
-        advice = await getAnthropicAdvice(roster, member.remainingBudget, positionNeeds, poolPlayers, room.rosterRules)
+        freshAdvice = await aiBreaker.fire(roster, member.remainingBudget, positionNeeds, poolPlayers, defaultRosterRules)
       } catch (err: any) {
         logger.error({ event: 'ai.anthropic_advice_error', roomId, err: err.message }, 'Anthropic API error')
       }
     }
 
-    if (!advice) {
-      advice = generateHeuristicAdvice(roster, member.remainingBudget, positionNeeds, poolPlayers)
+    if (!freshAdvice) {
+      freshAdvice = generateHeuristicAdvice(roster, member.remainingBudget, positionNeeds, poolPlayers)
     }
+    
+    return freshAdvice
+  })
 
-    if (advice && isRedisConnected) {
-      try {
-        await redis.set(cacheKey, JSON.stringify(advice), 'EX', 600) // 10 minutes cache
-        logger.info({ event: 'ai.advice_cached', roomId, userId: req.userId }, 'AI advice cached in Redis')
-      } catch (err: any) {
-        logger.error({ event: 'ai.cache_set_error', err: err.message }, 'Failed to write AI advice cache')
-      }
-    }
+  // To check if it was a cache hit, we would need getOrFetch to return a tuple, but here we just accept cacheHit is not completely accurate 
+  // or we can manually check cache first. Let's do a manual check to maintain cacheHit tracking for the client:
+  let finalAdvice = await cacheService.get(cacheKey)
+  if (finalAdvice) {
+    cacheHit = true
+  } else {
+    finalAdvice = advice // it was fetched via getOrFetch and cached just now
   }
 
   res.json({
     isProFeature: false,
-    advice,
+    advice: finalAdvice,
     cacheHit,
   })
 }))

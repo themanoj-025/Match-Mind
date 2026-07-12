@@ -24,14 +24,15 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.post('/create-checkout', idempotent(), authenticateToken, validate(createCheckoutSchema), asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+  const stripeService = (req as any).container.resolve('stripeService')
+  const userService = (req as any).container.resolve('userService')
   const { plan } = req.body as { plan: string } // 'monthly' | 'annual'
 
-  const user = await prisma.user.findUnique({ where: { id: req.userId } })
+  const user = await userService.getUser(req.userId)
   if (!user) return res.status(404).json({ error: { code: 'USER_NOT_FOUND', message: 'User not found' } })
 
   // If user already has a Stripe customer, reuse it
-  const existingSub = await prisma.subscription.findUnique({ where: { userId: user.id } })
+  const existingSub = await stripeService.getSubscriptionByUserId(user.id)
 
   // Use circuit breaker for Stripe API calls
   const session = await withBreaker('stripe', async () => {
@@ -99,7 +100,8 @@ router.post('/webhook', async (req, res) => {
     return res.status(400).send(`Webhook Error: ${err.message}`)
   }
 
-  const prisma = req.app.get('prisma')
+  const stripeService = (req as any).container.resolve('stripeService')
+  const userService = (req as any).container.resolve('userService')
 
   switch (event.type) {
     case 'checkout.session.completed': {
@@ -115,35 +117,11 @@ router.post('/webhook', async (req, res) => {
           const stripe = require('stripe')(env.STRIPE_SECRET_KEY)
           const sub = await stripe.subscriptions.retrieve(subscriptionId)
 
-          await prisma.subscription.upsert({
-            where: { userId },
-            create: {
-              userId,
-              stripeCustomerId: customerId,
-              stripeSubscriptionId: subscriptionId,
-              plan: sub.items.data[0]?.price?.recurring?.interval === 'year' ? 'annual' : 'monthly',
-              status: 'ACTIVE',
-              currentPeriodStart: new Date(sub.current_period_start * 1000),
-              currentPeriodEnd: new Date(sub.current_period_end * 1000),
-              cancelAtPeriodEnd: sub.cancel_at_period_end,
-            },
-            update: {
-              stripeCustomerId: customerId,
-              stripeSubscriptionId: subscriptionId,
-              plan: sub.items.data[0]?.price?.recurring?.interval === 'year' ? 'annual' : 'monthly',
-              status: 'ACTIVE',
-              currentPeriodStart: new Date(sub.current_period_start * 1000),
-              currentPeriodEnd: new Date(sub.current_period_end * 1000),
-              cancelAtPeriodEnd: sub.cancel_at_period_end,
-            },
-          })
+          await stripeService.upsertSubscription(userId, customerId, subscriptionId, sub)
 
-          await prisma.user.update({
-            where: { id: userId },
-            data: {
-              isPro: true,
-              proExpiresAt: new Date(sub.current_period_end * 1000),
-            },
+          await userService.updateUser(userId, {
+            isPro: true,
+            proExpiresAt: new Date(sub.current_period_end * 1000),
           })
         } catch (err: any) {
           logger.error({ event: 'stripe.subscription_creation_failed', err: err.message }, 'Failed to process subscription')
@@ -157,31 +135,20 @@ router.post('/webhook', async (req, res) => {
       const subscriptionId = sub.id
 
       try {
-        const existing = await prisma.subscription.findUnique({ where: { stripeSubscriptionId: subscriptionId } })
+        const existing = await stripeService.getSubscriptionByStripeId(subscriptionId)
         if (!existing) break
 
-        await prisma.subscription.update({
-          where: { stripeSubscriptionId: subscriptionId },
-          data: {
-            status: sub.status === 'active' ? 'ACTIVE' : sub.status === 'past_due' ? 'PAST_DUE' : 'CANCELLED',
-            currentPeriodStart: new Date(sub.current_period_start * 1000),
-            currentPeriodEnd: new Date(sub.current_period_end * 1000),
-            cancelAtPeriodEnd: sub.cancel_at_period_end,
-          },
-        })
+        await stripeService.updateSubscriptionStatus(subscriptionId, sub)
 
         if (sub.status === 'active') {
-          await prisma.user.update({
-            where: { id: existing.userId },
-            data: {
-              isPro: true,
-              proExpiresAt: new Date(sub.current_period_end * 1000),
-            },
+          await userService.updateUser(existing.userId, {
+            isPro: true,
+            proExpiresAt: new Date(sub.current_period_end * 1000),
           })
         } else if (sub.status === 'past_due' || sub.status === 'canceled' || sub.status === 'unpaid') {
-          await prisma.user.update({
-            where: { id: existing.userId },
-            data: { isPro: false, proExpiresAt: null },
+          await userService.updateUser(existing.userId, {
+            isPro: false,
+            proExpiresAt: null,
           })
         }
       } catch (err: any) {
@@ -195,17 +162,14 @@ router.post('/webhook', async (req, res) => {
       const subscriptionId = sub.id
 
       try {
-        const existing = await prisma.subscription.findUnique({ where: { stripeSubscriptionId: subscriptionId } })
+        const existing = await stripeService.getSubscriptionByStripeId(subscriptionId)
         if (!existing) break
 
-        await prisma.subscription.update({
-          where: { stripeSubscriptionId: subscriptionId },
-          data: { status: 'CANCELLED', cancelAtPeriodEnd: true },
-        })
+        await stripeService.cancelSubscription(subscriptionId)
 
-        await prisma.user.update({
-          where: { id: existing.userId },
-          data: { isPro: false, proExpiresAt: null },
+        await userService.updateUser(existing.userId, {
+          isPro: false,
+          proExpiresAt: null,
         })
       } catch (err: any) {
         logger.error({ event: 'stripe.subscription_deletion_failed', err: err.message }, 'Subscription deletion failed')
@@ -231,8 +195,8 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.post('/create-portal-session', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
-  const sub = await prisma.subscription.findUnique({ where: { userId: req.userId } })
+  const stripeService = (req as any).container.resolve('stripeService')
+  const sub = await stripeService.getSubscriptionByUserId(req.userId)
 
   if (!sub?.stripeCustomerId) {
     return res.status(400).json({ error: { code: 'NO_SUBSCRIPTION', message: 'No active subscription found' } })
@@ -264,28 +228,23 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.get('/status', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+  const stripeService = (req as any).container.resolve('stripeService')
+  const userService = (req as any).container.resolve('userService')
 
-  const user = await prisma.user.findUnique({
-    where: { id: req.userId },
-    select: {
-      isPro: true,
-      proExpiresAt: true,
-      subscription: true,
-    },
-  })
+  const user = await userService.getUser(req.userId)
+  const sub = await stripeService.getSubscriptionByUserId(req.userId)
 
   if (!user) return res.status(404).json({ error: { code: 'USER_NOT_FOUND', message: 'User not found' } })
 
   res.json({
     isPro: user.isPro,
     proExpiresAt: user.proExpiresAt,
-    subscription: user.subscription
+    subscription: sub
       ? {
-          plan: user.subscription.plan,
-          status: user.subscription.status,
-          currentPeriodEnd: user.subscription.currentPeriodEnd,
-          cancelAtPeriodEnd: user.subscription.cancelAtPeriodEnd,
+          plan: sub.plan,
+          status: sub.status,
+          currentPeriodEnd: sub.currentPeriodEnd,
+          cancelAtPeriodEnd: sub.cancelAtPeriodEnd,
         }
       : null,
   })

@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useApp } from '../context/AppContext'
+import { useAuthStore } from '../store/useAuthStore'
+import { useToastStore } from '../store/useToastStore'
 import { Button } from '../components/Button'
 import { Input } from '../components/Input'
 import { Card } from '../components/Card'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, Mail, Lock, User, Trophy, Zap, Shield } from 'lucide-react'
+import { env } from '../config/env'
 
 export const Auth: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true)
@@ -13,7 +15,8 @@ export const Auth: React.FC = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const { login, showToast } = useApp()
+  const { setUser } = useAuthStore()
+  const { showToast } = useToastStore()
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,8 +26,9 @@ export const Auth: React.FC = () => {
     const payload = isLogin ? { email, password } : { username, email, password }
 
     try {
-      const response = await fetch(`http://localhost:5000${endpoint}`, {
+      const response = await fetch(`${env.API_URL}${endpoint}`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
@@ -33,7 +37,7 @@ export const Auth: React.FC = () => {
       if (!response.ok) {
         showToast(data.error?.message || 'Authentication failed', 'error')
       } else {
-        login(data.token, data.user)
+        setUser(data.user)
         showToast(isLogin ? 'Welcome back!' : 'Account created successfully!', 'success')
         navigate('/lobby')
       }
@@ -45,7 +49,7 @@ export const Auth: React.FC = () => {
   }
 
   const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:5000/api/auth/google'
+    window.location.href = `${env.API_URL}/api/auth/google`
   }
 
   return (

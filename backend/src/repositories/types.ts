@@ -34,6 +34,7 @@ export interface UserData {
   createdAt: Date
   updatedAt: Date
   lastActiveAt: Date | null
+  tokenVersion: number
 }
 
 export interface MatchData {
@@ -111,6 +112,12 @@ export interface IUserRepository {
   }): Promise<Partial<UserData>[]>
   count(where?: Record<string, unknown>): Promise<number>
   updateMany(where: Record<string, unknown>, data: Partial<UserData>): Promise<{ count: number }>
+  updateSports(userId: string, sports: string[]): Promise<void>
+  updateTeams(userId: string, teamIds: string[]): Promise<void>
+  followUser(followerId: string, followingId: string): Promise<unknown>
+  unfollowUser(followerId: string, followingId: string): Promise<void>
+  getNotifications(userId: string, take?: number): Promise<unknown[]>
+  markNotificationsRead(userId: string): Promise<void>
 }
 
 export interface IReportRepository {

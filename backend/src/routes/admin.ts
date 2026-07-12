@@ -9,15 +9,67 @@ import logger from '../utils/logger'
 import type { AuthenticatedRequest } from '../middleware/auth'
 import { validateTournamentDraftPool } from '../lib/validateDraftPool'
 import { openapiRegistry } from "../config/openapi";
+import { redis } from '../lib/redis'
+import { z } from 'zod'
+import { paginationSchema, PaginationParams, PaginatedResponse } from '@matchmind/shared-types'
 
 const router = express.Router()
+
+async function invalidatePlayerCache() {
+  if (redis.status === 'ready' || redis.status === 'connect') {
+    try {
+      const keys = await redis.keys('players:*')
+      if (keys.length > 0) {
+        await redis.del(...keys)
+        logger.info({ event: 'redis.cache_invalidated' }, 'Invalidated player cache')
+      }
+    } catch (err: any) {
+      logger.error({ event: 'redis.cache_invalidation_error', err: err.message }, 'Failed to invalidate cache')
+    }
+  }
+}
 
 // All admin routes require auth + admin role
 router.use(authenticateToken, requireAdmin)
 
+// Audit Log Middleware for all mutations
+const auditLogMiddleware = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const method = req.method
+  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
+    // Intercept when the response finishes
+    res.on('finish', () => {
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        const authenticatedReq = req as AuthenticatedRequest
+        const actionStr = `API_MUTATION_${method}`
+        
+        try {
+          const adminService = getAdminService(authenticatedReq)
+          adminService.logAction(
+            authenticatedReq.userId!,
+            actionStr,
+            req.originalUrl,
+            'api',
+            {
+              body: req.body,
+              query: req.query,
+              params: req.params,
+            }
+          ).catch((err: any) => {
+            logger.error({ event: 'admin.audit_log_error', err: err.message }, 'Failed to save audit log in middleware')
+          })
+        } catch (err: any) {
+          logger.error({ event: 'admin.audit_log_setup_error', err: err.message }, 'Failed to instantiate admin service for logging')
+        }
+      }
+    })
+  }
+  next()
+}
+router.use(auditLogMiddleware)
+
 /** Create an AdminService instance from the Express app's prisma client */
 function getAdminService(req: AuthenticatedRequest) {
-  const prisma = req.app.get('prisma')
+  const prisma = (req as any).container.resolve('prisma')
   const { userRepository, reportRepository, adminLogRepository } = createRepositories(prisma)
   return new AdminService({
     userRepository,
@@ -46,7 +98,7 @@ router.get('/stats', asyncHandler(async (req: AuthenticatedRequest, res) => {
   const stats = await getAdminService(req).getDashboardStats()
 
   // Compute sport distribution from real fixtures data
-  const prisma = req.app.get('prisma')
+  const prisma = (req as any).container.resolve('prisma')
   const allFixtures = await prisma.fixture.findMany({
     select: { sport: true },
   })
@@ -108,9 +160,8 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.get('/users', asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
-  const page = parseInt(req.query.page as string) || 1
-  const limit = parseInt(req.query.limit as string) || 20
+  const prisma = (req as any).container.resolve('prisma')
+  const { page, limit } = paginationSchema.parse(req.query)
   const search = (req.query.search as string) || ''
 
   const where: Record<string, unknown> = { isDeleted: false }
@@ -160,7 +211,7 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.get('/users/:id', asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+  const prisma = (req as any).container.resolve('prisma')
   const user = await prisma.user.findUnique({
     where: { id: req.params.id },
     include: {
@@ -189,7 +240,7 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.patch('/users/:id', asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+  const prisma = (req as any).container.resolve('prisma')
   const { role, tier, username, email, displayName } = req.body as {
     role?: string
     tier?: string
@@ -225,7 +276,7 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.delete('/users/:id', asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+  const prisma = (req as any).container.resolve('prisma')
   await prisma.user.update({
     where: { id: req.params.id },
     data: { isDeleted: true, email: `deleted-${req.params.id}@matchmind.gg`, username: `deleted-${req.params.id}` },
@@ -245,7 +296,7 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.post('/users/:id/toggle-pro', asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+  const prisma = (req as any).container.resolve('prisma')
   const user = await prisma.user.findUnique({ where: { id: req.params.id }, select: { isPro: true } })
   if (!user) return res.status(404).json({ error: { code: 'USER_NOT_FOUND', message: 'User not found' } })
 
@@ -278,9 +329,8 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.get('/fixtures', asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
-  const page = parseInt(req.query.page as string) || 1
-  const limit = parseInt(req.query.limit as string) || 20
+  const prisma = (req as any).container.resolve('prisma')
+  const { page, limit } = paginationSchema.parse(req.query)
   const tournamentId = req.query.tournamentId as string | undefined
 
   const where: Record<string, any> = {}
@@ -310,7 +360,7 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.patch('/fixtures/:id', asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+  const prisma = (req as any).container.resolve('prisma')
   const { homeScore, awayScore, status } = req.body as {
     homeScore?: number
     awayScore?: number
@@ -344,9 +394,8 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.get('/reports', asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
-  const page = parseInt(req.query.page as string) || 1
-  const limit = parseInt(req.query.limit as string) || 20
+  const prisma = (req as any).container.resolve('prisma')
+  const { page, limit } = paginationSchema.parse(req.query)
   const status = (req.query.status as string) || 'pending'
 
   const [reports, total] = await Promise.all([
@@ -377,7 +426,7 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.patch('/reports/:id', asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+  const prisma = (req as any).container.resolve('prisma')
   const { status } = req.body as { status?: string } // 'resolved' | 'dismissed'
 
   const report = await prisma.report.update({
@@ -412,9 +461,8 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.get('/activity-log', asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
-  const page = parseInt(req.query.page as string) || 1
-  const limit = parseInt(req.query.limit as string) || 50
+  const prisma = (req as any).container.resolve('prisma')
+  const { page, limit } = paginationSchema.parse(req.query)
 
   const [logs, total] = await Promise.all([
     prisma.adminLog.findMany({
@@ -648,8 +696,11 @@ router.post('/draft/icons/:playerId/toggle', asyncHandler(async (req: Authentica
 
   getAdminService(req).logAction(req.userId!, 'ICON_ELIGIBILITY_TOGGLED', String(req.params.playerId), 'player', {
     wasEligible: !newValue,
-    nowEligible: newValue,
   })
+
+  await invalidatePlayerCache()
+
+  res.json({ success: true, player: allPlayers[playerIndex] })
 
   logger.info({
     event: 'admin.icon_toggled',
@@ -763,6 +814,8 @@ router.post('/draft/revalidate', asyncHandler(async (req: AuthenticatedRequest, 
     tournamentIds,
     allPassed: results.every((r: any) => r.passed),
   })
+
+  await invalidatePlayerCache()
 
   res.json({
     success: true,

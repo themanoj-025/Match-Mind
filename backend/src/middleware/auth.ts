@@ -50,7 +50,7 @@ export const authenticateToken = async (req: AuthenticatedRequest, res: Response
     req.userId = decoded.userId
 
     // Verify token hasn't been revoked (tokenVersion matches)
-    const prisma = req.app.get('prisma')
+    const prisma = (req as any).container.resolve('prisma')
     if (prisma && decoded.tokenVersion !== undefined) {
       const isValid = await checkTokenVersion(decoded.userId, decoded.tokenVersion, prisma)
       if (!isValid) {
@@ -78,7 +78,7 @@ export const optionalAuth = async (req: AuthenticatedRequest, _res: Response, ne
   if (token) {
     try {
       const decoded = jwt.verify(token, env.JWT_SECRET!) as { userId: string; tokenVersion?: number }
-      const prisma = req.app.get('prisma')
+      const prisma = (req as any).container.resolve('prisma')
       if (prisma && decoded.tokenVersion !== undefined) {
         const isValid = await checkTokenVersion(decoded.userId, decoded.tokenVersion, prisma)
         if (isValid) {

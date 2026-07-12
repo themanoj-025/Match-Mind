@@ -1,10 +1,10 @@
 import express from 'express'
 import { authenticateToken } from '../middleware/auth'
+import { cursorPaginationSchema, CursorPaginationParams, PaginatedResponse } from '@matchmind/shared-types'
 import asyncHandler from '../middleware/asyncHandler'
 import { computeRoomLeaderboard } from '../services/leaderboardService'
 import type { AuthenticatedRequest } from '../middleware/auth'
 import logger from '../utils/logger'
-import { getCachedOrFetch } from '../utils/cache'
 import { openapiRegistry } from "../config/openapi";
 
 const router = express.Router()
@@ -17,41 +17,22 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.get('/rooms/:roomId', asyncHandler(async (req, res) => {
-  const prisma = req.app.get('prisma')
+  const roomService = (req as any).container.resolve('roomService')
+  const cacheService = (req as any).container.resolve('cacheService')
   const roomId = req.params.roomId as string
 
   const cacheKey = `leaderboard:room:${roomId}`
-  const payload = await getCachedOrFetch(cacheKey, 60, async () => {
-    // Get the room to verify it exists
-    const room = await prisma.room.findUnique({
-      where: { id: roomId },
-      select: { id: true, tournamentId: true },
-    })
-    if (!room) {
-      return { error: 'ROOM_NOT_FOUND' }
-    }
+  const payload = await cacheService.getOrFetch(cacheKey, 300, async () => {
+    const data = await roomService.getRoomLeaderboardData(roomId)
+    if (!data) return { error: 'ROOM_NOT_FOUND' }
 
-    // Fetch all fantasy points ledger entries for this room
-    const ledger = await prisma.fantasyPointsLedger.findMany({
-      where: { roomId },
-    })
-
-    // Fetch all roster entries for cost calculation
-    const rosters = await prisma.roster.findMany({
-      where: { roomId },
-      select: { userId: true, soldPrice: true },
-    })
-
-    // Compute the leaderboard as a derived view
-    const entries = computeRoomLeaderboard(ledger, roomId, rosters)
+    const entries = computeRoomLeaderboard(data.ledger, roomId, data.rosters)
 
     return {
-      roomId: room.id,
-      tournamentId: room.tournamentId,
+      roomId,
+      tournamentId: data.tournamentId,
       entries,
-      totalFixtures: ledger.length > 0
-        ? new Set(ledger.map((l: any) => l.fixtureId)).size
-        : 0,
+      totalFixtures: data.ledger.length > 0 ? new Set(data.ledger.map((l: any) => l.fixtureId)).size : 0,
     }
   })
 

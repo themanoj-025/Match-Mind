@@ -20,7 +20,10 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@matchmind/shared-types": ["../packages/shared-types/src/index.ts"]
+    }
   },
   "include": ["src"]
 }

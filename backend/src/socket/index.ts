@@ -25,6 +25,8 @@ import logger from '../utils/logger'
 const ALLOWED_ROOM_TYPES = ['match', 'squad', 'sport', 'room', 'dm']
 
 import { redis } from '../lib/redis'
+import { scheduleAuctionTimer } from '../lib/queue'
+import { ConcurrencyError } from '../errors/DomainError'
 
 // Fallback in-memory maps for when Redis is offline
 const connectionRateMap = new Map<string, number[]>()
@@ -102,7 +104,7 @@ function makeAuctionHelpers(prisma: any) {
         data: { ...state },
       })
       if (result.count === 0) {
-        throw new Error('OPTIMISTIC_CONCURRENCY_CONFLICT')
+        throw new ConcurrencyError()
       }
     },
     getRoom: async (roomId: string) => prisma.room.findUnique({ where: { id: roomId } }),
@@ -228,6 +230,19 @@ export const setupSocket = (io: Server, prisma: any): void => {
       }
     })
 
+    socket.on('SYNC_STATE', async ({ roomId }: { roomId?: string }) => {
+      if (!roomId || typeof roomId !== 'string') return
+      const actualRoomId = roomId.replace('room:', '')
+      try {
+        const state = await prisma.auctionState.findUnique({ where: { roomId: actualRoomId } })
+        if (state) {
+          socket.emit('ROOM_STATE_SYNC', { auctionState: state })
+        }
+      } catch (err: any) {
+        logger.error({ event: 'socket.sync_state_error', roomId, err: err.message }, 'Failed to sync state on reconnect')
+      }
+    })
+
     // ─── Auction Events ───────────────────────────────────
 
     socket.on('PLACE_BID', async (data: {
@@ -285,6 +300,10 @@ export const setupSocket = (io: Server, prisma: any): void => {
             timerEndsAt: result.newState.timerEndsAt,
             version: result.newState.version,
           })
+
+          if (result.newState.timerEndsAt) {
+            await scheduleAuctionTimer(data.roomId, result.newState.timerEndsAt)
+          }
         } else {
           // Send rejection only to the bidder
           socket.emit('BID_REJECTED', {
@@ -370,7 +389,7 @@ export const setupSocket = (io: Server, prisma: any): void => {
           case 'START_RE_AUCTION':
             newState = await startReAuction(data.roomId, helpers.getAuctionState, helpers.saveAuctionState)
             if (newState) {
-              io.to(`room:${data.roomId}`).emit('RE_AUCTION_STARTED', { roomId: data.roomId, poolQueue: newState.poolQueue })
+              io.to(`room:${data.roomId}`).emit('RE_AUCTION_STARTED', { roomId: data.roomId })
             }
             return
           case 'END_AUCTION':
@@ -382,6 +401,9 @@ export const setupSocket = (io: Server, prisma: any): void => {
 
         if (newState) {
           io.to(`room:${data.roomId}`).emit('AUCTION_PHASE_CHANGE', { roomId: data.roomId, state: newState })
+          if (newState.phase === 'PLAYER_LIVE' && newState.timerEndsAt) {
+            await scheduleAuctionTimer(data.roomId, newState.timerEndsAt)
+          }
         }
       } catch (err: any) {
         logger.error({ event: 'socket.host_action_error', userId: socket.userId, err: err.message }, 'HOST_ACTION error')

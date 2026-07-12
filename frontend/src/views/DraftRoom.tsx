@@ -1,11 +1,37 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { io, Socket } from 'socket.io-client'
-import { useApp } from '../context/AppContext'
+import { useAuthStore } from '../store/useAuthStore'
+import { useToastStore } from '../store/useToastStore'
 import { Button } from '../components/Button'
 import { Input } from '../components/Input'
 import { Card } from '../components/Card'
 import { MessageSquare, Users, DollarSign, Clock, Sparkles, Trophy, ArrowLeft } from 'lucide-react'
+
+import { env } from '../config/env'
+
+const DraftTimer: React.FC<{ timerEndsAt: string | null }> = ({ timerEndsAt }) => {
+  const [timeLeft, setTimeLeft] = useState(0)
+
+  useEffect(() => {
+    if (!timerEndsAt) return
+    const interval = setInterval(() => {
+      const remaining = Math.max(0, Math.round((new Date(timerEndsAt).getTime() - Date.now()) / 1000))
+      setTimeLeft(remaining)
+      if (remaining === 0) {
+        clearInterval(interval)
+      }
+    }, 500)
+    return () => clearInterval(interval)
+  }, [timerEndsAt])
+
+  return (
+    <div className="flex items-center gap-2 mt-1.5 text-2xl font-bold font-mono text-rose-400">
+      <Clock className="w-5 h-5 text-rose-400 animate-pulse" /> {timeLeft}s
+    </div>
+  )
+}
+
 
 interface Player {
   id: string
@@ -35,7 +61,8 @@ interface ChatMsg {
 
 export const DraftRoom: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>()
-  const { token, user, showToast } = useApp()
+  const { user } = useAuthStore()
+  const { showToast } = useToastStore()
   const navigate = useNavigate()
 
   const [socket, setSocket] = useState<Socket | null>(null)
@@ -44,9 +71,7 @@ export const DraftRoom: React.FC = () => {
   const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null)
   const [currentBid, setCurrentBid] = useState(0)
   const [currentBidderId, setCurrentBidderId] = useState<string | null>(null)
-  const [timerEndsAt, setTimerEndsAt] = useState<string | null>(null)
-  const [timeLeft, setTimeLeft] = useState(0)
-  
+  const [timerEndsAt, setTimerEndsAt] = useState<string | null>(null)  
   const [myBudget, setMyBudget] = useState(0)
   const [roster, setRoster] = useState<RosterItem[]>([])
   const [activeMembers, setActiveMembers] = useState<any[]>([])
@@ -60,18 +85,7 @@ export const DraftRoom: React.FC = () => {
 
   const chatEndRef = useRef<HTMLDivElement>(null)
 
-  // Timer countdown hook
-  useEffect(() => {
-    if (!timerEndsAt) return
-    const interval = setInterval(() => {
-      const remaining = Math.max(0, Math.round((new Date(timerEndsAt).getTime() - Date.now()) / 1000))
-      setTimeLeft(remaining)
-      if (remaining === 0) {
-        clearInterval(interval)
-      }
-    }, 500)
-    return () => clearInterval(interval)
-  }, [timerEndsAt])
+
 
   // Scroll chat to bottom
   useEffect(() => {
@@ -80,14 +94,14 @@ export const DraftRoom: React.FC = () => {
 
   // Socket Connection setup
   useEffect(() => {
-    if (!token || !roomId) {
+    if (!user || !roomId) {
       navigate('/login')
       return
     }
 
-    const socketUrl = 'http://localhost:5000'
+    const socketUrl = env.API_URL
     const newSocket = io(socketUrl, {
-      auth: { token },
+      withCredentials: true,
       transports: ['websocket'],
     })
 
@@ -154,7 +168,7 @@ export const DraftRoom: React.FC = () => {
     return () => {
       newSocket.disconnect()
     }
-  }, [roomId, token])
+  }, [roomId, user])
 
   const handlePlaceBid = (e: React.FormEvent) => {
     e.preventDefault()
@@ -178,11 +192,11 @@ export const DraftRoom: React.FC = () => {
     setLoadingAi(true)
     setAiOpen(true)
     try {
-      const response = await fetch('http://localhost:5000/api/ai/auction-advice', {
+      const response = await fetch(`${env.API_URL}/api/ai/auction-advice`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ roomId }),
       })
@@ -281,9 +295,7 @@ export const DraftRoom: React.FC = () => {
                   </div>
                   <div className="flex flex-col items-end">
                     <span className="text-xs text-foreground-muted uppercase font-mono">Bidding Ends In</span>
-                    <div className="flex items-center gap-2 mt-1.5 text-2xl font-bold font-mono text-rose-400">
-                      <Clock className="w-5 h-5 text-rose-400 animate-pulse" /> {timeLeft}s
-                    </div>
+                    <DraftTimer timerEndsAt={timerEndsAt} />
                   </div>
                 </div>
 

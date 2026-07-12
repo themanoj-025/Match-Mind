@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useApp } from '../context/AppContext'
+import { useAuthStore } from '../store/useAuthStore'
+import { useToastStore } from '../store/useToastStore'
 import { Button } from '../components/Button'
 import { Input } from '../components/Input'
 import { Card } from '../components/Card'
 import { Layers, Plus, LogOut, Trophy } from 'lucide-react'
+import { env } from '../config/env'
 
 interface Room {
   id: string
@@ -22,13 +24,14 @@ export const Lobby: React.FC = () => {
   const [newRoomName, setNewRoomName] = useState('')
   const [budget, setBudget] = useState(200)
   const [loading, setLoading] = useState(false)
-  const { token, logout, showToast } = useApp()
+  const { user, logout } = useAuthStore()
+  const { showToast } = useToastStore()
   const navigate = useNavigate()
 
   const fetchRooms = async () => {
     try {
       const response = await fetch('http://localhost:5000/api/rooms', {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include'
       })
       const data = await response.json()
       if (response.ok) {
@@ -40,12 +43,12 @@ export const Lobby: React.FC = () => {
   }
 
   useEffect(() => {
-    if (!token) {
+    if (!user) {
       navigate('/login')
       return
     }
     fetchRooms()
-  }, [token])
+  }, [user])
 
   const handleCreateRoom = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -53,11 +56,11 @@ export const Lobby: React.FC = () => {
     setLoading(true)
 
     try {
-      const response = await fetch('http://localhost:5000/api/rooms', {
+      const response = await fetch(`${env.API_URL}/api/rooms`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           name: newRoomName,
