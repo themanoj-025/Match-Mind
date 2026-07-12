@@ -2,55 +2,55 @@ name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ['main']
   pull_request:
-    branches: [ "main" ]
+    branches: ['main']
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20.x'
-        cache: 'npm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
 
-    - name: Install Dependencies
-      run: npm run setup
+      - name: Install Dependencies
+        run: npm run setup
 
-    - name: Run Linter
-      run: npm run lint
+      - name: Run Linter
+        run: npm run lint
 
-    - name: Run Typecheck
-      run: npm run typecheck
+      - name: Run Typecheck
+        run: npm run typecheck
 
-    - name: Build Frontend
-      run: npm run build
+      - name: Build Frontend
+        run: npm run build
 
-    # Test suite requires Redis. We spin up Redis for testing.
-    - name: Setup Redis
-      uses: supercharge/redis-github-action@1.7.0
+      # Test suite requires Redis. We spin up Redis for testing.
+      - name: Setup Redis
+        uses: supercharge/redis-github-action@1.7.0
 
-    # Tests currently failing due to Docker dependency in test:up in package.json.
-    # But for a real CI, we run them directly via vitest.
-    - name: Run Tests (Backend)
-      run: cd backend && npx vitest run
-      env:
-        PORT: 5000
-        NODE_ENV: test
-        JWT_SECRET: test-secret
-        JWT_RESET_SECRET: test-reset-secret
+      # Tests currently failing due to Docker dependency in test:up in package.json.
+      # But for a real CI, we run them directly via vitest.
+      - name: Run Tests (Backend)
+        run: cd backend && npx vitest run
+        env:
+          PORT: 5000
+          NODE_ENV: test
+          JWT_SECRET: test-secret
+          JWT_RESET_SECRET: test-reset-secret
 
-    - name: Security Scan (Trivy / npm audit)
-      run: npm audit --audit-level=high
+      - name: Security Scan (Trivy / npm audit)
+        run: npm audit --audit-level=high
 
-    - name: Secret Scan (Gitleaks)
-      uses: gitleaks/gitleaks-action@v2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Secret Scan (Gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
