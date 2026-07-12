@@ -4,15 +4,15 @@ services:
     container_name: matchmind-db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: matchmind
-      POSTGRES_PASSWORD: matchmindpassword
-      POSTGRES_DB: matchmind
+      POSTGRES_USER: ${POSTGRES_USER:-matchmind}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-matchmindpassword}
+      POSTGRES_DB: ${POSTGRES_DB:-matchmind}
     ports:
       - '5432:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U matchmind -d matchmind']
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-matchmind} -d ${POSTGRES_DB:-matchmind}']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -43,7 +43,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3001
-      DATABASE_URL: 'postgresql://matchmind:matchmindpassword@postgres:5432/matchmind?schema=public'
+      DATABASE_URL: ${DATABASE_URL:-postgresql://matchmind:matchmindpassword@postgres:5432/matchmind?schema=public}
       REDIS_URL: 'redis://redis:6379'
     depends_on:
       postgres:
