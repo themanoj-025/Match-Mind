@@ -5,7 +5,7 @@ generator client {
 
 generator erd {
   provider = "prisma-erd-generator"
-  output   = "../docs/schema-baseline.svg"
+  output   = "../docs/schema-baseline.md"
   theme    = "forest"
 }
 
@@ -13,7 +13,6 @@ datasource db {
   provider = "postgresql"
   url      = "postgresql://matchmind:matchmind_test_password@localhost:5433/matchmind_test"
 }
-
 
 enum UserRole {
   USER
@@ -101,7 +100,7 @@ enum DraftRunResultStatus {
 }
 
 model User {
-  id                 String                @id @default(uuid())
+  id                 String                @id @default(uuid(7))
   username           String                @unique
   email              String                @unique
   emailVerified      Boolean               @default(false)
@@ -111,8 +110,8 @@ model User {
   bannerImage        String?
   bio                String?
   countryCode        String?
-  role UserRole @default(USER)
-  tier UserTier @default(BRONZE)
+  role               UserRole              @default(USER)
+  tier               UserTier              @default(BRONZE)
   totalPoints        Int                   @default(0)
   weeklyPoints       Int                   @default(0)
   globalRank         Int?
@@ -149,7 +148,7 @@ model User {
 }
 
 model Tournament {
-  id              String           @id @default(uuid())
+  id              String           @id @default(uuid(7))
   name            String
   shortName       String
   status          String
@@ -174,7 +173,7 @@ model Tournament {
 }
 
 model Player {
-  id                String            @id @default(uuid())
+  id                String            @id @default(uuid(7))
   tournamentId      String
   name              String
   club              String
@@ -186,22 +185,24 @@ model Player {
   isEligibleForIcon Boolean           @default(false)
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
+  deletedAt         DateTime?
   tournament        Tournament        @relation(fields: [tournamentId], references: [id])
   playerMatchStats  PlayerMatchStat[]
   rosters           Roster[]
   starredBy         StarredPlayer[]
 
   @@index([tournamentId])
+  @@index([deletedAt])
 }
 
 model Room {
-  id            String                @id @default(uuid())
+  id            String                @id @default(uuid(7))
   tournamentId  String
   hostId        String
   name          String
   inviteCode    String                @unique
   totalBudget   Float
-  status RoomStatus @default(LOBBY)
+  status        RoomStatus            @default(LOBBY)
   createdAt     DateTime              @default(now())
   updatedAt     DateTime              @updatedAt
   deletedAt     DateTime?
@@ -217,16 +218,16 @@ model Room {
 }
 
 model RoomMember {
-  id              String   @id @default(uuid())
+  id              String         @id @default(uuid(7))
   roomId          String
   userId          String
-  role RoomMemberRole @default(member)
+  role            RoomMemberRole @default(member)
   remainingBudget Float
-  isReady         Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  room            Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isReady         Boolean        @default(false)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  room            Room           @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([roomId, userId])
   @@index([roomId])
@@ -234,7 +235,7 @@ model RoomMember {
 }
 
 model Bid {
-  id        String   @id @default(uuid())
+  id        String   @id @default(uuid(7))
   roomId    String
   playerId  String
   userId    String
@@ -250,7 +251,7 @@ model Bid {
 }
 
 model Roster {
-  id            String   @id @default(uuid())
+  id            String   @id @default(uuid(7))
   roomId        String
   userId        String
   playerId      String
@@ -270,21 +271,21 @@ model Roster {
 }
 
 model AuctionState {
-  id              String    @id @default(uuid())
-  roomId          String    @unique
-  phase AuctionPhase @default(IDLE)
+  id              String       @id @default(uuid(7))
+  roomId          String       @unique
+  phase           AuctionPhase @default(IDLE)
   currentPlayerId String?
-  currentBid      Float     @default(0)
+  currentBid      Float        @default(0)
   currentBidderId String?
   timerEndsAt     DateTime?
-  version         Int       @default(1)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  room            Room      @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  version         Int          @default(1)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  room            Room         @relation(fields: [roomId], references: [id], onDelete: Cascade)
 }
 
 model Fixture {
-  id               String                @id @default(uuid())
+  id               String                @id @default(uuid(7))
   tournamentId     String
   stage            String
   round            Int?
@@ -295,21 +296,23 @@ model Fixture {
   venueId          String?
   homeScore        Int?
   awayScore        Int?
-  status FixtureStatus @default(SCHEDULED)
+  status           FixtureStatus         @default(SCHEDULED)
   scheduledAt      DateTime
   kickoffAt        DateTime?
   createdAt        DateTime              @default(now())
   updatedAt        DateTime              @updatedAt
+  deletedAt        DateTime?
   fantasyPoints    FantasyPointsLedger[]
   tournament       Tournament            @relation(fields: [tournamentId], references: [id])
   playerMatchStats PlayerMatchStat[]
   predictions      Prediction[]
 
   @@index([tournamentId])
+  @@index([deletedAt])
 }
 
 model PlayerMatchStat {
-  id              String   @id @default(uuid())
+  id              String   @id @default(uuid(7))
   fixtureId       String
   playerId        String
   minutesPlayed   Int      @default(0)
@@ -333,7 +336,7 @@ model PlayerMatchStat {
 }
 
 model Prediction {
-  id              String    @id @default(uuid())
+  id              String    @id @default(uuid(7))
   userId          String
   matchId         String
   homeGoals       Int
@@ -362,7 +365,7 @@ model Prediction {
 }
 
 model Follow {
-  id          String   @id @default(uuid())
+  id          String   @id @default(uuid(7))
   followerId  String
   followingId String
   createdAt   DateTime @default(now())
@@ -376,22 +379,22 @@ model Follow {
 }
 
 model ChatMessage {
-  id        String    @id @default(uuid())
+  id        String          @id @default(uuid(7))
   userId    String
   roomId    String
   text      String
-  timestamp DateTime  @default(now())
+  timestamp DateTime        @default(now())
   gifUrl    String?
-  type ChatMessageType @default(user)
+  type      ChatMessageType @default(user)
   reactions Json?
-  isPinned  Boolean   @default(false)
-  isDeleted Boolean   @default(false)
-  isSystem  Boolean   @default(false)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  isPinned  Boolean         @default(false)
+  isDeleted Boolean         @default(false)
+  isSystem  Boolean         @default(false)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
   deletedAt DateTime?
-  room      Room      @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  room      Room            @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   reports   Report[]
 
   @@index([roomId, deletedAt])
@@ -399,7 +402,7 @@ model ChatMessage {
 }
 
 model Notification {
-  id        String   @id @default(uuid())
+  id        String   @id @default(uuid(7))
   userId    String
   type      String
   title     String
@@ -415,7 +418,7 @@ model Notification {
 }
 
 model Report {
-  id         String      @id @default(uuid())
+  id         String      @id @default(uuid(7))
   reporterId String
   messageId  String
   reason     String
@@ -429,7 +432,7 @@ model Report {
 }
 
 model AdminLog {
-  id         String   @id @default(uuid())
+  id         String   @id @default(uuid(7))
   adminId    String
   action     String
   targetId   String?
@@ -442,7 +445,7 @@ model AdminLog {
 }
 
 model Subscription {
-  id        String    @id @default(uuid())
+  id        String    @id @default(uuid(7))
   userId    String
   status    String
   plan      String
@@ -455,7 +458,7 @@ model Subscription {
 }
 
 model Session {
-  id        String   @id @default(uuid())
+  id        String   @id @default(uuid(7))
   userId    String
   token     String   @unique
   expiresAt DateTime
@@ -467,7 +470,7 @@ model Session {
 }
 
 model StarredPlayer {
-  id        String   @id @default(uuid())
+  id        String   @id @default(uuid(7))
   userId    String
   playerId  String
   createdAt DateTime @default(now())
@@ -480,15 +483,17 @@ model StarredPlayer {
 }
 
 model LeaderboardSnapshot {
-  id        String   @id @default(uuid())
+  id        String   @id @default(uuid(7))
   period    String
   data      Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([data], type: Gin)
 }
 
 model Achievement {
-  id               String            @id @default(uuid())
+  id               String            @id @default(uuid(7))
   name             String            @unique
   description      String
   icon             String
@@ -499,7 +504,7 @@ model Achievement {
 }
 
 model UserAchievement {
-  id            String      @id @default(uuid())
+  id            String      @id @default(uuid(7))
   userId        String
   achievementId String
   earnedAt      DateTime    @default(now())
@@ -513,7 +518,7 @@ model UserAchievement {
 }
 
 model DraftSession {
-  id                    String          @id @default(uuid())
+  id                    String          @id @default(uuid(7))
   userId                String
   tournamentId          String
   formation             String
@@ -523,16 +528,18 @@ model DraftSession {
   formationBonusApplied Boolean         @default(false)
   createdAt             DateTime        @default(now())
   updatedAt             DateTime        @updatedAt
+  deletedAt             DateTime?
   draftPicks            DraftPick[]
   draftRunResult        DraftRunResult?
   tournament            Tournament      @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
   user                  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([deletedAt])
 }
 
 model DraftPick {
-  id               String       @id @default(uuid())
+  id               String       @id @default(uuid(7))
   draftSessionId   String
   slotIndex        Int
   position         String
@@ -546,10 +553,12 @@ model DraftPick {
   draftSession     DraftSession @relation(fields: [draftSessionId], references: [id], onDelete: Cascade)
 
   @@index([draftSessionId])
+  @@index([offeredPlayerIds], type: Gin)
+  @@index([offeredRarities], type: Gin)
 }
 
 model DraftRunResult {
-  id             String       @id @default(uuid())
+  id             String       @id @default(uuid(7))
   draftSessionId String       @unique
   userId         String
   tournamentId   String
@@ -569,20 +578,22 @@ model DraftRunResult {
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([rewards], type: Gin)
+  @@index([rounds], type: Gin)
 }
 
 model DraftTicket {
-  id        String   @id @default(uuid())
+  id        String            @id @default(uuid(7))
   userId    String
-  status DraftTicketStatus @default(AVAILABLE)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  status    DraftTicketStatus @default(AVAILABLE)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
 
   @@index([userId])
 }
 
 model DraftRewardsCatalog {
-  id                String   @id @default(uuid())
+  id                String   @id @default(uuid(7))
   winCountThreshold Int
   cosmeticId        String
   name              String
@@ -592,7 +603,7 @@ model DraftRewardsCatalog {
 }
 
 model PlayerRarityCache {
-  id         String   @id @default(uuid())
+  id         String   @id @default(uuid(7))
   playerId   String   @unique
   rarityTier String
   createdAt  DateTime @default(now())
@@ -600,16 +611,18 @@ model PlayerRarityCache {
 }
 
 model RoomTemplate {
-  id          String   @id @default(uuid())
+  id          String   @id @default(uuid(7))
   name        String
   rosterRules Json
   totalBudget Float
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([rosterRules], type: Gin)
 }
 
 model FantasyPointsLedger {
-  id                String   @id @default(uuid())
+  id                String   @id @default(uuid(7))
   userId            String
   roomId            String
   fixtureId         String
@@ -627,4 +640,5 @@ model FantasyPointsLedger {
   @@unique([userId, roomId, fixtureId, playerId])
   @@index([userId])
   @@index([roomId])
+  @@index([breakdown], type: Gin)
 }
