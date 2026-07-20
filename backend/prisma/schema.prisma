@@ -48,7 +48,7 @@ enum RoomStatus {
 
 enum RoomMemberRole {
   member
-  admin
+  host
 }
 
 enum AuctionPhase {
