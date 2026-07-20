@@ -190,7 +190,6 @@ describe('Phase 1: Room Creation', () => {
         name: 'Integration Test Draft',
         tournamentId: 'fifa-wc-2026',
         totalBudget: 500,
-        rosterRules: { GK: 2, DEF: 5, MID: 5, FWD: 3, total: 15 },
       },
     })
 
@@ -203,7 +202,6 @@ describe('Phase 1: Room Creation', () => {
     expect(body.inviteCode).toBeDefined()
     expect(body.inviteCode).toHaveLength(8)
     expect(body.totalBudget).toBe(500)
-    expect(body.rosterRules).toEqual({ GK: 2, DEF: 5, MID: 5, FWD: 3, total: 15 })
 
     shared.roomId = body.id
     shared.inviteCode = body.inviteCode

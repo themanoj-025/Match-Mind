@@ -11,7 +11,7 @@ export class RoomService {
 
   async countActiveRoomsForUser(userId: string): Promise<number> {
     return this.prisma.room.count({
-      where: { hostId: userId, status: { not: 'COMPLETED' } },
+      where: { hostId: userId, status: { not: 'FINISHED' } },
     })
   }
 
@@ -21,7 +21,7 @@ export class RoomService {
 
   async createRoomWithHostAndAuction(
     data: { name: string; tournamentId: string; totalBudget: number; inviteCode: string },
-    hostId: string
+    hostId: string,
   ): Promise<any> {
     const room = await this.prisma.room.create({
       data: {
@@ -95,7 +95,7 @@ export class RoomService {
       where: { id: roomId },
       select: { status: true, hostId: true },
     })
-    
+
     return {
       members,
       roomStatus: room?.status || 'unknown',
@@ -149,12 +149,16 @@ export class RoomService {
     })
   }
 
-  async getRoomLeaderboardData(roomId: string): Promise<{ ledger: any[]; rosters: any[]; tournamentId: string } | null> {
+  async getRoomLeaderboardData(
+    roomId: string,
+  ): Promise<{ ledger: any[]; rosters: any[]; tournamentId: string } | null> {
     const room = await this.prisma.room.findUnique({
       where: { id: roomId },
       select: { id: true, tournamentId: true },
     })
-    if (!room) return null
+    if (!room) {
+      return null
+    }
 
     const ledger = await this.prisma.fantasyPointsLedger.findMany({
       where: { roomId },
