@@ -43,6 +43,7 @@ export default tseslint.config(
       // Disable no-undef for TypeScript
       'no-undef': 'off',
       'no-redeclare': 'off',
+      'preserve-caught-error': 'off',
 
       // No duplicate imports
       'no-duplicate-imports': 'warn',
