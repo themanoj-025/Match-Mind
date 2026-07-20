@@ -39,7 +39,9 @@ const shared = {
 
 async function api(method: string, path: string, opts: { body?: any; auth?: boolean } = {}) {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-  if (opts.auth !== false) headers['Authorization'] = `Bearer ${TEST_AUTH_TOKEN}`
+  if (opts.auth !== false) {
+    headers['Authorization'] = `Bearer ${TEST_AUTH_TOKEN}`
+  }
 
   const res = await fetch(`${baseUrl}${path}`, {
     method,
@@ -92,9 +94,33 @@ beforeAll(async () => {
   // Seed players
   await prisma.player.createMany({
     data: [
-      { id: 'player-1', tournamentId: 'fifa-wc-2026', name: 'Lionel Messi', club: 'Inter Miami', nationality: 'Argentina', position: 'FWD', basePrice: 50 },
-      { id: 'player-2', tournamentId: 'fifa-wc-2026', name: 'Kylian Mbappe', club: 'Real Madrid', nationality: 'France', position: 'FWD', basePrice: 60 },
-      { id: 'player-3', tournamentId: 'fifa-wc-2026', name: 'Kevin De Bruyne', club: 'Man City', nationality: 'Belgium', position: 'MID', basePrice: 45 },
+      {
+        id: 'player-1',
+        tournamentId: 'fifa-wc-2026',
+        name: 'Lionel Messi',
+        club: 'Inter Miami',
+        nationality: 'Argentina',
+        position: 'FWD',
+        basePrice: 50,
+      },
+      {
+        id: 'player-2',
+        tournamentId: 'fifa-wc-2026',
+        name: 'Kylian Mbappe',
+        club: 'Real Madrid',
+        nationality: 'France',
+        position: 'FWD',
+        basePrice: 60,
+      },
+      {
+        id: 'player-3',
+        tournamentId: 'fifa-wc-2026',
+        name: 'Kevin De Bruyne',
+        club: 'Man City',
+        nationality: 'Belgium',
+        position: 'MID',
+        basePrice: 45,
+      },
     ],
     skipDuplicates: true,
   })
@@ -138,9 +164,9 @@ describe('Room CRUD', () => {
         totalBudget: 500,
       },
     })
-    
+
     if (res.status !== 201) {
-      console.log('POST /api/rooms FAILED:', res.status, res.body)
+      throw new Error(`POST /api/rooms FAILED: ${res.status} ${JSON.stringify(res.body)}`)
     }
 
     const { status, body } = res
@@ -183,7 +209,7 @@ describe('Auction Host Controls', () => {
         remainingBudget: 500,
       },
     })
-    
+
     const member = await prisma.roomMember.findUnique({
       where: { roomId_userId: { roomId: shared.roomId, userId: TEST_USER_ID } },
     })
