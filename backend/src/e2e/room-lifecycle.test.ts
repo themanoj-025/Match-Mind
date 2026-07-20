@@ -81,6 +81,23 @@ beforeAll(async () => {
       totalPoints: 0,
     },
   })
+  // Seed tournament so POST /api/rooms doesn't fail on foreign key constraint
+  await prisma.tournament.upsert({
+    where: { id: 'fifa-wc-2026' },
+    update: {},
+    create: {
+      id: 'fifa-wc-2026',
+      name: 'FIFA World Cup 2026',
+      shortName: 'WC 2026',
+      status: 'upcoming',
+      confederation: 'FIFA',
+      gender: 'men',
+      format: 'international',
+      teamCount: 48,
+      squadSize: 26,
+      launchPhase: 1,
+    },
+  })
 
   // Add more test players so the auction pool is non-trivial
   await prisma.player.create({
