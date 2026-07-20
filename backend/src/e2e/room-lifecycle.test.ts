@@ -193,6 +193,10 @@ describe('Phase 1: Room Creation', () => {
       },
     })
 
+    if (status !== 201) {
+      throw new Error(`POST /api/rooms failed! Expected 201, got ${status}. Body: ${JSON.stringify(body)}`)
+    }
+
     expect(status).toBe(201)
     expect(body.id).toBeDefined()
     expect(body.name).toBe('Integration Test Draft')
@@ -579,6 +583,9 @@ describe('Phase 7: Captain/VC Selection', () => {
       token: BIDDER_TOKEN,
     })
 
+    if (status !== 200) {
+      throw new Error(`Phase 7 Test 1 failed! Expected 200, got ${status}. Body: ${JSON.stringify(body)}`)
+    }
     expect(status).toBe(200)
     expect(Array.isArray(body)).toBe(true)
     const entry = body.find((r: any) => r.playerId === shared.firstPlayerId)
@@ -592,6 +599,9 @@ describe('Phase 7: Captain/VC Selection', () => {
       token: BIDDER_TOKEN,
     })
 
+    if (status !== 400) {
+      throw new Error(`Expected 400, got ${status}. Body: ${JSON.stringify(body)}`)
+    }
     expect(status).toBe(400)
     expect(body.error?.code).toBe('PLAYER_NOT_IN_ROSTER')
   })
