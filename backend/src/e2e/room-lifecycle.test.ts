@@ -68,6 +68,20 @@ beforeAll(async () => {
   prisma = testEnv.prisma
   dataDir = testEnv.dataDir
 
+  // Register the first (host) test user in the DB
+  await prisma.user.create({
+    data: {
+      id: 'host-user-1',
+      username: 'host',
+      email: 'host@test.com',
+      displayName: 'Host User',
+      passwordHash: '$2a$10$testhashedpassword',
+      tier: 'BRONZE',
+      isPro: false,
+      totalPoints: 0,
+    },
+  })
+
   // Register the second test user in the DB
   await prisma.user.create({
     data: {
@@ -81,6 +95,7 @@ beforeAll(async () => {
       totalPoints: 0,
     },
   })
+
   // Seed tournament so POST /api/rooms doesn't fail on foreign key constraint
   await prisma.tournament.upsert({
     where: { id: 'fifa-wc-2026' },
@@ -89,7 +104,7 @@ beforeAll(async () => {
       id: 'fifa-wc-2026',
       name: 'FIFA World Cup 2026',
       shortName: 'WC 2026',
-      status: 'upcoming',
+      status: 'UPCOMING',
       confederation: 'FIFA',
       gender: 'men',
       format: 'international',

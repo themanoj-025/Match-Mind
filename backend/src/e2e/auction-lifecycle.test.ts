@@ -73,6 +73,32 @@ beforeAll(async () => {
   await prisma.room.deleteMany()
   await prisma.user.deleteMany()
 
+  // Create test users
+  await prisma.user.create({
+    data: {
+      id: TEST_USER_ID,
+      username: 'test',
+      email: 'test@test.com',
+      displayName: 'Test User',
+      passwordHash: '$2a$10$testhashedpassword',
+      tier: 'BRONZE',
+      isPro: false,
+      totalPoints: 0,
+    },
+  })
+  await prisma.user.create({
+    data: {
+      id: OTHER_USER_ID,
+      username: 'other',
+      email: 'other@test.com',
+      displayName: 'Other User',
+      passwordHash: '$2a$10$testhashedpassword',
+      tier: 'BRONZE',
+      isPro: false,
+      totalPoints: 0,
+    },
+  })
+
   // Seed tournament so POST /api/rooms doesn't fail on foreign key constraint
   await prisma.tournament.upsert({
     where: { id: 'fifa-wc-2026' },
@@ -81,7 +107,7 @@ beforeAll(async () => {
       id: 'fifa-wc-2026',
       name: 'FIFA World Cup 2026',
       shortName: 'WC 2026',
-      status: 'upcoming',
+      status: 'UPCOMING',
       confederation: 'FIFA',
       gender: 'men',
       format: 'international',
