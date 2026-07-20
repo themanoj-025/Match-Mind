@@ -17,9 +17,9 @@ openapiRegistry.registerPath({
 })
 router.get('/rooms/:roomId', async (req, res) => {
   // @ts-ignore
-      const roomService = (req as unknown).container.resolve('roomService')
+      const roomService = (req as any).container.resolve('roomService')
   // @ts-ignore
-      const cacheService = (req as unknown).container.resolve('cacheService')
+      const cacheService = (req as any).container.resolve('cacheService')
       const roomId = req.params.roomId as string
 
       const cacheKey = `leaderboard:room:${roomId}`

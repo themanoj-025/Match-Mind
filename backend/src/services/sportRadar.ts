@@ -50,7 +50,7 @@ export class SportRadarService {
           alias: event.competitors[1].abbreviation
         }
       })) || []
-    } catch (error) {
+    } catch (error: any) {
       logger.error({ event: 'sportradar.fetch_failed', error }, 'Failed to fetch schedule from SportRadar')
       throw error
     }

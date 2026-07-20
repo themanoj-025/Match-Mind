@@ -47,7 +47,7 @@ openapiRegistry.registerPath({
 })
 router.post('/', idempotent(), createRoomLimiter, authenticateToken, validate(createRoomSchema), async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const roomService = (req as unknown).container.resolve('roomService')
+      const roomService = (req as any).container.resolve('roomService')
       const { name, tournamentId, totalBudget } = req.body as z.infer<typeof createRoomSchema>
 
       // Check free tier limit
@@ -84,7 +84,7 @@ openapiRegistry.registerPath({
 })
 router.get('/mine', authenticateToken, async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const roomService = (req as unknown).container.resolve('roomService')
+      const roomService = (req as any).container.resolve('roomService')
       const userRooms = await roomService.getUserRooms(req.userId)
       res.json(userRooms)
     })
@@ -98,7 +98,7 @@ openapiRegistry.registerPath({
 })
 router.get('/:id', async (req, res) => {
   // @ts-ignore
-      const roomService = (req as unknown).container.resolve('roomService')
+      const roomService = (req as any).container.resolve('roomService')
       const room = await roomService.getRoomDetails(req.params.id)
       if (!room) {
         return res.status(404).json({ error: { code: 'ROOM_NOT_FOUND', message: 'Room not found' } })
@@ -115,7 +115,7 @@ openapiRegistry.registerPath({
 })
 router.get('/:id/members', async (req, res) => {
   // @ts-ignore
-      const roomService = (req as unknown).container.resolve('roomService')
+      const roomService = (req as any).container.resolve('roomService')
       const data = await roomService.getRoomMembers(req.params.id)
       res.json(data)
     })
@@ -130,7 +130,7 @@ openapiRegistry.registerPath({
 })
 router.post('/:id/join', joinRoomLimiter, authenticateToken, validate(joinRoomSchema), async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const roomService = (req as unknown).container.resolve('roomService')
+      const roomService = (req as any).container.resolve('roomService')
       const roomId = req.params.id as string
       const { inviteCode } = req.body as z.infer<typeof joinRoomSchema>
 
@@ -173,7 +173,7 @@ openapiRegistry.registerPath({
 })
 router.patch('/:id/ready', authenticateToken, async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const roomService = (req as unknown).container.resolve('roomService')
+      const roomService = (req as any).container.resolve('roomService')
       const roomId = req.params.id as string
 
       const member = await roomService.getMember(roomId, req.userId)
@@ -211,7 +211,7 @@ openapiRegistry.registerPath({
 })
 router.post('/:id/regenerate-invite', authenticateToken, async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const roomService = (req as unknown).container.resolve('roomService')
+      const roomService = (req as any).container.resolve('roomService')
       const roomId = req.params.id as string
 
       const room = await roomService.getRoomById(roomId)
@@ -245,7 +245,7 @@ openapiRegistry.registerPath({
 })
 router.get('/:id/leaderboard', async (req, res) => {
   // @ts-ignore
-      const roomService = (req as unknown).container.resolve('roomService')
+      const roomService = (req as any).container.resolve('roomService')
       const roomId = req.params.id as string
 
       const data = await roomService.getRoomLeaderboardData(roomId)

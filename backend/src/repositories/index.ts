@@ -330,7 +330,7 @@ export class PrismaAdminLogRepository implements IAdminLogRepository {
   }
 
   async create(data: Record<string, unknown>): Promise<unknown> {
-    return (this.prisma as unknown).adminLog.create({
+    return (this.prisma as any).adminLog.create({
       data: {
         adminId: data.adminId as string,
         action: data.action as string,
@@ -342,11 +342,11 @@ export class PrismaAdminLogRepository implements IAdminLogRepository {
   }
 
   async findMany(opts: { orderBy?: Record<string, 'asc' | 'desc'>; take?: number; skip?: number }): Promise<unknown[]> {
-    return (this.prisma as unknown).adminLog.findMany(opts)
+    return (this.prisma as any).adminLog.findMany(opts)
   }
 
   async count(where?: Record<string, unknown>): Promise<number> {
-    return (this.prisma as unknown).adminLog.count({ where })
+    return (this.prisma as any).adminLog.count({ where })
   }
 }
 

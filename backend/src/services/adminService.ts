@@ -99,7 +99,7 @@ export class AdminService {
         targetType: targetType ?? null,
         detail,
       })
-    } catch (err) {
+    } catch (err: any) {
       logger.error({ event: 'admin.log_failed', err: String(err) }, 'Failed to log admin action')
     }
   }

@@ -22,7 +22,7 @@ async function invalidatePlayerCache() {
         await redis.del(...keys)
         logger.info({ event: 'redis.cache_invalidated' }, 'Invalidated player cache')
       }
-    } catch (err: unknown) {
+    } catch (err: any) {
       logger.error({ event: 'redis.cache_invalidation_error', err: (err as Error).message }, 'Failed to invalidate cache')
     }
   }
@@ -53,10 +53,10 @@ const auditLogMiddleware = (req: express.Request, res: express.Response, next: e
               query: req.query,
               params: req.params,
             }
-          ).catch((err: unknown) => {
+          ).catch((err: any) => {
             logger.error({ event: 'admin.audit_log_error', err: (err as Error).message }, 'Failed to save audit log in middleware')
           })
-        } catch (err: unknown) {
+        } catch (err: any) {
           logger.error({ event: 'admin.audit_log_setup_error', err: (err as Error).message }, 'Failed to instantiate admin service for logging')
         }
       }
@@ -68,7 +68,7 @@ router.use(auditLogMiddleware)
 
 /** Create an AdminService instance from the Express app's prisma client */
 function getAdminService(req: AuthenticatedRequest) {
-  const prisma = (req as unknown).container.resolve('prisma')
+  const prisma = (req as any).container.resolve('prisma')
   const { userRepository, reportRepository, adminLogRepository } = createRepositories(prisma)
   return new AdminService({
     userRepository,
@@ -97,7 +97,7 @@ router.get('/stats', async (req: AuthenticatedRequest, res) => {
       const stats = await getAdminService(req).getDashboardStats()
 
       // Compute sport distribution from real fixtures data
-      const prisma = (req as unknown).container.resolve('prisma')
+      const prisma = (req as any).container.resolve('prisma')
       const allFixtures = await prisma.fixture.findMany({
         select: { sport: true },
       })
@@ -159,7 +159,7 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.get('/users', async (req: AuthenticatedRequest, res) => {
-      const prisma = (req as unknown).container.resolve('prisma')
+      const prisma = (req as any).container.resolve('prisma')
       const { page, limit } = paginationSchema.parse(req.query)
       const search = (req.query.search as string) || ''
 
@@ -210,7 +210,7 @@ openapiRegistry.registerPath({
   responses: { 200: { description: 'Success' } }
 })
 router.get('/users/:id', async (req: AuthenticatedRequest, res) => {
-      const prisma = (req as unknown).container.resolve('prisma')
+      const prisma = (req as any).container.resolve('prisma')
       const user = await prisma.user.findUnique({
         where: { id: req.params.id },
         include: {
@@ -240,7 +240,7 @@ openapiRegistry.registerPath({
 })
 router.patch('/users/:id', async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const prisma = (req as unknown).container.resolve('prisma')
+      const prisma = (req as any).container.resolve('prisma')
       const { role, tier, username, email, displayName } = req.body as {
         role?: string
         tier?: string
@@ -277,7 +277,7 @@ openapiRegistry.registerPath({
 })
 router.delete('/users/:id', async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const prisma = (req as unknown).container.resolve('prisma')
+      const prisma = (req as any).container.resolve('prisma')
       await prisma.user.update({
         where: { id: req.params.id },
         data: { isDeleted: true, email: `deleted-${req.params.id}@matchmind.gg`, username: `deleted-${req.params.id}` },
@@ -298,7 +298,7 @@ openapiRegistry.registerPath({
 })
 router.post('/users/:id/toggle-pro', async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const prisma = (req as unknown).container.resolve('prisma')
+      const prisma = (req as any).container.resolve('prisma')
       const user = await prisma.user.findUnique({ where: { id: req.params.id }, select: { isPro: true } })
       if (!user) return res.status(404).json({ error: { code: 'USER_NOT_FOUND', message: 'User not found' } })
 
@@ -332,7 +332,7 @@ openapiRegistry.registerPath({
 })
 router.get('/fixtures', async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const prisma = (req as unknown).container.resolve('prisma')
+      const prisma = (req as any).container.resolve('prisma')
       const { page, limit } = paginationSchema.parse(req.query)
       const tournamentId = req.query.tournamentId as string | undefined
 
@@ -364,7 +364,7 @@ openapiRegistry.registerPath({
 })
 router.patch('/fixtures/:id', async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const prisma = (req as unknown).container.resolve('prisma')
+      const prisma = (req as any).container.resolve('prisma')
       const { homeScore, awayScore, status } = req.body as {
         homeScore?: number
         awayScore?: number
@@ -399,7 +399,7 @@ openapiRegistry.registerPath({
 })
 router.get('/reports', async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const prisma = (req as unknown).container.resolve('prisma')
+      const prisma = (req as any).container.resolve('prisma')
       const { page, limit } = paginationSchema.parse(req.query)
       const status = (req.query.status as string) || 'pending'
 
@@ -432,7 +432,7 @@ openapiRegistry.registerPath({
 })
 router.patch('/reports/:id', async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const prisma = (req as unknown).container.resolve('prisma')
+      const prisma = (req as any).container.resolve('prisma')
       const { status } = req.body as { status?: string } // 'resolved' | 'dismissed'
 
       const report = await prisma.report.update({
@@ -468,7 +468,7 @@ openapiRegistry.registerPath({
 })
 router.get('/activity-log', async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const prisma = (req as unknown).container.resolve('prisma')
+      const prisma = (req as any).container.resolve('prisma')
       const { page, limit } = paginationSchema.parse(req.query)
 
       const [logs, total] = await Promise.all([

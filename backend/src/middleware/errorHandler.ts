@@ -17,12 +17,12 @@ import type { AuthenticatedRequest } from './auth'
  * Must have 4 params so Express recognizes it as an error handler.
  */
 // eslint-disable-next-line no-unused-vars
-export function errorHandler(err: unknown, req: AuthenticatedRequest, res: Response, _next: NextFunction): void {
+export function errorHandler(err: any, req: AuthenticatedRequest, res: Response, _next: NextFunction): void {
   // Structured error logging with request context
   logger.error({
     event: 'error.unhandled',
     err: { message: (err as Error).message, stack: env.NODE_ENV === 'development' ? err.stack : undefined },
-    requestId: (req as unknown).id,
+    requestId: (req as any).id,
     method: req.method,
     url: req.originalUrl || req.url,
     userId: req.userId,

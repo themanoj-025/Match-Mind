@@ -75,7 +75,7 @@ const prismaWithSoftDelete = rawPrisma.$extends({
         // However, standard soft delete practice often skips this for findUnique if finding by ID.
         // For strictness:
         const result = await query(args)
-        if (result && (result as unknown).deletedAt) return null
+        if (result && (result as any).deletedAt) return null
         return result
       },
     },
@@ -107,7 +107,7 @@ const prismaWithSoftDelete = rawPrisma.$extends({
       },
       async findUnique({ model, operation, args, query }: any) {
         const result = await query(args)
-        if (result && (result as unknown).deletedAt) return null
+        if (result && (result as any).deletedAt) return null
         return result
       },
     },
@@ -139,7 +139,7 @@ const prismaWithSoftDelete = rawPrisma.$extends({
       },
       async findUnique({ model, operation, args, query }: any) {
         const result = await query(args)
-        if (result && (result as unknown).deletedAt) return null
+        if (result && (result as any).deletedAt) return null
         return result
       },
     },
@@ -171,7 +171,7 @@ const prismaWithSoftDelete = rawPrisma.$extends({
       },
       async findUnique({ model, operation, args, query }: any) {
         const result = await query(args)
-        if (result && (result as unknown).deletedAt) return null
+        if (result && (result as any).deletedAt) return null
         return result
       },
     },

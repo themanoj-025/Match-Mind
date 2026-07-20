@@ -64,13 +64,13 @@ export async function acquireLock(
                 return 0
               end
             `
-            await redis.eval(releaseScript, 1, key, token).catch((err: unknown) => {
+            await redis.eval(releaseScript, 1, key, token).catch((err: any) => {
               logger.error({ event: 'lock.release_failed', key, err: (err as Error).message }, 'Failed to release lock')
             })
           }
         }
       }
-    } catch (err: unknown) {
+    } catch (err: any) {
       logger.error({ event: 'lock.acquire_error', key, err: (err as Error).message }, 'Error attempting to acquire lock in Redis')
     }
 

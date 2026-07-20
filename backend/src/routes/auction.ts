@@ -60,7 +60,7 @@ openapiRegistry.registerPath({
 })
 router.get('/:roomId/state', authenticateToken, async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const prisma = (req as unknown).container.resolve('prisma')
+      const prisma = (req as any).container.resolve('prisma')
       const state = await prisma.auctionState.findUnique({ where: { roomId: req.params.roomId as string } })
       if (!state) {
         return res.status(404).json({ error: { code: 'STATE_NOT_FOUND', message: 'Auction state not found' } })
@@ -79,7 +79,7 @@ openapiRegistry.registerPath({
 })
 router.post('/:roomId/start', auctionActionLimiter, authenticateToken, async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const prisma = (req as unknown).container.resolve('prisma')
+      const prisma = (req as any).container.resolve('prisma')
 
       const room = await prisma.room.findUnique({ where: { id: req.params.roomId as string } })
       if (!room) return res.status(404).json({ error: { code: 'ROOM_NOT_FOUND', message: 'Room not found' } })
@@ -143,7 +143,7 @@ openapiRegistry.registerPath({
 })
 router.post('/:roomId/next-player', auctionActionLimiter, authenticateToken, async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const prisma = (req as unknown).container.resolve('prisma')
+      const prisma = (req as any).container.resolve('prisma')
       const room = await prisma.room.findUnique({ where: { id: req.params.roomId as string } })
       if (!room)  return res.status(404).json({ error: { code: 'ROOM_NOT_FOUND', message: 'Room not found' } })
       if (room.hostId !== req.userId) return res.status(403).json({ error: { code: 'NOT_HOST', message: 'Only the host can advance' } })
@@ -180,7 +180,7 @@ openapiRegistry.registerPath({
 })
 router.post('/:roomId/force-sold', auctionActionLimiter, authenticateToken, async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const prisma = (req as unknown).container.resolve('prisma')
+      const prisma = (req as any).container.resolve('prisma')
       const room = await prisma.room.findUnique({ where: { id: req.params.roomId as string } })
       if (!room) return res.status(404).json({ error: { code: 'ROOM_NOT_FOUND', message: 'Room not found' } })
       if (room.hostId !== req.userId) return res.status(403).json({ error: { code: 'NOT_HOST', message: 'Only the host can force-sell' } })
@@ -241,7 +241,7 @@ openapiRegistry.registerPath({
 })
 router.post('/:roomId/force-unsold', auctionActionLimiter, authenticateToken, async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const prisma = (req as unknown).container.resolve('prisma')
+      const prisma = (req as any).container.resolve('prisma')
       const room = await prisma.room.findUnique({ where: { id: req.params.roomId as string } })
       if (!room) return res.status(404).json({ error: { code: 'ROOM_NOT_FOUND', message: 'Room not found' } })
       if (room.hostId !== req.userId) return res.status(403).json({ error: { code: 'NOT_HOST', message: 'Only the host can force-unsold' } })
@@ -270,7 +270,7 @@ openapiRegistry.registerPath({
 })
 router.post('/:roomId/re-auction', auctionActionLimiter, authenticateToken, async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const prisma = (req as unknown).container.resolve('prisma')
+      const prisma = (req as any).container.resolve('prisma')
       const room = await prisma.room.findUnique({ where: { id: req.params.roomId as string } })
       if (!room) return res.status(404).json({ error: { code: 'ROOM_NOT_FOUND', message: 'Room not found' } })
       if (room.hostId !== req.userId) return res.status(403).json({ error: { code: 'NOT_HOST', message: 'Only the host can start re-auction' } })
@@ -308,7 +308,7 @@ openapiRegistry.registerPath({
 })
 router.post('/:roomId/pause', auctionActionLimiter, authenticateToken, async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const prisma = (req as unknown).container.resolve('prisma')
+      const prisma = (req as any).container.resolve('prisma')
       const room = await prisma.room.findUnique({ where: { id: req.params.roomId as string } })
       if (!room) return res.status(404).json({ error: { code: 'ROOM_NOT_FOUND', message: 'Room not found' } })
       if (room.hostId !== req.userId) return res.status(403).json({ error: { code: 'NOT_HOST', message: 'Only the host can pause the auction' } })
@@ -337,7 +337,7 @@ openapiRegistry.registerPath({
 })
 router.post('/:roomId/resume', auctionActionLimiter, authenticateToken, async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const prisma = (req as unknown).container.resolve('prisma')
+      const prisma = (req as any).container.resolve('prisma')
       const room = await prisma.room.findUnique({ where: { id: req.params.roomId as string } })
       if (!room) return res.status(404).json({ error: { code: 'ROOM_NOT_FOUND', message: 'Room not found' } })
       if (room.hostId !== req.userId) return res.status(403).json({ error: { code: 'NOT_HOST', message: 'Only the host can resume the auction' } })
@@ -366,7 +366,7 @@ openapiRegistry.registerPath({
 })
 router.post('/:roomId/end', auctionActionLimiter, authenticateToken, async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const prisma = (req as unknown).container.resolve('prisma')
+      const prisma = (req as any).container.resolve('prisma')
       const room = await prisma.room.findUnique({ where: { id: req.params.roomId as string } })
       if (!room) return res.status(404).json({ error: { code: 'ROOM_NOT_FOUND', message: 'Room not found' } })
       if (room.hostId !== req.userId) return res.status(403).json({ error: { code: 'NOT_HOST', message: 'Only the host can end the auction' } })

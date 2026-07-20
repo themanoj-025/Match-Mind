@@ -53,9 +53,9 @@ router.post(
   validate(draftStartSchema),
   async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const draftService = (req as unknown).container.resolve('draftService')
+      const draftService = (req as any).container.resolve('draftService')
   // @ts-ignore
-      const userService = (req as unknown).container.resolve('userService')
+      const userService = (req as any).container.resolve('userService')
       
       const { tournamentId, formation } = req.body as { tournamentId: string; formation: string }
 
@@ -107,7 +107,7 @@ router.get(
   '/formations',
   async (req, res) => {
   // @ts-ignore
-        const draftService = (req as unknown).container.resolve('draftService')
+        const draftService = (req as any).container.resolve('draftService')
         const formations = draftService.loadFormations()
         res.json(formations)
       },
@@ -125,7 +125,7 @@ router.get(
   '/mine',
   async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-        const draftService = (req as unknown).container.resolve('draftService')
+        const draftService = (req as any).container.resolve('draftService')
         const sessions = await draftService.listUserDrafts(req.userId!)
         res.json(sessions)
       },
@@ -143,9 +143,9 @@ router.get(
   '/tickets',
   async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-        const draftService = (req as unknown).container.resolve('draftService')
+        const draftService = (req as any).container.resolve('draftService')
   // @ts-ignore
-        const userService = (req as unknown).container.resolve('userService')
+        const userService = (req as any).container.resolve('userService')
         const tournamentId = req.query.tournamentId as string | undefined
 
         const user = await userService.getUser(req.userId)
@@ -184,9 +184,9 @@ router.get(
   '/:sessionId',
   async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-        const draftService = (req as unknown).container.resolve('draftService')
+        const draftService = (req as any).container.resolve('draftService')
   // @ts-ignore
-        const prisma = (req as unknown).container.resolve('prisma') // temporary for player fetch
+        const prisma = (req as any).container.resolve('prisma') // temporary for player fetch
         const result = await draftService.getSessionState(req.params.sessionId as string, req.userId!)
 
         if (result.error) {
@@ -244,7 +244,7 @@ router.get(
   '/:sessionId/next-round',
   async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-        const draftService = (req as unknown).container.resolve('draftService')
+        const draftService = (req as any).container.resolve('draftService')
         const result = await draftService.getNextRound(req.params.sessionId as string, req.userId!)
 
         if (result.error) {
@@ -278,7 +278,7 @@ router.post(
   validate(draftPickSchema),
   async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const draftService = (req as unknown).container.resolve('draftService')
+      const draftService = (req as any).container.resolve('draftService')
       const { slotIndex, pickedPlayerId } = req.body as { slotIndex: number; pickedPlayerId: string }
 
       const result = await draftService.processPick(
@@ -315,7 +315,7 @@ router.post(
   '/:sessionId/commit',
   async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-        const draftService = (req as unknown).container.resolve('draftService')
+        const draftService = (req as any).container.resolve('draftService')
         const result = await draftService.commitSquad(req.params.sessionId as string, req.userId!)
 
         if (!result.success) {
@@ -354,7 +354,7 @@ router.post(
   '/:sessionId/enter-run',
   async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-        const draftService = (req as unknown).container.resolve('draftService')
+        const draftService = (req as any).container.resolve('draftService')
         const result = await draftService.enterRun(req.params.sessionId as string, req.userId!)
 
         if (!result.success) {
@@ -388,7 +388,7 @@ router.get(
   '/:sessionId/run-status',
   async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-        const draftService = (req as unknown).container.resolve('draftService')
+        const draftService = (req as any).container.resolve('draftService')
         const result = await draftService.getRunStatus(req.params.sessionId as string, req.userId!)
 
         if (!result.success) {
@@ -414,7 +414,7 @@ router.post(
   '/:sessionId/resolve-matchday',
   async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-        const draftService = (req as unknown).container.resolve('draftService')
+        const draftService = (req as any).container.resolve('draftService')
         const result = await draftService.resolveNextMatchday(req.params.sessionId as string, req.userId!)
 
         if (!result.success) {

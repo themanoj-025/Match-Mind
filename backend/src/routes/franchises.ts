@@ -14,7 +14,7 @@ openapiRegistry.registerPath({
 })
 router.get('/:roomId/franchises/:userId', authenticateToken, async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const prisma = (req as unknown).container.resolve('prisma')
+      const prisma = (req as any).container.resolve('prisma')
       const roomId = req.params.roomId as string
       const userId = req.params.userId as string
 
@@ -49,7 +49,7 @@ openapiRegistry.registerPath({
 })
 router.patch('/:roomId/franchises/me/captain', authenticateToken, async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const prisma = (req as unknown).container.resolve('prisma')
+      const prisma = (req as any).container.resolve('prisma')
       const roomId = req.params.roomId as string
       const { playerId, isViceCaptain } = req.body as { playerId?: string; isViceCaptain?: boolean }
 

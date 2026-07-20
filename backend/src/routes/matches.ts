@@ -20,7 +20,7 @@ openapiRegistry.registerPath({
 })
 router.get('/', async (req, res) => {
   // @ts-ignore
-      const matchService = (req as unknown).container.resolve('matchService')
+      const matchService = (req as any).container.resolve('matchService')
       const fixtures = await matchService.getMatches()
       res.json(fixtures)
     })
@@ -34,7 +34,7 @@ openapiRegistry.registerPath({
 })
 router.get('/:id', async (req, res) => {
   // @ts-ignore
-      const matchService = (req as unknown).container.resolve('matchService')
+      const matchService = (req as any).container.resolve('matchService')
       const fixture = await matchService.getMatchById(req.params.id)
       if (!fixture) {
         return res.status(404).json({ error: { code: 'FIXTURE_NOT_FOUND', message: 'Fixture not found' } })

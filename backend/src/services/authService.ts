@@ -59,7 +59,7 @@ export async function getTokenVersion(userId: string, prisma: any): Promise<numb
       select: { tokenVersion: true },
     })
     return user?.tokenVersion ?? 0
-  } catch (err) {
+  } catch (err: any) {
     logger.error({ event: 'auth.token_version_error', userId, err: String(err) }, 'Failed to get token version — denying access')
     return 0
   }

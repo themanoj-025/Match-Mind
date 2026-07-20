@@ -17,7 +17,7 @@
     "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
     "build": "cd frontend && npm run build",
     "setup": "npm run install:all",
-    "prepare": "husky",
+    "prepare": "node -e \"try { require('child_process').execSync('husky', { stdio: 'inherit' }) } catch (e) {}\"",
     "lint": "cd backend && npm run lint && cd ../frontend && npm run lint",
     "typecheck": "cd backend && npm run typecheck && cd ../frontend && npm run typecheck",
     "test": "cd backend && npm run test && cd ../frontend && npm run test"

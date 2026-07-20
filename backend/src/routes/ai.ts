@@ -43,9 +43,9 @@ openapiRegistry.registerPath({
 })
 router.post('/auction-advice', authenticateToken, aiPredictionLimiter, async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const prisma = (req as unknown).container.resolve('prisma')
+      const prisma = (req as any).container.resolve('prisma')
   // @ts-ignore
-      const cacheService = (req as unknown).container.resolve('cacheService')
+      const cacheService = (req as any).container.resolve('cacheService')
       const { roomId } = req.body as { roomId: string }
 
       if (!roomId) {
@@ -125,7 +125,7 @@ router.post('/auction-advice', authenticateToken, aiPredictionLimiter, async (re
         if (env.ANTHROPIC_API_KEY) {
           try {
             freshAdvice = await aiBreaker.fire(roster, member.remainingBudget, positionNeeds, poolPlayers, defaultRosterRules)
-          } catch (err: unknown) {
+          } catch (err: any) {
             logger.error({ event: 'ai.anthropic_advice_error', roomId, err: (err as Error).message }, 'Anthropic API error')
           }
         }

@@ -24,9 +24,9 @@ openapiRegistry.registerPath({
 })
 router.post('/create-checkout', idempotent(), authenticateToken, validate(createCheckoutSchema), async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const stripeService = (req as unknown).container.resolve('stripeService')
+      const stripeService = (req as any).container.resolve('stripeService')
   // @ts-ignore
-      const userService = (req as unknown).container.resolve('userService')
+      const userService = (req as any).container.resolve('userService')
       const { plan } = req.body as { plan: string } // 'monthly' | 'annual'
 
       const user = await userService.getUser(req.userId)
@@ -96,15 +96,15 @@ router.post('/webhook', async (req, res) => {
     const stripe = require('stripe')(env.STRIPE_SECRET_KEY)
     const body = Buffer.isBuffer(req.body) ? req.body : JSON.stringify(req.body)
     event = stripe.webhooks.constructEvent(body, sig, env.STRIPE_WEBHOOK_SECRET)
-  } catch (err: unknown) {
+  } catch (err: any) {
     logger.error({ event: 'stripe.webhook_verification_failed', err: (err as Error).message }, 'Stripe webhook signature verification failed')
     return res.status(400).send(`Webhook Error: ${(err as Error).message}`)
   }
 
   // @ts-ignore
-  const stripeService = (req as unknown).container.resolve('stripeService')
+  const stripeService = (req as any).container.resolve('stripeService')
   // @ts-ignore
-  const userService = (req as unknown).container.resolve('userService')
+  const userService = (req as any).container.resolve('userService')
 
   switch (event.type) {
     case 'checkout.session.completed': {
@@ -126,7 +126,7 @@ router.post('/webhook', async (req, res) => {
             isPro: true,
             proExpiresAt: new Date(sub.current_period_end * 1000),
           })
-        } catch (err: unknown) {
+        } catch (err: any) {
           logger.error({ event: 'stripe.subscription_creation_failed', err: (err as Error).message }, 'Failed to process subscription')
         }
       }
@@ -154,7 +154,7 @@ router.post('/webhook', async (req, res) => {
             proExpiresAt: null,
           })
         }
-      } catch (err: unknown) {
+      } catch (err: any) {
         logger.error({ event: 'stripe.subscription_update_failed', err: (err as Error).message }, 'Subscription update failed')
       }
       break
@@ -174,7 +174,7 @@ router.post('/webhook', async (req, res) => {
           isPro: false,
           proExpiresAt: null,
         })
-      } catch (err: unknown) {
+      } catch (err: any) {
         logger.error({ event: 'stripe.subscription_deletion_failed', err: (err as Error).message }, 'Subscription deletion failed')
       }
       break
@@ -199,7 +199,7 @@ openapiRegistry.registerPath({
 })
 router.post('/create-portal-session', authenticateToken, async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const stripeService = (req as unknown).container.resolve('stripeService')
+      const stripeService = (req as any).container.resolve('stripeService')
       const sub = await stripeService.getSubscriptionByUserId(req.userId)
 
       if (!sub?.stripeCustomerId) {
@@ -233,9 +233,9 @@ openapiRegistry.registerPath({
 })
 router.get('/status', authenticateToken, async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const stripeService = (req as unknown).container.resolve('stripeService')
+      const stripeService = (req as any).container.resolve('stripeService')
   // @ts-ignore
-      const userService = (req as unknown).container.resolve('userService')
+      const userService = (req as any).container.resolve('userService')
 
       const user = await userService.getUser(req.userId)
       const sub = await stripeService.getSubscriptionByUserId(req.userId)

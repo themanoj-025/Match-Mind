@@ -27,7 +27,7 @@ openapiRegistry.registerPath({
 })
 router.get('/conversations', authenticateToken, async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const messageService = (req as unknown).container.resolve('messageService')
+      const messageService = (req as any).container.resolve('messageService')
       const userId = req.userId!
 
       // Get all DM rooms this user is part of
@@ -94,9 +94,9 @@ openapiRegistry.registerPath({
 })
 router.get('/:userId', authenticateToken, async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const messageService = (req as unknown).container.resolve('messageService')
+      const messageService = (req as any).container.resolve('messageService')
   // @ts-ignore
-      const userService = (req as unknown).container.resolve('userService')
+      const userService = (req as any).container.resolve('userService')
       const { userId: targetUserId } = req.params
       const roomId = getDMRoomId(req.userId!, String(targetUserId))
 
@@ -124,9 +124,9 @@ openapiRegistry.registerPath({
 })
 router.post('/:userId', authenticateToken, validate(sendMessageSchema), async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const messageService = (req as unknown).container.resolve('messageService')
+      const messageService = (req as any).container.resolve('messageService')
   // @ts-ignore
-      const userService = (req as unknown).container.resolve('userService')
+      const userService = (req as any).container.resolve('userService')
       const { text, gifUrl } = req.body as { text?: string; gifUrl?: string }
       const { userId: targetUserId } = req.params
       const roomId = getDMRoomId(req.userId!, String(targetUserId))
@@ -169,7 +169,7 @@ openapiRegistry.registerPath({
 })
 router.patch('/read/:userId', authenticateToken, async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const messageService = (req as unknown).container.resolve('messageService')
+      const messageService = (req as any).container.resolve('messageService')
       const { userId: targetUserId } = req.params
       const roomId = getDMRoomId(req.userId!, String(targetUserId))
 

@@ -514,7 +514,7 @@ async function resolveNextRound(
       benchmarkPoints,
       breakdown,
     }
-  } catch (err: unknown) {
+  } catch (err: any) {
     logger.error({
       event: 'draft_run.resolve_error',
       sessionId,

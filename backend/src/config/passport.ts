@@ -24,7 +24,7 @@ export function configurePassport(prisma: DatabaseClient) {
       const user = await prisma.user.findUnique({ where: { id: payload.userId } })
       if (!user) return done(null, false)
       return done(null, user)
-    } catch (err) {
+    } catch (err: any) {
       return done(err, false)
     }
   }))
@@ -52,7 +52,7 @@ export function configurePassport(prisma: DatabaseClient) {
           })
         }
         return done(null, user)
-      } catch (err) {
+      } catch (err: any) {
         return done(err, null)
       }
     }))
@@ -66,7 +66,7 @@ export function configurePassport(prisma: DatabaseClient) {
     try {
       const user = await prisma.user.findUnique({ where: { id } })
       done(null, user)
-    } catch (err) {
+    } catch (err: any) {
       done(err, null)
     }
   })

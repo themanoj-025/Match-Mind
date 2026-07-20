@@ -17,7 +17,7 @@ openapiRegistry.registerPath({
 })
 router.get('/', async (req, res) => {
   // @ts-ignore
-      const matchService = (req as unknown).container.resolve('matchService')
+      const matchService = (req as any).container.resolve('matchService')
       const { tournamentId } = req.query as { tournamentId?: string }
 
       const fixtures = await matchService.getFixtures(tournamentId)
@@ -33,7 +33,7 @@ openapiRegistry.registerPath({
 })
 router.get('/:id', async (req, res) => {
   // @ts-ignore
-      const matchService = (req as unknown).container.resolve('matchService')
+      const matchService = (req as any).container.resolve('matchService')
       const fixture = await matchService.getFixtureDetails(req.params.id)
       if (!fixture) {
         return res.status(404).json({ error: { code: 'FIXTURE_NOT_FOUND', message: 'Fixture not found' } })
@@ -50,7 +50,7 @@ openapiRegistry.registerPath({
 })
 router.post('/', authenticateToken, requireAdmin, async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const matchService = (req as unknown).container.resolve('matchService')
+      const matchService = (req as any).container.resolve('matchService')
       const fixture = await matchService.createFixture(req.body)
       res.status(201).json(fixture)
     })
@@ -64,7 +64,7 @@ openapiRegistry.registerPath({
 })
 router.post('/:id/player-stats', authenticateToken, requireAdmin, async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const matchService = (req as unknown).container.resolve('matchService')
+      const matchService = (req as any).container.resolve('matchService')
       const { playerStats } = req.body as {
         playerStats: Array<{
           playerId: string
@@ -97,7 +97,7 @@ openapiRegistry.registerPath({
 })
 router.post('/:id/finalize', authenticateToken, requireAdmin, async (req: AuthenticatedRequest, res) => {
   // @ts-ignore
-      const matchService = (req as unknown).container.resolve('matchService')
+      const matchService = (req as any).container.resolve('matchService')
       const io = req.app.get('io')
 
       const { roomsProcessed, fantasyEntries } = await matchService.finalizeFixture(

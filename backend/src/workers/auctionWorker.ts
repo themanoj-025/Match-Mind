@@ -105,7 +105,7 @@ export const auctionWorker = new Worker(
       }
 
       return { success: true }
-    } catch (err: unknown) {
+    } catch (err: any) {
   // @ts-ignore
       if (err instanceof ConcurrencyError || err.code === 'CONCURRENCY_ERROR') {
         logger.warn({ event: 'worker.auction.concurrency', roomId }, 'Concurrency conflict in worker, ignoring')

@@ -89,7 +89,7 @@ export async function withBreaker<T>(
   try {
     const result = await breaker.fire(action)
     return result as T
-  } catch (err) {
+  } catch (err: any) {
     logger.warn({
       event: 'circuit_breaker.fallback',
       service: serviceName,
