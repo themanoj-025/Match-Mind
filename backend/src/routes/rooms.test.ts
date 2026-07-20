@@ -120,7 +120,7 @@ describe('Room Creation', () => {
 
     // Check free tier limit
     const activeRooms = await prisma.room.count({
-      where: { hostId: 'user-1', status: { not: 'COMPLETED' } },
+      where: { hostId: 'user-1', status: { not: 'FINISHED' } },
     })
     expect(activeRooms).toBe(0)
     expect(mockRoomCount).toHaveBeenCalled()
@@ -175,7 +175,7 @@ describe('Room Creation', () => {
     const prisma = { room: { count: mockRoomCount } }
 
     const activeRooms = await prisma.room.count({
-      where: { hostId: 'user-1', status: { not: 'COMPLETED' } },
+      where: { hostId: 'user-1', status: { not: 'FINISHED' } },
     })
     expect(activeRooms).toBe(3)
   })
@@ -355,7 +355,10 @@ describe('Room Queries', () => {
   it('lists all rooms for a user via their memberships', async () => {
     const memberships = [
       { ...createMockMember(), room: createMockRoom() },
-      { ...createMockMember({ roomId: 'room-2', userId: 'user-1' }), room: createMockRoom({ id: 'room-2', name: 'Second Room' }) },
+      {
+        ...createMockMember({ roomId: 'room-2', userId: 'user-1' }),
+        room: createMockRoom({ id: 'room-2', name: 'Second Room' }),
+      },
     ]
     const mockFindMany = vi.fn().mockResolvedValue(memberships)
 

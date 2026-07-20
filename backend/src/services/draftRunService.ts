@@ -31,24 +31,24 @@ export interface DraftRunResult {
   draftSessionId: string
   userId: string
   tournamentId: string
-  currentRound: number              // which matchday round (0-indexed)
+  currentRound: number // which matchday round (0-indexed)
   totalWins: number
   totalLosses: number
   totalTies: number
   status: DraftRunStatus
-  rewards: string[]                 // cosmetic reward IDs earned
-  rounds: DraftRunRound[]           // resolved round history (sub-document)
-  eliminatedAt: string | null       // date when 3rd loss occurred
-  clearedAt: string | null          // date when 5th win occurred
+  rewards: string[] // cosmetic reward IDs earned
+  rounds: DraftRunRound[] // resolved round history (sub-document)
+  eliminatedAt: string | null // date when 3rd loss occurred
+  clearedAt: string | null // date when 5th win occurred
   createdAt: string
   updatedAt: string
 }
 
 export interface DraftRunRound {
   roundNumber: number
-  matchdayId: string | null         // the fixture/matchday ID (null if no real match yet)
-  matchdayName: string | null       // e.g. "Matchday 1"
-  outcome: RunOutcome | null        // null if matchday not yet resolved
+  matchdayId: string | null // the fixture/matchday ID (null if no real match yet)
+  matchdayName: string | null // e.g. "Matchday 1"
+  outcome: RunOutcome | null // null if matchday not yet resolved
   userPoints: number
   benchmarkPoints: number
   breakdown: Record<string, number> // per-player fantasy point breakdown
@@ -64,8 +64,8 @@ export interface DraftRunState {
   nextMatchdayLabel: string | null
 }
 
-const BENCHMARK_SCORE_BASE = 45     // average fantasy points for a full squad
-const BENCHMARK_VARIANCE = 15       // ± random variance
+const BENCHMARK_SCORE_BASE = 45 // average fantasy points for a full squad
+const BENCHMARK_VARIANCE = 15 // ± random variance
 
 // ─── Enter Run (§2.1) ───────────────────────────────────
 
@@ -74,17 +74,24 @@ export async function enterRun(
   sessionId: string,
   userId: string,
 ): Promise<{ success: boolean; result?: DraftRunResult; error?: string }> {
-  const session = await prisma.draftSession.findUnique({ where: { id: sessionId } }) as DraftSession | null
-  if (!session) return { success: false, error: 'Session not found' }
-  if (session.userId !== userId) return { success: false, error: 'Not your draft session' }
+  const session = (await prisma.draftSession.findUnique({ where: { id: sessionId } })) as DraftSession | null
+  if (!session) {
+    return { success: false, error: 'Session not found' }
+  }
+  if (session.userId !== userId) {
+    return { success: false, error: 'Not your draft session' }
+  }
   if (session.status !== 'SQUAD_COMPLETE') {
-    return { success: false, error: `Session status must be SQUAD_COMPLETE to enter a run (current: ${session.status})` }
+    return {
+      success: false,
+      error: `Session status must be SQUAD_COMPLETE to enter a run (current: ${session.status})`,
+    }
   }
 
   // Check if a run already exists for this session
-  const existingRun = await prisma.draftRunResult.findFirst({
+  const existingRun = (await prisma.draftRunResult.findFirst({
     where: { draftSessionId: sessionId },
-  }) as DraftRunResult | null
+  })) as DraftRunResult | null
 
   if (existingRun) {
     return { success: false, error: 'A Draft Run already exists for this session. Check run-status to continue.' }
@@ -92,7 +99,7 @@ export async function enterRun(
 
   // Create the Draft Run result
   const now = new Date().toISOString()
-  const result = await prisma.draftRunResult.create({
+  const result = (await prisma.draftRunResult.create({
     data: {
       draftSessionId: sessionId,
       userId,
@@ -109,7 +116,7 @@ export async function enterRun(
       createdAt: now,
       updatedAt: now,
     },
-  }) as DraftRunResult
+  })) as DraftRunResult
 
   // Update session status
   await prisma.draftSession.update({
@@ -134,22 +141,26 @@ export async function getRunStatus(
   sessionId: string,
   userId: string,
 ): Promise<{ success: boolean; state?: DraftRunState; error?: string }> {
-  const session = await prisma.draftSession.findUnique({ where: { id: sessionId } }) as DraftSession | null
-  if (!session) return { success: false, error: 'Session not found' }
-  if (session.userId !== userId) return { success: false, error: 'Not your draft session' }
+  const session = (await prisma.draftSession.findUnique({ where: { id: sessionId } })) as DraftSession | null
+  if (!session) {
+    return { success: false, error: 'Session not found' }
+  }
+  if (session.userId !== userId) {
+    return { success: false, error: 'Not your draft session' }
+  }
 
-  const result = await prisma.draftRunResult.findFirst({
+  const result = (await prisma.draftRunResult.findFirst({
     where: { draftSessionId: sessionId },
-  }) as DraftRunResult | null
+  })) as DraftRunResult | null
 
   if (!result) {
     return { success: false, error: 'No Draft Run found for this session. Enter a run first.' }
   }
 
   // Get picks for squad info
-  const picks = await prisma.draftPick.findMany({
+  const picks = (await prisma.draftPick.findMany({
     where: { draftSessionId: sessionId },
-  }) as DraftPick[]
+  })) as DraftPick[]
 
   const squad: SquadPlayer[] = picks
     .filter((p) => p.pickedPlayerId != null)
@@ -189,9 +200,10 @@ export async function getRunStatus(
   }
 
   // Next matchday label
-  const nextMatchdayLabel = result.status === 'WAITING_FOR_MATCHDAY' && !isEliminated && !isFullClear
-    ? `Waiting for Matchday ${result.currentRound + 1}`
-    : null
+  const nextMatchdayLabel =
+    result.status === 'WAITING_FOR_MATCHDAY' && !isEliminated && !isFullClear
+      ? `Waiting for Matchday ${result.currentRound + 1}`
+      : null
 
   return {
     success: true,
@@ -219,13 +231,17 @@ export async function resolveNextMatchday(
   round?: DraftRunRound
   error?: string
 }> {
-  const session = await prisma.draftSession.findUnique({ where: { id: sessionId } }) as DraftSession | null
-  if (!session) return { success: false, error: 'Session not found' }
-  if (session.userId !== userId) return { success: false, error: 'Not your draft session' }
+  const session = (await prisma.draftSession.findUnique({ where: { id: sessionId } })) as DraftSession | null
+  if (!session) {
+    return { success: false, error: 'Session not found' }
+  }
+  if (session.userId !== userId) {
+    return { success: false, error: 'Not your draft session' }
+  }
 
-  const result = await prisma.draftRunResult.findFirst({
+  const result = (await prisma.draftRunResult.findFirst({
     where: { draftSessionId: sessionId },
-  }) as DraftRunResult | null
+  })) as DraftRunResult | null
 
   if (!result) {
     return { success: false, error: 'No Draft Run found for this session. Enter a run first.' }
@@ -236,9 +252,9 @@ export async function resolveNextMatchday(
   }
 
   // Get picks for squad info
-  const picks = await prisma.draftPick.findMany({
+  const picks = (await prisma.draftPick.findMany({
     where: { draftSessionId: sessionId },
-  }) as DraftPick[]
+  })) as DraftPick[]
 
   const squad: SquadPlayer[] = picks
     .filter((p) => p.pickedPlayerId != null)
@@ -271,9 +287,9 @@ export async function resolveNextMatchday(
   }
 
   // Read the updated result from DB
-  const updatedResult = await prisma.draftRunResult.findFirst({
+  const updatedResult = (await prisma.draftRunResult.findFirst({
     where: { draftSessionId: sessionId },
-  }) as DraftRunResult | null
+  })) as DraftRunResult | null
 
   if (!updatedResult) {
     return { success: false, error: 'Run result lost after resolution — unexpected.' }
@@ -302,23 +318,20 @@ export async function resolveNextMatchday(
       currentRound: resolvedRound,
       isEliminated,
       isFullClear,
-      nextMatchdayLabel: updatedResult.status === 'WAITING_FOR_MATCHDAY'
-        ? `Waiting for Matchday ${updatedResult.currentRound + 1}`
-        : null,
+      nextMatchdayLabel:
+        updatedResult.status === 'WAITING_FOR_MATCHDAY'
+          ? `Waiting for Matchday ${updatedResult.currentRound + 1}`
+          : null,
     },
   }
 }
 
 // ─── Find Unresolved Fixtures ────────────────────────────
 
-async function findUnresolvedFixtures(
-  prisma: any,
-  tournamentId: string,
-  processedRoundCount: number,
-): Promise<any[]> {
-  // Find COMPLETED fixtures for this tournament that haven't been resolved yet
+async function findUnresolvedFixtures(prisma: any, tournamentId: string, processedRoundCount: number): Promise<any[]> {
+  // Find FINISHED fixtures for this tournament that haven't been resolved yet
   const fixtures = await prisma.fixture.findMany({
-    where: { tournamentId, status: 'COMPLETED' },
+    where: { tournamentId, status: 'FINISHED' },
     orderBy: { scheduledAt: 'asc' },
     take: 10,
   })
@@ -371,7 +384,7 @@ async function resolveNextRound(
 
     // Compute fantasy points for each squad player using real match stats
     const statsMap = new Map(playerStats.map((s: any) => [s.playerId, s]))
-    
+
     // Also fetch fantasy points from the ledger if available
     let userSquadPoints = 0
     const breakdown: Record<string, number> = {}
@@ -404,16 +417,15 @@ async function resolveNextRound(
     }
 
     // Apply synergy bonus as percentage boost
-    const synergyScore = result.currentRound > 0
-      ? (await prisma.draftSession.findUnique({ where: { id: sessionId } }))?.synergyScore ?? 0
-      : 0
-    const synergyMultiplier = 1 + (synergyScore / 100)
+    const synergyScore =
+      result.currentRound > 0
+        ? ((await prisma.draftSession.findUnique({ where: { id: sessionId } }))?.synergyScore ?? 0)
+        : 0
+    const synergyMultiplier = 1 + synergyScore / 100
     userSquadPoints = Math.round(userSquadPoints * synergyMultiplier)
 
     // Generate benchmark score: base + variance
-    const benchmarkPoints = BENCHMARK_SCORE_BASE + Math.round(
-      (Math.random() * 2 - 1) * BENCHMARK_VARIANCE
-    )
+    const benchmarkPoints = BENCHMARK_SCORE_BASE + Math.round((Math.random() * 2 - 1) * BENCHMARK_VARIANCE)
 
     // Determine outcome
     const margin = userSquadPoints - benchmarkPoints
@@ -444,9 +456,9 @@ async function resolveNextRound(
     }
 
     // Compute rewards earned
-    const earnedRewards = RUN_REWARD_TIERS
-      .filter((t) => newWins >= t.minWins && result.totalWins < t.minWins)
-      .map((t) => t.id)
+    const earnedRewards = RUN_REWARD_TIERS.filter((t) => newWins >= t.minWins && result.totalWins < t.minWins).map(
+      (t) => t.id,
+    )
 
     // Save round to DB as sub-document within the result
     const roundNumber = result.currentRound + 1
@@ -531,8 +543,11 @@ function computeApproximatePoints(stats: any, position: string): number {
   let points = 0
 
   // Minutes
-  if (stats.minutesPlayed >= 60) points += 2
-  else if (stats.minutesPlayed > 0) points += 1
+  if (stats.minutesPlayed >= 60) {
+    points += 2
+  } else if (stats.minutesPlayed > 0) {
+    points += 1
+  }
 
   // Goals by position
   const goalPoints = position === 'FWD' ? 4 : position === 'MID' ? 5 : 6
@@ -547,7 +562,9 @@ function computeApproximatePoints(stats: any, position: string): number {
   }
 
   // Saves (GK)
-  if (stats.saves >= 3) points += Math.floor(stats.saves / 3)
+  if (stats.saves >= 3) {
+    points += Math.floor(stats.saves / 3)
+  }
 
   // Penalty saves
   points += (stats.penaltiesSaved || 0) * 5

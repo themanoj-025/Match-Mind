@@ -22,7 +22,9 @@ export class MatchService {
 
   async getFixtures(tournamentId?: string): Promise<any[]> {
     const where: Record<string, any> = {}
-    if (tournamentId) where.tournamentId = tournamentId
+    if (tournamentId) {
+      where.tournamentId = tournamentId
+    }
 
     return this.prisma.fixture.findMany({
       where,
@@ -57,11 +59,15 @@ export class MatchService {
     return created
   }
 
-  async finalizeFixture(fixtureId: string, adminId: string, io?: any): Promise<{ roomsProcessed: number; fantasyEntries: number }> {
-    // Mark fixture as COMPLETED
+  async finalizeFixture(
+    fixtureId: string,
+    adminId: string,
+    io?: any,
+  ): Promise<{ roomsProcessed: number; fantasyEntries: number }> {
+    // Mark fixture as FINISHED
     await this.prisma.fixture.update({
       where: { id: fixtureId },
-      data: { status: 'COMPLETED' },
+      data: { status: 'FINISHED' },
     })
 
     // Get all player match stats for this fixture
@@ -85,7 +91,9 @@ export class MatchService {
       where: { id: { in: playerIds } },
       select: { id: true, position: true, name: true },
     })
-    const playerMap = new Map<string, { id: string; position: string; name: string }>(allPlayers.map((p: any) => [p.id, p]))
+    const playerMap = new Map<string, { id: string; position: string; name: string }>(
+      allPlayers.map((p: any) => [p.id, p]),
+    )
 
     // Batch-load all rosters for all rooms
     const roomIds = rooms.map((r: any) => r.id)
@@ -111,7 +119,9 @@ export class MatchService {
     let totalEntries = 0
     for (const room of rooms) {
       const rosters = rostersByRoom.get(room.id) || []
-      if (rosters.length === 0) continue
+      if (rosters.length === 0) {
+        continue
+      }
 
       const results = await computeFantasyPoints(
         fixtureId,

@@ -44,7 +44,10 @@ async function checkRateLimitRedis(key: string, limit: number, windowSec: number
     }
     return current <= limit
   } catch (err: any) {
-    logger.error({ event: 'redis.rate_limit_error', key, err: (err as Error).message }, 'Failed to check rate limit in Redis')
+    logger.error(
+      { event: 'redis.rate_limit_error', key, err: (err as Error).message },
+      'Failed to check rate limit in Redis',
+    )
     return false
   }
 }
@@ -111,8 +114,7 @@ function makeAuctionHelpers(prisma: any) {
     getPlayer: async (playerId: string) => prisma.player.findUnique({ where: { id: playerId } }),
     getRoomMember: async (roomId: string, userId: string) =>
       prisma.roomMember.findUnique({ where: { roomId_userId: { roomId, userId } } }),
-    getRoster: async (roomId: string, userId: string) =>
-      prisma.roster.findMany({ where: { roomId, userId } }),
+    getRoster: async (roomId: string, userId: string) => prisma.roster.findMany({ where: { roomId, userId } }),
     getPlayerPool: async (_roomId: string) => [], // Filled from auction state
     saveBid: async (bid: any) => prisma.bid.create({ data: bid }),
   }
@@ -155,7 +157,10 @@ export const setupSocket = (io: Server, prisma: any): void => {
   })
 
   io.on('connection', (socket: AuthenticatedSocket) => {
-    logger.info({ event: 'socket.connected', socketId: socket.id, userId: socket.userId }, `Socket connected: ${socket.id}`)
+    logger.info(
+      { event: 'socket.connected', socketId: socket.id, userId: socket.userId },
+      `Socket connected: ${socket.id}`,
+    )
 
     // Join user-specific room for targeted events
     socket.join(`user:${socket.userId}`)
@@ -163,16 +168,23 @@ export const setupSocket = (io: Server, prisma: any): void => {
     // Clean up bid rate tracker on disconnect
     socket.on('disconnect', () => {
       bidRateTrackers.delete(socket.id)
-      logger.info({ event: 'socket.disconnected', socketId: socket.id, userId: socket.userId }, `Socket disconnected: ${socket.id}`)
+      logger.info(
+        { event: 'socket.disconnected', socketId: socket.id, userId: socket.userId },
+        `Socket disconnected: ${socket.id}`,
+      )
     })
 
     // ─── Room Management ─────────────────────────────────
 
     socket.on('JOIN_ROOM', ({ roomId, tournamentId }: { roomId?: string; tournamentId?: string }) => {
-      if (!roomId || typeof roomId !== 'string') return
+      if (!roomId || typeof roomId !== 'string') {
+        return
+      }
       const roomPrefix = roomId.split(':')[0]
       // @ts-ignore
-      if (!ALLOWED_ROOM_TYPES.includes(roomPrefix)) return
+      if (!ALLOWED_ROOM_TYPES.includes(roomPrefix)) {
+        return
+      }
 
       // Always join the legacy room name for backward compatibility with existing broadcasts
       socket.join(roomId)
@@ -194,7 +206,8 @@ export const setupSocket = (io: Server, prisma: any): void => {
       // used for the tournament-namespaced secondary join below
       if (roomId.startsWith('room:')) {
         const actualRoomId = roomId.replace('room:', '')
-        prisma.auctionState.findUnique({ where: { roomId: actualRoomId } })
+        prisma.auctionState
+          .findUnique({ where: { roomId: actualRoomId } })
           .then((state: any) => {
             if (state) {
               socket.emit('ROOM_STATE_SYNC', { auctionState: state })
@@ -211,7 +224,9 @@ export const setupSocket = (io: Server, prisma: any): void => {
     })
 
     socket.on('LEAVE_ROOM', ({ roomId, tournamentId }: { roomId?: string; tournamentId?: string }) => {
-      if (!roomId || typeof roomId !== 'string') return
+      if (!roomId || typeof roomId !== 'string') {
+        return
+      }
 
       // Always leave the legacy room name
       socket.leave(roomId)
@@ -231,7 +246,9 @@ export const setupSocket = (io: Server, prisma: any): void => {
     })
 
     socket.on('SYNC_STATE', async ({ roomId }: { roomId?: string }) => {
-      if (!roomId || typeof roomId !== 'string') return
+      if (!roomId || typeof roomId !== 'string') {
+        return
+      }
       const actualRoomId = roomId.replace('room:', '')
       try {
         const state = await prisma.auctionState.findUnique({ where: { roomId: actualRoomId } })
@@ -239,91 +256,93 @@ export const setupSocket = (io: Server, prisma: any): void => {
           socket.emit('ROOM_STATE_SYNC', { auctionState: state })
         }
       } catch (err: any) {
-        logger.error({ event: 'socket.sync_state_error', roomId, err: (err as Error).message }, 'Failed to sync state on reconnect')
+        logger.error(
+          { event: 'socket.sync_state_error', roomId, err: (err as Error).message },
+          'Failed to sync state on reconnect',
+        )
       }
     })
 
     // ─── Auction Events ───────────────────────────────────
 
-    socket.on('PLACE_BID', async (data: {
-      roomId: string
-      playerId: string
-      amount: number
-      expectedVersion: number
-    }) => {
+    socket.on(
+      'PLACE_BID',
+      async (data: { roomId: string; playerId: string; amount: number; expectedVersion: number }) => {
+        try {
+          if (!socket.userId) {
+            socket.emit('BID_REJECTED', { code: 'UNAUTHENTICATED', message: 'Not authenticated' })
+            return
+          }
+
+          // Per-socket bid rate limiting (5/sec)
+          if (!(await checkBidRate(socket.id))) {
+            socket.emit('BID_REJECTED', { code: 'RATE_LIMITED', message: 'Too many bids. Slow down.' })
+            return
+          }
+
+          // Verify room membership
+          const member = await prisma.roomMember.findUnique({
+            where: { roomId_userId: { roomId: data.roomId, userId: socket.userId } },
+          })
+          if (!member) {
+            socket.emit('BID_REJECTED', { code: 'NOT_MEMBER', message: 'You are not a member of this room' })
+            return
+          }
+
+          const helpers = makeAuctionHelpers(prisma)
+          const result = await processBid(
+            {
+              roomId: data.roomId,
+              playerId: data.playerId,
+              amount: data.amount,
+              userId: socket.userId,
+              expectedVersion: data.expectedVersion,
+            } as BidRequest,
+            helpers.getRoom,
+            helpers.getPlayer,
+            helpers.getRoomMember,
+            helpers.getRoster,
+            helpers.getAuctionState,
+            helpers.saveAuctionState,
+            helpers.saveBid,
+            helpers.getPlayerPool,
+          )
+
+          if (result.accepted && result.newState) {
+            // Broadcast to entire room
+            io.to(`room:${data.roomId}`).emit('NEW_BID', {
+              playerId: data.playerId,
+              amount: data.amount,
+              bidderId: socket.userId,
+              timerEndsAt: result.newState.timerEndsAt,
+              version: result.newState.version,
+            })
+
+            if (result.newState.timerEndsAt) {
+              await scheduleAuctionTimer(data.roomId, result.newState.timerEndsAt)
+            }
+          } else {
+            // Send rejection only to the bidder
+            socket.emit('BID_REJECTED', {
+              code: result.reason?.split(':')[0] || 'BID_REJECTED',
+              message: result.reason || 'Bid rejected',
+            })
+          }
+        } catch (err: any) {
+          logger.error(
+            { event: 'socket.bid_error', userId: socket.userId, err: (err as Error).message },
+            'PLACE_BID error',
+          )
+          socket.emit('BID_REJECTED', { code: 'INTERNAL_ERROR', message: 'Failed to process bid' })
+        }
+      },
+    )
+
+    socket.on('HOST_ACTION', async (data: { roomId: string; action: string; payload?: any }) => {
       try {
         if (!socket.userId) {
-          socket.emit('BID_REJECTED', { code: 'UNAUTHENTICATED', message: 'Not authenticated' })
           return
         }
-
-        // Per-socket bid rate limiting (5/sec)
-        if (!(await checkBidRate(socket.id))) {
-          socket.emit('BID_REJECTED', { code: 'RATE_LIMITED', message: 'Too many bids. Slow down.' })
-          return
-        }
-
-        // Verify room membership
-        const member = await prisma.roomMember.findUnique({
-          where: { roomId_userId: { roomId: data.roomId, userId: socket.userId } },
-        })
-        if (!member) {
-          socket.emit('BID_REJECTED', { code: 'NOT_MEMBER', message: 'You are not a member of this room' })
-          return
-        }
-
-        const helpers = makeAuctionHelpers(prisma)
-        const result = await processBid(
-          {
-            roomId: data.roomId,
-            playerId: data.playerId,
-            amount: data.amount,
-            userId: socket.userId,
-            expectedVersion: data.expectedVersion,
-          } as BidRequest,
-          helpers.getRoom,
-          helpers.getPlayer,
-          helpers.getRoomMember,
-          helpers.getRoster,
-          helpers.getAuctionState,
-          helpers.saveAuctionState,
-          helpers.saveBid,
-          helpers.getPlayerPool,
-        )
-
-        if (result.accepted && result.newState) {
-          // Broadcast to entire room
-          io.to(`room:${data.roomId}`).emit('NEW_BID', {
-            playerId: data.playerId,
-            amount: data.amount,
-            bidderId: socket.userId,
-            timerEndsAt: result.newState.timerEndsAt,
-            version: result.newState.version,
-          })
-
-          if (result.newState.timerEndsAt) {
-            await scheduleAuctionTimer(data.roomId, result.newState.timerEndsAt)
-          }
-        } else {
-          // Send rejection only to the bidder
-          socket.emit('BID_REJECTED', {
-            code: result.reason?.split(':')[0] || 'BID_REJECTED',
-            message: result.reason || 'Bid rejected',
-          })
-        }
-      } catch (err: any) {
-        logger.error({ event: 'socket.bid_error', userId: socket.userId, err: (err as Error).message }, 'PLACE_BID error')
-        socket.emit('BID_REJECTED', { code: 'INTERNAL_ERROR', message: 'Failed to process bid' })
-      }
-    })
-
-    socket.on('HOST_ACTION', async (data: {
-      roomId: string
-      action: string
-      payload?: any
-    }) => {
-      try {
-        if (!socket.userId) return
 
         const room = await prisma.room.findUnique({ where: { id: data.roomId } })
         if (!room || room.hostId !== socket.userId) {
@@ -393,8 +412,12 @@ export const setupSocket = (io: Server, prisma: any): void => {
             }
             return
           case 'END_AUCTION':
-            await prisma.room.update({ where: { id: data.roomId }, data: { status: 'COMPLETED' } })
-            await helpers.saveAuctionState(data.roomId, { ...(await helpers.getAuctionState(data.roomId))!, phase: 'FINISHED', version: Date.now() })
+            await prisma.room.update({ where: { id: data.roomId }, data: { status: 'FINISHED' } })
+            await helpers.saveAuctionState(data.roomId, {
+              ...(await helpers.getAuctionState(data.roomId))!,
+              phase: 'FINISHED',
+              version: Date.now(),
+            })
             io.to(`room:${data.roomId}`).emit('AUCTION_FINISHED', { roomId: data.roomId })
             return
         }
@@ -406,13 +429,18 @@ export const setupSocket = (io: Server, prisma: any): void => {
           }
         }
       } catch (err: any) {
-        logger.error({ event: 'socket.host_action_error', userId: socket.userId, err: (err as Error).message }, 'HOST_ACTION error')
+        logger.error(
+          { event: 'socket.host_action_error', userId: socket.userId, err: (err as Error).message },
+          'HOST_ACTION error',
+        )
         socket.emit('HOST_ACTION_REJECTED', { code: 'INTERNAL_ERROR', message: 'Failed to process action' })
       }
     })
 
     socket.on('TOGGLE_STAR', async ({ roomId, playerId }: { roomId?: string; playerId?: string }) => {
-      if (!roomId || !playerId || !socket.userId) return
+      if (!roomId || !playerId || !socket.userId) {
+        return
+      }
       try {
         const existing = await prisma.starredPlayer.findUnique({
           where: { userId_roomId_playerId: { userId: socket.userId, roomId, playerId } },
@@ -438,11 +466,16 @@ export const setupSocket = (io: Server, prisma: any): void => {
       return input
         .replace(/[<>"']/g, (char) => {
           switch (char) {
-            case '<': return '&lt;'
-            case '>': return '&gt;'
-            case '"': return '&quot;'
-            case "'": return '&#x27;'
-            default: return char
+            case '<':
+              return '&lt;'
+            case '>':
+              return '&gt;'
+            case '"':
+              return '&quot;'
+            case "'":
+              return '&#x27;'
+            default:
+              return char
           }
         })
         .trim()
@@ -451,14 +484,20 @@ export const setupSocket = (io: Server, prisma: any): void => {
 
     socket.on('SEND_MESSAGE', async ({ roomId, text, gifUrl }: { roomId?: string; text?: string; gifUrl?: string }) => {
       try {
-        if (!roomId || typeof roomId !== 'string') return
+        if (!roomId || typeof roomId !== 'string') {
+          return
+        }
         const cleanText = typeof text === 'string' ? sanitizeText(text) : ''
         const cleanGifUrl = typeof gifUrl === 'string' ? gifUrl.trim().slice(0, 500) : null
-        if (!cleanText && !cleanGifUrl) return
+        if (!cleanText && !cleanGifUrl) {
+          return
+        }
 
         const roomType = roomId.split(':')[0]
         // @ts-ignore
-        if (!ALLOWED_ROOM_TYPES.includes(roomType)) return
+        if (!ALLOWED_ROOM_TYPES.includes(roomType)) {
+          return
+        }
 
         const message = await prisma.chatMessage.create({
           data: {
@@ -478,39 +517,58 @@ export const setupSocket = (io: Server, prisma: any): void => {
 
         io.to(roomId).emit('CHAT_MESSAGE', message)
       } catch (err: any) {
-        logger.error({ event: 'socket.send_message_error', userId: socket.userId, err: (err as Error).message }, 'SEND_MESSAGE error')
+        logger.error(
+          { event: 'socket.send_message_error', userId: socket.userId, err: (err as Error).message },
+          'SEND_MESSAGE error',
+        )
         socket.emit('CHAT_ERROR', { message: 'Failed to send message' })
       }
     })
 
     socket.on('SEND_REACTION', ({ roomId, emoji }: { roomId?: string; emoji?: string }) => {
-      if (!roomId || typeof roomId !== 'string') return
-      if (!emoji || typeof emoji !== 'string') return
+      if (!roomId || typeof roomId !== 'string') {
+        return
+      }
+      if (!emoji || typeof emoji !== 'string') {
+        return
+      }
       io.to(roomId).emit('REACTION_UPDATE', { roomId, emoji, userId: socket.userId })
     })
 
     // ─── Direct Messages ─────────────────────────────────
 
     socket.on('DM_TYPING', ({ roomId }: { roomId?: string }) => {
-      if (!roomId || typeof roomId !== 'string') return
+      if (!roomId || typeof roomId !== 'string') {
+        return
+      }
       socket.to(roomId).emit('DM_TYPING', { roomId, userId: socket.userId })
     })
 
     socket.on('DM_STOP_TYPING', ({ roomId }: { roomId?: string }) => {
-      if (!roomId || typeof roomId !== 'string') return
+      if (!roomId || typeof roomId !== 'string') {
+        return
+      }
       socket.to(roomId).emit('DM_STOP_TYPING', { roomId, userId: socket.userId })
     })
 
     socket.on('JOIN_DM', ({ roomId }: { roomId?: string }) => {
-      if (!roomId || typeof roomId !== 'string') return
-      if (!roomId.startsWith('dm:')) return
+      if (!roomId || typeof roomId !== 'string') {
+        return
+      }
+      if (!roomId.startsWith('dm:')) {
+        return
+      }
       const participants = roomId.replace('dm:', '').split(':')
-      if (!participants.includes(socket.userId!)) return
+      if (!participants.includes(socket.userId!)) {
+        return
+      }
       socket.join(roomId)
     })
 
     socket.on('LEAVE_DM', ({ roomId }: { roomId?: string }) => {
-      if (!roomId || typeof roomId !== 'string') return
+      if (!roomId || typeof roomId !== 'string') {
+        return
+      }
       socket.leave(roomId)
     })
 
