@@ -10,6 +10,21 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: matchmind
+          POSTGRES_PASSWORD: matchmind_test_password
+          POSTGRES_DB: matchmind_test
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -36,9 +51,14 @@ jobs:
       # Test suite requires Redis. We spin up Redis for testing.
       - name: Setup Redis
         uses: supercharge/redis-github-action@1.7.0
+        with:
+          redis-port: 6380
 
-      # Tests currently failing due to Docker dependency in test:up in package.json.
-      # But for a real CI, we run them directly via vitest.
+      - name: Push Prisma Schema
+        run: cd backend && npx prisma db push --accept-data-loss --force-reset
+        env:
+          DATABASE_URL: postgresql://matchmind:matchmind_test_password@localhost:5433/matchmind_test
+
       - name: Run Tests (Backend)
         run: cd backend && npx vitest run --coverage
         env:
@@ -46,6 +66,8 @@ jobs:
           NODE_ENV: test
           JWT_SECRET: test-secret
           JWT_RESET_SECRET: test-reset-secret
+          DATABASE_URL: postgresql://matchmind:matchmind_test_password@localhost:5433/matchmind_test
+          REDIS_URL: redis://localhost:6380
 
       - name: Security Scan (Trivy / npm audit)
         run: npm audit --audit-level=high
