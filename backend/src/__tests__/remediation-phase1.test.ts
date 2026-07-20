@@ -45,7 +45,7 @@ describe('Remediation Phase 1 Tests', () => {
 
       expect(response.status).toBe(401)
       expect(response.body.error.code).toBe('TOKEN_REVOKED')
-      expect(response.body.(error as Error).message).toContain('revoked')
+      expect((response.body.error as Error).message).toContain('revoked')
     })
   })
 
