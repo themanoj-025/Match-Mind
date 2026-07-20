@@ -9,7 +9,6 @@ import jwt from 'jsonwebtoken'
 process.env.JWT_SECRET = 'test-jwt-secret-64-chars-minimum-for-testing-purposes-only'
 
 describe('Remediation Phase 1 Tests', () => {
-
   describe('Token Verification Fail-Closed', () => {
     it('should reject authentication if database lookup fails (fail-closed)', async () => {
       const app = express()
@@ -22,10 +21,14 @@ describe('Remediation Phase 1 Tests', () => {
         },
       }
 
-      app.use((req, _res, next) => {
-        req.app.get = (key: string) => {
-          if (key === 'prisma') return prismaMock
-          return null
+      app.use((req: any, _res, next) => {
+        req.container = {
+          resolve: (key: string) => {
+            if (key === 'prisma') {
+              return prismaMock
+            }
+            return null
+          },
         }
         next()
       })
@@ -34,14 +37,9 @@ describe('Remediation Phase 1 Tests', () => {
         res.json({ success: true, userId: req.userId })
       })
 
-      const token = jwt.sign(
-        { userId: 'user-1', tokenVersion: 1 },
-        process.env.JWT_SECRET!
-      )
+      const token = jwt.sign({ userId: 'user-1', tokenVersion: 1 }, process.env.JWT_SECRET!)
 
-      const response = await request(app)
-        .get('/test-auth')
-        .set('Authorization', `Bearer ${token}`)
+      const response = await request(app).get('/test-auth').set('Authorization', `Bearer ${token}`)
 
       expect(response.status).toBe(401)
       expect(response.body.error.code).toBe('TOKEN_REVOKED')

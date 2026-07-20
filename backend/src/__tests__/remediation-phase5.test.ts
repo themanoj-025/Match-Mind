@@ -23,7 +23,6 @@ vi.mock('../lib/redis', () => {
 })
 
 describe('Remediation Phase 5 Tests — AI Hint Caching', () => {
-
   it('should hit the cache on subsequent requests with identical inputs', async () => {
     const app = express()
     app.use(express.json())
@@ -51,10 +50,30 @@ describe('Remediation Phase 5 Tests — AI Hint Caching', () => {
       },
     }
 
-    app.use((req, _res, next) => {
-      req.app.get = (key: string) => {
-        if (key === 'prisma') return prismaMock
-        return null
+    const cacheServiceMock = {
+      get: vi.fn().mockImplementation(async (key) => (mockCache.get(key) ? JSON.parse(mockCache.get(key)!) : null)),
+      set: vi.fn().mockImplementation(async (key, val) => mockCache.set(key, JSON.stringify(val))),
+      getOrFetch: vi.fn().mockImplementation(async (key, ttl, fetcher) => {
+        if (mockCache.has(key)) {
+          return JSON.parse(mockCache.get(key)!)
+        }
+        const val = await fetcher()
+        mockCache.set(key, JSON.stringify(val))
+        return val
+      }),
+    }
+
+    app.use((req: any, _res, next) => {
+      req.container = {
+        resolve: (key: string) => {
+          if (key === 'prisma') {
+            return prismaMock
+          }
+          if (key === 'cacheService') {
+            return cacheServiceMock
+          }
+          return null
+        },
       }
       next()
     })
@@ -71,18 +90,17 @@ describe('Remediation Phase 5 Tests — AI Hint Caching', () => {
     }))
 
     // First request should result in cache miss and generate heuristic/anthropic response
-    const res1 = await request(app)
-      .post('/api/ai/auction-advice')
-      .send({ roomId: 'room-1' })
+    const res1 = await request(app).post('/api/ai/auction-advice').send({ roomId: 'room-1' })
 
+    if (res1.status !== 200) {
+      console.log(res1.body)
+    }
     expect(res1.status).toBe(200)
     expect(res1.body.cacheHit).toBe(false)
     expect(res1.body.advice).toBeDefined()
 
     // Second request should result in cache hit since inputs are identical
-    const res2 = await request(app)
-      .post('/api/ai/auction-advice')
-      .send({ roomId: 'room-1' })
+    const res2 = await request(app).post('/api/ai/auction-advice').send({ roomId: 'room-1' })
 
     expect(res2.status).toBe(200)
     expect(res2.body.cacheHit).toBe(true)
