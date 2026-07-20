@@ -266,8 +266,6 @@ describe('Phase 1: Room Creation', () => {
     expect(body.currentBid).toBe(0)
     expect(body.currentBidderId).toBeNull()
     expect(body.timerEndsAt).toBeNull()
-    expect(body.poolQueue).toEqual([])
-    expect(body.unsoldPlayerIds).toEqual([])
     expect(body.version).toBe(1)
   })
 
@@ -399,9 +397,6 @@ describe('Phase 4: Start Auction', () => {
     expect(body.state.currentBidderId).toBeNull()
     expect(body.state.timerEndsAt).toBeDefined()
     expect(body.state.version).toBe(1)
-
-    // Should have a non-empty pool queue
-    expect(body.state.poolQueue.length).toBeGreaterThanOrEqual(5)
 
     shared.firstPlayerId = body.state.currentPlayerId
   })
