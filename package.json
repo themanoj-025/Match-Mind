@@ -14,7 +14,7 @@
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:watch": "concurrently -n api,web -c cyan,green \"cd backend && npm run dev:watch\" \"cd frontend && npm run dev\"",
-    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "install:all": "npm install && npm run build -w @matchmind/shared-types",
     "build": "cd frontend && npm run build",
     "setup": "npm run install:all",
     "prepare": "node -e \"try { require('child_process').execSync('husky', { stdio: 'inherit' }) } catch (e) {}\"",
