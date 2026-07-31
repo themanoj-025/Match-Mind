@@ -301,11 +301,11 @@ export const Landing: React.FC = () => {
                   <Sliders className="w-5 h-5 text-accent-bright" />
                 </div>
                 <h3 className="text-lg font-semibold tracking-tight mb-2 flex items-center justify-between">
-                  AI Strategy Advisor
-                  <span className="text-[10px] font-mono bg-accent/10 text-accent-bright px-1.5 py-0.5 rounded uppercase">CLAUDE-POWERED</span>
+                  Smart Strategy Advisor
+                  <span className="text-[10px] font-mono bg-accent/10 text-accent-bright px-1.5 py-0.5 rounded uppercase">ADVANCED ANALYTICS</span>
                 </h3>
                 <p className="text-xs text-foreground-muted leading-relaxed">
-                  Get formation-aware, budget-optimized recommendations — powered by AI trained on real transfer market and performance data.
+                  Get formation-aware, budget-optimized recommendations — using analytical models trained on real transfer market and performance data.
                 </p>
               </div>
               {/* Micro-visual mockup */}
