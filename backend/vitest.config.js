@@ -7,7 +7,7 @@ export default defineConfig({
     setupFiles: ['./src/test-utils/setup-env.ts'],
     envPrefix: [''],
     include: ['src/**/*.test.{js,ts}', 'src/**/*.spec.{js,ts}'],
-    exclude: ['node_modules', 'dist'],
+    exclude: ['node_modules', 'dist', 'src/e2e/**'],
     coverage: {
       provider: 'v8',
       include: ['src/services/**', 'src/middleware/validate.js', 'src/utils/**'],
@@ -20,15 +20,6 @@ export default defineConfig({
     },
     testTimeout: 10000,
     hookTimeout: 10000,
-    // Use tsx to handle TypeScript files loaded via CommonJS require()
-    pool: 'forks',
-    poolOptions: {
-      forks: {
-        execArgv: ['--import', 'tsx'],
-      },
-      threads: {
-        execArgv: ['--import', 'tsx'],
-      },
-    },
+    fileParallelism: false,
   },
 })
