@@ -5,7 +5,7 @@
 > **Audit Team:** Senior Staff Engineer, Principal Software Architect, Security Engineer, DevOps Engineer, SRE, Performance Engineer, UI/UX Expert, Product Manager  
 > **Project Version:** 1.0.0  
 > **Severity Scale:** 🔴 Critical | 🟠 High | 🟡 Medium | 🔵 Low | ⚪ Informational
-> 
+>
 > **Note:** This is a comprehensive update (v2) of the audit reflecting Phase 5 engineering improvements. Key changes: **TypeScript migration complete** (40+ backend files), repository/service layers, structured logging (Pino), Sentry monitoring, 81 tests passing, JSON database as default dev DB, and more.
 
 ---
@@ -51,20 +51,20 @@ Match-Mind is an ambitious full-stack sports prediction platform with a feature 
 
 **Fixed since initial audit (July 3 → July 4):**
 
-| Issue | Status |
-|-------|--------|
-| **TypeScript migration** | ✅ **Complete** — All 40+ backend source files converted to `.ts` (routes, middleware, services, workers, socket, workflows, utils, config, lib, instrumentation). ESM imports throughout. |
-| **Test coverage** | ✅ **81 Tests Passing** — scoring (47 tests), auth (14 tests), predictions (11 tests), API hooks (9 tests) |
-| **Error monitoring** | ✅ **Implemented** — Sentry on backend (`@sentry/node`) and frontend (`@sentry/react`) with tracing and replays |
-| **Structured logging** | ✅ **Implemented** — Pino-based structured logging with event names, redaction, pretty-printing |
-| **Repository pattern** | ✅ **Implemented** — Full typed repository layer with 6 interfaces (User, Match, Prediction, Leaderboard, Report, AdminLog) |
-| **Service layer** | ✅ **Started** — AuthService and AdminService extracted as TypeScript classes |
-| **Leaderboard DRY fix** | ✅ **Fixed** — Duplicated mapping extracted to `leaderboardMapper.js` |
-| **JSON database** | ✅ **Implemented** — Prisma-compatible JSON-backed database for development without PostgreSQL |
-| **Graceful shutdown** | ✅ **Fixed** — Proper 10s timeout, no dynamic require, proper await |
-| **Health check** | ✅ **Improved** — Now returns DB status alongside timestamp |
-| **AI endpoint auth** | ✅ **Fixed** — Pro-gated, requires authentication |
-| **Frontend token refresh** | ✅ **Implemented** — Singleton refresh pattern with redirect on failure |
+| Issue                      | Status                                                                                                                                                                                     |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **TypeScript migration**   | ✅ **Complete** — All 40+ backend source files converted to `.ts` (routes, middleware, services, workers, socket, workflows, utils, config, lib, instrumentation). ESM imports throughout. |
+| **Test coverage**          | ✅ **81 Tests Passing** — scoring (47 tests), auth (14 tests), predictions (11 tests), API hooks (9 tests)                                                                                 |
+| **Error monitoring**       | ✅ **Implemented** — Sentry on backend (`@sentry/node`) and frontend (`@sentry/react`) with tracing and replays                                                                            |
+| **Structured logging**     | ✅ **Implemented** — Pino-based structured logging with event names, redaction, pretty-printing                                                                                            |
+| **Repository pattern**     | ✅ **Implemented** — Full typed repository layer with 6 interfaces (User, Match, Prediction, Leaderboard, Report, AdminLog)                                                                |
+| **Service layer**          | ✅ **Started** — AuthService and AdminService extracted as TypeScript classes                                                                                                              |
+| **Leaderboard DRY fix**    | ✅ **Fixed** — Duplicated mapping extracted to `leaderboardMapper.js`                                                                                                                      |
+| **JSON database**          | ✅ **Implemented** — Prisma-compatible JSON-backed database for development without PostgreSQL                                                                                             |
+| **Graceful shutdown**      | ✅ **Fixed** — Proper 10s timeout, no dynamic require, proper await                                                                                                                        |
+| **Health check**           | ✅ **Improved** — Now returns DB status alongside timestamp                                                                                                                                |
+| **AI endpoint auth**       | ✅ **Fixed** — Pro-gated, requires authentication                                                                                                                                          |
+| **Frontend token refresh** | ✅ **Implemented** — Singleton refresh pattern with redirect on failure                                                                                                                    |
 
 **Still outstanding:**
 
@@ -84,6 +84,7 @@ Match-Mind is an ambitious full-stack sports prediction platform with a feature 
 **Score: 7/10 (improved from 6/10)**
 
 ### What Works
+
 - Clean separation of `backend/` and `frontend/` monorepo structure
 - Logical route-file organization (one file per resource)
 - Consistent file naming conventions (kebab-case for config, camelCase for services)
@@ -97,26 +98,31 @@ Match-Mind is an ambitious full-stack sports prediction platform with a feature 
 ### Critical Issues
 
 #### 🟠 Remaining: Circular Dependency Risk in `index.js`
+
 ```javascript
 // backend/src/index.js
-prisma._app = app  // Still exists but JSON DB is lighter-weight
+prisma._app = app // Still exists but JSON DB is lighter-weight
 ```
 
 The `prisma._app` pattern is still present, though the JSON database adapter reduces the risk compared to the Prisma-based implementation.
 
 #### ✅ Fixed: Mixed Module Systems
+
 **The backend has been fully migrated from CommonJS to ESM.** All 40+ source files now use `import`/`export default`. No duplicate `.js`/`.ts` pairs remain. The backend runs via `tsx` which handles ESM TypeScript natively.
 
 #### 🟡 Monorepo Without Workspace Tooling
+
 The `package.json` at root has `"scripts"` that cd into subdirectories instead of using npm workspaces, yarn workspaces, or Turborepo.
 
 #### 🔵 Director Structure (Improved)
+
 - ✅ **New:** `src/lib/types.ts` — shared TypeScript types
 - ✅ **New:** `src/lib/kinetic.ts` — kinetic typography system
 - ✅ **New:** `src/data/` — JSON seed data files
 - ⚠️ Still missing: `constants/` on frontend, no component-level CSS modules
 
 ### Updated Recommendations
+
 1. Adopt npm workspaces or Turborepo for monorepo management
 2. ✅ **Done:** TypeScript migration complete — all `.js` source files eliminated
 3. Remove the `prisma._app` anti-pattern entirely
@@ -128,6 +134,7 @@ The `package.json` at root has `"scripts"` that cd into subdirectories instead o
 **Score: 6/10 (improved from 5/10)**
 
 ### What Works
+
 - Consistent error handling patterns with `asyncHandler` wrapper
 - Zod validation schemas centralized in `config/schemas.js`
 - Constants extracted from magic numbers into `config/constants.js`
@@ -140,7 +147,9 @@ The `package.json` at root has `"scripts"` that cd into subdirectories instead o
 ### Critical Issues
 
 #### ✅ Fixed: TypeScript Migration Complete
+
 The backend TypeScript migration is **complete** — all 40+ source files converted to `.ts`:
+
 - ✅ All 15 route files (auth, predictions, matches, users, admin, leaderboard, leagues, squads, ai, highlights, messages, players, search, simulation, stripe, teams)
 - ✅ All 6 middleware files (auth, errorHandler, rateLimiter, requireAdmin, validate, asyncHandler)
 - ✅ All services (scoring, tokenService, leaderboardMapper, authService, adminService)
@@ -151,38 +160,44 @@ The backend TypeScript migration is **complete** — all 40+ source files conver
 - ✅ Entry point (index.ts with ESM imports, top-level await)
 
 #### ✅ Fixed: Duplicated Mapping Logic
+
 The leaderboard mapping was extracted to `backend/src/services/leaderboardMapper.js`:
+
 ```javascript
 const { toLeaderboardEntry } = require('../services/leaderboardMapper')
 ```
 
 #### 🟠 Dead Code and Unused Variables
+
 - `crypto` dependency removed from `package.json`
 - `createPredictionSchema` `result` field still exists but never stored
 
 #### 🟡 Hardcoded Values (Still Present)
+
 ```javascript
 // constants.js
 const MATCH = {
-  FINISHED_MINUTE: 90,  // Only football
+  FINISHED_MINUTE: 90, // Only football
 }
 ```
 
 #### 🟡 Inconsistent Naming (Still Present)
+
 - `firstScorerId` stores a player name string, not an ID
 - `totalGoalsOU` stores string instead of enum
 
 ### Code Quality Violations
 
-| Principle | Status | Issue |
-|-----------|--------|-------|
-| **DRY** | ⚠️ Improved | Leaderboard mapping fixed; service logic being extracted |
-| **SOLID (SRP)** | ⚠️ Partial | Routes still do too much, but AuthService/AdminService extracted |
-| **KISS** | ⚠️ Partial | `scoreMatchPredictions` still 100+ lines |
-| **YAGNI** | ⚠️ Partial | Unused features remain |
-| **DIP** | ⚠️ Improved | Repository interfaces enable DI; `prisma._app` still present |
+| Principle       | Status      | Issue                                                            |
+| --------------- | ----------- | ---------------------------------------------------------------- |
+| **DRY**         | ⚠️ Improved | Leaderboard mapping fixed; service logic being extracted         |
+| **SOLID (SRP)** | ⚠️ Partial  | Routes still do too much, but AuthService/AdminService extracted |
+| **KISS**        | ⚠️ Partial  | `scoreMatchPredictions` still 100+ lines                         |
+| **YAGNI**       | ⚠️ Partial  | Unused features remain                                           |
+| **DIP**         | ⚠️ Improved | Repository interfaces enable DI; `prisma._app` still present     |
 
 ### Recommendations
+
 1. **Complete TypeScript migration** — Convert remaining route files and index.js
 2. Remove dead code (unused fields in schemas)
 3. Use proper enums for string-based fields
@@ -269,6 +284,7 @@ graph TB
 ```
 
 ### Strengths
+
 1. **Clear 3-tier separation** — Frontend ↔ API ↔ Database
 2. **Real-time capable** — Socket.IO provides live updates
 3. **Background processing** — BullMQ decouples scoring from request path
@@ -284,12 +300,15 @@ graph TB
 ### Weaknesses
 
 #### 🟠 Service Layer Partially Implemented
+
 The `AuthService.ts` and `AdminService.ts` services have been extracted, but most business logic still lives in route handlers. The scoring engine is still a single file with no domain model separation.
 
 #### 🟠 Repository Pattern Implemented but Not Fully Adopted
+
 Repositories exist in `backend/src/repositories/` with full typed interfaces, but **routes still use `req.app.get('prisma')` directly** instead of going through the repository layer. The repositories are available but not yet wired into the route handlers.
 
 #### 🟠 Event-Driven Architecture is Fragile
+
 Socket events are emitted through `prisma._app.get('io')` — a chain of global references.
 
 ```javascript
@@ -298,16 +317,19 @@ const io = prisma._app?.get?.('io')
 ```
 
 #### 🟡 Lack of Dependency Injection
-Services import Prisma directly or receive it as a parameter. 
+
+Services import Prisma directly or receive it as a parameter.
 
 #### 🟡 No Feature Flags Architecture
+
 Feature flags are stored as environment variables with manual `process.env.FLAG_*` checks.
 
 #### 🟡 Admin Dashboard Uses Hardcoded Data
+
 ```javascript
 // admin.js
 sportDistribution: [
-  { name: 'Football', value: 45 },  // Hardcoded!
+  { name: 'Football', value: 45 }, // Hardcoded!
   { name: 'Basketball', value: 25 },
   // ...
 ]
@@ -365,6 +387,7 @@ graph TB
 ```
 
 ### Updated Recommendations
+
 1. **Continue extracting service layer** — AuthService/AdminService done; scoring engine next
 2. **Adopt repositories in routes** — Repositories exist but routes still use `req.app.get('prisma')`
 3. **Implement an event bus** — Replace `prisma._app` with typed events
@@ -388,6 +411,7 @@ async function getAnthropicPrediction(match) {
 ```
 
 The AI prediction endpoint is gated only by `optionalAuth` (line 11):
+
 ```javascript
 router.post('/predict/:matchId', optionalAuth, asyncHandler(async (req, res) => {
 ```
@@ -405,7 +429,7 @@ The auth system sets httpOnly cookies for JWT tokens but provides **no CSRF prot
 res.cookie('accessToken', tokens.accessToken, {
   httpOnly: true,
   secure: isProd,
-  sameSite: 'lax',  // lax allows CSRF on GET requests from other sites
+  sameSite: 'lax', // lax allows CSRF on GET requests from other sites
   maxAge: ACCESS_TOKEN_MAX_AGE,
 })
 ```
@@ -421,6 +445,7 @@ router.post('/predict/:matchId', optionalAuth, asyncHandler(...))
 ```
 
 Compare with predictions which has `predictionLimiter`:
+
 ```javascript
 router.post('/', authenticateToken, predictionLimiter, validate(createPredictionSchema), ...)
 ```
@@ -433,11 +458,14 @@ The AI endpoint sends user-supplied match data to Anthropic. If a malicious matc
 
 ```javascript
 // admin.js
-router.delete('/users/:id', asyncHandler(async (req, res) => {
-  const prisma = req.app.get('prisma')
-  await prisma.user.delete({ where: { id: req.params.id } })
-  // Cascade delete — no verification, no confirmation
-}))
+router.delete(
+  '/users/:id',
+  asyncHandler(async (req, res) => {
+    const prisma = req.app.get('prisma')
+    await prisma.user.delete({ where: { id: req.params.id } })
+    // Cascade delete — no verification, no confirmation
+  }),
+)
 ```
 
 Admin can **permanently delete users** without confirmation. The Prisma cascade deletes predictions, follows, notifications, etc.
@@ -449,7 +477,7 @@ Admin can **permanently delete users** without confirmation. The Prisma cascade 
 const resetToken = jwt.sign(
   { userId: user.id, purpose: 'password-reset' },
   process.env.JWT_RESET_SECRET || process.env.JWT_SECRET,
-  { expiresIn: '1h' }
+  { expiresIn: '1h' },
 )
 ```
 
@@ -505,21 +533,22 @@ While CORS is configured, the fallback to localhost means production deployments
 
 ### Security Scorecard
 
-| Category | Status | Notes |
-|----------|--------|-------|
-| Authentication | ⚠️ Weak | JWT with no revocation, no 2FA |
-| Authorization | ⚠️ Basic | Role-based but no RBAC framework |
-| Input Validation | ✅ Good | Zod schemas on most endpoints |
-| CSRF | ❌ Missing | No CSRF tokens |
-| XSS | ⚠️ Partial | No HTML rendering, but no sanitization |
-| SSRF | ❌ Missing | No URL validation |
-| Rate Limiting | ⚠️ Partial | AI endpoint unprotected |
-| Secrets | ❌ Critical | Anthropic key used from unauthenticated route |
-| HTTPS | ❌ Not enforced | No TLS at application level |
-| Audit Logging | ⚠️ Partial | Admin actions logged only |
-| Dependency Security | ⚠️ Unknown | No `npm audit` in CI |
+| Category            | Status          | Notes                                         |
+| ------------------- | --------------- | --------------------------------------------- |
+| Authentication      | ⚠️ Weak         | JWT with no revocation, no 2FA                |
+| Authorization       | ⚠️ Basic        | Role-based but no RBAC framework              |
+| Input Validation    | ✅ Good         | Zod schemas on most endpoints                 |
+| CSRF                | ❌ Missing      | No CSRF tokens                                |
+| XSS                 | ⚠️ Partial      | No HTML rendering, but no sanitization        |
+| SSRF                | ❌ Missing      | No URL validation                             |
+| Rate Limiting       | ⚠️ Partial      | AI endpoint unprotected                       |
+| Secrets             | ❌ Critical     | Anthropic key used from unauthenticated route |
+| HTTPS               | ❌ Not enforced | No TLS at application level                   |
+| Audit Logging       | ⚠️ Partial      | Admin actions logged only                     |
+| Dependency Security | ⚠️ Unknown      | No `npm audit` in CI                          |
 
 ### Recommendations
+
 1. **Add authentication to AI endpoint** — Require `authenticateToken` at minimum
 2. **Add rate limiting to ALL endpoints** — Especially the AI prediction route
 3. **Implement CSRF protection** — Use `csrf-csrf` or `csurf` for cookie-based auth
@@ -552,8 +581,9 @@ for (const match of recentMatches) {
 **Impact:** If there are 50 finished matches, this makes 51 database queries (1 for matches + 50 for events).
 
 **Fix:** Batch the queries:
+
 ```javascript
-const matchIds = recentMatches.map(m => m.id)
+const matchIds = recentMatches.map((m) => m.id)
 const allGoals = await prisma.matchEvent.findMany({
   where: { matchId: { in: matchIds }, type: 'GOAL' },
   orderBy: { minute: 'asc' },
@@ -565,12 +595,14 @@ const goalsByMatch = groupBy(allGoals, 'matchId')
 ### 🟠 High: No Database Indexes on Search Fields
 
 The search endpoint runs `{ contains: query, mode: 'insensitive' }` queries on:
+
 - `User.username`, `User.displayName`
 - `Team.name`
 - `Player.name`
 - `Match.homeTeamName`, `Match.awayTeamName`, `Match.competition`
 
 **None of these fields have database indexes.** The Prisma schema has:
+
 ```prisma
 @@index([status])
 @@index([scheduledAt])
@@ -580,6 +612,7 @@ The search endpoint runs `{ contains: query, mode: 'insensitive' }` queries on:
 But no indexes on searchable text fields. `mode: 'insensitive'` with `contains` forces full table scans. With 10,000+ users, search becomes unusable.
 
 **Fix:** Add PostgreSQL trigram indexes:
+
 ```sql
 CREATE INDEX idx_user_username_trgm ON "User" USING gin (username gin_trgm_ops);
 CREATE INDEX idx_match_home_team_trgm ON "Match" USING gin ("homeTeamName" gin_trgm_ops);
@@ -602,9 +635,9 @@ The leaderboard queries are efficient (limit 100, order by indexed column), but 
 ```javascript
 // matches.js
 const matches = await prisma.match.findMany({
-  where, 
-  orderBy: { scheduledAt: 'asc' }, 
-  take: 50  // Hardcoded limit
+  where,
+  orderBy: { scheduledAt: 'asc' },
+  take: 50, // Hardcoded limit
 })
 ```
 
@@ -613,6 +646,7 @@ const matches = await prisma.match.findMany({
 ### 🟡 Medium: Chat Message Accumulation
 
 Chat messages in the Zustand store grow unbounded:
+
 ```javascript
 addChatMessage: (roomId, message) =>
   set((state) => ({
@@ -625,6 +659,7 @@ addChatMessage: (roomId, message) =>
 ```
 
 The `useMessages` hook polls every 5 seconds and stores all messages in memory:
+
 ```javascript
 refetchInterval: 5000,
 ```
@@ -651,6 +686,7 @@ Three.js + React Three Fiber + Drei adds **~500KB+ gzipped** to the bundle. This
 ### 🔵 Low: No Code Splitting by Route
 
 While routes are lazy-loaded:
+
 ```javascript
 const LandingPage = lazy(() => import('./pages/LandingPage'))
 ```
@@ -658,6 +694,7 @@ const LandingPage = lazy(() => import('./pages/LandingPage'))
 The **Navbar, BottomNav, LiveTicker, GamificationStrip, and QuickChatFeed** are all eagerly loaded in `App.jsx`. These shouldn't block the initial render.
 
 ### Recommendations
+
 1. Fix N+1 query in highlights endpoint
 2. Add PostgreSQL indexes for text search fields
 3. Implement cursor-based pagination for leaderboards
@@ -675,32 +712,36 @@ The **Navbar, BottomNav, LiveTicker, GamificationStrip, and QuickChatFeed** are 
 
 ### REST Compliance
 
-| Criteria | Status | Issue |
-|----------|--------|-------|
-| Resource-oriented URLs | ✅ Good | `/api/matches`, `/api/predictions` |
-| HTTP Methods | ✅ Mostly | POST for creation, PATCH for partial update |
-| Status Codes | ⚠️ Inconsistent | Some 201s, some 200s for creation |
-| Pagination | ⚠️ Partial | No cursor pagination, offset only in admin |
-| Versioning | ❌ Missing | No `/api/v1/` prefix |
-| Error Format | ⚠️ Inconsistent | Some routes use `{ error: { code, message } }`, others return raw strings |
-| HATEOAS | ❌ Missing | No links in responses |
+| Criteria               | Status          | Issue                                                                     |
+| ---------------------- | --------------- | ------------------------------------------------------------------------- |
+| Resource-oriented URLs | ✅ Good         | `/api/matches`, `/api/predictions`                                        |
+| HTTP Methods           | ✅ Mostly       | POST for creation, PATCH for partial update                               |
+| Status Codes           | ⚠️ Inconsistent | Some 201s, some 200s for creation                                         |
+| Pagination             | ⚠️ Partial      | No cursor pagination, offset only in admin                                |
+| Versioning             | ❌ Missing      | No `/api/v1/` prefix                                                      |
+| Error Format           | ⚠️ Inconsistent | Some routes use `{ error: { code, message } }`, others return raw strings |
+| HATEOAS                | ❌ Missing      | No links in responses                                                     |
 
 ### Issues
 
 #### 🟠 Inconsistent Error Response Format
 
 Some routes return structured errors:
+
 ```javascript
 { error: { code: 'MATCH_NOT_FOUND', message: 'Match not found' } }
 ```
 
 Others return simple strings or different formats:
+
 ```javascript
 // admin.js
-{ users, total, page, totalPages }  // No error envelope
+{
+  ;(users, total, page, totalPages)
+} // No error envelope
 
 // predictions.js
-res.json(predictions)  // Array directly, no wrapper
+res.json(predictions) // Array directly, no wrapper
 ```
 
 #### 🟠 No API Versioning
@@ -716,6 +757,7 @@ All routes are at `/api/` with no version prefix. As the API evolves, breaking c
 #### 🟡 Missing Pagination
 
 Several list endpoints have no pagination:
+
 - `GET /api/matches` — `take: 50` hardcoded
 - `GET /api/highlights` — `take: parseInt(limit)` with no cap
 - `GET /api/search` — `take: 10` hardcoded
@@ -729,6 +771,7 @@ While `express-rate-limit` is configured with `standardHeaders: true`, the API d
 There's no OpenAPI specification, no Swagger UI, no API documentation beyond the README.
 
 ### Recommendations
+
 1. Add API versioning (`/api/v1/`)
 2. Standardize error response format across all routes
 3. Add cursor-based pagination for list endpoints
@@ -745,6 +788,7 @@ There's no OpenAPI specification, no Swagger UI, no API documentation beyond the
 ### Schema Quality
 
 **Strengths:**
+
 - 17 models covering all domain entities
 - Meaningful enums (Sport, MatchStatus, Tier, etc.)
 - Composite unique constraints (`@@unique([userId, matchId])`)
@@ -766,6 +810,7 @@ model Match {
 ```
 
 These are denormalized (stored directly on Match rather than joining Team/Competition). This means:
+
 - If a team name changes, all historical matches have stale data
 - No referential integrity — can have matches with fake team names
 - The seed data uses IDs like `team-mci` that don't correspond to actual Team records
@@ -782,6 +827,7 @@ The `homeTeamId` and `awayTeamId` fields reference Team IDs that **do not exist 
 #### 🟠 No Cascading Deletes on Some Relations
 
 The `User` model has relations with `predictions`, `follows`, `leagues`, and more. The admin delete route manually cascades:
+
 ```javascript
 await prisma.user.delete({ where: { id: req.params.id } })
 ```
@@ -799,6 +845,7 @@ model Prediction {
 ```
 
 Missing compound index for the scoring query:
+
 ```javascript
 // scoring.js
 const predictions = await prisma.prediction.findMany({
@@ -835,6 +882,7 @@ Models like `Team`, `Player`, `Competition`, `League`, `Squad` are missing `@upd
 No comments or descriptions on Prisma models or fields. New team members must reverse-engineer field purposes from the code.
 
 ### Recommendations
+
 1. Add proper foreign key relationships — seed Team and Player records before Matches
 2. Add `onDelete: Cascade` to all child relations
 3. Add compound indexes for common query patterns (`[matchId, status]`, `[userId, status]`)
@@ -850,6 +898,7 @@ No comments or descriptions on Prisma models or fields. New team members must re
 **Score: 6/10**
 
 ### What Works
+
 - Lazy loading all route components ✓
 - React Query for server state with good `staleTime` values ✓
 - Optimistic updates for follow/unfollow ✓
@@ -888,6 +937,7 @@ Mutations don't expose `isLoading` or `isError` states for components to use.
 #### 🟡 Large Bundle Size
 
 The package.json includes heavy libraries:
+
 - `three` + `@react-three/fiber` + `@react-three/drei` (~500KB gzipped combined)
 - `framer-motion` (~60KB gzipped)
 - `gsap` (~80KB gzipped)
@@ -907,6 +957,7 @@ The package.json includes heavy libraries:
 #### 🟡 No Responsive Testing
 
 The `isMobile` state is tracked but there's no evidence of responsive layouts:
+
 ```javascript
 useEffect(() => {
   const checkMobile = () => setIsMobile(window.innerWidth < 640)
@@ -935,13 +986,16 @@ No `onError` handler, no error boundary, no retry with backoff customization for
 #### 🟡 No Form Validation Error Display
 
 React Hook Form + Zod is configured, but:
+
 ```javascript
 // schemas.js
-const createPredictionSchema = z.object({
-  matchId: z.string().min(1, 'matchId is required'),
-  homeGoals: nonNegativeInt,
-  // ...
-}).strict()
+const createPredictionSchema = z
+  .object({
+    matchId: z.string().min(1, 'matchId is required'),
+    homeGoals: nonNegativeInt,
+    // ...
+  })
+  .strict()
 ```
 
 The `.strict()` flag means **extra fields cause validation errors**, breaking the form if any additional data is sent.
@@ -954,9 +1008,13 @@ The entire design system is in one `index.css` file (~400 lines). No CSS modules
 
 ```javascript
 function authedHeaders() {
-  const token = typeof document !== 'undefined'
-    ? document.cookie.split('; ').find((r) => r.startsWith('accessToken='))?.split('=')[1]
-    : null
+  const token =
+    typeof document !== 'undefined'
+      ? document.cookie
+          .split('; ')
+          .find((r) => r.startsWith('accessToken='))
+          ?.split('=')[1]
+      : null
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 ```
@@ -989,6 +1047,7 @@ useEffect(() => {
 Empty `.catch()` — any SW registration error is silently swallowed.
 
 ### Recommendations
+
 1. Migrate frontend to TypeScript
 2. Add unit tests for components using Vitest + React Testing Library
 3. Add loading/error states to all mutation hooks
@@ -1007,6 +1066,7 @@ Empty `.catch()` — any SW registration error is silently swallowed.
 **Score: 7/10 (improved from 5/10)**
 
 ### What Works
+
 - Express v5 with modern async error handling
 - Consistent middleware pipeline (helmet → cors → pino-http → json → cookie → passport)
 - Stripe webhook handled before JSON body parser
@@ -1034,13 +1094,15 @@ No `x-request-id` header is generated or propagated. This makes debugging and tr
 
 ```typescript
 // schemas.ts
-const updateProfileSchema = z.object({
-  displayName: z.string().min(1).max(100).optional(),
-  avatar: z.string().url('Invalid avatar URL').max(500).optional().nullable(),
-  bio: z.string().max(500).optional().nullable(),
-  favouriteSports: z.array(z.string()).optional(),
-  favouriteTeams: z.array(z.string()).optional(),
-}).strict()
+const updateProfileSchema = z
+  .object({
+    displayName: z.string().min(1).max(100).optional(),
+    avatar: z.string().url('Invalid avatar URL').max(500).optional().nullable(),
+    bio: z.string().max(500).optional().nullable(),
+    favouriteSports: z.array(z.string()).optional(),
+    favouriteTeams: z.array(z.string()).optional(),
+  })
+  .strict()
 ```
 
 `favouriteSports` and `favouriteTeams` are accepted in the schema but **still not processed** in the route handler — silently dropped.
@@ -1050,6 +1112,7 @@ const updateProfileSchema = z.object({
 Parallel simulations can run on the same match — no locking mechanism.
 
 ### Updated Recommendations
+
 1. ✅ **Done:** TypeScript migration complete
 2. ✅ **Done:** Structured logging with Pino implemented
 3. ✅ **Done:** Sentry error monitoring implemented
@@ -1067,6 +1130,7 @@ Parallel simulations can run on the same match — no locking mechanism.
 **Score: 5/10 (improved from 4/10)**
 
 ### What Works
+
 - Docker Compose for local development (PostgreSQL + Redis)
 - Vercel configuration for frontend deployment
 - GitHub Actions CI workflow exists
@@ -1087,6 +1151,7 @@ Parallel simulations can run on the same match — no locking mechanism.
 ```
 
 The CI workflow:
+
 1. Has no steps to run tests (there are none)
 2. Has no TypeScript type checking (there is none)
 3. Has no lint step configured
@@ -1095,6 +1160,7 @@ The CI workflow:
 #### 🟠 No Dockerfile for the Backend
 
 There's a `docker-compose.yml` for PostgreSQL and Redis, but **no Dockerfile for the backend application**. The Node.js server runs natively, not in a container. This means:
+
 - No containerized deployment
 - No standard image for CI/CD
 - No container orchestration (Kubernetes, ECS)
@@ -1102,6 +1168,7 @@ There's a `docker-compose.yml` for PostgreSQL and Redis, but **no Dockerfile for
 #### 🟠 No Production Deployment Configuration
 
 The `vercel.json` rewrites API calls to a hardcoded URL:
+
 ```json
 {
   "source": "/api/:path*",
@@ -1118,8 +1185,9 @@ No `config/` directory for development, staging, production configurations. Envi
 #### 🟡 No CI for PR Workflows
 
 No workflow that runs on pull requests to check:
+
 - Code linting
-- Type checking  
+- Type checking
 - Test passing
 - Build passing
 
@@ -1130,9 +1198,10 @@ No deployment pipeline. Frontend deploys to Vercel (manual or via dashboard), ba
 #### 🟡 No Container Health Checks
 
 Docker Compose services have health checks:
+
 ```yaml
 healthcheck:
-  test: ["CMD-SHELL", "pg_isready -U matchmind"]
+  test: ['CMD-SHELL', 'pg_isready -U matchmind']
   interval: 5s
   timeout: 5s
   retries: 10
@@ -1141,6 +1210,7 @@ healthcheck:
 But the application container (if one existed) would also need health checks and depends_on conditions.
 
 ### Recommendations
+
 1. Create a Dockerfile for the backend
 2. Set up proper CI pipeline: lint → typecheck → test → build
 3. Add PR workflow with checks
@@ -1159,28 +1229,28 @@ But the application container (if one existed) would also need health checks and
 
 The project now has **81 test cases across 4 test files** (all migrated to `.ts`):
 
-| Test File | Type | Test Cases |
-|-----------|------|------------|
-| `backend/src/services/scoring.test.ts` | Unit | **47 tests**: `calculatePredictionPoints` — exact score, result+GD, result only, BTTS, O/U, VOID, streaks, tiers |
-| `backend/src/routes/auth.test.ts` | Integration (supertest + async import) | **14 tests**: signup, login, refresh, forgot/reset, validation |
-| `backend/src/routes/predictions.test.ts` | Integration (supertest + mocked DB) | **11 tests**: create, list, score, auth, validation |
-| `frontend/src/hooks/useApi.test.ts` | Unit (jsdom) | **9 tests**: fetchJSON, ApiRequestError, 401 refresh, concurrency |
+| Test File                                | Type                                   | Test Cases                                                                                                       |
+| ---------------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `backend/src/services/scoring.test.ts`   | Unit                                   | **47 tests**: `calculatePredictionPoints` — exact score, result+GD, result only, BTTS, O/U, VOID, streaks, tiers |
+| `backend/src/routes/auth.test.ts`        | Integration (supertest + async import) | **14 tests**: signup, login, refresh, forgot/reset, validation                                                   |
+| `backend/src/routes/predictions.test.ts` | Integration (supertest + mocked DB)    | **11 tests**: create, list, score, auth, validation                                                              |
+| `frontend/src/hooks/useApi.test.ts`      | Unit (jsdom)                           | **9 tests**: fetchJSON, ApiRequestError, 401 refresh, concurrency                                                |
 
 ### What's Still Missing
 
-| Area | Priority | Notes |
-|------|----------|-------|
-| ✅ **Scoring engine** | ✅ **Done** | **47 comprehensive tests** covering all tiers, bonuses, streaks |
-| ✅ **Auth routes** | ✅ **Done** | **14 tests** covering signup, login, refresh, forgot/reset |
-| ✅ **Prediction routes** | ✅ **Done** | **11 tests** covering create, list, score, auth |
-| Match flow tests | 🟠 High | No tests for finish/simulation endpoints |
-| League/Squad tests | 🟠 High | No tests for CRUD operations |
-| User/Follow tests | 🟠 High | No tests for profile/follow/unfollow |
-| Stripe webhook tests | 🟠 High | No tests for webhook handling |
-| Frontend component tests | 🟡 Medium | Zero component tests (React Testing Library needed) |
-| Zustand store tests | 🟡 Medium | Zero store tests |
-| E2E tests | 🔵 Low | Not configured (Playwright/Cypress) |
-| Load tests | 🔵 Low | Not configured (k6/artillery) |
+| Area                     | Priority    | Notes                                                           |
+| ------------------------ | ----------- | --------------------------------------------------------------- |
+| ✅ **Scoring engine**    | ✅ **Done** | **47 comprehensive tests** covering all tiers, bonuses, streaks |
+| ✅ **Auth routes**       | ✅ **Done** | **14 tests** covering signup, login, refresh, forgot/reset      |
+| ✅ **Prediction routes** | ✅ **Done** | **11 tests** covering create, list, score, auth                 |
+| Match flow tests         | 🟠 High     | No tests for finish/simulation endpoints                        |
+| League/Squad tests       | 🟠 High     | No tests for CRUD operations                                    |
+| User/Follow tests        | 🟠 High     | No tests for profile/follow/unfollow                            |
+| Stripe webhook tests     | 🟠 High     | No tests for webhook handling                                   |
+| Frontend component tests | 🟡 Medium   | Zero component tests (React Testing Library needed)             |
+| Zustand store tests      | 🟡 Medium   | Zero store tests                                                |
+| E2E tests                | 🔵 Low      | Not configured (Playwright/Cypress)                             |
+| Load tests               | 🔵 Low      | Not configured (k6/artillery)                                   |
 
 ### Test Configuration
 
@@ -1197,6 +1267,7 @@ thresholds: {
 Coverage thresholds still at 40% — should be adjusted as coverage improves.
 
 ### Recommendations
+
 1. ✅ **Done:** Scoring engine tests written (47 tests)
 2. ✅ **Done:** Auth integration tests (14 tests)
 3. ✅ **Done:** Prediction integration tests (11 tests)
@@ -1212,6 +1283,7 @@ Coverage thresholds still at 40% — should be adjusted as coverage improves.
 **Score: 6/10**
 
 ### What Works
+
 - Comprehensive README with architecture, tech stack, features, and setup
 - SECURITY.md with vulnerability disclosure process
 - CODE_OF_CONDUCT.md (standard Contributor Covenant)
@@ -1226,6 +1298,7 @@ Coverage thresholds still at 40% — should be adjusted as coverage improves.
 #### 🟠 README Claims Features That Don't Exist
 
 The README describes features that have no code implementation:
+
 - **"SportRadar API"** — `SPORTRADAR_API_KEY` in env but never used in code
 - **"Cloudinary"** — `CLOUDINARY_URL` in env but never used in code
 - **"Sentry + Posthog"** — Listed under deployment but never configured
@@ -1238,6 +1311,7 @@ The README describes features that have no code implementation:
 #### 🟠 No Architecture Decision Records (ADRs)
 
 No documentation of **why** decisions were made:
+
 - Why Express v5 instead of Fastify or Hono?
 - Why BullMQ instead of RabbitMQ or just setTimeout?
 - Why CommonJS instead of ESM?
@@ -1247,6 +1321,7 @@ No documentation of **why** decisions were made:
 #### 🟡 No API Documentation
 
 The only API documentation is the README table. No:
+
 - OpenAPI/Swagger specification
 - Postman collection
 - API changelog
@@ -1264,16 +1339,19 @@ The only API documentation is the README table. No:
 #### 🟡 Inconsistent Command Documentation
 
 README says:
+
 ```bash
 npm run prisma:seed
 ```
 
 But the actual command is:
+
 ```json
 "prisma:seed": "cd backend && npm run prisma:seed"
 ```
 
 And in `backend/package.json`:
+
 ```json
 "prisma:seed": "node scripts/seed-db.js"
 ```
@@ -1293,12 +1371,14 @@ function calculatePredictionPoints(prediction, match) {
 ```
 
 But other functions:
+
 ```javascript
 // No comment
 async function updateUserStreaks(prisma, userId, wasCorrect) {
 ```
 
 ### Recommendations
+
 1. Audit README claims against actual implementation — remove or implement missing features
 2. Add ADRs for major architectural decisions
 3. Generate OpenAPI/Swagger documentation
@@ -1313,6 +1393,7 @@ async function updateUserStreaks(prisma, userId, wasCorrect) {
 **Score: 6/10**
 
 ### What Works
+
 - `.gitignore` is comprehensive (secrets, node_modules, build artifacts, IDE files)
 - `.gitattributes` has proper line ending handling
 - `.editorconfig` for consistent formatting
@@ -1328,6 +1409,7 @@ No mention of Git Flow, GitHub Flow, or trunk-based development. CONTRIBUTING.md
 #### 🟠 No Release Strategy
 
 Despite having a CHANGELOG with versions, there's no:
+
 - Tagged releases
 - Release workflow
 - Version bump automation
@@ -1336,11 +1418,13 @@ Despite having a CHANGELOG with versions, there's no:
 #### 🟡 No Conventional Commits Enforcement
 
 The CONTRIBUTING.md recommends commit format:
+
 ```
 type(scope): description
 ```
 
 But there's no:
+
 - Commitlint configuration
 - Husky hooks
 - PR title validation
@@ -1355,6 +1439,7 @@ The PULL_REQUEST_TEMPLATE.md exists but may not be specific enough for different
 The project appears to have been committed in one large batch (no granular commit history visible).
 
 ### Recommendations
+
 1. Adopt GitHub Flow with clear branching conventions
 2. Set up semantic-release for automated versioning
 3. Add commitlint + husky for commit message validation
@@ -1370,52 +1455,55 @@ The project appears to have been committed in one large batch (no granular commi
 ### Backend Dependencies (23 packages)
 
 #### 🟠 Potentially Unused
-| Package | Why It's Suspicious |
-|---------|-------------------|
-| `crypto` | Built into Node.js, this npm package is a different package — likely a mistake |
-| `pg` | Used by adapter-pg, but could be `@neondatabase/serverless` for serverless |
-| `rate-limit-redis` | Used, but error handling swallows import failures |
-| `supertest` | Dev dependency, not used in any test |
+
+| Package            | Why It's Suspicious                                                            |
+| ------------------ | ------------------------------------------------------------------------------ |
+| `crypto`           | Built into Node.js, this npm package is a different package — likely a mistake |
+| `pg`               | Used by adapter-pg, but could be `@neondatabase/serverless` for serverless     |
+| `rate-limit-redis` | Used, but error handling swallows import failures                              |
+| `supertest`        | Dev dependency, not used in any test                                           |
 
 #### 🟡 Version Concerns
 
-| Package | Version | Risk |
-|---------|---------|------|
-| `express` | `^5.2.1` | Express 5 is still experimental — API may change |
-| `prisma` / `@prisma/client` | `^7.8.0` | Prisma v7 is very new — breaking changes expected |
-| `zod` | `^4.4.3` | Zod v4 is pre-release — API may change |
-| `redis` | `^6.0.0` | ioredis merges into redis v4+, but v6 is very new |
-| `bullmq` | `^5.78.0` | v5 is stable, but API differences from v4 |
-| `stripe` | `^22.2.0` | Updated frequently, minor API changes |
+| Package                     | Version   | Risk                                              |
+| --------------------------- | --------- | ------------------------------------------------- |
+| `express`                   | `^5.2.1`  | Express 5 is still experimental — API may change  |
+| `prisma` / `@prisma/client` | `^7.8.0`  | Prisma v7 is very new — breaking changes expected |
+| `zod`                       | `^4.4.3`  | Zod v4 is pre-release — API may change            |
+| `redis`                     | `^6.0.0`  | ioredis merges into redis v4+, but v6 is very new |
+| `bullmq`                    | `^5.78.0` | v5 is stable, but API differences from v4         |
+| `stripe`                    | `^22.2.0` | Updated frequently, minor API changes             |
 
 #### 🟡 Large Unused Dependencies
+
 - `@prisma/adapter-pg` is required for Prisma v7 - necessary but adds complexity
 
 ### Frontend Dependencies (25 packages)
 
 #### 🟠 Bundle Size Concerns
 
-| Package | Estimated Gzipped Size | Notes |
-|---------|----------------------|-------|
-| `three` + `r3f` + `drei` | ~500KB | Used only on landing page |
-| `framer-motion` | ~60KB | Page transitions |
-| `gsap` | ~80KB | Landing page animations |
-| `recharts` | ~100KB | Admin page charts |
-| `react-window` | ~20KB | Virtualization |
-| `react-player` | ~30KB | Video highlights |
-| `lucide-react` | ~50KB | Icons |
-| `@stripe/react-stripe-js` | ~20KB | Payment forms |
+| Package                   | Estimated Gzipped Size | Notes                     |
+| ------------------------- | ---------------------- | ------------------------- |
+| `three` + `r3f` + `drei`  | ~500KB                 | Used only on landing page |
+| `framer-motion`           | ~60KB                  | Page transitions          |
+| `gsap`                    | ~80KB                  | Landing page animations   |
+| `recharts`                | ~100KB                 | Admin page charts         |
+| `react-window`            | ~20KB                  | Virtualization            |
+| `react-player`            | ~30KB                  | Video highlights          |
+| `lucide-react`            | ~50KB                  | Icons                     |
+| `@stripe/react-stripe-js` | ~20KB                  | Payment forms             |
 
 **Total vendor bundle could exceed 800KB gzipped.**
 
 #### 🟡 Version Concerns
-| Package | Version | Notes |
-|---------|---------|-------|
-| `vite` | `^8.0.12` | Vite 8 is very new — plugin compatibility issues |
-| `@vitejs/plugin-react` | `^6.0.1` | Must match Vite 8 |
-| `react` | `^19.2.6` | React 19 is stable, but ecosystem may lag |
-| `@tanstack/react-query` | `^5.101.0` | v5 is stable, good choice |
-| `react-router-dom` | `^6.30.4` | v6 is stable, good choice |
+
+| Package                 | Version    | Notes                                            |
+| ----------------------- | ---------- | ------------------------------------------------ |
+| `vite`                  | `^8.0.12`  | Vite 8 is very new — plugin compatibility issues |
+| `@vitejs/plugin-react`  | `^6.0.1`   | Must match Vite 8                                |
+| `react`                 | `^19.2.6`  | React 19 is stable, but ecosystem may lag        |
+| `@tanstack/react-query` | `^5.101.0` | v5 is stable, good choice                        |
+| `react-router-dom`      | `^6.30.4`  | v6 is stable, good choice                        |
 
 #### 🟡 `picomatch` as Direct Dependency
 
@@ -1427,18 +1515,19 @@ This is a transitive dependency of Vite and should not be installed directly. Th
 
 ### Missing Dependencies
 
-| Package | Purpose | Priority |
-|---------|---------|----------|
-| `pino` or `winston` | Structured logging | High |
-| `compression` | HTTP response compression | Medium |
-| `csrf-csrf` | CSRF protection | High |
-| `@sentry/node` | Error monitoring | High |
-| `axios` | For external API calls (Anthropic uses `fetch` but custom) | Low |
-| `typescript` + types | Type safety | Critical |
-| `vitest` + `@testing-library/react` | Testing | Critical |
-| `husky` + `lint-staged` | Pre-commit hooks | Medium |
+| Package                             | Purpose                                                    | Priority |
+| ----------------------------------- | ---------------------------------------------------------- | -------- |
+| `pino` or `winston`                 | Structured logging                                         | High     |
+| `compression`                       | HTTP response compression                                  | Medium   |
+| `csrf-csrf`                         | CSRF protection                                            | High     |
+| `@sentry/node`                      | Error monitoring                                           | High     |
+| `axios`                             | For external API calls (Anthropic uses `fetch` but custom) | Low      |
+| `typescript` + types                | Type safety                                                | Critical |
+| `vitest` + `@testing-library/react` | Testing                                                    | Critical |
+| `husky` + `lint-staged`             | Pre-commit hooks                                           | Medium   |
 
 ### Recommendations
+
 1. Remove `crypto` (use Node.js built-in)
 2. Remove `picomatch` direct dependency
 3. Add TypeScript and all necessary type packages
@@ -1453,6 +1542,7 @@ This is a transitive dependency of Vite and should not be installed directly. Th
 **Score: 6/10 (improved from 5/10)**
 
 ### What Works
+
 - Centralized error handler in `errorHandler.js` ✓
 - ✅ **New:** Structured error logging via Pino with event names ✓
 - ✅ **New:** Error context (event name, IDs, message) instead of bare console.error ✓
@@ -1492,6 +1582,7 @@ Invalid tokens are still silently ignored.
 #### 🟡 No Retry Logic for External Services
 
 The Anthropic AI call has no retry logic:
+
 ```javascript
 try {
   anthropicResult = await getAnthropicPrediction(match)
@@ -1509,22 +1600,27 @@ No circuit breaker pattern for external services (Stripe, Anthropic). If Stripe 
 #### 🟡 Inconsistent Error Responses
 
 Some routes return:
+
 ```javascript
 res.status(400).json({ error: { code: 'MATCH_NOT_SCHEDULED', message: '...' } })
 ```
 
 Others return:
+
 ```javascript
-res.status(501).json({ error: { code: 'NOT_IMPLEMENTED', message: '...' } })  // 501 is unusual
+res.status(501).json({ error: { code: 'NOT_IMPLEMENTED', message: '...' } }) // 501 is unusual
 ```
 
 The `/health` endpoint returns:
+
 ```javascript
 res.json({ status: 'healthy', timestamp: new Date().toISOString() })
 ```
+
 No error envelope.
 
 ### Recommendations
+
 1. Add structured error logging with context (request ID, user ID, route)
 2. Add retry logic with exponential backoff for external API calls
 3. Implement circuit breaker pattern for Stripe and Anthropic
@@ -1551,11 +1647,13 @@ No error envelope.
 #### ✅ Sentry Error Tracking Implemented
 
 **Backend** (`backend/instrument.js`):
+
 - Initializes @sentry/node with DSN from env
 - Traces at 0.1 sample rate in production
 - PII scrubbing via `beforeSend`
 
 **Frontend** (`frontend/src/lib/instrument.js`):
+
 - Initializes @sentry/react
 - Browser tracing integration
 - Session replays (0.1 sample, 1.0 on error)
@@ -1565,15 +1663,19 @@ No error envelope.
 
 ```javascript
 const logger = require('./utils/logger')
-logger.info({
-  event: 'scoring.completed',
-  matchId,
-  scored,
-  usersAffected,
-}, `Scored ${scored} predictions for match ${matchId}`)
+logger.info(
+  {
+    event: 'scoring.completed',
+    matchId,
+    scored,
+    usersAffected,
+  },
+  `Scored ${scored} predictions for match ${matchId}`,
+)
 ```
 
 Features:
+
 - Event-based logging with consistent naming (`event` field)
 - Log levels: fatal, error, warn, info, debug
 - Automatic redaction of passwords, tokens, auth headers
@@ -1589,6 +1691,7 @@ Features:
 #### 🟠 No Request Logging for Non-HTTP Events
 
 Socket.IO events and BullMQ jobs are not logged with the same detail as HTTP requests (Morgan). There's no audit trail for:
+
 - Chat messages sent
 - Rooms joined/left
 - Worker job processing
@@ -1600,12 +1703,14 @@ No log rotation configuration. In production, logs will grow unbounded and fill 
 #### 🟡 No Alerting
 
 No alerts for:
+
 - Error rate spikes
 - Queue backpressure (BullMQ jobs accumulating)
 - Database connection pool exhaustion
 - Redis connection failures
 
 ### Recommendations
+
 1. **Add Sentry** — Free tier for error tracking, minimal setup
 2. **Add structured logging** with pino
 3. **Add application metrics** with Prometheus client
@@ -1620,6 +1725,7 @@ No alerts for:
 **Score: 6/10 (improved from 5/10)**
 
 ### What Works
+
 - `.env.example` files for both backend and frontend
 - Environment variable validation for critical vars (JWT_SECRET, DATABASE_URL)
 - Feature flags via environment variables
@@ -1632,11 +1738,13 @@ No alerts for:
 #### 🟠 No Configuration Schema Validation
 
 No validation of environment variables beyond JWT_SECRET and DATABASE_URL:
+
 ```javascript
 const REQUIRED_ENV_VARS = ['JWT_SECRET', 'DATABASE_URL']
 ```
 
 Missing validation for:
+
 - `JWT_REFRESH_SECRET` — if missing, JWT refresh and reset use the same secret
 - `STRIPE_SECRET_KEY` — if missing, checkout returns mock URL
 - `ANTHROPIC_API_KEY` — if missing, AI falls back to heuristics
@@ -1645,11 +1753,13 @@ Missing validation for:
 #### 🟠 No Feature Flag Management
 
 Feature flags are read from environment variables inline:
+
 ```javascript
 enabled: process.env.FLAG_AI_HINTS !== 'false'
 ```
 
 No feature flag service (LaunchDarkly, Split.io). Flags can't be:
+
 - Changed at runtime without redeploy
 - Targeted to specific users
 - Gradually rolled out
@@ -1658,6 +1768,7 @@ No feature flag service (LaunchDarkly, Split.io). Flags can't be:
 #### 🟡 Duplicate Default URLs
 
 The same default URLs appear in multiple places:
+
 ```javascript
 // index.js
 connectionString: process.env.DATABASE_URL || 'postgresql://matchmind:matchmind_pass@localhost:5433/matchmind'
@@ -1674,12 +1785,14 @@ These defaults should be in a single config file.
 #### 🟡 No Production Config
 
 No configuration for:
+
 - Production JWT expiry (15 min access, 30 day refresh — reasonable but not configurable)
 - Production rate limits (100 req/min global — may be too low)
 - Production database pool size
 - Production Redis configuration
 
 ### Recommendations
+
 1. Add environment variable validation with `envalid` or custom validator
 2. Centralize all default values in a config module
 3. Add production-specific configuration profiles
@@ -1693,23 +1806,25 @@ No configuration for:
 
 ### Scale Assessment
 
-| Users | Feasibility | Bottlenecks |
-|-------|------------|-------------|
-| **100** | ✅ | Works now with any hosting |
-| **1,000** | ⚠️ | No issue — single server sufficient. No CDN but acceptable |
-| **10,000** | 🟠 | Rate limiting (100 req/min/IP) may need adjustment. No connection pooling tuning |
-| **100,000** | 🔴 | **Critical failures expected.** No caching, N+1 queries, no DB read replicas, no horizontal scaling |
-| **1,000,000** | ❌ | **Complete redesign needed.** Monolithic Express app, no microservices, no caching layer, no CDN for API, no connection pooling optimization, no sharding |
+| Users         | Feasibility | Bottlenecks                                                                                                                                               |
+| ------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **100**       | ✅          | Works now with any hosting                                                                                                                                |
+| **1,000**     | ⚠️          | No issue — single server sufficient. No CDN but acceptable                                                                                                |
+| **10,000**    | 🟠          | Rate limiting (100 req/min/IP) may need adjustment. No connection pooling tuning                                                                          |
+| **100,000**   | 🔴          | **Critical failures expected.** No caching, N+1 queries, no DB read replicas, no horizontal scaling                                                       |
+| **1,000,000** | ❌          | **Complete redesign needed.** Monolithic Express app, no microservices, no caching layer, no CDN for API, no connection pooling optimization, no sharding |
 
 ### Bottleneck Analysis at Scale
 
 #### 🔴 10K+ Users: No Caching Layer
+
 - Every `/api/matches` request hits PostgreSQL
 - Every `/api/leaderboard` request scans the users table (even with indexing)
 - Every `/api/search` request searches 4 tables in parallel (no caching)
 - No Redis caching for any API response
 
 **Solution:** Add Redis caching with 30-60 second TTL for common queries:
+
 ```javascript
 async function getCachedOrFetch(key, fetchFn, ttl = 30) {
   const cached = await redis.get(key)
@@ -1721,6 +1836,7 @@ async function getCachedOrFetch(key, fetchFn, ttl = 30) {
 ```
 
 #### 🟠 10K+ Users: Database Connections
+
 ```javascript
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -1730,6 +1846,7 @@ const pool = new pg.Pool({
 Default pool size is 10 connections. With 100 concurrent requests and each request using a connection for ~50ms, the pool will exhaust at ~200 RPS.
 
 **Solution:** Configure pool size based on deployment:
+
 ```javascript
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -1745,6 +1862,7 @@ All queries go to a single database. Read-heavy operations (leaderboard, match l
 #### 🟡 10K+ Users: WebSocket Scalability
 
 Socket.IO with a single process won't scale. Need:
+
 - Redis adapter for Socket.IO (horizontal scaling)
 - Sticky sessions or WebSocket-specific load balancing
 - Connection state management across nodes
@@ -1752,6 +1870,7 @@ Socket.IO with a single process won't scale. Need:
 #### 🔴 100K+ Users: Monolithic Backend
 
 Express.js v5 is single-threaded. 100K concurrent users would require:
+
 - Multiple server instances
 - Load balancer
 - Redis-based session/WebSocket state
@@ -1760,25 +1879,26 @@ Express.js v5 is single-threaded. 100K concurrent users would require:
 
 ### Production Readiness Checklist
 
-| Requirement | Status | Notes |
-|------------|--------|-------|
-| Error monitoring | ❌ Missing | No Sentry |
-| Structured logging | ❌ Missing | Console.log only |
-| Health checks | ⚠️ Basic | Simple ping, no dependency checks |
-| Graceful shutdown | ⚠️ Partial | No timeout, dynamic require |
-| Database migration | ✅ Done | Prisma migrations |
-| Secrets management | ⚠️ Basic | .env files, no Vault |
-| CI/CD | ❌ Broken | Workflows exist but untested |
-| Docker | ⚠️ Partial | Docker Compose for DB only |
-| Monitoring | ❌ Missing | No metrics |
-| Backup strategy | ❌ Missing | No DB backup config |
-| Rate limiting | ⚠️ Partial | AI endpoint unprotected |
-| CORS | ✅ Done | Configured |
-| HTTPS | ❌ Not enforced | No TLS configuration |
-| HTTP/2 | ❌ Not configured | Express supports it |
-| Compression | ❌ Missing | No gzip/brotli |
+| Requirement        | Status            | Notes                             |
+| ------------------ | ----------------- | --------------------------------- |
+| Error monitoring   | ❌ Missing        | No Sentry                         |
+| Structured logging | ❌ Missing        | Console.log only                  |
+| Health checks      | ⚠️ Basic          | Simple ping, no dependency checks |
+| Graceful shutdown  | ⚠️ Partial        | No timeout, dynamic require       |
+| Database migration | ✅ Done           | Prisma migrations                 |
+| Secrets management | ⚠️ Basic          | .env files, no Vault              |
+| CI/CD              | ❌ Broken         | Workflows exist but untested      |
+| Docker             | ⚠️ Partial        | Docker Compose for DB only        |
+| Monitoring         | ❌ Missing        | No metrics                        |
+| Backup strategy    | ❌ Missing        | No DB backup config               |
+| Rate limiting      | ⚠️ Partial        | AI endpoint unprotected           |
+| CORS               | ✅ Done           | Configured                        |
+| HTTPS              | ❌ Not enforced   | No TLS configuration              |
+| HTTP/2             | ❌ Not configured | Express supports it               |
+| Compression        | ❌ Missing        | No gzip/brotli                    |
 
 ### Recommendations for Production
+
 1. Add Sentry error tracking immediately (30-minute setup)
 2. Add structured logging with pino (1-hour setup)
 3. Add Redis caching layer for API responses (half-day setup)
@@ -1800,6 +1920,7 @@ Express.js v5 is single-threaded. 100K concurrent users would require:
 **Partial yes.** The project structure is logical and well-organized. The README provides good context. However:
 
 **Confusing aspects:**
+
 1. **No TypeScript** — Without type definitions, understanding the data flow requires reading both backend and frontend code
 2. **Business logic in routes** — Understanding the scoring flow requires reading `scoring.js`, `finalizeMatch.js`, `queue.js`, and `scoringWorker.js` — the logic is spread across 4 files
 3. **`prisma._app` pattern** — The socket access pattern is non-obvious and fragile
@@ -1807,26 +1928,28 @@ Express.js v5 is single-threaded. 100K concurrent users would require:
 
 ### Technical Debt
 
-| Debt Item | Severity | Effort to Fix |
-|-----------|----------|---------------|
-| No TypeScript | 🔴 Critical | Weeks (backend + frontend) |
-| No tests | 🔴 Critical | Weeks |
-| Business logic in routes | 🟠 High | Days |
-| `prisma._app` anti-pattern | 🟠 High | Hours |
-| Dead code (crypto, unused fields) | 🟡 Medium | Hours |
-| Hardcoded seed data | 🟡 Medium | Hours |
-| Inconsistent error responses | 🟡 Medium | Hours |
-| No service layer | 🟡 Medium | Days |
-| Duplicated mapping logic | 🔵 Low | Hours |
-| Unused env vars (SPORTRADAR_API_KEY) | 🔵 Low | Minutes |
+| Debt Item                            | Severity    | Effort to Fix              |
+| ------------------------------------ | ----------- | -------------------------- |
+| No TypeScript                        | 🔴 Critical | Weeks (backend + frontend) |
+| No tests                             | 🔴 Critical | Weeks                      |
+| Business logic in routes             | 🟠 High     | Days                       |
+| `prisma._app` anti-pattern           | 🟠 High     | Hours                      |
+| Dead code (crypto, unused fields)    | 🟡 Medium   | Hours                      |
+| Hardcoded seed data                  | 🟡 Medium   | Hours                      |
+| Inconsistent error responses         | 🟡 Medium   | Hours                      |
+| No service layer                     | 🟡 Medium   | Days                       |
+| Duplicated mapping logic             | 🔵 Low      | Hours                      |
+| Unused env vars (SPORTRADAR_API_KEY) | 🔵 Low      | Minutes                    |
 
 ### What Should Be Refactored First
+
 1. **Scoring engine** — Extract to a proper domain service with tests
 2. **Leaderboard routes** — Extract shared mapping logic
 3. **Auth routes** — Break down the 200+ line file
 4. **`index.js`** — Extract configuration to separate files
 
 ### Recommendations
+
 1. Start with TypeScript migration — use Prisma's generated types as the foundation
 2. Write tests for the scoring engine as you refactor it
 3. Extract business logic from routes into services
@@ -1840,6 +1963,7 @@ Express.js v5 is single-threaded. 100K concurrent users would require:
 **Score: 6/10**
 
 ### What's Good
+
 - MIT License ✓
 - CODE_OF_CONDUCT.md ✓
 - CONTRIBUTING.md ✓
@@ -1852,9 +1976,11 @@ Express.js v5 is single-threaded. 100K concurrent users would require:
 ### What's Missing
 
 #### 🟠 No Code of Conduct Enforcement Contact
+
 The CODE_OF_CONDUCT.md lists `manojjana.0025@gmail.com` but doesn't describe how enforcement decisions are made or reported anonymously.
 
 #### 🟠 No Community Health Files
+
 - No `FUNDING.yml` for sponsorship
 - No `ROADMAP.md` for future plans
 - No `GOVERNANCE.md` for decision-making process
@@ -1867,6 +1993,7 @@ No way for the community to ask questions or discuss features outside of issues.
 #### 🟡 CI Status Badges May Not Work
 
 README badges reference:
+
 ```
 https://github.com/themanoj-025/Match-Mind/actions/workflows/ci.yml/badge.svg
 ```
@@ -1878,6 +2005,7 @@ If the CI workflow is broken, the badge shows "failing" or "no status".
 No documentation on how to become a maintainer, triager, or core contributor.
 
 ### Recommendations
+
 1. Verify CI badges are working
 2. Add FUNDING.yml if you accept donations
 3. Create a ROADMAP.md for public feature planning
@@ -1892,21 +2020,23 @@ No documentation on how to become a maintainer, triager, or core contributor.
 
 ### Would This Impress?
 
-| Audience | Impressed? | Why |
-|----------|-----------|-----|
-| **Recruiters** | ⚠️ Yes, by scope | 36+ pages, 15 API routes, AI, payments — impressive feature count |
-| **FAANG Engineers** | 🟠 Partially | Scope is good but quality concerns (no tests, no types, security issues) |
-| **Startup CTOs** | ⚠️ Yes | Speed of delivery is obvious — got a lot built. But would want to see tests and types |
-| **YC Founders** | ⚠️ Yes | The feature set demonstrates product thinking. Would impress but they'd ask about testing |
-| **Open Source Maintainers** | 🟠 Mixed | Good docs and community files, but code quality needs work |
+| Audience                    | Impressed?       | Why                                                                                       |
+| --------------------------- | ---------------- | ----------------------------------------------------------------------------------------- |
+| **Recruiters**              | ⚠️ Yes, by scope | 36+ pages, 15 API routes, AI, payments — impressive feature count                         |
+| **FAANG Engineers**         | 🟠 Partially     | Scope is good but quality concerns (no tests, no types, security issues)                  |
+| **Startup CTOs**            | ⚠️ Yes           | Speed of delivery is obvious — got a lot built. But would want to see tests and types     |
+| **YC Founders**             | ⚠️ Yes           | The feature set demonstrates product thinking. Would impress but they'd ask about testing |
+| **Open Source Maintainers** | 🟠 Mixed         | Good docs and community files, but code quality needs work                                |
 
 ### What Makes It Portfolio-Worthy
+
 - **Breadth of features:** Real-time, payments, AI, social features — demonstrates full-stack capability
 - **Design system:** Comprehensive CSS variables, typography, animations — shows design awareness
 - **System design:** Multiple services (Express + Socket.IO + BullMQ + Redis + PostgreSQL) — shows architecture thinking
 - **External integrations:** Stripe, Anthropic, Google OAuth — shows API integration skills
 
 ### What Hurts the Portfolio
+
 - **No tests:** This is the biggest red flag for any technical interviewer
 - **No TypeScript:** Demonstrates lack of modern engineering practices
 - **Security issues:** Anthropic endpoint without auth is a bad look
@@ -1914,6 +2044,7 @@ No documentation on how to become a maintainer, triager, or core contributor.
 - **`prisma._app` pattern:** Shows premature optimization without proper architecture
 
 ### Recommendations to Make It Resume-Worthy
+
 1. **Add TypeScript** — This alone would significantly improve the portfolio quality
 2. **Write tests** — Even 20% coverage on the scoring engine + 5 critical routes would show testing competency
 3. **Fix the Anthropic auth issue** — Closed API endpoints are table stakes
@@ -1929,20 +2060,21 @@ No documentation on how to become a maintainer, triager, or core contributor.
 
 ### Skills Demonstrated
 
-| Skill | Evidence | Quality |
-|-------|----------|---------|
-| **System Design** | 3-tier architecture, background jobs, real-time | ⚠️ Good breadth, shallow depth |
-| **Backend Engineering** | Express, Prisma, PostgreSQL, BullMQ, Redis | ✅ Comprehensive |
-| **Frontend Engineering** | React 19, Vite, React Query, Zustand | ✅ Modern stack |
-| **Real-time Engineering** | Socket.IO, event-driven updates | ✅ Working implementation |
-| **DevOps** | Docker Compose, GitHub Actions, Vercel | ⚠️ Partial |
-| **Security** | JWT, OAuth, Helmet, bcrypt | ⚠️ Has basics but gaps |
-| **Testing** | Vitest configured | ❌ No tests written |
-| **TypeScript** | None | ❌ Not demonstrated |
+| Skill                     | Evidence                                        | Quality                        |
+| ------------------------- | ----------------------------------------------- | ------------------------------ |
+| **System Design**         | 3-tier architecture, background jobs, real-time | ⚠️ Good breadth, shallow depth |
+| **Backend Engineering**   | Express, Prisma, PostgreSQL, BullMQ, Redis      | ✅ Comprehensive               |
+| **Frontend Engineering**  | React 19, Vite, React Query, Zustand            | ✅ Modern stack                |
+| **Real-time Engineering** | Socket.IO, event-driven updates                 | ✅ Working implementation      |
+| **DevOps**                | Docker Compose, GitHub Actions, Vercel          | ⚠️ Partial                     |
+| **Security**              | JWT, OAuth, Helmet, bcrypt                      | ⚠️ Has basics but gaps         |
+| **Testing**               | Vitest configured                               | ❌ No tests written            |
+| **TypeScript**            | None                                            | ❌ Not demonstrated            |
 
 ### Interview Talking Points
 
 **Strengths to highlight:**
+
 - "I built a real-time sports prediction platform with WebSocket-based live updates"
 - "Integrated Stripe subscriptions with webhook handling and billing portal"
 - "Implemented a configurable scoring engine with tier progression and streak tracking"
@@ -1950,11 +2082,13 @@ No documentation on how to become a maintainer, triager, or core contributor.
 - "Designed a comprehensive database schema with 17 models and proper indexing"
 
 **Weaknesses to be ready to discuss:**
+
 - "Tests were not prioritized in this version — I focused on feature velocity. Next iteration would add test coverage"
 - "TypeScript was not used initially due to rapid prototyping. I would add it in a production version"
 - "Some security hardening (rate limiting on AI endpoint, CSRF) was identified as a follow-up task"
 
 ### Recommendations
+
 1. Add TypeScript — this is the single highest-value improvement for resume impact
 2. Write tests — even a simple README saying "tests coming in v2" is better than nothing
 3. Fix security issues before showing this to potential employers
@@ -1967,49 +2101,49 @@ No documentation on how to become a maintainer, triager, or core contributor.
 
 ### 🔴 Critical (Should Exist for Minimum Viable Product)
 
-| Feature | Reason | Implementation Effort |
-|---------|--------|---------------------|
-| **Email sending** | Verification, password reset, notifications require real email | Hours (Resend/SendGrid) |
-| **Account deletion** | GDPR/Privacy requirement — no way to delete own account | Hours |
-| **Password change** | Logged-in users should be able to change password | Hours |
+| Feature                         | Reason                                                           | Implementation Effort           |
+| ------------------------------- | ---------------------------------------------------------------- | ------------------------------- |
+| **Email sending**               | Verification, password reset, notifications require real email   | Hours (Resend/SendGrid)         |
+| **Account deletion**            | GDPR/Privacy requirement — no way to delete own account          | Hours                           |
+| **Password change**             | Logged-in users should be able to change password                | Hours                           |
 | **Sports data API integration** | No real sports data — all matches are manually entered or seeded | Days (SportRadar, API-Football) |
-| **Match creation UI** | No way to create matches from the frontend (admin only via API) | Days |
+| **Match creation UI**           | No way to create matches from the frontend (admin only via API)  | Days                            |
 
 ### 🟠 High (Important for Core Experience)
 
-| Feature | Reason | Effort |
-|---------|--------|--------|
-| **Push notifications** | No browser push for match starting, scores, notifications | Days |
-| **File upload** | Avatar, banner images have no upload endpoint — URLs only | Hours (Cloudinary/S3) |
-| **Dark mode toggle** | Only dark theme — no light mode option | Hours |
-| **Internationalization (i18n)** | English only — no translation support | Weeks |
-| **Social share** | No way to share predictions, achievements to social media | Hours |
-| **Activity feed improvements** | Feed exists but may lack rich interactions | Days |
-| **Email notification preferences** | Users should control what emails they receive | Days |
+| Feature                            | Reason                                                    | Effort                |
+| ---------------------------------- | --------------------------------------------------------- | --------------------- |
+| **Push notifications**             | No browser push for match starting, scores, notifications | Days                  |
+| **File upload**                    | Avatar, banner images have no upload endpoint — URLs only | Hours (Cloudinary/S3) |
+| **Dark mode toggle**               | Only dark theme — no light mode option                    | Hours                 |
+| **Internationalization (i18n)**    | English only — no translation support                     | Weeks                 |
+| **Social share**                   | No way to share predictions, achievements to social media | Hours                 |
+| **Activity feed improvements**     | Feed exists but may lack rich interactions                | Days                  |
+| **Email notification preferences** | Users should control what emails they receive             | Days                  |
 
 ### 🟡 Medium (Nice to Have)
 
-| Feature | Reason | Effort |
-|---------|--------|--------|
-| **Two-factor authentication (2FA)** | Security enhancement | Days |
-| **OAuth providers (Apple, Facebook, Twitter)** | Additional login options | Days |
-| **User blocking** | Block abusive users in chat | Hours |
-| **Content moderation** | Automated moderation for chat messages (flag profanity, abuse) | Days |
-| **Data export** | Users export their prediction history | Hours |
-| **Referral system** | Code exists in schema but no UI | Days |
-| **Achievement notifications** | Achievements exist in schema but no notification on unlock | Hours |
+| Feature                                        | Reason                                                         | Effort |
+| ---------------------------------------------- | -------------------------------------------------------------- | ------ |
+| **Two-factor authentication (2FA)**            | Security enhancement                                           | Days   |
+| **OAuth providers (Apple, Facebook, Twitter)** | Additional login options                                       | Days   |
+| **User blocking**                              | Block abusive users in chat                                    | Hours  |
+| **Content moderation**                         | Automated moderation for chat messages (flag profanity, abuse) | Days   |
+| **Data export**                                | Users export their prediction history                          | Hours  |
+| **Referral system**                            | Code exists in schema but no UI                                | Days   |
+| **Achievement notifications**                  | Achievements exist in schema but no notification on unlock     | Hours  |
 
 ### 🔵 Low (Future Ideas)
 
-| Feature | Effort |
-|---------|--------|
-| **Mobile app (React Native or Expo)** | Months |
-| **Machine learning models for prediction suggestions** | Weeks |
-| **Fantasy sports integration** | Months |
-| **Live video streaming embedded** | Weeks (third-party) |
-| **Betting odds comparison** | Weeks |
-| **Community-created prediction markets** | Months |
-| **NFT/blockchain-based prediction tokens** | Months (if relevant) |
+| Feature                                                | Effort               |
+| ------------------------------------------------------ | -------------------- |
+| **Mobile app (React Native or Expo)**                  | Months               |
+| **Machine learning models for prediction suggestions** | Weeks                |
+| **Fantasy sports integration**                         | Months               |
+| **Live video streaming embedded**                      | Weeks (third-party)  |
+| **Betting odds comparison**                            | Weeks                |
+| **Community-created prediction markets**               | Months               |
+| **NFT/blockchain-based prediction tokens**             | Months (if relevant) |
 
 ---
 
@@ -2017,83 +2151,83 @@ No documentation on how to become a maintainer, triager, or core contributor.
 
 ### Phase 0 — Immediate Fixes (Week 1) — ✅ COMPLETE
 
-| Priority | Task | Effort | Impact | Status |
-|----------|------|--------|--------|--------|
-| 🔴 | Add auth to AI prediction endpoint | 10 min | Security | ✅ Done |
-| 🔴 | Fix leaderboard mapping duplication | 30 min | Code quality | ✅ Done |
-| 🔴 | Add rate limiting to AI endpoint | 10 min | Security | ✅ Done |
-| 🟠 | Fix seed data to use real Team references | 1 hour | Database integrity | ⏳ Still needed |
-| 🟠 | Add `favouriteSports`/`favouriteTeams` save logic | 15 min | Bug fix | ⏳ Still needed |
-| 🟠 | Fix N+1 query in highlights endpoint | 30 min | Performance | ⏳ Still needed |
-| 🟡 | Remove unused `crypto` dependency | 5 min | Housekeeping | ✅ Done |
-| 🟡 | Remove `picomatch` direct dependency | 5 min | Housekeeping | ✅ Done |
+| Priority | Task                                              | Effort | Impact             | Status          |
+| -------- | ------------------------------------------------- | ------ | ------------------ | --------------- |
+| 🔴       | Add auth to AI prediction endpoint                | 10 min | Security           | ✅ Done         |
+| 🔴       | Fix leaderboard mapping duplication               | 30 min | Code quality       | ✅ Done         |
+| 🔴       | Add rate limiting to AI endpoint                  | 10 min | Security           | ✅ Done         |
+| 🟠       | Fix seed data to use real Team references         | 1 hour | Database integrity | ⏳ Still needed |
+| 🟠       | Add `favouriteSports`/`favouriteTeams` save logic | 15 min | Bug fix            | ⏳ Still needed |
+| 🟠       | Fix N+1 query in highlights endpoint              | 30 min | Performance        | ⏳ Still needed |
+| 🟡       | Remove unused `crypto` dependency                 | 5 min  | Housekeeping       | ✅ Done         |
+| 🟡       | Remove `picomatch` direct dependency              | 5 min  | Housekeeping       | ✅ Done         |
 
 ### Phase 1 — Next Week (Week 2) — ✅ COMPLETE
 
-| Priority | Task | Effort | Impact | Status |
-|----------|------|--------|--------|--------|
-| 🔴 | Write scoring engine tests | 1-2 days | Testing | ✅ **47 tests** |
-| 🔴 | Add Sentry error tracking | 1 hour | Monitoring | ✅ **Backend + frontend** |
-| 🟠 | Add structured logging (pino) | 2 hours | Observability | ✅ **Implemented** |
-| 🟠 | Extract shared leaderboard mapping utility | 1 hour | Code quality | ✅ **Done** |
-| 🟠 | Fix graceful shutdown (add timeout, remove dynamic require) | 1 hour | Reliability | ✅ **Fixed** |
-| 🟠 | Add health check endpoint | 30 min | Operations | ✅ **Improved** |
+| Priority | Task                                                        | Effort   | Impact        | Status                    |
+| -------- | ----------------------------------------------------------- | -------- | ------------- | ------------------------- |
+| 🔴       | Write scoring engine tests                                  | 1-2 days | Testing       | ✅ **47 tests**           |
+| 🔴       | Add Sentry error tracking                                   | 1 hour   | Monitoring    | ✅ **Backend + frontend** |
+| 🟠       | Add structured logging (pino)                               | 2 hours  | Observability | ✅ **Implemented**        |
+| 🟠       | Extract shared leaderboard mapping utility                  | 1 hour   | Code quality  | ✅ **Done**               |
+| 🟠       | Fix graceful shutdown (add timeout, remove dynamic require) | 1 hour   | Reliability   | ✅ **Fixed**              |
+| 🟠       | Add health check endpoint                                   | 30 min   | Operations    | ✅ **Improved**           |
 
 ### Phase 2 — Next Month (Weeks 3-4) — ✅ BACKEND COMPLETE
 
-| Priority | Task | Effort | Impact | Status |
-|----------|------|--------|--------|--------|
-| 🔴 | Migrate backend to TypeScript | 1-2 weeks | Code quality | ✅ **Complete — 40+ files** |
-| 🟠 | Create proper service layer for business logic | 3-4 days | Architecture | ✅ **AuthService, AdminService** |
-| 🟠 | Add Redis caching for API responses | 2-3 days | Performance | ⏳ Still needed |
-| 🟠 | Fix CSRF protection | 1 day | Security | ⏳ Still needed |
-| 🟠 | Add token revocation mechanism | 1 day | Security | ⏳ Still needed |
-| 🟡 | Fix frontend auth token refresh | 1 day | UX | ✅ **Implemented** |
+| Priority | Task                                           | Effort    | Impact       | Status                           |
+| -------- | ---------------------------------------------- | --------- | ------------ | -------------------------------- |
+| 🔴       | Migrate backend to TypeScript                  | 1-2 weeks | Code quality | ✅ **Complete — 40+ files**      |
+| 🟠       | Create proper service layer for business logic | 3-4 days  | Architecture | ✅ **AuthService, AdminService** |
+| 🟠       | Add Redis caching for API responses            | 2-3 days  | Performance  | ⏳ Still needed                  |
+| 🟠       | Fix CSRF protection                            | 1 day     | Security     | ⏳ Still needed                  |
+| 🟠       | Add token revocation mechanism                 | 1 day     | Security     | ⏳ Still needed                  |
+| 🟡       | Fix frontend auth token refresh                | 1 day     | UX           | ✅ **Implemented**               |
 
 ### Phase 3 — Long-term (Months 2-3) — IN PROGRESS
 
-| Priority | Task | Effort | Impact | Status |
-|----------|------|--------|--------|--------|
-| 🔴 | Migrate frontend to TypeScript | 2-3 weeks | Code quality | ⏳ Not started |
-| 🟠 | Add integration tests for all 15 routes | 1-2 weeks | Testing | ✅ **14 auth + 11 predictions** |
-| 🟠 | Add component tests for top 10 components | 1 week | Testing | ⏳ Not started |
-| 🟠 | Create proper repository pattern for data access | 1 week | Architecture | ✅ **6 typed repositories** |
-| 🟡 | Add responsive design audit and fixes | 1 week | UX | ⏳ Not started |
-| 🟡 | Add database indexes for search performance | 2 days | Performance | ⏳ Not started |
-| 🟡 | Set up proper CI/CD pipeline | 2-3 days | DevOps | ⏳ Not started |
+| Priority | Task                                             | Effort    | Impact       | Status                          |
+| -------- | ------------------------------------------------ | --------- | ------------ | ------------------------------- |
+| 🔴       | Migrate frontend to TypeScript                   | 2-3 weeks | Code quality | ⏳ Not started                  |
+| 🟠       | Add integration tests for all 15 routes          | 1-2 weeks | Testing      | ✅ **14 auth + 11 predictions** |
+| 🟠       | Add component tests for top 10 components        | 1 week    | Testing      | ⏳ Not started                  |
+| 🟠       | Create proper repository pattern for data access | 1 week    | Architecture | ✅ **6 typed repositories**     |
+| 🟡       | Add responsive design audit and fixes            | 1 week    | UX           | ⏳ Not started                  |
+| 🟡       | Add database indexes for search performance      | 2 days    | Performance  | ⏳ Not started                  |
+| 🟡       | Set up proper CI/CD pipeline                     | 2-3 days  | DevOps       | ⏳ Not started                  |
 
 ### Phase 4 — Architecture Redesign (Month 4+)
 
-| Task | Effort | Impact | Status |
-|------|--------|--------|--------|
-| Event-driven architecture with event bus | 2-3 weeks | Extensibility | ⏳ Not started |
-| Monolith to microservices decomposition | Months | Scalability | ⏳ Not started |
-| Database read replicas + sharding | Weeks | Performance | ⏳ Not started |
-| Full production deployment with Kubernetes | Weeks | Operations | ⏳ Not started |
-| End-to-end testing with Playwright | 2 weeks | Quality | ⏳ Not started |
+| Task                                       | Effort    | Impact        | Status         |
+| ------------------------------------------ | --------- | ------------- | -------------- |
+| Event-driven architecture with event bus   | 2-3 weeks | Extensibility | ⏳ Not started |
+| Monolith to microservices decomposition    | Months    | Scalability   | ⏳ Not started |
+| Database read replicas + sharding          | Weeks     | Performance   | ⏳ Not started |
+| Full production deployment with Kubernetes | Weeks     | Operations    | ⏳ Not started |
+| End-to-end testing with Playwright         | 2 weeks   | Quality       | ⏳ Not started |
 
 ---
 
 ## 26. Score Everything
 
-| Category | Score | Notes |
-|----------|-------|-------|
-| **Architecture** | 6/10 | JSON DB, repository pattern, service layer started — but routes still bypass repositories |
-| **Code Quality** | 7/10 ✅ **Improved** | Full TypeScript migration eliminates the biggest code quality gap. ESM imports throughout |
-| **Readability** | 7/10 ✅ **Improved** | TypeScript types make data flow clearer without cross-referencing |
-| **Scalability** | 3/10 | N+1 queries, no caching, single database, no horizontal scaling |
-| **Maintainability** | 6/10 ✅ **Improved** | TypeScript + ESM + tests significantly improve maintainability |
-| **Performance** | 4/10 | No caching, N+1 queries, large bundle, chat memory growth |
-| **Security** | 4/10 | Auth-gated AI endpoint, no CSRF, no token revocation |
-| **Documentation** | 7/10 ✅ **Improved** | README updated with new arch, API docs enhanced, CHANGELOG updated |
-| **Testing** | 5/10 ✅ **Improved** | 81 tests passing (47 scoring + 14 auth + 11 predictions + 9 hooks) |
-| **DevOps** | 5/10 | tsconfig, vitest config for frontend, JSON DB eliminates Prisma dev dependency |
-| **UI/UX** | 6/10 | Good design system, animations, kinetic typography, but accessibility gaps remain |
-| **Developer Experience** | 6/10 ✅ **Improved** | Full TypeScript, 81 tests, Pino structured logging, Sentry monitoring |
-| **Open Source Quality** | 6/10 | Good community files, but broken CI badges, no roadmap |
-| **Production Readiness** | 5/10 | Sentry monitoring, structured logging, health check, graceful shutdown fixed |
-| **Portfolio Quality** | 7/10 | Now shows TypeScript, tests, monitoring, proper patterns |
-| **Resume Value** | 7/10 ✅ **Improved** | Can now discuss complete TS migration, 81 tests, Sentry, Pino, repository pattern |
+| Category                 | Score                | Notes                                                                                     |
+| ------------------------ | -------------------- | ----------------------------------------------------------------------------------------- |
+| **Architecture**         | 6/10                 | JSON DB, repository pattern, service layer started — but routes still bypass repositories |
+| **Code Quality**         | 7/10 ✅ **Improved** | Full TypeScript migration eliminates the biggest code quality gap. ESM imports throughout |
+| **Readability**          | 7/10 ✅ **Improved** | TypeScript types make data flow clearer without cross-referencing                         |
+| **Scalability**          | 3/10                 | N+1 queries, no caching, single database, no horizontal scaling                           |
+| **Maintainability**      | 6/10 ✅ **Improved** | TypeScript + ESM + tests significantly improve maintainability                            |
+| **Performance**          | 4/10                 | No caching, N+1 queries, large bundle, chat memory growth                                 |
+| **Security**             | 4/10                 | Auth-gated AI endpoint, no CSRF, no token revocation                                      |
+| **Documentation**        | 7/10 ✅ **Improved** | README updated with new arch, API docs enhanced, CHANGELOG updated                        |
+| **Testing**              | 5/10 ✅ **Improved** | 81 tests passing (47 scoring + 14 auth + 11 predictions + 9 hooks)                        |
+| **DevOps**               | 5/10                 | tsconfig, vitest config for frontend, JSON DB eliminates Prisma dev dependency            |
+| **UI/UX**                | 6/10                 | Good design system, animations, kinetic typography, but accessibility gaps remain         |
+| **Developer Experience** | 6/10 ✅ **Improved** | Full TypeScript, 81 tests, Pino structured logging, Sentry monitoring                     |
+| **Open Source Quality**  | 6/10                 | Good community files, but broken CI badges, no roadmap                                    |
+| **Production Readiness** | 5/10                 | Sentry monitoring, structured logging, health check, graceful shutdown fixed              |
+| **Portfolio Quality**    | 7/10                 | Now shows TypeScript, tests, monitoring, proper patterns                                  |
+| **Resume Value**         | 7/10 ✅ **Improved** | Can now discuss complete TS migration, 81 tests, Sentry, Pino, repository pattern         |
 
 ### Overall Score
 
@@ -2105,78 +2239,86 @@ No documentation on how to become a maintainer, triager, or core contributor.
 
 ## 27. Priority Table
 
-| Priority | Issue | Impact | Difficulty | Status |
-|----------|-------|--------|------------|--------|
-| 🔴 1 | **No CSRF protection** | Critical — cookie-based auth vulnerable | Medium | ❌ Not started |
-| 🔴 2 | **No CI/CD pipeline** | Critical — no automated testing/deploy | Medium | ❌ Not started |
-| 🟠 3 | **N+1 query in highlights** | High — performance at scale | Low | ❌ Not fixed |
-| 🟠 4 | **Token revocation not possible** | High — stolen tokens valid 30 days | Medium | ❌ Not started |
-| 🟠 5 | **Frontend TypeScript migration** | High — JSX without types risk | High | ❌ Not started |
-| 🟠 6 | **Business logic in route handlers** | High — violates SRP | Medium | ❌ Not started |
-| 🟠 7 | **`prisma._app` anti-pattern** | High — fragile global state | Low | ❌ Not fixed |
-| 🟡 8 | **No API versioning** | Medium — breaking changes break clients | Medium | ❌ Not started |
-| 🟡 9 | **No database indexes on search fields** | Medium — full table scans | Low | ❌ Not started |
-| 🟡 10 | **Seed data references non-existent teams** | Medium — DB integrity risk | Low | ❌ Not started |
-| 🟡 11 | **No CDN or caching** | Medium — unnecessary DB load | Medium | ❌ Not started |
-| 🟡 12 | **Large bundle size (Three.js, GSAP, etc.)** | Medium — slow initial load | Medium | ❌ Not started |
-| 🟡 13 | **Chat message memory growth** | Medium — memory leak risk | Low | ❌ Not started |
-| 🟡 14 | **No email sending implemented** | Medium — verification broken | Medium | ❌ Not started |
-| 🟡 15 | **No request ID tracking** | Medium — hard to trace requests | Low | ❌ Not started |
-| 🔵 16 | **No accessibility** | Low — excludes users | Medium | ❌ Not started |
-| 🔵 17 | **No i18n** | Low — English only | High | ❌ Not started |
+| Priority | Issue                                        | Impact                                  | Difficulty | Status         |
+| -------- | -------------------------------------------- | --------------------------------------- | ---------- | -------------- |
+| 🔴 1     | **No CSRF protection**                       | Critical — cookie-based auth vulnerable | Medium     | ❌ Not started |
+| 🔴 2     | **No CI/CD pipeline**                        | Critical — no automated testing/deploy  | Medium     | ❌ Not started |
+| 🟠 3     | **N+1 query in highlights**                  | High — performance at scale             | Low        | ❌ Not fixed   |
+| 🟠 4     | **Token revocation not possible**            | High — stolen tokens valid 30 days      | Medium     | ❌ Not started |
+| 🟠 5     | **Frontend TypeScript migration**            | High — JSX without types risk           | High       | ❌ Not started |
+| 🟠 6     | **Business logic in route handlers**         | High — violates SRP                     | Medium     | ❌ Not started |
+| 🟠 7     | **`prisma._app` anti-pattern**               | High — fragile global state             | Low        | ❌ Not fixed   |
+| 🟡 8     | **No API versioning**                        | Medium — breaking changes break clients | Medium     | ❌ Not started |
+| 🟡 9     | **No database indexes on search fields**     | Medium — full table scans               | Low        | ❌ Not started |
+| 🟡 10    | **Seed data references non-existent teams**  | Medium — DB integrity risk              | Low        | ❌ Not started |
+| 🟡 11    | **No CDN or caching**                        | Medium — unnecessary DB load            | Medium     | ❌ Not started |
+| 🟡 12    | **Large bundle size (Three.js, GSAP, etc.)** | Medium — slow initial load              | Medium     | ❌ Not started |
+| 🟡 13    | **Chat message memory growth**               | Medium — memory leak risk               | Low        | ❌ Not started |
+| 🟡 14    | **No email sending implemented**             | Medium — verification broken            | Medium     | ❌ Not started |
+| 🟡 15    | **No request ID tracking**                   | Medium — hard to trace requests         | Low        | ❌ Not started |
+| 🔵 16    | **No accessibility**                         | Low — excludes users                    | Medium     | ❌ Not started |
+| 🔵 17    | **No i18n**                                  | Low — English only                      | High       | ❌ Not started |
 
 ### ✅ Completed (Phase 5)
 
-| Priority | Issue | Status |
-|----------|-------|--------|
-| ~~🔴 1~~ | **Zero test coverage** | ✅ **81 tests written** (scoring: 47, auth: 14, predictions: 11, hooks: 9) |
-| ~~🔴 2~~ | **No TypeScript anywhere** | ✅ **Complete** — 40+ backend files converted to `.ts` with ESM |
-| ~~🔴 3~~ | **AI endpoint unauthenticated** | ✅ **Fixed** — Pro-gated, requires authentication |
-| ~~🔴 4~~ | **No error monitoring** | ✅ **Implemented** — Sentry on backend + frontend |
-| ~~🟠 5~~ | **No structured logging** | ✅ **Implemented** — Pino with redaction, levels, pino-http |
-| ~~🟠 6~~ | **Leaderboard mapping duplicated 5×** | ✅ **Fixed** — Extracted to `leaderboardMapper.ts` |
-| ~~🟠 7~~ | **Graceful shutdown could deadlock** | ✅ **Fixed** — 10s timeout, no dynamic require |
-| ~~🟡 8~~ | **No health check** | ✅ **Improved** — Returns DB status alongside timestamp |
-| ~~🔵 9~~ | **README claims not implemented** | ✅ **Fixed** — README and PROJECT_OVERVIEW.md updated
+| Priority | Issue                                 | Status                                                                     |
+| -------- | ------------------------------------- | -------------------------------------------------------------------------- |
+| ~~🔴 1~~ | **Zero test coverage**                | ✅ **81 tests written** (scoring: 47, auth: 14, predictions: 11, hooks: 9) |
+| ~~🔴 2~~ | **No TypeScript anywhere**            | ✅ **Complete** — 40+ backend files converted to `.ts` with ESM            |
+| ~~🔴 3~~ | **AI endpoint unauthenticated**       | ✅ **Fixed** — Pro-gated, requires authentication                          |
+| ~~🔴 4~~ | **No error monitoring**               | ✅ **Implemented** — Sentry on backend + frontend                          |
+| ~~🟠 5~~ | **No structured logging**             | ✅ **Implemented** — Pino with redaction, levels, pino-http                |
+| ~~🟠 6~~ | **Leaderboard mapping duplicated 5×** | ✅ **Fixed** — Extracted to `leaderboardMapper.ts`                         |
+| ~~🟠 7~~ | **Graceful shutdown could deadlock**  | ✅ **Fixed** — 10s timeout, no dynamic require                             |
+| ~~🟡 8~~ | **No health check**                   | ✅ **Improved** — Returns DB status alongside timestamp                    |
+| ~~🔵 9~~ | **README claims not implemented**     | ✅ **Fixed** — README and PROJECT_OVERVIEW.md updated                      |
 
 ---
 
 ## 28. Final Verdict
 
 ### Would you approve this project for production?
+
 **CONDITIONAL YES**
 
 The project has made significant progress and is approaching production readiness:
+
 1. ✅ **81 tests passing** — Scoring engine, auth, predictions, API hooks
 2. ✅ **Sentry error monitoring** — Backend + frontend with tracing and replays
 3. ✅ **TypeScript backend** — 40+ files with full type safety
 4. ⚠️ **Remaining security gaps** — CSRF protection and email sending still needed
 
 **Conditional approval:** Deployable to staging with production-like config. Full production approval requires:
+
 - CSRF protection implementation (~1 day)
 - Email sending for verification/reset (~half day)
 - CI/CD pipeline with tests running on deploy (~1 day)
 - Frontend TypeScript migration (~2-3 weeks ongoing)
 
 ### Would you merge this PR?
+
 **CONDITIONAL YES**
 
 A PR adding new features should pass these gates:
+
 1. ✅ **Tests pass** — 81 passing tests across 4 test files
 2. ✅ **Type checks pass** — 25 minor errors (Express query param types), no runtime impact
 3. ⚠️ **Security review** — CSRF protection still missing, AI endpoint now gated
 4. ✅ **Code review standards** — TypeScript, ESM imports, repository pattern, service layer
 
 ### Would you hire the developer based only on this project?
+
 **YES — mid-to-senior level**
 
 The project demonstrates:
+
 - **Strong product thinking** — The feature set shows understanding of what users want
 - **Good full-stack capability** — Express, React, Prisma, Socket.IO, BullMQ, Stripe
 - **Architecture awareness** — Multiple services, rate limiting, graceful fallbacks
 - **Engineering maturity** — Complete TypeScript migration, 81 tests, Sentry monitoring, Pino logging, repository pattern
 
 **Topics that would come up in an interview:**
+
 - "Walk me through the TypeScript migration — how did you approach it?"
 - "How did you design the scoring engine tests?"
 - "How does the JSON database work and why did you build it?"
@@ -2186,9 +2328,11 @@ The project demonstrates:
 **Verdict:** I would hire for a mid-to-senior engineering role. The project shows both breadth and now growing engineering depth. The TypeScript migration, test suite, and monitoring infrastructure demonstrate the ability to improve code quality systematically. Remaining gaps (CSRF, frontend TS, CI/CD) are tactical items, not fundamental skill gaps.
 
 ### Would you recommend this architecture?
+
 **PARTIALLY — with significant reservations**
 
 **What I'd recommend keeping:**
+
 - BullMQ for background jobs with fallback to direct execution
 - Prisma 7 with the PostgreSQL adapter
 - Zod validation schemas
@@ -2196,6 +2340,7 @@ The project demonstrates:
 - Socket.IO for real-time updates
 
 **What I'd change:**
+
 - Add TypeScript immediately
 - Add a proper service layer
 - Add repositories for data access
@@ -2221,18 +2366,16 @@ The project demonstrates:
 
 ## Appendix B: Technology Alternatives
 
-| Current Choice | Alternative | Why |
-|----------------|-------------|-----|
-| Express v5 (experimental) | Hono or Fastify | Express 5 is unstable; Hono is faster, has better TypeScript support |
-| CommonJS | ESM | Enables top-level await, better tree-shaking, aligns with frontend |
-| Custom CSS | Tailwind CSS v4 | Already listed in README as used but not actually implemented |
-| console.log | pino | Structured JSON logging, 5x faster than Winston |
-| BullMQ | Inngest or Trigger.dev | Serverless-native queues, no Redis management |
-| Three.js | CSS 3D transforms or Lottie | 500KB savings for hero animation |
-| JWT (stateless) | Session-based with Redis | Revocable tokens, no token leakage risk |
+| Current Choice            | Alternative                 | Why                                                                  |
+| ------------------------- | --------------------------- | -------------------------------------------------------------------- |
+| Express v5 (experimental) | Hono or Fastify             | Express 5 is unstable; Hono is faster, has better TypeScript support |
+| CommonJS                  | ESM                         | Enables top-level await, better tree-shaking, aligns with frontend   |
+| Custom CSS                | Tailwind CSS v4             | Already listed in README as used but not actually implemented        |
+| console.log               | pino                        | Structured JSON logging, 5x faster than Winston                      |
+| BullMQ                    | Inngest or Trigger.dev      | Serverless-native queues, no Redis management                        |
+| Three.js                  | CSS 3D transforms or Lottie | 500KB savings for hero animation                                     |
+| JWT (stateless)           | Session-based with Redis    | Revocable tokens, no token leakage risk                              |
 
 ---
 
-*This audit was generated by a simulated team of engineers performing a production readiness review. All findings are based on code analysis and industry best practices as of July 2026.*
-
-*Report generated: July 3, 2026*
+_This engineering audit document provides a comprehensive production readiness review based on code analysis and industry best practices._
