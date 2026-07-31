@@ -1,10 +1,13 @@
 # MEMORY.md — Match-Mind
 
 ## Project Overview
+
 Match-Mind is a full-stack fantasy sports prediction and auction platform where users create teams, participate in draft sessions, bid on players in real-time auctions, join prediction rooms, compete on leaderboards, and earn achievements. It features real-time WebSocket communication, a sophisticated auction engine, draft mechanics, and gamification.
 
 ## Business Purpose
+
 Provide an engaging fantasy sports platform where users can:
+
 - Participate in player auctions
 - Build fantasy rosters through drafts
 - Join prediction rooms and compete with friends
@@ -13,21 +16,23 @@ Provide an engaging fantasy sports platform where users can:
 - Follow players, teams, and tournaments
 
 ## Tech Stack
-| Category | Technology |
-|----------|------------|
-| Backend | Node.js / Express / TypeScript |
-| Frontend | React 19 / TypeScript / Vite |
-| Styling | Tailwind CSS / GSAP animations |
-| Realtime | Socket.IO |
-| Database | JSON file-based (custom JSON DB) |
-| Auth | JWT + Passport |
-| Payments | Stripe integration |
-| Testing | Vitest (unit + e2e) |
-| CI/CD | GitHub Actions |
-| Deployment | Vercel (frontend) / Docker (backend) |
-| 3D Graphics | Three.js (hero scene) |
+
+| Category    | Technology                           |
+| ----------- | ------------------------------------ |
+| Backend     | Node.js / Express / TypeScript       |
+| Frontend    | React 19 / TypeScript / Vite         |
+| Styling     | Tailwind CSS / GSAP animations       |
+| Realtime    | Socket.IO                            |
+| Database    | JSON file-based (custom JSON DB)     |
+| Auth        | JWT + Passport                       |
+| Payments    | Stripe integration                   |
+| Testing     | Vitest (unit + e2e)                  |
+| CI/CD       | GitHub Actions                       |
+| Deployment  | Vercel (frontend) / Docker (backend) |
+| 3D Graphics | Three.js (hero scene)                |
 
 ## Repository Structure
+
 ```
 Match-Mind/
 ├── backend/                    # Express + TypeScript backend
@@ -65,6 +70,7 @@ Match-Mind/
 ```
 
 ## Key Features
+
 - **User System**: Registration, login, JWT auth, profiles, subscriptions
 - **Auctions**: Real-time bidding engine with Socket.IO, bid tracking
 - **Drafts**: Player draft sessions, pick tracking, draft runs
@@ -80,6 +86,7 @@ Match-Mind/
 - **Payments**: Stripe integration for subscriptions/purchases
 
 ## Data Flow
+
 ```
 User (Browser)
        ↓

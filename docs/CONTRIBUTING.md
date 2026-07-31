@@ -5,6 +5,7 @@ Thank you for your interest in contributing to Match-Mind, the sports prediction
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 20+
 - npm
 - Redis 6+ (optional, for BullMQ queue)
@@ -17,6 +18,7 @@ Thank you for your interest in contributing to Match-Mind, the sports prediction
 1. Fork and clone the repository.
 
 2. **Backend setup:**
+
    ```bash
    cd backend
    npm install
@@ -24,12 +26,14 @@ Thank you for your interest in contributing to Match-Mind, the sports prediction
    ```
 
 3. **Frontend setup:**
+
    ```bash
    cd frontend
    npm install
    ```
 
 4. **Run the backend:**
+
    ```bash
    cd backend
    npm run dev           # or `npm run dev:watch` with nodemon
@@ -42,20 +46,22 @@ Thank you for your interest in contributing to Match-Mind, the sports prediction
    ```
 
 ### Expected Environment Variables
-| Variable | Description |
-|---|---|
-| `JWT_SECRET` | JWT signing secret |
-| `PORT` | Backend server port |
-| `GOOGLE_CLIENT_ID` | Google OAuth client ID (optional) |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret (optional) |
-| `STRIPE_SECRET_KEY` | Stripe API secret key (optional) |
-| `ANTHROPIC_API_KEY` | Anthropic API key (optional) |
-| `REDIS_URL` | Redis connection string |
-| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` | Nodemailer config (optional) |
+
+| Variable                                              | Description                           |
+| ----------------------------------------------------- | ------------------------------------- |
+| `JWT_SECRET`                                          | JWT signing secret                    |
+| `PORT`                                                | Backend server port                   |
+| `GOOGLE_CLIENT_ID`                                    | Google OAuth client ID (optional)     |
+| `GOOGLE_CLIENT_SECRET`                                | Google OAuth client secret (optional) |
+| `STRIPE_SECRET_KEY`                                   | Stripe API secret key (optional)      |
+| `ANTHROPIC_API_KEY`                                   | Anthropic API key (optional)          |
+| `REDIS_URL`                                           | Redis connection string               |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` | Nodemailer config (optional)          |
 
 ## Code Style
 
 ### Backend (TypeScript)
+
 - Use ES modules (`import`/`export`) — TypeScript via tsx handles ESM natively.
 - Follow standard Express.js patterns with async route handlers.
 - All new files must be `.ts` (no `.js` files allowed in `src/`).
@@ -63,6 +69,7 @@ Thank you for your interest in contributing to Match-Mind, the sports prediction
 - Keep route files focused — routes should call service functions, not contain business logic.
 
 ### Frontend (React/TypeScript)
+
 - Use functional components with hooks (`useState`, `useEffect`, custom hooks).
 - Use React Query for server state management (`useApi.ts`).
 - Use Zustand for client state (`useStore.ts`).
@@ -72,6 +79,7 @@ Thank you for your interest in contributing to Match-Mind, the sports prediction
 ## Project Architecture
 
 ### Backend (`backend/src/`)
+
 - **`index.ts`** — Express + Socket.IO server entry point
 - **`routes/`** — 15+ route files (auth, rooms, auction, tournaments, players, fixtures, leaderboard, users, messages, search, admin, stripe, ai, etc.)
 - **`services/`** — Business logic (auctionEngine, fantasyPoints, adminService, authService, leaderboardService, etc.)
@@ -82,6 +90,7 @@ Thank you for your interest in contributing to Match-Mind, the sports prediction
 - **`config/`** — Server configuration (passport, schemas, tournaments)
 
 ### Frontend (`frontend/src/`)
+
 - **`pages/`** — Page-level components
 - **`components/`** — Reusable UI components
 - **`hooks/`** — Custom React hooks (useApi.js for API calls)
@@ -89,6 +98,7 @@ Thank you for your interest in contributing to Match-Mind, the sports prediction
 - **`utils/`** — Utility functions (api.js)
 
 ### Database
+
 - **JSON DB** (`backend/src/lib/jsonDb.ts`) — the production database. An in-memory store backed by JSON files in `backend/src/data/`. No database server required.
 - The JSON DB implements a **Prisma-compatible API** — all route handlers and services use `prisma.model.method()` syntax (`prisma.user.findUnique`, `prisma.room.findMany`, etc.), which a Proxy transparently maps to the JSON file backend.
 - New models are created by adding a `.json` file to `backend/src/data/` and registering the name in `jsonDb.ts`. No migrations needed.
@@ -131,6 +141,7 @@ Tests use isolated JSON-DB instances in temp directories — no shared mutable s
 ## Reporting Issues
 
 Include in your report:
+
 - Steps to reproduce
 - Whether the issue is backend, frontend, or database
 - Error messages and console output
@@ -139,15 +150,18 @@ Include in your report:
 ## Adding New Features
 
 ### New API Route
+
 1. Create the route file in `backend/src/routes/`.
 2. Register it in `backend/src/index.ts`.
 3. The JSON DB auto-loads new collections — just create a `.json` file in `backend/src/data/`.
 
 ### New Socket Event
+
 1. Add event handlers in `backend/src/socket/`.
 2. Emit events from the appropriate service or route.
 
 ### New Database Model
+
 1. Create a new JSON file in `backend/src/data/` (e.g., `newmodel.json` with an empty array `[]`).
 2. Add the model name to the `modelNames` array in `backend/src/lib/jsonDb.ts`.
 3. No migrations needed — the JSON DB dynamically loads `.json` files on startup.
