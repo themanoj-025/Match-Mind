@@ -80,20 +80,33 @@ jobs:
           import json
 
           data = json.load(open('/tmp/npm-audit.json'))
+          ALLOWED = {'GHSA-qwww-vcr4-c8h2', 'GHSA-h5cw-625j-3rxh'}  # react-router RSC-mode CSRF
           blocking = []
           for name, info in (data.get('vulnerabilities') or {}).items():
               if info.get('severity') not in ('high', 'critical'):
                   continue
-              via = [v for v in info.get('via', []) if isinstance(v, dict)]
-              urls = {v.get('url', '') for v in via}
-              if not any(u.endswith('GHSA-qwww-vcr4-c8h2') or u.endswith('GHSA-h5cw-625j-3rxh') for u in urls):
-                  blocking.append((name, info.get('severity'), sorted(urls)))
+              urls = set()
+              for v in info.get('via', []):
+                  if isinstance(v, dict) and v.get('url'):
+                      urls.add(v['url'])
+              if isinstance(info.get('url'), str) and info['url']:
+                  urls.add(info['url'])
+              # react-router / react-router-dom: only advisory is the RSC-mode
+              # CSRF which does not affect this client-only (non-RSC) SPA, and
+              # there is no patched 7.x release.
+              if name in ('react-router', 'react-router-dom') and (
+                  not urls or all(u.endswith(a) for u in urls for a in ALLOWED)
+              ):
+                  continue
+              non_allowed = {u for u in urls if not any(u.endswith(a) for a in ALLOWED)}
+              if non_allowed:
+                  blocking.append((name, info.get('severity'), sorted(non_allowed)))
           if blocking:
               print('BLOCKING high/critical advisories found:')
               for b in blocking:
                   print(' -', b)
               raise SystemExit(1)
-          print('npm audit OK (remaining react-router RSC advisory is not applicable to this SPA)')
+          print('npm audit OK (react-router RSC advisory not applicable to this client-only SPA)')
           EOF
 
       - name: Secret Scan (Gitleaks)
