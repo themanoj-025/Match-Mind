@@ -76,3 +76,29 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate compose files
+        run: |
+          docker compose -f docker-compose.yml config --quiet
+          docker compose -f docker-compose.yml -f docker-compose.test.yml config --quiet
+
+      # The backend Dockerfile uses monorepo-relative COPY paths
+      # (COPY backend/package.json …), so the build context must be the
+      # repo root — NOT backend/.
+      - name: Build backend image
+        run: docker build -f backend/Dockerfile -t matchmind:ci .
+
+      - name: Scan image for vulnerabilities
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: matchmind:ci
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH
