@@ -1,8 +1,10 @@
-name: "Scheduled maintenance"
+name: 'Scheduled maintenance'
 
+permissions:
+  contents: read
 on:
   schedule:
-    - cron: '0 6 * * 1'  # Every Monday
+    - cron: '0 6 * * 1' # Every Monday
   workflow_dispatch:
 
 jobs:
@@ -13,7 +15,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: '20'
 
       - name: Audit backend dependencies
         working-directory: ./backend
@@ -27,7 +29,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: '20'
 
       - name: Audit frontend dependencies
         working-directory: ./frontend

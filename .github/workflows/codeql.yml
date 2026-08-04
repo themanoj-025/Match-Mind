@@ -5,15 +5,17 @@
 #
 # See: https://docs.github.com/en/code-security/codeql-analy
 
-name: "CodeQL"
+name: 'CodeQL'
 
+permissions:
+  contents: read
 on:
   push:
     branches: [main, master]
   pull_request:
     branches: [main, master]
   schedule:
-    - cron: '0 6 * * 1'  # Every Monday at 06:00 UTC
+    - cron: '0 6 * * 1' # Every Monday at 06:00 UTC
 
 jobs:
   analyze:
@@ -45,4 +47,4 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
-          category: "/language:${{matrix.language}}"
+          category: '/language:${{matrix.language}}'

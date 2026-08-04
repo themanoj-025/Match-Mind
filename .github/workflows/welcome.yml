@@ -2,8 +2,10 @@
 #
 # https://github.com/actions/first-interaction
 
-name: "Welcome new contributors"
+name: 'Welcome new contributors'
 
+permissions:
+  contents: read
 on:
   issues:
     types: [opened]

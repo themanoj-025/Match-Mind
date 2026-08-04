@@ -5,11 +5,13 @@
 #
 # See: https://github.com/actions/stale
 
-name: "Stale issues & PRs"
+name: 'Stale issues & PRs'
 
+permissions:
+  contents: read
 on:
   schedule:
-    - cron: '0 6 * * 1'  # Every Monday at 06:00 UTC
+    - cron: '0 6 * * 1' # Every Monday at 06:00 UTC
 
 jobs:
   stale:
