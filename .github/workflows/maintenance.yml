@@ -9,6 +9,7 @@ on:
 
 jobs:
   npm-audit-backend:
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,6 +24,7 @@ jobs:
         continue-on-error: true
 
   npm-audit-frontend:
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -37,6 +39,7 @@ jobs:
         continue-on-error: true
 
   dependency-review:
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:

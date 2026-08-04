@@ -13,6 +13,7 @@ concurrency:
 jobs:
   # ─── Backend: Build Docker image → Push to GHCR ─────
   backend:
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -73,6 +74,7 @@ jobs:
 
   # ─── Frontend: Deploy to Vercel ──────────────────────
   frontend:
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
