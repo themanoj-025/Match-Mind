@@ -70,7 +70,7 @@ export async function sendVerificationEmail(
       `,
     })
     logger.info({ event: 'email.verification_sent', to }, 'Verification email sent')
-  } catch (err) {
+  } catch (err: any) {
     logger.error({ event: 'email.verification_failed', to, err: String(err) }, 'Failed to send verification email')
   }
 }
@@ -122,7 +122,7 @@ export async function sendPasswordResetEmail(
       `,
     })
     logger.info({ event: 'email.password_reset_sent', to }, 'Password reset email sent')
-  } catch (err) {
+  } catch (err: any) {
     logger.error({ event: 'email.password_reset_failed', to, err: String(err) }, 'Failed to send password reset email')
   }
 }

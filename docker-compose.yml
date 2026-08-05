@@ -4,15 +4,15 @@ services:
     container_name: matchmind-db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: matchmind
-      POSTGRES_PASSWORD: matchmindpassword
-      POSTGRES_DB: matchmind
+      POSTGRES_USER: ${POSTGRES_USER:-matchmind}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-matchmindpassword}
+      POSTGRES_DB: ${POSTGRES_DB:-matchmind}
     ports:
       - '5432:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U matchmind -d matchmind']
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-matchmind} -d ${POSTGRES_DB:-matchmind}']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -34,8 +34,10 @@ services:
 
   app:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      # The backend Dockerfile references monorepo-relative paths
+      # (COPY backend/package.json …), so context must be the repo root.
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: matchmind-api
     restart: unless-stopped
     ports:
@@ -43,8 +45,14 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3001
-      DATABASE_URL: 'postgresql://matchmind:matchmindpassword@postgres:5432/matchmind?schema=public'
+      DATABASE_URL: ${DATABASE_URL:-postgresql://matchmind:matchmindpassword@postgres:5432/matchmind?schema=public}
       REDIS_URL: 'redis://redis:6379'
+      # Required by backend/src/config/env.ts (min 32 chars). Set in .env — the
+      # app fails fast at startup if these are missing. Dev-only placeholders:
+      #   JWT_SECRET=dev-only-jwt-secret-0123456789abcdef0123456789abcdef
+      JWT_SECRET: ${JWT_SECRET:-}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-}
+      JWT_RESET_SECRET: ${JWT_RESET_SECRET:-}
     depends_on:
       postgres:
         condition: service_healthy

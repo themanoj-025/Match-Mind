@@ -47,10 +47,10 @@ export class AdminService {
 
     const [totalUsers, activeUsers, activeRooms, liveAuctions, proUsers, reports] = await Promise.all([
       userRepository.count(),
-      prisma.user.count({ where: { lastActiveAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } } as any }),
-      prisma.room.count({ where: {} as any }),
-      prisma.room.count({ where: { status: 'DRAFTING' } as any }),
-      prisma.user.count({ where: { isPro: true } as any }),
+      prisma.user.count({ where: { lastActiveAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } } as unknown }),
+      prisma.room.count({ where: {} as unknown }),
+      prisma.room.count({ where: { status: 'DRAFTING' } as unknown }),
+      prisma.user.count({ where: { isPro: true } as unknown }),
       reportRepository.count({ where: { status: 'pending' } }),
     ])
 
@@ -99,7 +99,7 @@ export class AdminService {
         targetType: targetType ?? null,
         detail,
       })
-    } catch (err) {
+    } catch (err: any) {
       logger.error({ event: 'admin.log_failed', err: String(err) }, 'Failed to log admin action')
     }
   }

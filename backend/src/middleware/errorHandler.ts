@@ -21,19 +21,19 @@ export function errorHandler(err: any, req: AuthenticatedRequest, res: Response,
   // Structured error logging with request context
   logger.error({
     event: 'error.unhandled',
-    err: { message: err.message, stack: env.NODE_ENV === 'development' ? err.stack : undefined },
+    err: { message: (err as Error).message, stack: env.NODE_ENV === 'development' ? err.stack : undefined },
     requestId: (req as any).id,
     method: req.method,
     url: req.originalUrl || req.url,
     userId: req.userId,
-  }, err.message)
+  }, (err as Error).message)
 
   // ─── JSON DB errors (unique constraint, not found) ───────────────────
   if (err.code === 'CONFLICT') {
     res.status(409).json({
       error: {
         code: 'CONFLICT',
-        message: err.message || 'A record with that value already exists',
+        message: (err as Error).message || 'A record with that value already exists',
       },
     })
     return
@@ -42,7 +42,7 @@ export function errorHandler(err: any, req: AuthenticatedRequest, res: Response,
     res.status(404).json({
       error: {
         code: 'NOT_FOUND',
-        message: err.message || 'The requested record was not found',
+        message: (err as Error).message || 'The requested record was not found',
       },
     })
     return
@@ -64,7 +64,7 @@ export function errorHandler(err: any, req: AuthenticatedRequest, res: Response,
     res.status(err.statusCode || 400).json({
       error: {
         code: err.code || 'APP_ERROR',
-        message: err.message,
+        message: (err as Error).message,
       },
     })
     return

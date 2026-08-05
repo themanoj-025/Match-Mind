@@ -33,10 +33,7 @@ function createMockRoom(overrides: any = {}) {
     name: 'Test Room',
     inviteCode: 'ABCD1234',
     totalBudget: 500,
-    rosterRules: { GK: 2, DEF: 5, MID: 5, FWD: 3, total: 15 },
     status: 'LOBBY',
-    bidIncrementRule: { base: 5 },
-    antiSnipeSeconds: 5,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     ...overrides,
@@ -63,8 +60,6 @@ function createMockState(overrides: any = {}) {
     currentBid: 0,
     currentBidderId: null,
     timerEndsAt: null,
-    poolQueue: [],
-    unsoldPlayerIds: [],
     version: 1,
     ...overrides,
   }
@@ -121,12 +116,11 @@ describe('Room Creation', () => {
       name: 'Test Room',
       tournamentId: 'fifa-wc-2026',
       totalBudget: 500,
-      rosterRules: { GK: 2, DEF: 5, MID: 5, FWD: 3, total: 15 },
     }
 
     // Check free tier limit
     const activeRooms = await prisma.room.count({
-      where: { hostId: 'user-1', status: { not: 'COMPLETED' } },
+      where: { hostId: 'user-1', status: { not: 'FINISHED' } },
     })
     expect(activeRooms).toBe(0)
     expect(mockRoomCount).toHaveBeenCalled()
@@ -141,8 +135,6 @@ describe('Room Creation', () => {
       hostId: 'user-1',
       inviteCode: 'ABCD1234',
       status: 'LOBBY',
-      bidIncrementRule: { base: 5 },
-      antiSnipeSeconds: 5,
     }
     const room = await prisma.room.create({ data: roomData })
     expect(room.id).toBe('room-1')
@@ -171,8 +163,6 @@ describe('Room Creation', () => {
         currentBid: 0,
         currentBidderId: null,
         timerEndsAt: null,
-        poolQueue: [],
-        unsoldPlayerIds: [],
         version: 1,
       },
     })
@@ -185,7 +175,7 @@ describe('Room Creation', () => {
     const prisma = { room: { count: mockRoomCount } }
 
     const activeRooms = await prisma.room.count({
-      where: { hostId: 'user-1', status: { not: 'COMPLETED' } },
+      where: { hostId: 'user-1', status: { not: 'FINISHED' } },
     })
     expect(activeRooms).toBe(3)
   })
@@ -365,7 +355,10 @@ describe('Room Queries', () => {
   it('lists all rooms for a user via their memberships', async () => {
     const memberships = [
       { ...createMockMember(), room: createMockRoom() },
-      { ...createMockMember({ roomId: 'room-2', userId: 'user-1' }), room: createMockRoom({ id: 'room-2', name: 'Second Room' }) },
+      {
+        ...createMockMember({ roomId: 'room-2', userId: 'user-1' }),
+        room: createMockRoom({ id: 'room-2', name: 'Second Room' }),
+      },
     ]
     const mockFindMany = vi.fn().mockResolvedValue(memberships)
 

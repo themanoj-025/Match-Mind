@@ -43,11 +43,7 @@ let baseUrl: string
 
 // ─── API Helper ──────────────────────────────────────────
 
-async function api(
-  method: string,
-  path: string,
-  opts: { body?: any; auth?: boolean; token?: string } = {},
-) {
+async function api(method: string, path: string, opts: { body?: any; auth?: boolean; token?: string } = {}) {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' }
   if (opts.auth !== false) {
     headers['Authorization'] = `Bearer ${opts.token || HOST_TOKEN}`
@@ -72,55 +68,117 @@ beforeAll(async () => {
   prisma = testEnv.prisma
   dataDir = testEnv.dataDir
 
-  // Register the second test user in the DB
+  // Register the first (host) test user in the DB
   await prisma.user.create({
     data: {
-      id: BIDDER_USER.id,
-      username: BIDDER_USER.username,
-      email: BIDDER_USER.email,
-      displayName: 'Bidder User',
-      password: '$2a$10$testhashedpassword',
+      id: 'host-user-1',
+      username: 'host',
+      email: 'host@test.com',
+      displayName: 'Host User',
+      passwordHash: '$2a$10$testhashedpassword',
       tier: 'BRONZE',
       isPro: false,
       totalPoints: 0,
     },
   })
 
+  // Register the second test user in the DB
+  await prisma.user.create({
+    data: {
+      id: 'bidder-user-1',
+      username: 'bidder',
+      email: 'bidder@test.com',
+      displayName: 'Bidder User',
+      passwordHash: '$2a$10$testhashedpassword',
+      tier: 'BRONZE',
+      isPro: false,
+      totalPoints: 0,
+    },
+  })
+
+  // Seed tournament so POST /api/rooms doesn't fail on foreign key constraint
+  await prisma.tournament.upsert({
+    where: { id: 'fifa-wc-2026' },
+    update: {},
+    create: {
+      id: 'fifa-wc-2026',
+      name: 'FIFA World Cup 2026',
+      shortName: 'WC 2026',
+      status: 'UPCOMING',
+      confederation: 'FIFA',
+      gender: 'men',
+      format: 'international',
+      teamCount: 48,
+      squadSize: 26,
+      launchPhase: 1,
+    },
+  })
+
   // Add more test players so the auction pool is non-trivial
   await prisma.player.create({
     data: {
-      id: 'player-10', name: 'Lionel Test', club: 'Test FC', nationality: 'Testland',
-      position: 'FWD', basePrice: 25, tournamentId: 'fifa-wc-2026',
+      id: 'player-10',
+      name: 'Lionel Test',
+      club: 'Test FC',
+      nationality: 'Testland',
+      position: 'FWD',
+      basePrice: 25,
+      tournamentId: 'fifa-wc-2026',
     },
   })
   await prisma.player.create({
     data: {
-      id: 'player-11', name: 'Cristiano Test', club: 'Test FC', nationality: 'Testland',
-      position: 'FWD', basePrice: 22, tournamentId: 'fifa-wc-2026',
+      id: 'player-11',
+      name: 'Cristiano Test',
+      club: 'Test FC',
+      nationality: 'Testland',
+      position: 'FWD',
+      basePrice: 22,
+      tournamentId: 'fifa-wc-2026',
     },
   })
   await prisma.player.create({
     data: {
-      id: 'player-12', name: 'Kylian Test', club: 'Test FC', nationality: 'Testland',
-      position: 'FWD', basePrice: 20, tournamentId: 'fifa-wc-2026',
+      id: 'player-12',
+      name: 'Kylian Test',
+      club: 'Test FC',
+      nationality: 'Testland',
+      position: 'FWD',
+      basePrice: 20,
+      tournamentId: 'fifa-wc-2026',
     },
   })
   await prisma.player.create({
     data: {
-      id: 'player-13', name: 'Kevin Test', club: 'Test FC', nationality: 'Testland',
-      position: 'MID', basePrice: 18, tournamentId: 'fifa-wc-2026',
+      id: 'player-13',
+      name: 'Kevin Test',
+      club: 'Test FC',
+      nationality: 'Testland',
+      position: 'MID',
+      basePrice: 18,
+      tournamentId: 'fifa-wc-2026',
     },
   })
   await prisma.player.create({
     data: {
-      id: 'player-14', name: 'Virgil Test', club: 'Test FC', nationality: 'Testland',
-      position: 'DEF', basePrice: 15, tournamentId: 'fifa-wc-2026',
+      id: 'player-14',
+      name: 'Virgil Test',
+      club: 'Test FC',
+      nationality: 'Testland',
+      position: 'DEF',
+      basePrice: 15,
+      tournamentId: 'fifa-wc-2026',
     },
   })
   await prisma.player.create({
     data: {
-      id: 'player-15', name: 'Alisson Test', club: 'Test FC', nationality: 'Testland',
-      position: 'GK', basePrice: 12, tournamentId: 'fifa-wc-2026',
+      id: 'player-15',
+      name: 'Alisson Test',
+      club: 'Test FC',
+      nationality: 'Testland',
+      position: 'GK',
+      basePrice: 12,
+      tournamentId: 'fifa-wc-2026',
     },
   })
 
@@ -147,9 +205,12 @@ describe('Phase 1: Room Creation', () => {
         name: 'Integration Test Draft',
         tournamentId: 'fifa-wc-2026',
         totalBudget: 500,
-        rosterRules: { GK: 2, DEF: 5, MID: 5, FWD: 3, total: 15 },
       },
     })
+
+    if (status !== 201) {
+      throw new Error(`POST /api/rooms failed! Expected 201, got ${status}. Body: ${JSON.stringify(body)}`)
+    }
 
     expect(status).toBe(201)
     expect(body.id).toBeDefined()
@@ -160,7 +221,6 @@ describe('Phase 1: Room Creation', () => {
     expect(body.inviteCode).toBeDefined()
     expect(body.inviteCode).toHaveLength(8)
     expect(body.totalBudget).toBe(500)
-    expect(body.rosterRules).toEqual({ GK: 2, DEF: 5, MID: 5, FWD: 3, total: 15 })
 
     shared.roomId = body.id
     shared.inviteCode = body.inviteCode
@@ -206,8 +266,6 @@ describe('Phase 1: Room Creation', () => {
     expect(body.currentBid).toBe(0)
     expect(body.currentBidderId).toBeNull()
     expect(body.timerEndsAt).toBeNull()
-    expect(body.poolQueue).toEqual([])
-    expect(body.unsoldPlayerIds).toEqual([])
     expect(body.version).toBe(1)
   })
 
@@ -230,28 +288,20 @@ describe('Phase 1: Room Creation', () => {
 
 describe('Phase 2: Join Room with Invite Code', () => {
   it('POST /api/rooms/:id/join rejects join with wrong invite code', async () => {
-    const { status, body } = await api(
-      'POST',
-      `/api/rooms/${shared.roomId}/join`,
-      {
-        body: { inviteCode: 'WRONG123' },
-        token: BIDDER_TOKEN,
-      },
-    )
+    const { status, body } = await api('POST', `/api/rooms/${shared.roomId}/join`, {
+      body: { inviteCode: 'WRONG123' },
+      token: BIDDER_TOKEN,
+    })
 
     expect(status).toBe(403)
     expect(body.error?.code).toBe('INVALID_INVITE_CODE')
   })
 
   it('POST /api/rooms/:id/join accepts join with correct invite code', async () => {
-    const { status, body } = await api(
-      'POST',
-      `/api/rooms/${shared.roomId}/join`,
-      {
-        body: { inviteCode: shared.inviteCode },
-        token: BIDDER_TOKEN,
-      },
-    )
+    const { status, body } = await api('POST', `/api/rooms/${shared.roomId}/join`, {
+      body: { inviteCode: shared.inviteCode },
+      token: BIDDER_TOKEN,
+    })
 
     expect(status).toBe(201)
     expect(body.roomId).toBe(shared.roomId)
@@ -262,14 +312,10 @@ describe('Phase 2: Join Room with Invite Code', () => {
   })
 
   it('POST /api/rooms/:id/join rejects duplicate join', async () => {
-    const { status, body } = await api(
-      'POST',
-      `/api/rooms/${shared.roomId}/join`,
-      {
-        body: { inviteCode: shared.inviteCode },
-        token: BIDDER_TOKEN,
-      },
-    )
+    const { status, body } = await api('POST', `/api/rooms/${shared.roomId}/join`, {
+      body: { inviteCode: shared.inviteCode },
+      token: BIDDER_TOKEN,
+    })
 
     expect(status).toBe(409)
     expect(body.error?.code).toBe('ALREADY_MEMBER')
@@ -297,22 +343,14 @@ describe('Phase 2: Join Room with Invite Code', () => {
 
 describe('Phase 3: Ready Check', () => {
   it('PATCH /api/rooms/:id/ready toggles ready for the bidder', async () => {
-    const { status, body } = await api(
-      'PATCH',
-      `/api/rooms/${shared.roomId}/ready`,
-      { token: BIDDER_TOKEN },
-    )
+    const { status, body } = await api('PATCH', `/api/rooms/${shared.roomId}/ready`, { token: BIDDER_TOKEN })
 
     expect(status).toBe(200)
     expect(body.isReady).toBe(true) // was false, now true
     expect(body.member.isReady).toBe(true)
 
     // Toggle back to verify
-    const { body: body2 } = await api(
-      'PATCH',
-      `/api/rooms/${shared.roomId}/ready`,
-      { token: BIDDER_TOKEN },
-    )
+    const { body: body2 } = await api('PATCH', `/api/rooms/${shared.roomId}/ready`, { token: BIDDER_TOKEN })
     expect(body2.isReady).toBe(false)
 
     // Set ready again for auction start
@@ -321,11 +359,7 @@ describe('Phase 3: Ready Check', () => {
 
   it('rejects ready toggle when not a member', async () => {
     const nonMemberToken = jwt.sign({ userId: 'non-member' }, process.env.JWT_SECRET, { expiresIn: '1h' })
-    const { status, body } = await api(
-      'PATCH',
-      `/api/rooms/${shared.roomId}/ready`,
-      { token: nonMemberToken },
-    )
+    const { status, body } = await api('PATCH', `/api/rooms/${shared.roomId}/ready`, { token: nonMemberToken })
 
     expect(status).toBe(404)
     expect(body.error?.code).toBe('NOT_MEMBER')
@@ -346,21 +380,14 @@ describe('Phase 3: Ready Check', () => {
 
 describe('Phase 4: Start Auction', () => {
   it('rejects non-host from starting the auction', async () => {
-    const { status, body } = await api(
-      'POST',
-      `/api/rooms/${shared.roomId}/start`,
-      { token: BIDDER_TOKEN },
-    )
+    const { status, body } = await api('POST', `/api/rooms/${shared.roomId}/start`, { token: BIDDER_TOKEN })
 
     expect(status).toBe(403)
     expect(body.error?.code).toBe('NOT_HOST')
   })
 
   it('POST /api/rooms/:roomId/start begins the auction', async () => {
-    const { status, body } = await api(
-      'POST',
-      `/api/rooms/${shared.roomId}/start`,
-    )
+    const { status, body } = await api('POST', `/api/rooms/${shared.roomId}/start`)
 
     expect(status).toBe(200)
     expect(body.state).toBeDefined()
@@ -370,9 +397,6 @@ describe('Phase 4: Start Auction', () => {
     expect(body.state.currentBidderId).toBeNull()
     expect(body.state.timerEndsAt).toBeDefined()
     expect(body.state.version).toBe(1)
-
-    // Should have a non-empty pool queue
-    expect(body.state.poolQueue.length).toBeGreaterThanOrEqual(5)
 
     shared.firstPlayerId = body.state.currentPlayerId
   })
@@ -393,10 +417,7 @@ describe('Phase 4: Start Auction', () => {
   })
 
   it('rejects start when auction already active', async () => {
-    const { status, body } = await api(
-      'POST',
-      `/api/rooms/${shared.roomId}/start`,
-    )
+    const { status, body } = await api('POST', `/api/rooms/${shared.roomId}/start`)
 
     expect(status).toBe(400)
     expect(body.error?.code).toBe('WRONG_STATE')
@@ -510,20 +531,14 @@ describe('Phase 6: Force-Sold & Roster Verification', () => {
     expect(stateRes.body.currentPlayerId).toBeDefined()
     expect(stateRes.body.currentBidderId).toBe(BIDDER_USER.id)
 
-    const { status, body } = await api(
-      'POST',
-      `/api/rooms/${shared.roomId}/force-sold`,
-    )
+    const { status, body } = await api('POST', `/api/rooms/${shared.roomId}/force-sold`)
 
     expect(status).toBe(200)
     expect(body.message).toBe('Player sold')
   })
 
   it('GET /api/rooms/:roomId/franchises/:userId shows roster with the sold player', async () => {
-    const { status, body } = await api(
-      'GET',
-      `/api/rooms/${shared.roomId}/franchises/${BIDDER_USER.id}`,
-    )
+    const { status, body } = await api('GET', `/api/rooms/${shared.roomId}/franchises/${BIDDER_USER.id}`)
 
     expect(status).toBe(200)
     expect(body.userId).toBe(BIDDER_USER.id)
@@ -544,10 +559,7 @@ describe('Phase 6: Force-Sold & Roster Verification', () => {
   })
 
   it('budget was deducted from the winning bidder', async () => {
-    const { status, body } = await api(
-      'GET',
-      `/api/rooms/${shared.roomId}/franchises/${BIDDER_USER.id}`,
-    )
+    const { status, body } = await api('GET', `/api/rooms/${shared.roomId}/franchises/${BIDDER_USER.id}`)
 
     expect(status).toBe(200)
     // Initial budget: 500, sold price: 15 or 25
@@ -557,10 +569,7 @@ describe('Phase 6: Force-Sold & Roster Verification', () => {
 
   it('rejects force-sold when no player is live (already moved on)', async () => {
     // After force-sold, the phase should have changed
-    const { status, body } = await api(
-      'POST',
-      `/api/rooms/${shared.roomId}/force-sold`,
-    )
+    const { status, body } = await api('POST', `/api/rooms/${shared.roomId}/force-sold`)
 
     // May be OK if the auction engine handles the state, but if it tries to
     // sell when no player is live (after sell + next), it returns error
@@ -579,12 +588,14 @@ describe('Phase 6: Force-Sold & Roster Verification', () => {
 
 describe('Phase 7: Captain/VC Selection', () => {
   it('PATCH /api/rooms/:roomId/franchises/me/captain sets captain', async () => {
-    const { status, body } = await api(
-      'PATCH',
-      `/api/rooms/${shared.roomId}/franchises/me/captain`,
-      { body: { playerId: shared.firstPlayerId, isViceCaptain: false }, token: BIDDER_TOKEN },
-    )
+    const { status, body } = await api('PATCH', `/api/rooms/${shared.roomId}/franchises/me/captain`, {
+      body: { playerId: shared.firstPlayerId, isViceCaptain: false },
+      token: BIDDER_TOKEN,
+    })
 
+    if (status !== 200) {
+      throw new Error(`Phase 7 Test 1 failed! Expected 200, got ${status}. Body: ${JSON.stringify(body)}`)
+    }
     expect(status).toBe(200)
     expect(Array.isArray(body)).toBe(true)
     const entry = body.find((r: any) => r.playerId === shared.firstPlayerId)
@@ -593,12 +604,14 @@ describe('Phase 7: Captain/VC Selection', () => {
   })
 
   it('rejects captain assignment for player not in roster', async () => {
-    const { status, body } = await api(
-      'PATCH',
-      `/api/rooms/${shared.roomId}/franchises/me/captain`,
-      { body: { playerId: 'non-existent-player', isViceCaptain: false }, token: BIDDER_TOKEN },
-    )
+    const { status, body } = await api('PATCH', `/api/rooms/${shared.roomId}/franchises/me/captain`, {
+      body: { playerId: 'non-existent-player', isViceCaptain: false },
+      token: BIDDER_TOKEN,
+    })
 
+    if (status !== 400) {
+      throw new Error(`Expected 400, got ${status}. Body: ${JSON.stringify(body)}`)
+    }
     expect(status).toBe(400)
     expect(body.error?.code).toBe('PLAYER_NOT_IN_ROSTER')
   })
@@ -608,11 +621,10 @@ describe('Phase 7: Captain/VC Selection', () => {
     // (clearing others first, but there's only one player).
     // This test validates the reset logic works (no duplicate captains).
 
-    const { body } = await api(
-      'PATCH',
-      `/api/rooms/${shared.roomId}/franchises/me/captain`,
-      { body: { playerId: shared.firstPlayerId, isViceCaptain: false }, token: BIDDER_TOKEN },
-    )
+    const { body } = await api('PATCH', `/api/rooms/${shared.roomId}/franchises/me/captain`, {
+      body: { playerId: shared.firstPlayerId, isViceCaptain: false },
+      token: BIDDER_TOKEN,
+    })
 
     const captains = body.filter((r: any) => r.isCaptain)
     expect(captains.length).toBe(1)

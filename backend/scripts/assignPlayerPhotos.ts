@@ -7,7 +7,7 @@
  *   - Initials derived from player name
  *   - Deterministic via seeded name-based color saturation
  *
- * This is a placeholder until real player photos are sourced.
+ * Assigns placeholder player photos until real images are sourced.
  * ui-avatars.com is free, requires no API key, and works over HTTPS.
  *
  * Usage:

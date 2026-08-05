@@ -24,7 +24,7 @@ export function configurePassport(prisma: DatabaseClient) {
       const user = await prisma.user.findUnique({ where: { id: payload.userId } })
       if (!user) return done(null, false)
       return done(null, user)
-    } catch (err) {
+    } catch (err: any) {
       return done(err, false)
     }
   }))
@@ -35,7 +35,7 @@ export function configurePassport(prisma: DatabaseClient) {
       clientID: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
       callbackURL: `${env.BACKEND_URL || 'http://localhost:4000'}/api/auth/google/cb`,
-    }, async (accessToken: string, refreshToken: string, profile: any, done: (error: any, user?: any) => void) => {
+    }, async (accessToken: string, refreshToken: string, profile: any, done: (error: unknown, user?: any) => void) => {
       try {
         const email = profile.emails?.[0]?.value
         if (!email) return done(new Error('No email from Google'), null)
@@ -52,7 +52,7 @@ export function configurePassport(prisma: DatabaseClient) {
           })
         }
         return done(null, user)
-      } catch (err) {
+      } catch (err: any) {
         return done(err, null)
       }
     }))
@@ -66,7 +66,7 @@ export function configurePassport(prisma: DatabaseClient) {
     try {
       const user = await prisma.user.findUnique({ where: { id } })
       done(null, user)
-    } catch (err) {
+    } catch (err: any) {
       done(err, null)
     }
   })

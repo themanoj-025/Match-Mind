@@ -10,11 +10,18 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import {
-  requiredIncrement,
-  validateBudgetForRemainingSlots,
-  AuctionState,
-} from './auctionEngine'
+import { redis } from '../lib/redis'
+
+vi.mock('../lib/redis', () => ({
+  redis: {
+    rpush: vi.fn(),
+    lpop: vi.fn(),
+    llen: vi.fn(),
+    lrange: vi.fn(),
+    del: vi.fn(),
+  },
+}))
+import { requiredIncrement, validateBudgetForRemainingSlots, AuctionState } from './auctionEngine'
 
 // ─── Mock dependencies ──────────────────────────────────
 
@@ -102,12 +109,12 @@ describe('requiredIncrement()', () => {
 describe('validateBudgetForRemainingSlots()', () => {
   it('accepts a bid when enough budget and slots remain', () => {
     const result = validateBudgetForRemainingSlots(
-      500,  // remainingBudget
-      50,   // bidAmount
+      500, // remainingBudget
+      50, // bidAmount
       'MID', // playerPosition
       DEFAULT_ROSTER_RULES,
-      [],   // currentRoster (empty — all slots open)
-      [],   // playerPool
+      [], // currentRoster (empty — all slots open)
+      [], // playerPool
     )
     expect(result.valid).toBe(true)
   })
@@ -119,9 +126,7 @@ describe('validateBudgetForRemainingSlots()', () => {
       soldPrice: 20 + i * 5,
     }))
 
-    const result = validateBudgetForRemainingSlots(
-      500, 50, 'MID', DEFAULT_ROSTER_RULES, roster, [],
-    )
+    const result = validateBudgetForRemainingSlots(500, 50, 'MID', DEFAULT_ROSTER_RULES, roster, [])
     expect(result.valid).toBe(false)
     expect(result.reason).toContain('ROSTER_SLOT_FULL')
     expect(result.reason).toContain('MID')
@@ -130,13 +135,13 @@ describe('validateBudgetForRemainingSlots()', () => {
   it('rejects a bid that would leave insufficient budget for remaining slots', () => {
     // User has 70 budget, bids 60, leaving 10 — but needs 50 for remaining 10 slots at 5 each
     const result = validateBudgetForRemainingSlots(
-      70,   // remainingBudget (can afford 60+10=70)
-      60,   // bidAmount (leaves 10)
+      70, // remainingBudget (can afford 60+10=70)
+      60, // bidAmount (leaves 10)
       'FWD', // playerPosition
       DEFAULT_ROSTER_RULES,
-      [],   // empty roster — 15 slots total, 1 being filled = 14 remaining
+      [], // empty roster — 15 slots total, 1 being filled = 14 remaining
       [],
-      5,    // minPlayerPrice
+      5, // minPlayerPrice
     )
     expect(result.valid).toBe(false)
     expect(result.reason).toContain('INSUFFICIENT_BUDGET')
@@ -146,9 +151,7 @@ describe('validateBudgetForRemainingSlots()', () => {
 
   it('accepts a bid when exactly enough budget for remaining slots', () => {
     // User has 135, bids 50, leaving 85. Need 17 remaining slots * 5 = 85. 85 >= 85 ✓
-    const result = validateBudgetForRemainingSlots(
-      135, 50, 'MID', DEFAULT_ROSTER_RULES, [], [], 5,
-    )
+    const result = validateBudgetForRemainingSlots(135, 50, 'MID', DEFAULT_ROSTER_RULES, [], [], 5)
     expect(result.valid).toBe(true)
   })
 
@@ -162,30 +165,19 @@ describe('validateBudgetForRemainingSlots()', () => {
       ...Array.from({ length: 3 }, (_, i) => ({ position: 'FWD' as const, soldPrice: 10 + i * 5 })),
     ]
     // 1 DEF slot remains. Bidding full budget: 90 - 90 = 0. No reserve needed since 0 remaining slots after this bid.
-    const result = validateBudgetForRemainingSlots(
-      90, 90, 'DEF', DEFAULT_ROSTER_RULES, roster, [], 5,
-    )
+    const result = validateBudgetForRemainingSlots(90, 90, 'DEF', DEFAULT_ROSTER_RULES, roster, [], 5)
     expect(result.valid).toBe(true)
   })
 
   it('handles GK position correctly', () => {
-    const roster = [
-      { position: 'GK' as const, soldPrice: 10 },
-    ]
+    const roster = [{ position: 'GK' as const, soldPrice: 10 }]
     // 2 GK slots total, 1 filled, can add another
-    const result = validateBudgetForRemainingSlots(
-      500, 30, 'GK', DEFAULT_ROSTER_RULES, roster, [],
-    )
+    const result = validateBudgetForRemainingSlots(500, 30, 'GK', DEFAULT_ROSTER_RULES, roster, [])
     expect(result.valid).toBe(true)
 
     // Now fill both GK slots
-    const fullRoster = [
-      ...roster,
-      { position: 'GK' as const, soldPrice: 15 },
-    ]
-    const result2 = validateBudgetForRemainingSlots(
-      500, 30, 'GK', DEFAULT_ROSTER_RULES, fullRoster, [],
-    )
+    const fullRoster = [...roster, { position: 'GK' as const, soldPrice: 15 }]
+    const result2 = validateBudgetForRemainingSlots(500, 30, 'GK', DEFAULT_ROSTER_RULES, fullRoster, [])
     expect(result2.valid).toBe(false)
     expect(result2.reason).toContain('ROSTER_SLOT_FULL')
   })
@@ -424,11 +416,7 @@ describe('FSM transitions', () => {
     const { sellCurrentPlayer } = await import('./auctionEngine')
     const idleState = createMockState({ phase: 'IDLE' })
 
-    const result = await sellCurrentPlayer(
-      'room-1',
-      vi.fn().mockResolvedValue(idleState),
-      vi.fn(),
-    )
+    const result = await sellCurrentPlayer('room-1', vi.fn().mockResolvedValue(idleState), vi.fn())
     expect(result).toBeNull()
   })
 
@@ -445,13 +433,14 @@ describe('FSM transitions', () => {
     expect(result).not.toBeNull()
     expect(result!.phase).toBe('UNSOLD')
     expect(result!.currentPlayerId).toBeNull()
-    expect(result!.unsoldPlayerIds).toContain('player-1')
+    expect(redis.rpush).toHaveBeenCalledWith('auction:room-1:unsold', 'player-1')
     expect(result!.version).toBe(2)
   })
 
   it('moveToNextPlayer advances to next player in queue', async () => {
     const { moveToNextPlayer } = await import('./auctionEngine')
-    const state = createMockState() // poolQueue: ['player-2', 'player-3', 'player-4']
+    const state = createMockState()
+    vi.mocked(redis.lpop).mockResolvedValueOnce('player-2')
 
     const result = await moveToNextPlayer(
       'room-1',
@@ -462,7 +451,7 @@ describe('FSM transitions', () => {
     expect(result).not.toBeNull()
     expect(result!.phase).toBe('PLAYER_LIVE')
     expect(result!.currentPlayerId).toBe('player-2')
-    expect(result!.poolQueue).toEqual(['player-3', 'player-4'])
+    expect(redis.lpop).toHaveBeenCalledWith('auction:room-1:pool')
     expect(result!.currentBid).toBe(0)
     expect(result!.timerEndsAt).not.toBeNull()
     expect(result!.version).toBe(2)
@@ -470,10 +459,9 @@ describe('FSM transitions', () => {
 
   it('moveToNextPlayer transitions to RE_AUCTION when pool exhausted but unsold remain', async () => {
     const { moveToNextPlayer } = await import('./auctionEngine')
-    const state = createMockState({
-      poolQueue: [],
-      unsoldPlayerIds: ['player-2', 'player-3'],
-    })
+    const state = createMockState()
+    vi.mocked(redis.lpop).mockResolvedValueOnce(null)
+    vi.mocked(redis.llen).mockResolvedValueOnce(2)
 
     const result = await moveToNextPlayer(
       'room-1',
@@ -488,10 +476,9 @@ describe('FSM transitions', () => {
 
   it('moveToNextPlayer transitions to FINISHED when everything exhausted', async () => {
     const { moveToNextPlayer } = await import('./auctionEngine')
-    const state = createMockState({
-      poolQueue: [],
-      unsoldPlayerIds: [],
-    })
+    const state = createMockState()
+    vi.mocked(redis.lpop).mockResolvedValueOnce(null)
+    vi.mocked(redis.llen).mockResolvedValueOnce(0)
 
     const result = await moveToNextPlayer(
       'room-1',
@@ -506,11 +493,8 @@ describe('FSM transitions', () => {
 
   it('startReAuction moves unsold pool into PLAYER_LIVE queue', async () => {
     const { startReAuction } = await import('./auctionEngine')
-    const state = createMockState({
-      phase: 'RE_AUCTION',
-      poolQueue: [],
-      unsoldPlayerIds: ['player-2', 'player-5', 'player-8'],
-    })
+    const state = createMockState({ phase: 'RE_AUCTION' })
+    vi.mocked(redis.lrange).mockResolvedValueOnce(['player-2', 'player-5', 'player-8'])
 
     const result = await startReAuction(
       'room-1',
@@ -520,8 +504,8 @@ describe('FSM transitions', () => {
 
     expect(result).not.toBeNull()
     expect(result!.phase).toBe('PLAYER_LIVE')
-    expect(result!.poolQueue).toEqual(['player-2', 'player-5', 'player-8'])
-    expect(result!.unsoldPlayerIds).toEqual([])
+    expect(redis.rpush).toHaveBeenCalledWith('auction:room-1:pool', 'player-2', 'player-5', 'player-8')
+    expect(redis.del).toHaveBeenCalledWith('auction:room-1:unsold')
     expect(result!.currentPlayerId).toBeNull() // host must trigger NEXT_PLAYER
     expect(result!.currentBid).toBe(0)
     expect(result!.currentBidderId).toBeNull()
@@ -538,13 +522,7 @@ describe('checkAuctionTimer()', () => {
       timerEndsAt: new Date(Date.now() + 30000).toISOString(), // 30s remaining
     })
 
-    const result = await checkAuctionTimer(
-      'room-1',
-      vi.fn().mockResolvedValue(state),
-      vi.fn(),
-      vi.fn(),
-      vi.fn(),
-    )
+    const result = await checkAuctionTimer('room-1', vi.fn().mockResolvedValue(state), vi.fn(), vi.fn(), vi.fn())
 
     expect(result).toBeNull()
   })
@@ -553,13 +531,7 @@ describe('checkAuctionTimer()', () => {
     const { checkAuctionTimer } = await import('./auctionEngine')
     const state = createMockState({ phase: 'IDLE' })
 
-    const result = await checkAuctionTimer(
-      'room-1',
-      vi.fn().mockResolvedValue(state),
-      vi.fn(),
-      vi.fn(),
-      vi.fn(),
-    )
+    const result = await checkAuctionTimer('room-1', vi.fn().mockResolvedValue(state), vi.fn(), vi.fn(), vi.fn())
     expect(result).toBeNull()
   })
 
@@ -571,19 +543,14 @@ describe('checkAuctionTimer()', () => {
       currentPlayerId: 'player-1',
       timerEndsAt: new Date(Date.now() - 1000).toISOString(), // 1s ago (expired)
     })
+    vi.mocked(redis.lpop).mockResolvedValueOnce('player-2')
 
     const deductBudget = vi.fn().mockResolvedValue(undefined)
     const createRoster = vi.fn().mockResolvedValue(undefined)
     const saveState = vi.fn().mockResolvedValue(undefined)
     const getState = vi.fn().mockResolvedValue(expiredState)
 
-    const result = await checkAuctionTimer(
-      'room-1',
-      getState,
-      saveState,
-      deductBudget,
-      createRoster,
-    )
+    const result = await checkAuctionTimer('room-1', getState, saveState, deductBudget, createRoster)
 
     expect(result).not.toBeNull()
     expect(result!.action).toBe('SOLD_AND_NEXT')
@@ -604,6 +571,7 @@ describe('checkAuctionTimer()', () => {
       currentPlayerId: 'player-1',
       timerEndsAt: new Date(Date.now() - 1000).toISOString(),
     })
+    vi.mocked(redis.lpop).mockResolvedValueOnce('player-2')
 
     const result = await checkAuctionTimer(
       'room-1',
@@ -625,10 +593,10 @@ describe('checkAuctionTimer()', () => {
       currentBid: 50,
       currentBidderId: 'user-1',
       currentPlayerId: 'player-1',
-      poolQueue: [],
-      unsoldPlayerIds: [],
       timerEndsAt: new Date(Date.now() - 1000).toISOString(),
     })
+    vi.mocked(redis.lpop).mockResolvedValueOnce(null)
+    vi.mocked(redis.llen).mockResolvedValueOnce(0)
 
     const deductBudget = vi.fn().mockResolvedValue(undefined)
     const createRoster = vi.fn().mockResolvedValue(undefined)

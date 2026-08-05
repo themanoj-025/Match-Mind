@@ -13,11 +13,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import {
-  enterRun,
-  getRunStatus,
-  resolveNextMatchday,
-} from './draftRunService'
+import { enterRun, getRunStatus, resolveNextMatchday } from './draftRunService'
 import { DRAFT, RUN_REWARD_TIERS } from '../config/constants'
 
 // ─── Types ───────────────────────────────────────────────
@@ -102,7 +98,7 @@ function makeFixture(overrides: any = {}): any {
   return {
     id: 'fixture-1',
     tournamentId: TOURNAMENT_ID,
-    status: 'COMPLETED',
+    status: 'FINISHED',
     name: 'Matchday 1',
     scheduledAt: '2026-07-08T20:00:00.000Z',
     homeTeamId: 'team-1',
@@ -451,9 +447,9 @@ describe('resolveNextMatchday()', () => {
 
     const fixture = makeFixture()
     const playerStats = [
-      makePlayerStats({ playerId: 'p1', minutesPlayed: 90, goals: 1, assists: 1 }),   // MID: 2(min) + 5(goal) + 3(assist) = 10
+      makePlayerStats({ playerId: 'p1', minutesPlayed: 90, goals: 1, assists: 1 }), // MID: 2(min) + 5(goal) + 3(assist) = 10
       makePlayerStats({ playerId: 'p2', minutesPlayed: 90, cleanSheet: true, goalsConceded: 0 }), // DEF: 2(min) + 4(CS) = 6
-      makePlayerStats({ playerId: 'p3', minutesPlayed: 70, goals: 2 }),                // FWD: 2(min) + 8(goals) = 10
+      makePlayerStats({ playerId: 'p3', minutesPlayed: 70, goals: 2 }), // FWD: 2(min) + 8(goals) = 10
     ]
 
     const allPlayers = [
@@ -492,7 +488,7 @@ describe('resolveNextMatchday()', () => {
       updatedAt: NOW,
     }
     prisma.draftRunResult.findFirst
-      .mockResolvedValueOnce(runResult)  // first call in resolveNextMatchday
+      .mockResolvedValueOnce(runResult) // first call in resolveNextMatchday
       .mockResolvedValueOnce(updatedResult) // after update
 
     const result = await resolveNextMatchday(prisma, SESSION_ID, USER_ID)
@@ -603,9 +599,7 @@ describe('computeApproximatePoints() fallback (tested through resolveNextRound)'
     prisma.player.findMany.mockResolvedValue(allPlayers)
     prisma.fantasyPointsLedger.findMany.mockResolvedValue([]) // force fallback path
 
-    prisma.draftRunResult.findFirst
-      .mockResolvedValueOnce(makeRunResult())
-      .mockResolvedValueOnce(makeRunResult())
+    prisma.draftRunResult.findFirst.mockResolvedValueOnce(makeRunResult()).mockResolvedValueOnce(makeRunResult())
 
     const result = await resolveNextMatchday(prisma, SESSION_ID, USER_ID)
     vi.useRealTimers()
@@ -708,13 +702,11 @@ describe('resolveNextRound() — elimination and rewards', () => {
     const allPlayers = [{ id: 'p1', position: 'FWD', name: 'Scorer' }]
 
     prisma.draftSession.findUnique.mockResolvedValue(session)
-    prisma.draftRunResult.findFirst
-      .mockResolvedValueOnce(runResult)
-      .mockResolvedValueOnce({
-        ...runResult,
-        ...runOverrides,
-        totalWins: (runOverrides.totalWins ?? 0) + 1,
-      })
+    prisma.draftRunResult.findFirst.mockResolvedValueOnce(runResult).mockResolvedValueOnce({
+      ...runResult,
+      ...runOverrides,
+      totalWins: (runOverrides.totalWins ?? 0) + 1,
+    })
     prisma.draftPick.findMany.mockResolvedValue(picks)
     prisma.fixture.findMany.mockResolvedValue([fixture])
     prisma.playerMatchStat.findMany.mockResolvedValue(playerStats)
@@ -785,15 +777,13 @@ describe('resolveNextRound() — elimination and rewards', () => {
     const allPlayers = [{ id: 'p1', position: 'FWD', name: 'Scorer' }]
 
     prisma.draftSession.findUnique.mockResolvedValue(session)
-    prisma.draftRunResult.findFirst
-      .mockResolvedValueOnce(runResult)
-      .mockResolvedValueOnce({
-        ...runResult,
-        totalWins: 1,
-        totalLosses: 3,
-        status: 'COMPLETE',
-        eliminatedAt: NOW,
-      })
+    prisma.draftRunResult.findFirst.mockResolvedValueOnce(runResult).mockResolvedValueOnce({
+      ...runResult,
+      totalWins: 1,
+      totalLosses: 3,
+      status: 'COMPLETE',
+      eliminatedAt: NOW,
+    })
     prisma.draftPick.findMany.mockResolvedValue(picks)
     prisma.fixture.findMany.mockResolvedValue([fixture])
     prisma.playerMatchStat.findMany.mockResolvedValue(playerStats)
@@ -826,9 +816,7 @@ describe('resolveNextRound() — elimination and rewards', () => {
     const ledgerEntries = [{ playerId: 'p1', fixtureId: 'fixture-1', totalPoints: 99 }] // high from real ledger
 
     prisma.draftSession.findUnique.mockResolvedValue(session)
-    prisma.draftRunResult.findFirst
-      .mockResolvedValueOnce(runResult)
-      .mockResolvedValueOnce(runResult)
+    prisma.draftRunResult.findFirst.mockResolvedValueOnce(runResult).mockResolvedValueOnce(runResult)
     prisma.draftPick.findMany.mockResolvedValue(picks)
     prisma.fixture.findMany.mockResolvedValue([fixture])
     prisma.playerMatchStat.findMany.mockResolvedValue(playerStats)

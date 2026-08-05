@@ -22,7 +22,8 @@
     "sourceMap": true,
     "allowJs": true,
     "checkJs": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "useUnknownInCatchVariables": false
   },
   "include": ["src/**/*.ts", "instrument.ts"],
   "exclude": ["node_modules", "dist", "**/*.test.*", "scripts"]

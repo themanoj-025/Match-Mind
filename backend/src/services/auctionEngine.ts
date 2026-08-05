@@ -9,24 +9,20 @@
  *   (pool exhausted + unsold exhausted) → FINISHED
  */
 
-import { Mutex } from 'async-mutex'
+import { acquireLock } from './lockService'
 import {
   BID_INCREMENTS,
   AUCTION_DEFAULT_TIMER_SECONDS,
   AUCTION_ANTI_SNIPE_SECONDS,
   AUCTION_ANTI_SNIPE_RESET_SECONDS,
+  DEFAULT_ROSTER_RULES,
 } from '../config/tournaments'
 import logger from '../utils/logger'
+import { redis } from '../lib/redis'
 
 // ─── Types ───────────────────────────────────────────────
 
-export type AuctionPhase =
-  | 'IDLE'
-  | 'PLAYER_LIVE'
-  | 'SOLD'
-  | 'UNSOLD'
-  | 'RE_AUCTION'
-  | 'FINISHED'
+export type AuctionPhase = 'IDLE' | 'PLAYER_LIVE' | 'SOLD' | 'UNSOLD' | 'RE_AUCTION' | 'FINISHED'
 
 export interface AuctionState {
   roomId: string
@@ -35,8 +31,6 @@ export interface AuctionState {
   currentBid: number
   currentBidderId: string | null
   timerEndsAt: string | null
-  poolQueue: string[]
-  unsoldPlayerIds: string[]
   version: number
 }
 
@@ -54,15 +48,15 @@ export interface BidResult {
   newState?: AuctionState
 }
 
-// ─── Per-room mutexes ────────────────────────────────────
+// ─── Lock Helper ─────────────────────────────────────────
 
-const roomMutexes = new Map<string, Mutex>()
-
-function getRoomMutex(roomId: string): Mutex {
-  if (!roomMutexes.has(roomId)) {
-    roomMutexes.set(roomId, new Mutex())
+async function runWithLock<T>(roomId: string, fn: () => Promise<T>): Promise<T> {
+  const lock = await acquireLock(`lock:auction:${roomId}`)
+  try {
+    return await fn()
+  } finally {
+    await lock.release()
   }
-  return roomMutexes.get(roomId)!
 }
 
 // ─── Required Increment ──────────────────────────────────
@@ -87,7 +81,7 @@ export function validateBudgetForRemainingSlots(
   rosterRules: { GK: number; DEF: number; MID: number; FWD: number; total: number },
   currentRoster: Array<{ position: string; soldPrice: number }>,
   _playerPool: Array<{ id: string; position: string; basePrice: number }>,
-  minPlayerPrice: number = 5
+  minPlayerPrice: number = 5,
 ): { valid: boolean; reason?: string } {
   // Calculate remaining slots per position
   const positionCounts: Record<string, number> = { GK: 0, DEF: 0, MID: 0, FWD: 0 }
@@ -126,7 +120,9 @@ export function validateBudgetForRemainingSlots(
   remainingSlotsPerPosition[playerPosition] = Math.max(0, remainingSlotsPerPosition[playerPosition] - 1)
 
   const totalRemainingSlots = Object.values(remainingSlotsPerPosition).reduce((a, b) => a + b, 0)
-  if (totalRemainingSlots === 0) return { valid: true } // All slots filled
+  if (totalRemainingSlots === 0) {
+    return { valid: true }
+  } // All slots filled
 
   // Need at least minPlayerPrice per remaining slot
   const minimumReserve = totalRemainingSlots * minPlayerPrice
@@ -154,12 +150,12 @@ export async function processBid(
   saveBid: (bid: any) => Promise<void>,
   getPlayerPool: (roomId: string) => Promise<any[]>,
 ): Promise<BidResult> {
-  const mutex = getRoomMutex(bid.roomId)
-
-  return mutex.runExclusive(async () => {
+  return runWithLock(bid.roomId, async () => {
     // 1. Re-read state fresh from DB (never trust in-memory cache)
     const state = await getAuctionState(bid.roomId)
-    if (!state) return { accepted: false, reason: 'ROOM_NOT_FOUND' }
+    if (!state) {
+      return { accepted: false, reason: 'ROOM_NOT_FOUND' }
+    }
 
     // 2. Optimistic concurrency check
     if (state.version !== bid.expectedVersion) {
@@ -180,7 +176,9 @@ export async function processBid(
 
     // 4. Validate bidder is active member
     const member = await getRoomMember(bid.roomId, bid.userId)
-    if (!member) return { accepted: false, reason: 'NOT_ROOM_MEMBER' }
+    if (!member) {
+      return { accepted: false, reason: 'NOT_ROOM_MEMBER' }
+    }
 
     // 5. Validate minimum bid amount
     const minBid = state.currentBid + requiredIncrement(state.currentBid)
@@ -190,7 +188,9 @@ export async function processBid(
 
     // 6. Validate budget + roster slot constraints
     const player = await getPlayer(bid.playerId)
-    if (!player) return { accepted: false, reason: 'PLAYER_NOT_FOUND' }
+    if (!player) {
+      return { accepted: false, reason: 'PLAYER_NOT_FOUND' }
+    }
 
     const roster = await getRoster(bid.roomId, bid.userId)
     const playerPool = await getPlayerPool(bid.roomId)
@@ -198,7 +198,7 @@ export async function processBid(
       member.remainingBudget,
       bid.amount,
       player.position,
-      room.rosterRules,
+      DEFAULT_ROSTER_RULES,
       roster.map((r: any) => ({ position: r.position || player.position, soldPrice: r.soldPrice })),
       playerPool,
     )
@@ -208,9 +208,7 @@ export async function processBid(
 
     // 7. Apply bid — update state and persist
     const now = new Date()
-    const timerMs = state.timerEndsAt
-      ? new Date(state.timerEndsAt).getTime() - now.getTime()
-      : 0
+    const timerMs = state.timerEndsAt ? new Date(state.timerEndsAt).getTime() - now.getTime() : 0
     const timerSeconds = timerMs / 1000
 
     // Anti-snipe: if bid is placed in last anti-snipe seconds, reset timer
@@ -260,11 +258,11 @@ export async function sellCurrentPlayer(
   getAuctionState: (roomId: string) => Promise<AuctionState | null>,
   saveAuctionState: (roomId: string, state: AuctionState) => Promise<void>,
 ): Promise<AuctionState | null> {
-  const mutex = getRoomMutex(roomId)
-
-  return mutex.runExclusive(async () => {
+  return runWithLock(roomId, async () => {
     const state = await getAuctionState(roomId)
-    if (!state || state.phase !== 'PLAYER_LIVE') return null
+    if (!state || state.phase !== 'PLAYER_LIVE') {
+      return null
+    }
 
     const newState: AuctionState = {
       ...state,
@@ -284,11 +282,11 @@ export async function unsoldCurrentPlayer(
   getAuctionState: (roomId: string) => Promise<AuctionState | null>,
   saveAuctionState: (roomId: string, state: AuctionState) => Promise<void>,
 ): Promise<AuctionState | null> {
-  const mutex = getRoomMutex(roomId)
-
-  return mutex.runExclusive(async () => {
+  return runWithLock(roomId, async () => {
     const state = await getAuctionState(roomId)
-    if (!state || state.phase !== 'PLAYER_LIVE') return null
+    if (!state || state.phase !== 'PLAYER_LIVE') {
+      return null
+    }
 
     const currentPlayerId = state.currentPlayerId
     const newState: AuctionState = {
@@ -298,10 +296,11 @@ export async function unsoldCurrentPlayer(
       currentBid: 0,
       currentBidderId: null,
       timerEndsAt: null,
-      unsoldPlayerIds: currentPlayerId
-        ? [...state.unsoldPlayerIds, currentPlayerId]
-        : state.unsoldPlayerIds,
       version: state.version + 1,
+    }
+
+    if (currentPlayerId) {
+      await redis.rpush(`auction:${roomId}:unsold`, currentPlayerId)
     }
 
     await saveAuctionState(roomId, newState)
@@ -316,18 +315,18 @@ export async function moveToNextPlayer(
   getAuctionState: (roomId: string) => Promise<AuctionState | null>,
   saveAuctionState: (roomId: string, state: AuctionState) => Promise<void>,
 ): Promise<AuctionState | null> {
-  const mutex = getRoomMutex(roomId)
-
-  return mutex.runExclusive(async () => {
+  return runWithLock(roomId, async () => {
     const state = await getAuctionState(roomId)
-    if (!state) return null
+    if (!state) {
+      return null
+    }
 
-    const queue = [...state.poolQueue]
-    const nextPlayerId = queue.shift()
+    const nextPlayerId = await redis.lpop(`auction:${roomId}:pool`)
 
     if (!nextPlayerId) {
       // Pool is exhausted
-      if (state.unsoldPlayerIds.length > 0) {
+      const unsoldLen = await redis.llen(`auction:${roomId}:unsold`)
+      if (unsoldLen > 0) {
         // Switch to re-auction mode
         const newState: AuctionState = {
           ...state,
@@ -363,7 +362,6 @@ export async function moveToNextPlayer(
       currentBid: 0,
       currentBidderId: null,
       timerEndsAt: new Date(Date.now() + AUCTION_DEFAULT_TIMER_SECONDS * 1000).toISOString(),
-      poolQueue: queue,
       version: state.version + 1,
     }
 
@@ -392,18 +390,22 @@ export async function checkAuctionTimer(
   deductBudget: (roomId: string, userId: string, amount: number) => Promise<void>,
   createRosterEntry: (entry: { roomId: string; userId: string; playerId: string; soldPrice: number }) => Promise<void>,
 ): Promise<{ action: string; state: AuctionState | null } | null> {
-  const mutex = getRoomMutex(roomId)
-
-  return mutex.runExclusive(async () => {
+  return runWithLock(roomId, async () => {
     const state = await getAuctionState(roomId)
-    if (!state || state.phase !== 'PLAYER_LIVE') return null
-    if (!state.timerEndsAt) return null
+    if (!state || state.phase !== 'PLAYER_LIVE') {
+      return null
+    }
+    if (!state.timerEndsAt) {
+      return null
+    }
 
     const now = Date.now()
     const timerEnd = new Date(state.timerEndsAt).getTime()
 
     // Timer still running
-    if (timerEnd > now) return null
+    if (timerEnd > now) {
+      return null
+    }
 
     // Timer expired — resolve current player
     if (state.currentBidderId && state.currentPlayerId && state.currentBid > 0) {
@@ -432,9 +434,7 @@ export async function checkAuctionTimer(
       const unsoldState = await unsoldCurrentPlayerInternal(roomId, state, getAuctionState, saveAuctionState)
 
       // Move to next player
-      const nextState = unsoldState
-        ? await moveToNextPlayerInternal(roomId, getAuctionState, saveAuctionState)
-        : null
+      const nextState = unsoldState ? await moveToNextPlayerInternal(roomId, getAuctionState, saveAuctionState) : null
       return { action: 'UNSOLD_AND_NEXT', state: nextState }
     }
   })
@@ -448,14 +448,16 @@ async function moveToNextPlayerInternal(
   saveAuctionState: (roomId: string, state: AuctionState) => Promise<void>,
 ): Promise<AuctionState | null> {
   const state = await getAuctionState(roomId)
-  if (!state) return null
+  if (!state) {
+    return null
+  }
 
-  const queue = [...state.poolQueue]
-  const nextPlayerId = queue.shift()
+  const nextPlayerId = await redis.lpop(`auction:${roomId}:pool`)
 
   if (!nextPlayerId) {
     // Pool is exhausted
-    if (state.unsoldPlayerIds.length > 0) {
+    const unsoldLen = await redis.llen(`auction:${roomId}:unsold`)
+    if (unsoldLen > 0) {
       // Switch to re-auction mode
       const newState: AuctionState = {
         ...state,
@@ -490,7 +492,6 @@ async function moveToNextPlayerInternal(
     currentBid: 0,
     currentBidderId: null,
     timerEndsAt: new Date(Date.now() + AUCTION_DEFAULT_TIMER_SECONDS * 1000).toISOString(),
-    poolQueue: queue,
     version: state.version + 1,
   }
   await saveAuctionState(roomId, newState)
@@ -511,11 +512,13 @@ async function unsoldCurrentPlayerInternal(
     currentBid: 0,
     currentBidderId: null,
     timerEndsAt: null,
-    unsoldPlayerIds: currentPlayerId
-      ? [...state.unsoldPlayerIds, currentPlayerId]
-      : state.unsoldPlayerIds,
     version: state.version + 1,
   }
+
+  if (currentPlayerId) {
+    await redis.rpush(`auction:${roomId}:unsold`, currentPlayerId)
+  }
+
   await saveAuctionState(roomId, newState)
   return newState
 }
@@ -527,13 +530,19 @@ export async function startReAuction(
   getAuctionState: (roomId: string) => Promise<AuctionState | null>,
   saveAuctionState: (roomId: string, state: AuctionState) => Promise<void>,
 ): Promise<AuctionState | null> {
-  const mutex = getRoomMutex(roomId)
-
-  return mutex.runExclusive(async () => {
+  return runWithLock(roomId, async () => {
     const state = await getAuctionState(roomId)
-    if (!state || state.phase !== 'RE_AUCTION') return null
+    if (!state || state.phase !== 'RE_AUCTION') {
+      return null
+    }
 
-    const unsold = [...state.unsoldPlayerIds]
+    // Move all unsold to pool queue in Redis
+    const unsoldPlayers = await redis.lrange(`auction:${roomId}:unsold`, 0, -1)
+    if (unsoldPlayers.length > 0) {
+      await redis.rpush(`auction:${roomId}:pool`, ...unsoldPlayers)
+      await redis.del(`auction:${roomId}:unsold`)
+    }
+
     const newState: AuctionState = {
       ...state,
       phase: 'PLAYER_LIVE',
@@ -541,8 +550,6 @@ export async function startReAuction(
       currentBid: 0,
       currentBidderId: null,
       timerEndsAt: null,
-      poolQueue: unsold,
-      unsoldPlayerIds: [],
       version: state.version + 1,
     }
 
