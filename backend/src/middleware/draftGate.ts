@@ -1,5 +1,6 @@
+import { env } from '../config/env'
 /**
- * draftGate.ts — AuctionXI v4 §6.4
+ * draftGate.ts — MatchMind v4 §6.4
  *
  * Middleware that gates Draft Mode endpoints behind the per-tournament
  * feature flag. Draft Mode is only available for tournaments that have
@@ -17,7 +18,7 @@ import { AppError } from '../utils/AppError'
  * Reads from DRAFT_ENABLED_TOURNAMENTS env variable (comma-separated).
  */
 export function getDraftEnabledTournaments(): string[] {
-  const raw = process.env.DRAFT_ENABLED_TOURNAMENTS || ''
+  const raw = env.DRAFT_ENABLED_TOURNAMENTS || ''
   return raw
     .split(',')
     .map((s) => s.trim())

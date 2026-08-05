@@ -1,3 +1,4 @@
+import { env } from '../config/env'
 /**
  * Structured Logger — MatchMind
  *
@@ -14,12 +15,12 @@
 import pino from 'pino'
 
 // Determine log level from environment
-const level = process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'info' : 'debug')
+const level = env.LOG_LEVEL || (env.NODE_ENV === 'production' ? 'info' : 'debug')
 
 const logger = pino({
   level,
   // In development, pretty-print for readability
-  ...(process.env.NODE_ENV !== 'production' && process.stdout.isTTY
+  ...(env.NODE_ENV !== 'production' && process.stdout.isTTY
     ? {
         transport: {
           target: 'pino-pretty',

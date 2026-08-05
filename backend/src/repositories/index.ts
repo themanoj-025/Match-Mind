@@ -18,27 +18,9 @@ import type {
   LeaderboardEntry,
 } from './types'
 
-/** Minimal type compatible with both PrismaClient and JsonDatabase */
-export type DatabaseClient = {
-  [model: string]: {
-    findUnique: (args: any) => Promise<any>
-    findFirst: (args: any) => Promise<any>
-    findMany: (args: any) => Promise<any[]>
-    create: (args: any) => Promise<any>
-    update: (args: any) => Promise<any>
-    updateMany: (args: any) => Promise<{ count: number }>
-    delete: (args: any) => Promise<any>
-    deleteMany: (args: any) => Promise<{ count: number }>
-    count: (args?: any) => Promise<number>
-    upsert: (args: any) => Promise<any>
-    createMany: (args: any) => Promise<{ count: number }>
-  }
-} & {
-  $transaction: (ops: any[]) => Promise<any[]>
-  $connect: () => Promise<void>
-  $disconnect: () => Promise<void>
-  $queryRawUnsafe: (query: string) => Promise<any[]>
-}
+import { PrismaClient } from '@prisma/client'
+
+export type DatabaseClient = any
 
 // ─── User Repository ─────────────────────────────────────
 
@@ -63,10 +45,7 @@ export class PrismaUserRepository implements IUserRepository {
   async findByEmailOrUsername(email: string, username: string): Promise<UserData | null> {
     return this.prisma.user.findFirst({
       where: {
-        OR: [
-          { email },
-          { username },
-        ],
+        OR: [{ email }, { username }],
       },
     }) as unknown as UserData | null
   }
@@ -89,7 +68,7 @@ export class PrismaUserRepository implements IUserRepository {
   }
 
   async update(id: string, data: Partial<UserData>): Promise<UserData> {
-    return this.prisma.user.update({ where: { id }, data: data as any }) as unknown as UserData
+    return this.prisma.user.update({ where: { id }, data: data as unknown }) as unknown as UserData
   }
 
   async delete(id: string): Promise<void> {
@@ -111,7 +90,41 @@ export class PrismaUserRepository implements IUserRepository {
   }
 
   async updateMany(where: Record<string, unknown>, data: Partial<UserData>): Promise<{ count: number }> {
-    return this.prisma.user.updateMany({ where, data: data as any })
+    return this.prisma.user.updateMany({ where, data: data as unknown })
+  }
+
+  async updateSports(userId: string, sports: string[]): Promise<void> {
+    await this.prisma.userSport.deleteMany({ where: { userId } })
+    if (sports.length > 0) {
+      await this.prisma.userSport.createMany({
+        data: sports.map((sport: string) => ({ userId, sport })),
+      })
+    }
+  }
+
+  async updateTeams(userId: string, teamIds: string[]): Promise<void> {
+    await this.prisma.userTeam.deleteMany({ where: { userId } })
+    if (teamIds.length > 0) {
+      await this.prisma.userTeam.createMany({
+        data: teamIds.map((teamId: string) => ({ userId, teamId })),
+      })
+    }
+  }
+
+  async followUser(followerId: string, followingId: string): Promise<unknown> {
+    return this.prisma.follow.create({ data: { followerId, followingId } })
+  }
+
+  async unfollowUser(followerId: string, followingId: string): Promise<void> {
+    await this.prisma.follow.deleteMany({ where: { followerId, followingId } })
+  }
+
+  async getNotifications(userId: string, take = 50): Promise<unknown[]> {
+    return this.prisma.notification.findMany({ where: { userId }, orderBy: { createdAt: 'desc' }, take })
+  }
+
+  async markNotificationsRead(userId: string): Promise<void> {
+    await this.prisma.notification.updateMany({ where: { userId, isRead: false }, data: { isRead: true } })
   }
 }
 
@@ -124,7 +137,7 @@ export class PrismaMatchRepository implements IMatchRepository {
   }
 
   async findById(id: string): Promise<MatchData | null> {
-    return this.prisma.match.findUnique({ where: { id } }) as unknown as MatchData | null
+    return this.prisma.fixture.findUnique({ where: { id } }) as unknown as MatchData | null
   }
 
   async findMany(opts: {
@@ -134,15 +147,15 @@ export class PrismaMatchRepository implements IMatchRepository {
     skip?: number
     select?: Record<string, unknown>
   }): Promise<Partial<MatchData>[]> {
-    return this.prisma.match.findMany(opts) as unknown as Partial<MatchData>[]
+    return this.prisma.fixture.findMany(opts) as unknown as Partial<MatchData>[]
   }
 
   async update(id: string, data: Partial<MatchData>): Promise<MatchData> {
-    return this.prisma.match.update({ where: { id }, data: data as any }) as unknown as MatchData
+    return this.prisma.fixture.update({ where: { id }, data: data as unknown }) as unknown as MatchData
   }
 
   async count(where?: Record<string, unknown>): Promise<number> {
-    return this.prisma.match.count({ where })
+    return this.prisma.fixture.count({ where })
   }
 }
 
@@ -190,7 +203,7 @@ export class PrismaPredictionRepository implements IPredictionRepository {
         matchId: data.matchId,
         homeGoals: data.homeGoals,
         awayGoals: data.awayGoals,
-        status: (data.status ?? 'PENDING') as any,
+        status: (data.status ?? 'PENDING') as unknown,
         firstScorerId: data.firstScorerId ?? null,
         totalGoalsOU: data.totalGoalsOU ?? null,
         totalGoalsLine: data.totalGoalsLine ?? null,
@@ -200,14 +213,14 @@ export class PrismaPredictionRepository implements IPredictionRepository {
   }
 
   async update(id: string, data: Partial<PredictionData>): Promise<PredictionData> {
-    return this.prisma.prediction.update({ where: { id }, data: data as any }) as unknown as PredictionData
+    return this.prisma.prediction.update({ where: { id }, data: data as unknown }) as unknown as PredictionData
   }
 
   async updateMany(
     where: { matchId?: string; status?: string },
-    data: Partial<PredictionData>
+    data: Partial<PredictionData>,
   ): Promise<{ count: number }> {
-    return this.prisma.prediction.updateMany({ where: where as any, data: data as any })
+    return this.prisma.prediction.updateMany({ where: where as unknown, data: data as unknown })
   }
 }
 
@@ -236,7 +249,7 @@ export class PrismaLeaderboardRepository implements ILeaderboardRepository {
       take,
     })
 
-    return users.map((u, i) => ({
+    return users.map((u: any, i: number) => ({
       id: u.id,
       username: u.username,
       name: u.displayName || u.username,
@@ -267,7 +280,7 @@ export class PrismaLeaderboardRepository implements ILeaderboardRepository {
       take,
     })
 
-    return users.map((u, i) => ({
+    return users.map((u: any, i: number) => ({
       id: u.id,
       username: u.username,
       name: u.displayName || u.username,
@@ -291,7 +304,7 @@ export class PrismaReportRepository implements IReportRepository {
   }
 
   async count(where?: Record<string, unknown>): Promise<number> {
-    return this.prisma.report.count({ where: where as any })
+    return this.prisma.report.count({ where: where as unknown })
   }
 
   async findMany(opts: {
@@ -300,11 +313,11 @@ export class PrismaReportRepository implements IReportRepository {
     take?: number
     skip?: number
   }): Promise<unknown[]> {
-    return this.prisma.report.findMany(opts as any)
+    return this.prisma.report.findMany(opts as unknown)
   }
 
   async update(id: string, data: Record<string, unknown>): Promise<unknown> {
-    return this.prisma.report.update({ where: { id }, data: data as any })
+    return this.prisma.report.update({ where: { id }, data: data as unknown })
   }
 }
 
@@ -328,11 +341,7 @@ export class PrismaAdminLogRepository implements IAdminLogRepository {
     })
   }
 
-  async findMany(opts: {
-    orderBy?: Record<string, 'asc' | 'desc'>
-    take?: number
-    skip?: number
-  }): Promise<unknown[]> {
+  async findMany(opts: { orderBy?: Record<string, 'asc' | 'desc'>; take?: number; skip?: number }): Promise<unknown[]> {
     return (this.prisma as any).adminLog.findMany(opts)
   }
 

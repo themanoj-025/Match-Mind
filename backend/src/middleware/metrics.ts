@@ -1,5 +1,5 @@
 /**
- * Prometheus Metrics Middleware — AuctionXI
+ * Prometheus Metrics Middleware — MatchMind
  *
  * Tracks application-level metrics using prom-client:
  * - HTTP request count (by method, route, status)
@@ -20,19 +20,19 @@ import type { Request, Response, NextFunction } from 'express'
 // ─── Registry ───────────────────────────────────────────
 
 const register = new prometheus.Registry()
-prometheus.collectDefaultMetrics({ register, prefix: 'auctionxi_' })
+prometheus.collectDefaultMetrics({ register, prefix: 'matchmind_' })
 
 // ─── HTTP Metrics ───────────────────────────────────────
 
 const httpRequestCount = new prometheus.Counter({
-  name: 'auctionxi_http_requests_total',
+  name: 'matchmind_http_requests_total',
   help: 'Total HTTP request count',
   labelNames: ['method', 'route', 'status_code'],
   registers: [register],
 })
 
 const httpRequestDuration = new prometheus.Histogram({
-  name: 'auctionxi_http_request_duration_seconds',
+  name: 'matchmind_http_request_duration_seconds',
   help: 'HTTP request duration in seconds',
   labelNames: ['method', 'route', 'status_code'],
   buckets: [0.01, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10],
@@ -42,25 +42,25 @@ const httpRequestDuration = new prometheus.Histogram({
 // ─── Business Metrics ───────────────────────────────────
 
 const activeAuctionRooms = new prometheus.Gauge({
-  name: 'auctionxi_active_rooms',
+  name: 'matchmind_active_rooms',
   help: 'Number of rooms currently in DRAFTING state',
   registers: [register],
 })
 
 const totalBidsPlaced = new prometheus.Counter({
-  name: 'auctionxi_bids_total',
+  name: 'matchmind_bids_total',
   help: 'Total number of bids placed',
   registers: [register],
 })
 
 const activeWebSocketConnections = new prometheus.Gauge({
-  name: 'auctionxi_ws_connections',
+  name: 'matchmind_ws_connections',
   help: 'Number of active WebSocket connections',
   registers: [register],
 })
 
 const databaseWriteLatency = new prometheus.Histogram({
-  name: 'auctionxi_db_write_duration_seconds',
+  name: 'matchmind_db_write_duration_seconds',
   help: 'Database write operation latency',
   buckets: [0.001, 0.005, 0.01, 0.05, 0.1, 0.5],
   registers: [register],

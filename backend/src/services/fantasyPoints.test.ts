@@ -1,5 +1,5 @@
 /**
- * Fantasy Points Tests — AuctionXI
+ * Fantasy Points Tests — MatchMind
  *
  * Tests the fantasy football scoring engine:
  * - All scoring rules from §10.2 (minutes, goals by position, assists, clean sheets, saves, cards, etc.)

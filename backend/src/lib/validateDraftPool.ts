@@ -1,5 +1,5 @@
 /**
- * validateDraftPool.ts — AuctionXI v4 §6.3
+ * validateDraftPool.ts — MatchMind v4 §6.3
  *
  * Shared validation logic for Draft Mode pool readiness.
  * Imported by both:
@@ -47,7 +47,7 @@ export function validateTournamentDraftPool(
   const warnings: string[] = []
   const infos: string[] = []
 
-  let players: any[] = []
+  let players: any[];
   try {
     players = loadJSON('players.json', effectiveDataDir).filter(
       (p: any) => p.tournamentId === tournamentId,

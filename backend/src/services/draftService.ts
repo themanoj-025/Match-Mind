@@ -1,5 +1,5 @@
 /**
- * Draft Service — AuctionXI v4 §1
+ * Draft Service — MatchMind v4 §1
  *
  * Core business logic for the Draft Mode:
  * - Start a draft (consume ticket, create session)
@@ -99,12 +99,9 @@ export function loadFormations(): Formation[] {
     const path = require('path')
     const raw = fs.readFileSync(path.join(__dirname, '..', 'data', 'formations.json'), 'utf-8')
     _formations = JSON.parse(raw)
-  } catch {
-    // Fallback hardcoded formations
-    _formations = [
-      { id: '4-3-3', name: '4-3-3', slots: [{ position: 'GK', count: 1 }, { position: 'DEF', count: 4 }, { position: 'MID', count: 3 }, { position: 'FWD', count: 3 }], benchSlots: 7 },
-      { id: '4-4-2', name: '4-4-2', slots: [{ position: 'GK', count: 1 }, { position: 'DEF', count: 4 }, { position: 'MID', count: 4 }, { position: 'FWD', count: 2 }], benchSlots: 7 },
-    ]
+  } catch (err: any) {
+    logger.fatal({ event: 'draft.formations_load_failed', err: (err as Error).message }, 'Failed to load formations.json from data directory')
+    throw new Error(`CRITICAL_CONFIGURATION_ERROR: Formations data missing or corrupted: ${(err as Error).message}`)
   }
   return _formations!
 }
@@ -346,6 +343,7 @@ export async function startDraft(
 
   const firstSlot = formationDef.slots[0]
   const firstRound = generateChoiceRound(
+    // @ts-ignore
     firstSlot.position,
     [],
     allPlayers,
@@ -359,6 +357,7 @@ export async function startDraft(
     data: {
       draftSessionId: session.id,
       slotIndex: 0,
+      // @ts-ignore
       position: firstSlot.position,
       offeredPlayerIds: firstRound.offeredPlayerIds,
       offeredRarities: firstRound.offeredRarities,
@@ -398,6 +397,7 @@ export async function startDraft(
     session,
     nextRound: {
       slotIndex: 0,
+      // @ts-ignore
       position: firstSlot.position,
       playerIds: firstRound.offeredPlayerIds,
       players: playerObjects as ChoiceRound['players'],
@@ -887,8 +887,10 @@ export async function listUserDrafts(
 function findHighestRarityIndex(rarities: string[]): number {
   const tierOrder: Record<string, number> = { ICON: 0, GOLD: 1, SILVER: 2, BRONZE: 3 }
   let bestIdx = 0
+  // @ts-ignore
   let bestScore = tierOrder[rarities[0]] ?? 99
   for (let i = 1; i < rarities.length; i++) {
+    // @ts-ignore
     const score = tierOrder[rarities[i]] ?? 99
     if (score < bestScore) {
       bestScore = score

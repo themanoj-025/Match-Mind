@@ -1,7 +1,8 @@
+import { env } from '../config/env'
 /**
- * Socket.IO event handlers — AuctionXI
+ * Socket.IO event handlers — MatchMind
  *
- * Extended from MatchMind with auction-specific events:
+ * Auction-specific events:
  * - PLACE_BID: client → server bid placement (delegates to auctionEngine)
  * - HOST_ACTION: host controls
  * - Auction server → client events: ROOM_STATE_SYNC, NEW_BID, PLAYER_SOLD, etc.
@@ -23,56 +24,69 @@ import logger from '../utils/logger'
 
 const ALLOWED_ROOM_TYPES = ['match', 'squad', 'sport', 'room', 'dm']
 
-// ─── Connection rate limiter: per-IP, max 10 new connections/sec ─────
-const connectionRateMap = new Map<string, number[]>()
-const CONNECTION_RATE_LIMIT = 10       // max connections
-const CONNECTION_RATE_WINDOW = 1000     // per 1 second
+import { redis } from '../lib/redis'
+import { scheduleAuctionTimer } from '../lib/queue'
+import { ConcurrencyError } from '../errors/DomainError'
 
-function checkConnectionRate(ip: string): boolean {
+// Fallback in-memory maps for when Redis is offline
+const connectionRateMap = new Map<string, number[]>()
+const bidRateTrackers = new Map<string, number[]>()
+
+async function checkRateLimitRedis(key: string, limit: number, windowSec: number): Promise<boolean> {
+  const isRedisConnected = redis.status === 'ready' || redis.status === 'connect'
+  if (!isRedisConnected) {
+    return false // Fallback to memory
+  }
+  try {
+    const current = await redis.incr(key)
+    if (current === 1) {
+      await redis.expire(key, windowSec)
+    }
+    return current <= limit
+  } catch (err: any) {
+    logger.error(
+      { event: 'redis.rate_limit_error', key, err: (err as Error).message },
+      'Failed to check rate limit in Redis',
+    )
+    return false
+  }
+}
+
+async function checkConnectionRate(ip: string): Promise<boolean> {
+  const redisKey = `ratelimit:connection:${ip}`
+  const isRedisConnected = redis.status === 'ready' || redis.status === 'connect'
+  if (isRedisConnected) {
+    return checkRateLimitRedis(redisKey, 10, 1)
+  }
+
+  // Fallback to in-memory check
   const now = Date.now()
   let timestamps = connectionRateMap.get(ip) || []
-  timestamps = timestamps.filter((t) => now - t < CONNECTION_RATE_WINDOW)
-  if (timestamps.length >= CONNECTION_RATE_LIMIT) {
+  timestamps = timestamps.filter((t) => now - t < 1000)
+  if (timestamps.length >= 10) {
     return false
   }
   timestamps.push(now)
   connectionRateMap.set(ip, timestamps)
-
-  // Cleanup stale entries periodically
-  if (connectionRateMap.size > 10000) {
-    for (const [key, vals] of connectionRateMap.entries()) {
-      const valid = vals.filter((t) => now - t < CONNECTION_RATE_WINDOW)
-      if (valid.length === 0) connectionRateMap.delete(key)
-      else connectionRateMap.set(key, valid)
-    }
-  }
   return true
 }
 
-// ─── Per-socket bid rate limiter (5/sec per socket) ─────────────────
-/**
- * Creates a rate-limited wrapper for the PLACE_BID handler.
- * Uses a Map keyed by socket ID to track timestamps.
- * This is more robust than the old prependListener approach.
- */
-const bidRateTrackers = new Map<string, number[]>()
-const BID_RATE_LIMIT = 5
-const BID_RATE_WINDOW = 1000
+async function checkBidRate(socketId: string): Promise<boolean> {
+  const redisKey = `ratelimit:bid:${socketId}`
+  const isRedisConnected = redis.status === 'ready' || redis.status === 'connect'
+  if (isRedisConnected) {
+    return checkRateLimitRedis(redisKey, 5, 1)
+  }
 
-function checkBidRate(socketId: string): boolean {
+  // Fallback to in-memory check
   const now = Date.now()
   let timestamps = bidRateTrackers.get(socketId) || []
-  timestamps = timestamps.filter((t) => now - t < BID_RATE_WINDOW)
-  if (timestamps.length >= BID_RATE_LIMIT) {
+  timestamps = timestamps.filter((t) => now - t < 1000)
+  if (timestamps.length >= 5) {
     return false
   }
   timestamps.push(now)
   bidRateTrackers.set(socketId, timestamps)
-
-  // Cleanup on disconnect
-  if (timestamps.length > 20) {
-    timestamps.splice(0, timestamps.length - 20)
-  }
   return true
 }
 
@@ -87,17 +101,20 @@ function makeAuctionHelpers(prisma: any) {
       return state as AuctionState | null
     },
     saveAuctionState: async (roomId: string, state: AuctionState) => {
-      await prisma.auctionState.update({
-        where: { roomId },
+      const expectedVersion = state.version - 1
+      const result = await prisma.auctionState.updateMany({
+        where: { roomId, version: expectedVersion },
         data: { ...state },
       })
+      if (result.count === 0) {
+        throw new ConcurrencyError()
+      }
     },
     getRoom: async (roomId: string) => prisma.room.findUnique({ where: { id: roomId } }),
     getPlayer: async (playerId: string) => prisma.player.findUnique({ where: { id: playerId } }),
     getRoomMember: async (roomId: string, userId: string) =>
       prisma.roomMember.findUnique({ where: { roomId_userId: { roomId, userId } } }),
-    getRoster: async (roomId: string, userId: string) =>
-      prisma.roster.findMany({ where: { roomId, userId } }),
+    getRoster: async (roomId: string, userId: string) => prisma.roster.findMany({ where: { roomId, userId } }),
     getPlayerPool: async (_roomId: string) => [], // Filled from auction state
     saveBid: async (bid: any) => prisma.bid.create({ data: bid }),
   }
@@ -109,7 +126,7 @@ export const setupSocket = (io: Server, prisma: any): void => {
   io.use(async (socket: AuthenticatedSocket, next) => {
     // Connection rate limiting (per IP)
     const ip = socket.handshake.address || 'unknown'
-    if (!checkConnectionRate(ip)) {
+    if (!(await checkConnectionRate(ip))) {
       logger.warn({ event: 'socket.rate_limited', ip }, 'Socket connection rate limited')
       return next(new Error('Too many connections. Please slow down.'))
     }
@@ -119,7 +136,7 @@ export const setupSocket = (io: Server, prisma: any): void => {
       return next(new Error('Authentication required'))
     }
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string; tokenVersion?: number }
+      const decoded = jwt.verify(token, env.JWT_SECRET!) as { userId: string; tokenVersion?: number }
       socket.userId = decoded.userId
 
       // Verify token hasn't been revoked
@@ -134,13 +151,16 @@ export const setupSocket = (io: Server, prisma: any): void => {
       }
 
       next()
-    } catch (err) {
+    } catch (err: any) {
       return next(new Error('Invalid or expired token'))
     }
   })
 
   io.on('connection', (socket: AuthenticatedSocket) => {
-    logger.info({ event: 'socket.connected', socketId: socket.id, userId: socket.userId }, `Socket connected: ${socket.id}`)
+    logger.info(
+      { event: 'socket.connected', socketId: socket.id, userId: socket.userId },
+      `Socket connected: ${socket.id}`,
+    )
 
     // Join user-specific room for targeted events
     socket.join(`user:${socket.userId}`)
@@ -148,15 +168,23 @@ export const setupSocket = (io: Server, prisma: any): void => {
     // Clean up bid rate tracker on disconnect
     socket.on('disconnect', () => {
       bidRateTrackers.delete(socket.id)
-      logger.info({ event: 'socket.disconnected', socketId: socket.id, userId: socket.userId }, `Socket disconnected: ${socket.id}`)
+      logger.info(
+        { event: 'socket.disconnected', socketId: socket.id, userId: socket.userId },
+        `Socket disconnected: ${socket.id}`,
+      )
     })
 
     // ─── Room Management ─────────────────────────────────
 
     socket.on('JOIN_ROOM', ({ roomId, tournamentId }: { roomId?: string; tournamentId?: string }) => {
-      if (!roomId || typeof roomId !== 'string') return
+      if (!roomId || typeof roomId !== 'string') {
+        return
+      }
       const roomPrefix = roomId.split(':')[0]
-      if (!ALLOWED_ROOM_TYPES.includes(roomPrefix)) return
+      // @ts-ignore
+      if (!ALLOWED_ROOM_TYPES.includes(roomPrefix)) {
+        return
+      }
 
       // Always join the legacy room name for backward compatibility with existing broadcasts
       socket.join(roomId)
@@ -178,7 +206,8 @@ export const setupSocket = (io: Server, prisma: any): void => {
       // used for the tournament-namespaced secondary join below
       if (roomId.startsWith('room:')) {
         const actualRoomId = roomId.replace('room:', '')
-        prisma.auctionState.findUnique({ where: { roomId: actualRoomId } })
+        prisma.auctionState
+          .findUnique({ where: { roomId: actualRoomId } })
           .then((state: any) => {
             if (state) {
               socket.emit('ROOM_STATE_SYNC', { auctionState: state })
@@ -195,7 +224,9 @@ export const setupSocket = (io: Server, prisma: any): void => {
     })
 
     socket.on('LEAVE_ROOM', ({ roomId, tournamentId }: { roomId?: string; tournamentId?: string }) => {
-      if (!roomId || typeof roomId !== 'string') return
+      if (!roomId || typeof roomId !== 'string') {
+        return
+      }
 
       // Always leave the legacy room name
       socket.leave(roomId)
@@ -214,83 +245,104 @@ export const setupSocket = (io: Server, prisma: any): void => {
       }
     })
 
-    // ─── Auction Events ───────────────────────────────────
-
-    socket.on('PLACE_BID', async (data: {
-      roomId: string
-      playerId: string
-      amount: number
-      expectedVersion: number
-    }) => {
+    socket.on('SYNC_STATE', async ({ roomId }: { roomId?: string }) => {
+      if (!roomId || typeof roomId !== 'string') {
+        return
+      }
+      const actualRoomId = roomId.replace('room:', '')
       try {
-        if (!socket.userId) {
-          socket.emit('BID_REJECTED', { code: 'UNAUTHENTICATED', message: 'Not authenticated' })
-          return
-        }
-
-        // Per-socket bid rate limiting (5/sec)
-        if (!checkBidRate(socket.id)) {
-          socket.emit('BID_REJECTED', { code: 'RATE_LIMITED', message: 'Too many bids. Slow down.' })
-          return
-        }
-
-        // Verify room membership
-        const member = await prisma.roomMember.findUnique({
-          where: { roomId_userId: { roomId: data.roomId, userId: socket.userId } },
-        })
-        if (!member) {
-          socket.emit('BID_REJECTED', { code: 'NOT_MEMBER', message: 'You are not a member of this room' })
-          return
-        }
-
-        const helpers = makeAuctionHelpers(prisma)
-        const result = await processBid(
-          {
-            roomId: data.roomId,
-            playerId: data.playerId,
-            amount: data.amount,
-            userId: socket.userId,
-            expectedVersion: data.expectedVersion,
-          } as BidRequest,
-          helpers.getRoom,
-          helpers.getPlayer,
-          helpers.getRoomMember,
-          helpers.getRoster,
-          helpers.getAuctionState,
-          helpers.saveAuctionState,
-          helpers.saveBid,
-          helpers.getPlayerPool,
-        )
-
-        if (result.accepted && result.newState) {
-          // Broadcast to entire room
-          io.to(`room:${data.roomId}`).emit('NEW_BID', {
-            playerId: data.playerId,
-            amount: data.amount,
-            bidderId: socket.userId,
-            timerEndsAt: result.newState.timerEndsAt,
-            version: result.newState.version,
-          })
-        } else {
-          // Send rejection only to the bidder
-          socket.emit('BID_REJECTED', {
-            code: result.reason?.split(':')[0] || 'BID_REJECTED',
-            message: result.reason || 'Bid rejected',
-          })
+        const state = await prisma.auctionState.findUnique({ where: { roomId: actualRoomId } })
+        if (state) {
+          socket.emit('ROOM_STATE_SYNC', { auctionState: state })
         }
       } catch (err: any) {
-        logger.error({ event: 'socket.bid_error', userId: socket.userId, err: err.message }, 'PLACE_BID error')
-        socket.emit('BID_REJECTED', { code: 'INTERNAL_ERROR', message: 'Failed to process bid' })
+        logger.error(
+          { event: 'socket.sync_state_error', roomId, err: (err as Error).message },
+          'Failed to sync state on reconnect',
+        )
       }
     })
 
-    socket.on('HOST_ACTION', async (data: {
-      roomId: string
-      action: string
-      payload?: any
-    }) => {
+    // ─── Auction Events ───────────────────────────────────
+
+    socket.on(
+      'PLACE_BID',
+      async (data: { roomId: string; playerId: string; amount: number; expectedVersion: number }) => {
+        try {
+          if (!socket.userId) {
+            socket.emit('BID_REJECTED', { code: 'UNAUTHENTICATED', message: 'Not authenticated' })
+            return
+          }
+
+          // Per-socket bid rate limiting (5/sec)
+          if (!(await checkBidRate(socket.id))) {
+            socket.emit('BID_REJECTED', { code: 'RATE_LIMITED', message: 'Too many bids. Slow down.' })
+            return
+          }
+
+          // Verify room membership
+          const member = await prisma.roomMember.findUnique({
+            where: { roomId_userId: { roomId: data.roomId, userId: socket.userId } },
+          })
+          if (!member) {
+            socket.emit('BID_REJECTED', { code: 'NOT_MEMBER', message: 'You are not a member of this room' })
+            return
+          }
+
+          const helpers = makeAuctionHelpers(prisma)
+          const result = await processBid(
+            {
+              roomId: data.roomId,
+              playerId: data.playerId,
+              amount: data.amount,
+              userId: socket.userId,
+              expectedVersion: data.expectedVersion,
+            } as BidRequest,
+            helpers.getRoom,
+            helpers.getPlayer,
+            helpers.getRoomMember,
+            helpers.getRoster,
+            helpers.getAuctionState,
+            helpers.saveAuctionState,
+            helpers.saveBid,
+            helpers.getPlayerPool,
+          )
+
+          if (result.accepted && result.newState) {
+            // Broadcast to entire room
+            io.to(`room:${data.roomId}`).emit('NEW_BID', {
+              playerId: data.playerId,
+              amount: data.amount,
+              bidderId: socket.userId,
+              timerEndsAt: result.newState.timerEndsAt,
+              version: result.newState.version,
+            })
+
+            if (result.newState.timerEndsAt) {
+              await scheduleAuctionTimer(data.roomId, result.newState.timerEndsAt)
+            }
+          } else {
+            // Send rejection only to the bidder
+            socket.emit('BID_REJECTED', {
+              code: result.reason?.split(':')[0] || 'BID_REJECTED',
+              message: result.reason || 'Bid rejected',
+            })
+          }
+        } catch (err: any) {
+          logger.error(
+            { event: 'socket.bid_error', userId: socket.userId, err: (err as Error).message },
+            'PLACE_BID error',
+          )
+          socket.emit('BID_REJECTED', { code: 'INTERNAL_ERROR', message: 'Failed to process bid' })
+        }
+      },
+    )
+
+    socket.on('HOST_ACTION', async (data: { roomId: string; action: string; payload?: any }) => {
       try {
-        if (!socket.userId) return
+        if (!socket.userId) {
+          return
+        }
 
         const room = await prisma.room.findUnique({ where: { id: data.roomId } })
         if (!room || room.hostId !== socket.userId) {
@@ -356,27 +408,39 @@ export const setupSocket = (io: Server, prisma: any): void => {
           case 'START_RE_AUCTION':
             newState = await startReAuction(data.roomId, helpers.getAuctionState, helpers.saveAuctionState)
             if (newState) {
-              io.to(`room:${data.roomId}`).emit('RE_AUCTION_STARTED', { roomId: data.roomId, poolQueue: newState.poolQueue })
+              io.to(`room:${data.roomId}`).emit('RE_AUCTION_STARTED', { roomId: data.roomId })
             }
             return
           case 'END_AUCTION':
-            await prisma.room.update({ where: { id: data.roomId }, data: { status: 'COMPLETED' } })
-            await helpers.saveAuctionState(data.roomId, { ...(await helpers.getAuctionState(data.roomId))!, phase: 'FINISHED', version: Date.now() })
+            await prisma.room.update({ where: { id: data.roomId }, data: { status: 'FINISHED' } })
+            await helpers.saveAuctionState(data.roomId, {
+              ...(await helpers.getAuctionState(data.roomId))!,
+              phase: 'FINISHED',
+              version: Date.now(),
+            })
             io.to(`room:${data.roomId}`).emit('AUCTION_FINISHED', { roomId: data.roomId })
             return
         }
 
         if (newState) {
           io.to(`room:${data.roomId}`).emit('AUCTION_PHASE_CHANGE', { roomId: data.roomId, state: newState })
+          if (newState.phase === 'PLAYER_LIVE' && newState.timerEndsAt) {
+            await scheduleAuctionTimer(data.roomId, newState.timerEndsAt)
+          }
         }
       } catch (err: any) {
-        logger.error({ event: 'socket.host_action_error', userId: socket.userId, err: err.message }, 'HOST_ACTION error')
+        logger.error(
+          { event: 'socket.host_action_error', userId: socket.userId, err: (err as Error).message },
+          'HOST_ACTION error',
+        )
         socket.emit('HOST_ACTION_REJECTED', { code: 'INTERNAL_ERROR', message: 'Failed to process action' })
       }
     })
 
     socket.on('TOGGLE_STAR', async ({ roomId, playerId }: { roomId?: string; playerId?: string }) => {
-      if (!roomId || !playerId || !socket.userId) return
+      if (!roomId || !playerId || !socket.userId) {
+        return
+      }
       try {
         const existing = await prisma.starredPlayer.findUnique({
           where: { userId_roomId_playerId: { userId: socket.userId, roomId, playerId } },
@@ -387,21 +451,53 @@ export const setupSocket = (io: Server, prisma: any): void => {
           await prisma.starredPlayer.create({ data: { userId: socket.userId, roomId, playerId } })
         }
       } catch (err: any) {
-        logger.error({ event: 'socket.toggle_star_error', userId: socket.userId, err: err.message })
+        logger.error({ event: 'socket.toggle_star_error', userId: socket.userId, err: (err as Error).message })
       }
     })
 
-    // ─── Chat Messages ───────────────────────────────────
+    // ─── Chat Messages (with server-side XSS sanitization) ──
+
+    /**
+     * Strip HTML tags from user-provided text to prevent XSS.
+     * This is defense in depth — the frontend should also sanitize,
+     * but we never trust client input unconditionally.
+     */
+    function sanitizeText(input: string): string {
+      return input
+        .replace(/[<>"']/g, (char) => {
+          switch (char) {
+            case '<':
+              return '&lt;'
+            case '>':
+              return '&gt;'
+            case '"':
+              return '&quot;'
+            case "'":
+              return '&#x27;'
+            default:
+              return char
+          }
+        })
+        .trim()
+        .slice(0, 1000)
+    }
 
     socket.on('SEND_MESSAGE', async ({ roomId, text, gifUrl }: { roomId?: string; text?: string; gifUrl?: string }) => {
       try {
-        if (!roomId || typeof roomId !== 'string') return
-        const cleanText = typeof text === 'string' ? text.trim().slice(0, 1000) : ''
+        if (!roomId || typeof roomId !== 'string') {
+          return
+        }
+        const cleanText = typeof text === 'string' ? sanitizeText(text) : ''
         const cleanGifUrl = typeof gifUrl === 'string' ? gifUrl.trim().slice(0, 500) : null
-        if (!cleanText && !cleanGifUrl) return
+        if (!cleanText && !cleanGifUrl) {
+          return
+        }
 
         const roomType = roomId.split(':')[0]
-        if (!ALLOWED_ROOM_TYPES.includes(roomType)) return
+        // @ts-ignore
+        if (!ALLOWED_ROOM_TYPES.includes(roomType)) {
+          return
+        }
 
         const message = await prisma.chatMessage.create({
           data: {
@@ -421,39 +517,58 @@ export const setupSocket = (io: Server, prisma: any): void => {
 
         io.to(roomId).emit('CHAT_MESSAGE', message)
       } catch (err: any) {
-        logger.error({ event: 'socket.send_message_error', userId: socket.userId, err: err.message }, 'SEND_MESSAGE error')
+        logger.error(
+          { event: 'socket.send_message_error', userId: socket.userId, err: (err as Error).message },
+          'SEND_MESSAGE error',
+        )
         socket.emit('CHAT_ERROR', { message: 'Failed to send message' })
       }
     })
 
     socket.on('SEND_REACTION', ({ roomId, emoji }: { roomId?: string; emoji?: string }) => {
-      if (!roomId || typeof roomId !== 'string') return
-      if (!emoji || typeof emoji !== 'string') return
+      if (!roomId || typeof roomId !== 'string') {
+        return
+      }
+      if (!emoji || typeof emoji !== 'string') {
+        return
+      }
       io.to(roomId).emit('REACTION_UPDATE', { roomId, emoji, userId: socket.userId })
     })
 
     // ─── Direct Messages ─────────────────────────────────
 
     socket.on('DM_TYPING', ({ roomId }: { roomId?: string }) => {
-      if (!roomId || typeof roomId !== 'string') return
+      if (!roomId || typeof roomId !== 'string') {
+        return
+      }
       socket.to(roomId).emit('DM_TYPING', { roomId, userId: socket.userId })
     })
 
     socket.on('DM_STOP_TYPING', ({ roomId }: { roomId?: string }) => {
-      if (!roomId || typeof roomId !== 'string') return
+      if (!roomId || typeof roomId !== 'string') {
+        return
+      }
       socket.to(roomId).emit('DM_STOP_TYPING', { roomId, userId: socket.userId })
     })
 
     socket.on('JOIN_DM', ({ roomId }: { roomId?: string }) => {
-      if (!roomId || typeof roomId !== 'string') return
-      if (!roomId.startsWith('dm:')) return
+      if (!roomId || typeof roomId !== 'string') {
+        return
+      }
+      if (!roomId.startsWith('dm:')) {
+        return
+      }
       const participants = roomId.replace('dm:', '').split(':')
-      if (!participants.includes(socket.userId!)) return
+      if (!participants.includes(socket.userId!)) {
+        return
+      }
       socket.join(roomId)
     })
 
     socket.on('LEAVE_DM', ({ roomId }: { roomId?: string }) => {
-      if (!roomId || typeof roomId !== 'string') return
+      if (!roomId || typeof roomId !== 'string') {
+        return
+      }
       socket.leave(roomId)
     })
 

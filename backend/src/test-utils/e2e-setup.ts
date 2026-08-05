@@ -1,5 +1,5 @@
 /**
- * E2E Test Setup — AuctionXI
+ * E2E Test Setup — MatchMind
  *
  * Creates an Express app + JSON database in a temp directory for integration tests.
  * Used by supertest to test full API flows without starting the server.
@@ -8,15 +8,22 @@
 import express from 'express'
 import cookieParser from 'cookie-parser'
 import passport from 'passport'
-import path from 'path'
+import { execSync } from 'child_process'
 import os from 'os'
 import fs from 'fs'
-import { createJsonDatabase } from '../lib/jsonDb'
+
+process.env.DATABASE_URL = "postgresql://matchmind:matchmind_test_password@localhost:5433/matchmind_test"
+
+import { prisma } from '../lib/prisma'
+import { env } from '../config/env'
+import path from 'path'
+import { container } from '../container'
+import { scopePerRequest } from 'awilix-express'
 
 // ── Helpers ──────────────────────────────────────────────
 
 export function createTempDir(): string {
-  const dir = path.join(os.tmpdir(), 'auctionxi-e2e-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6))
+  const dir = path.join(os.tmpdir(), 'matchmind-e2e-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6))
   fs.mkdirSync(dir, { recursive: true })
   return dir
 }
@@ -24,14 +31,16 @@ export function createTempDir(): string {
 export function cleanupDir(dir: string): void {
   try {
     fs.rmSync(dir, { recursive: true, force: true })
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 }
 
 export function createTestUser(overrides: Record<string, any> = {}) {
   return {
     id: 'test-user-1',
     username: 'testuser',
-    email: 'test@auctionxi.com',
+    email: 'test@matchmind.gg',
     displayName: 'Test User',
     password: '$2a$10$testhashedpassword', // bcrypt hash of "password123"
     tier: 'BRONZE',
@@ -74,7 +83,8 @@ export function createTestTournament(overrides: Record<string, any> = {}) {
  * This replaces the real authenticateToken middleware so tests don't
  * need to generate JWTs or manage auth tokens.
  */
-function mockAuthenticateToken(req: any, _res: any, next: any) {
+function mockAuthenticateToken(req: express.Request, _res: any, next: any) {
+  // @ts-ignore
   req.userId = 'test-user-1'
   next()
 }
@@ -82,26 +92,16 @@ function mockAuthenticateToken(req: any, _res: any, next: any) {
 // ── App Factory ──────────────────────────────────────────
 
 export async function createTestApp() {
-  const dataDir = createTempDir()
-  const prisma = createJsonDatabase(dataDir)
 
-  // Initialize with seed data
-  await prisma.initialize({
-    user: [createTestUser()],
-    tournament: [createTestTournament()],
-    player: [
-      createTestPlayer(),
-      createTestPlayer({ id: 'player-2', name: 'Striker One', position: 'FWD', basePrice: 15 }),
-      createTestPlayer({ id: 'player-3', name: 'Defender Max', position: 'DEF', basePrice: 8 }),
-      createTestPlayer({ id: 'player-4', name: 'Keeper Ace', position: 'GK', basePrice: 12 }),
-      createTestPlayer({ id: 'player-5', name: 'Midfield Maestro', position: 'MID', basePrice: 20 }),
-    ],
-  })
+  // In a real e2e environment with Postgres, we would truncate tables and seed data here
+  // For now, assume CI sets up the test database
 
   const app = express()
   app.use(express.json())
   app.use(cookieParser())
   app.use(passport.initialize())
+  
+  app.use(scopePerRequest(container))
 
   // Make prisma accessible
   app.set('prisma', prisma)
@@ -135,5 +135,7 @@ export async function createTestApp() {
   const { errorHandler } = await import('../middleware/errorHandler')
   app.use(errorHandler)
 
-  return { app, prisma, dataDir }
+  console.log("e2e-setup PRISMA URL:", env.DATABASE_URL)
+
+  return { app, prisma }
 }

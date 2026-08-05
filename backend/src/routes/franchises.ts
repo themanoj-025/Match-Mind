@@ -1,20 +1,27 @@
 import express from 'express'
 import { authenticateToken } from '../middleware/auth'
-import asyncHandler from '../middleware/asyncHandler'
 import type { AuthenticatedRequest } from '../middleware/auth'
+import { openapiRegistry } from '../config/openapi'
 
 const router = express.Router()
 
 // GET /api/rooms/:roomId/franchises/:userId — view roster (read-only for other users)
-router.get('/:roomId/franchises/:userId', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+
+openapiRegistry.registerPath({
+  method: 'get',
+  path: '/:roomId/franchises/:userId',
+  responses: { 200: { description: 'Success' } },
+})
+router.get('/:roomId/franchises/:userId', authenticateToken, async (req: AuthenticatedRequest, res) => {
+  // @ts-ignore
+  const prisma = (req as any).container.resolve('prisma')
   const roomId = req.params.roomId as string
   const userId = req.params.userId as string
 
   const roster = await prisma.roster.findMany({
     where: { roomId, userId },
     include: { player: { select: { id: true, name: true, position: true, club: true, nationality: true } } },
-    orderBy: { isCaptain: 'desc', isViceCaptain: 'desc', 'player.name': 'asc' },
+    orderBy: [{ isCaptain: 'desc' }, { isViceCaptain: 'desc' }, { player: { name: 'asc' } }],
   })
 
   const member = await prisma.roomMember.findUnique({
@@ -27,11 +34,18 @@ router.get('/:roomId/franchises/:userId', authenticateToken, asyncHandler(async 
     remainingBudget: member?.remainingBudget ?? 0,
     rosterSize: roster.length,
   })
-}))
+})
 
 // PATCH /api/rooms/:roomId/franchises/me/captain — set captain and vice-captain (current user)
-router.patch('/:roomId/franchises/me/captain', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const prisma = req.app.get('prisma')
+
+openapiRegistry.registerPath({
+  method: 'patch',
+  path: '/:roomId/franchises/me/captain',
+  responses: { 200: { description: 'Success' } },
+})
+router.patch('/:roomId/franchises/me/captain', authenticateToken, async (req: AuthenticatedRequest, res) => {
+  // @ts-ignore
+  const prisma = (req as any).container.resolve('prisma')
   const roomId = req.params.roomId as string
   const { playerId, isViceCaptain } = req.body as { playerId?: string; isViceCaptain?: boolean }
 
@@ -39,13 +53,15 @@ router.patch('/:roomId/franchises/me/captain', authenticateToken, asyncHandler(a
     return res.status(400).json({ error: { code: 'MISSING_PLAYER_ID', message: 'playerId is required' } })
   }
 
-  // Verify the room is in DRAFTING or COMPLETED state
+  // Verify the room is in DRAFTING or FINISHED state
   const room = await prisma.room.findUnique({ where: { id: roomId } })
   if (!room) {
     return res.status(404).json({ error: { code: 'ROOM_NOT_FOUND', message: 'Room not found' } })
   }
   if (room.status === 'LOBBY' || room.status === 'PAUSED') {
-    return res.status(400).json({ error: { code: 'ROOM_NOT_ACTIVE', message: 'Cannot set captain while room is in lobby or paused' } })
+    return res
+      .status(400)
+      .json({ error: { code: 'ROOM_NOT_ACTIVE', message: 'Cannot set captain while room is in lobby or paused' } })
   }
 
   // Verify the player is in user's roster
@@ -96,6 +112,6 @@ router.patch('/:roomId/franchises/me/captain', authenticateToken, asyncHandler(a
   })
 
   res.json(updated)
-}))
+})
 
 export default router

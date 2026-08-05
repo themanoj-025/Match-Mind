@@ -1,5 +1,5 @@
 /**
- * seedDraftPlayers.ts — AuctionXI v4 §6.5
+ * seedDraftPlayers.ts — MatchMind v4 §6.5
  *
  * Generates comprehensive seed player data for both LIVE tournaments
  * (fifa-wc-2026 and uefa-ucl-2026-27) to ensure the Draft Mode

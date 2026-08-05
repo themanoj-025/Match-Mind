@@ -20,6 +20,7 @@ process.env.JWT_SECRET = 'test-jwt-secret'
 process.env.JWT_REFRESH_SECRET = 'test-refresh-secret'
 
 const TEST_USER_ID = 'test-user-1'
+const OTHER_USER_ID = 'other-user-2'
 const TEST_AUTH_TOKEN = jwt.sign({ userId: TEST_USER_ID }, process.env.JWT_SECRET, { expiresIn: '1h' })
 
 let app: any
@@ -38,7 +39,9 @@ const shared = {
 
 async function api(method: string, path: string, opts: { body?: any; auth?: boolean } = {}) {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-  if (opts.auth !== false) headers['Authorization'] = `Bearer ${TEST_AUTH_TOKEN}`
+  if (opts.auth !== false) {
+    headers['Authorization'] = `Bearer ${TEST_AUTH_TOKEN}`
+  }
 
   const res = await fetch(`${baseUrl}${path}`, {
     method,
@@ -59,11 +62,110 @@ beforeAll(async () => {
   prisma = testEnv.prisma
   dataDir = testEnv.dataDir
 
+  // Clear DB before tests
+  await prisma.bid.deleteMany()
+  await prisma.roster.deleteMany()
+  await prisma.roomMember.deleteMany()
+  await prisma.auctionState.deleteMany()
+  await prisma.room.deleteMany()
+  await prisma.player.deleteMany()
+  await prisma.tournament.deleteMany()
+  await prisma.room.deleteMany()
+  await prisma.user.deleteMany()
+
+  // Create test users
+  await prisma.user.create({
+    data: {
+      id: TEST_USER_ID,
+      username: 'test',
+      email: 'test@test.com',
+      displayName: 'Test User',
+      passwordHash: '$2a$10$testhashedpassword',
+      tier: 'BRONZE',
+      isPro: false,
+      totalPoints: 0,
+    },
+  })
+  await prisma.user.create({
+    data: {
+      id: OTHER_USER_ID,
+      username: 'other',
+      email: 'other@test.com',
+      displayName: 'Other User',
+      passwordHash: '$2a$10$testhashedpassword',
+      tier: 'BRONZE',
+      isPro: false,
+      totalPoints: 0,
+    },
+  })
+
+  // Seed tournament so POST /api/rooms doesn't fail on foreign key constraint
+  await prisma.tournament.upsert({
+    where: { id: 'fifa-wc-2026' },
+    update: {},
+    create: {
+      id: 'fifa-wc-2026',
+      name: 'FIFA World Cup 2026',
+      shortName: 'WC 2026',
+      status: 'UPCOMING',
+      confederation: 'FIFA',
+      gender: 'men',
+      format: 'international',
+      teamCount: 48,
+      squadSize: 26,
+      launchPhase: 1,
+    },
+  })
+
+  // Seed players
+  await prisma.player.createMany({
+    data: [
+      {
+        id: 'player-1',
+        tournamentId: 'fifa-wc-2026',
+        name: 'Lionel Messi',
+        club: 'Inter Miami',
+        nationality: 'Argentina',
+        position: 'FWD',
+        basePrice: 50,
+      },
+      {
+        id: 'player-2',
+        tournamentId: 'fifa-wc-2026',
+        name: 'Kylian Mbappe',
+        club: 'Real Madrid',
+        nationality: 'France',
+        position: 'FWD',
+        basePrice: 60,
+      },
+      {
+        id: 'player-3',
+        tournamentId: 'fifa-wc-2026',
+        name: 'Kevin De Bruyne',
+        club: 'Man City',
+        nationality: 'Belgium',
+        position: 'MID',
+        basePrice: 45,
+      },
+    ],
+    skipDuplicates: true,
+  })
+
   server = createServer(app)
   await new Promise<void>((resolve) => server.listen(0, resolve))
   const addr = server.address()
-  const port = typeof addr === 'object' && addr ? addr.port : 4001
-  baseUrl = `http://localhost:${port}`
+  if (typeof addr === 'object' && addr !== null) {
+    baseUrl = `http://localhost:${addr.port}`
+  }
+
+  // Seed users
+  await prisma.user.createMany({
+    data: [
+      { id: TEST_USER_ID, email: 'test@example.com', username: 'testuser', role: 'USER' },
+      { id: OTHER_USER_ID, email: 'other@example.com', username: 'otheruser', role: 'USER' },
+    ],
+    skipDuplicates: true,
+  })
 })
 
 afterAll(() => {
@@ -81,15 +183,19 @@ describe('Room CRUD', () => {
   })
 
   it('POST /api/rooms creates a room with invite code', async () => {
-    const { status, body } = await api('POST', '/api/rooms', {
+    const res = await api('POST', '/api/rooms', {
       body: {
         name: 'E2E Test Draft',
         tournamentId: 'fifa-wc-2026',
         totalBudget: 500,
-        rosterRules: { GK: 2, DEF: 5, MID: 5, FWD: 3, total: 15 },
       },
     })
 
+    if (res.status !== 201) {
+      throw new Error(`POST /api/rooms FAILED: ${res.status} ${JSON.stringify(res.body)}`)
+    }
+
+    const { status, body } = res
     expect(status).toBe(201)
     expect(body.id).toBeDefined()
     expect(body.name).toBe('E2E Test Draft')
@@ -121,14 +227,12 @@ describe('Room CRUD', () => {
 describe('Auction Host Controls', () => {
   let currentPlayerId: string
 
-  it('adds the test user as a room member', async () => {
+  it('adds the other user as a room member', async () => {
     await prisma.roomMember.create({
       data: {
         roomId: shared.roomId,
-        userId: TEST_USER_ID,
+        userId: OTHER_USER_ID,
         remainingBudget: 500,
-        rosterSize: 0,
-        joinedAt: new Date().toISOString(),
       },
     })
 
@@ -263,18 +367,14 @@ describe('API Error Handling', () => {
   })
 
   it('rejects non-host from starting auction', async () => {
-    // Create a room as different user by directly using prisma
-    const otherRoom = prisma.room.create({
+    const otherRoom = await prisma.room.create({
       data: {
         name: 'Other Room',
         tournamentId: 'fifa-wc-2026',
         hostId: 'other-user',
-        inviteCode: 'OTHER01',
-        totalBudget: 500,
-        rosterRules: { GK: 2, DEF: 5, MID: 5, FWD: 3, total: 15 },
+        inviteCode: `TEST-OTHER-${Date.now()}`,
         status: 'LOBBY',
-        bidIncrementRule: { base: 5 },
-        antiSnipeSeconds: 5,
+        totalBudget: 500,
       },
     })
 

@@ -1,9 +1,12 @@
 /**
- * Zod validation schemas for AuctionXI API.
+ * Zod validation schemas for MatchMind API.
  * All POST / PATCH / PUT route bodies are defined here.
  */
 
 import { z } from 'zod'
+import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi'
+
+extendZodWithOpenApi(z)
 import { isValidTournamentId, POSITIONS } from './tournaments'
 
 // ─── Auth ───────────────────────────────────────────────
@@ -30,6 +33,7 @@ export const createRoomSchema = z.object({
   name: z.string().min(1, 'Room name is required').max(100),
   tournamentId: z.string().refine(isValidTournamentId, { message: 'Invalid tournament ID — must match a known tournament in the registry (e.g. fifa-wc-2026, uefa-ucl-2026-27, etc.)' }),
   totalBudget: z.number().int().positive().default(500),
+  format: z.string().optional(),
   rosterRules: z.object({
     GK: z.number().int().min(1).max(5).default(2),
     DEF: z.number().int().min(1).max(8).default(5),

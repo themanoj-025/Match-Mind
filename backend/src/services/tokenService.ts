@@ -1,3 +1,4 @@
+import { env } from '../config/env'
 /**
  * Token Service — Cookie and token helpers
  *
@@ -19,14 +20,14 @@ export function setAuthCookies(res: Response, tokens: { accessToken: string; ref
   res.cookie('refreshToken', tokens.refreshToken, {
     httpOnly: true,
     sameSite: 'strict',
-    secure: process.env.NODE_ENV === 'production',
+    secure: env.NODE_ENV === 'production',
     path: '/api/auth',
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
   })
   res.cookie('accessToken', tokens.accessToken, {
     httpOnly: true,
     sameSite: 'strict',
-    secure: process.env.NODE_ENV === 'production',
+    secure: env.NODE_ENV === 'production',
     path: '/',
     maxAge: 15 * 60 * 1000, // 15 minutes
   })

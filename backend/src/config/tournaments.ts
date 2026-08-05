@@ -1,5 +1,5 @@
 /**
- * Tournament Configuration — AuctionXI v2
+ * Tournament Configuration — MatchMind v2
  *
  * Loads tournament metadata from tournamentRegistry.json,
  * validates it with Zod at boot, and exposes typed accessors.
@@ -92,7 +92,7 @@ function loadRegistry(): Tournament[] {
     const parsed = JSON.parse(raw)
     const result = RegistrySchema.parse(parsed)
     return result.tournaments as Tournament[]
-  } catch (err) {
+  } catch (err: any) {
     console.error('[TournamentRegistry] Failed to load or validate:', err)
     process.exit(1)
   }

@@ -1,5 +1,5 @@
 /**
- * validateLeagueDataPackage.ts — AuctionXI v2 §4.3
+ * validateLeagueDataPackage.ts — MatchMind v2 §4.3
  *
  * Validates that a tournament has a complete League Data Package before
  * its status can be flipped to LIVE.

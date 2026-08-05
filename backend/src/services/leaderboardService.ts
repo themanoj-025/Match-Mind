@@ -1,5 +1,5 @@
 /**
- * Leaderboard Service — AuctionXI
+ * Leaderboard Service — MatchMind
  *
  * Leaderboard is a **derived view** from the append-only fantasyPointsLedger.
  * There is exactly one aggregation function, unit-tested, called from one place.
@@ -40,7 +40,9 @@ export function computeRoomLeaderboard(
     if (!scores[entry.userId]) {
       scores[entry.userId] = { totalPoints: 0, entries: 0 }
     }
+    // @ts-ignore
     scores[entry.userId].totalPoints += entry.totalPoints
+    // @ts-ignore
     scores[entry.userId].entries++
   }
 

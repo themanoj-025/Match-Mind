@@ -1,5 +1,5 @@
 /**
- * computeRarityTiers.ts — AuctionXI v4 §1.3
+ * computeRarityTiers.ts — MatchMind v4 §1.3
  *
  * Ranks all players in every tournament by basePrice descending,
  * assigns a rarityTier per the percentile buckets defined in constants.ts,

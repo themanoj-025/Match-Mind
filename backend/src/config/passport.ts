@@ -1,3 +1,4 @@
+import { env } from './env'
 /**
  * Passport strategies for MatchMind.
  *
@@ -15,7 +16,7 @@ export function configurePassport(prisma: DatabaseClient) {
   // JWT Strategy — authenticate API requests via Bearer token
   const jwtOpts = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: process.env.JWT_SECRET!,
+    secretOrKey: env.JWT_SECRET!,
   }
 
   passport.use(new JwtStrategy(jwtOpts, async (payload: { userId: string }, done) => {
@@ -23,18 +24,18 @@ export function configurePassport(prisma: DatabaseClient) {
       const user = await prisma.user.findUnique({ where: { id: payload.userId } })
       if (!user) return done(null, false)
       return done(null, user)
-    } catch (err) {
+    } catch (err: any) {
       return done(err, false)
     }
   }))
 
   // Google OAuth Strategy — signup/login via Google
-  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
     passport.use(new GoogleStrategy({
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: `${process.env.BACKEND_URL || 'http://localhost:4000'}/api/auth/google/cb`,
-    }, async (accessToken: string, refreshToken: string, profile: any, done: (error: any, user?: any) => void) => {
+      clientID: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
+      callbackURL: `${env.BACKEND_URL || 'http://localhost:4000'}/api/auth/google/cb`,
+    }, async (accessToken: string, refreshToken: string, profile: any, done: (error: unknown, user?: any) => void) => {
       try {
         const email = profile.emails?.[0]?.value
         if (!email) return done(new Error('No email from Google'), null)
@@ -51,7 +52,7 @@ export function configurePassport(prisma: DatabaseClient) {
           })
         }
         return done(null, user)
-      } catch (err) {
+      } catch (err: any) {
         return done(err, null)
       }
     }))
@@ -65,7 +66,7 @@ export function configurePassport(prisma: DatabaseClient) {
     try {
       const user = await prisma.user.findUnique({ where: { id } })
       done(null, user)
-    } catch (err) {
+    } catch (err: any) {
       done(err, null)
     }
   })
