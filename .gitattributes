@@ -60,7 +60,7 @@ vercel.json text
 *.jpg binary
 *.jpeg binary
 *.gif binary
-*.svg text  # SVGs are text-based
+*.svg text
 *.ico binary
 *.woff binary
 *.woff2 binary
