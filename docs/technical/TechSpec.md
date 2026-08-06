@@ -147,6 +147,21 @@ sequenceDiagram
 | N+1 queries           | Repository patterns (audit remediation) |
 | Event-loop blocking   | Scoring worker extraction (roadmap)     |
 
+## Deployment Topology
+
+```mermaid
+graph TD
+    USER[Browser] --> SPA[React 19 + Vite SPA]
+    SPA --> API[Node.js API]
+    API --> REDIS[(Redis: live data + state)]
+    API --> WS[WebSocket feed: sports data]
+    subgraph Deploy
+        SPA --> VERCEL[Vercel frontend]
+        API --> API_C[Backend container]
+        REDIS --> RD_C[Redis container]
+    end
+```
+
 ## 11. Related Documents
 
 | Document                                                  | Relationship |

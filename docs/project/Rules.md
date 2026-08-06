@@ -88,6 +88,23 @@ tests/
 **Ask a human when:** schema migrations, Stripe changes, security incidents, WS scaling decisions.
 **Decide autonomously:** refactors, tests, UI polish, config.
 
+## Git / PR Workflow
+
+```mermaid
+flowchart TD
+    A["Start: pick an issue / task"] --> B["Create branch: feat/slug, fix/slug, security/slug"]
+    B --> C["Commit: Conventional Commits"]
+    C --> D["Push branch to origin"]
+    D --> E["Open pull request: ≤ 400 lines"]
+    E --> F{"CI green (lint, typecheck, test, gitleaks, audit)?"}
+    F -- No --> C
+    F -- Yes --> G{"Review approved?"}
+    G -- No --> H["Address feedback"]
+    H --> C
+    G -- Yes --> I["Squash merge to main"]
+    I --> J["Delete merged branch"]
+```
+
 ## 10. Related Documents
 
 | Document                                                          | Relationship      |
