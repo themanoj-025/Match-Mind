@@ -30,14 +30,14 @@ APIs are the contract between a service and its consumers. A well-designed API c
 **Severity if failed**: 🟡 Medium
 **Applies to**: REST APIs
 
-| Operation | Verb | Success | Idempotent | Safe |
-|---|---|---|---|---|
-| List | GET | 200 | Yes | Yes |
-| Read | GET /{id} | 200 | Yes | Yes |
-| Create | POST | 201 | No | No |
-| Replace | PUT /{id} | 200 | Yes | No |
-| Partial Update | PATCH /{id} | 200 | Not always | No |
-| Delete | DELETE /{id} | 204 | Yes | No |
+| Operation      | Verb         | Success | Idempotent | Safe |
+| -------------- | ------------ | ------- | ---------- | ---- |
+| List           | GET          | 200     | Yes        | Yes  |
+| Read           | GET /{id}    | 200     | Yes        | Yes  |
+| Create         | POST         | 201     | No         | No   |
+| Replace        | PUT /{id}    | 200     | Yes        | No   |
+| Partial Update | PATCH /{id}  | 200     | Not always | No   |
+| Delete         | DELETE /{id} | 204     | Yes        | No   |
 
 **CHECKPOINT [07.01.003]**
 **Title**: Verify error responses follow a consistent JSON envelope
@@ -182,27 +182,27 @@ APIs are the contract between a service and its consumers. A well-designed API c
 
 ### REST Verb/Status-Code Matrix
 
-| Operation | Verb | Success | Idempotent | Safe |
-|---|---|---|---|---|
-| List | GET | 200 | Yes | Yes |
-| Read | GET /{id} | 200 | Yes | Yes |
-| Create | POST | 201 | No | No |
-| Full replace | PUT /{id} | 200 | Yes | No |
-| Partial update | PATCH /{id} | 200 | Not always | No |
-| Delete | DELETE /{id} | 204 | Yes | No |
+| Operation      | Verb         | Success | Idempotent | Safe |
+| -------------- | ------------ | ------- | ---------- | ---- |
+| List           | GET          | 200     | Yes        | Yes  |
+| Read           | GET /{id}    | 200     | Yes        | Yes  |
+| Create         | POST         | 201     | No         | No   |
+| Full replace   | PUT /{id}    | 200     | Yes        | No   |
+| Partial update | PATCH /{id}  | 200     | Not always | No   |
+| Delete         | DELETE /{id} | 204     | Yes        | No   |
 
 ### Error Code Ranges
 
-| Code | Meaning | Example |
-|---|---|---|
-| 400 | Bad request | Missing required field |
-| 401 | Unauthenticated | Invalid token |
-| 403 | Forbidden | Insufficient permissions |
-| 404 | Not found | Resource ID not exist |
-| 409 | Conflict | Duplicate resource |
-| 422 | Unprocessable | Email format invalid |
-| 429 | Rate limited | Too many requests |
-| 500 | Internal error | Unhandled exception |
+| Code | Meaning         | Example                  |
+| ---- | --------------- | ------------------------ |
+| 400  | Bad request     | Missing required field   |
+| 401  | Unauthenticated | Invalid token            |
+| 403  | Forbidden       | Insufficient permissions |
+| 404  | Not found       | Resource ID not exist    |
+| 409  | Conflict        | Duplicate resource       |
+| 422  | Unprocessable   | Email format invalid     |
+| 429  | Rate limited    | Too many requests        |
+| 500  | Internal error  | Unhandled exception      |
 
 ### Idempotency Key Pattern
 
@@ -216,15 +216,15 @@ APIs are the contract between a service and its consumers. A well-designed API c
 
 ## Volume Scorecard Template
 
-| Subsection | Score (0–10) | Top 3 Findings | Evidence Required |
-|---|---|---|---|
-| 7.1 REST | | | Route definitions, error samples |
-| 7.2 GraphQL | | | Dataloader, cost analysis, introspection |
-| 7.3 gRPC | | | Deadlines, error model, TLS |
-| 7.4 WebSocket | | | Heartbeat, message size |
-| 7.5 SSE | | | Content-Type, format |
-| 7.6 Versioning | | | Strategy doc, pagination, filter validation |
-| 7.7 Cross-Cutting | | | Auth, rate limiting, idempotency, OpenAPI |
+| Subsection        | Score (0–10) | Top 3 Findings | Evidence Required                           |
+| ----------------- | ------------ | -------------- | ------------------------------------------- |
+| 7.1 REST          |              |                | Route definitions, error samples            |
+| 7.2 GraphQL       |              |                | Dataloader, cost analysis, introspection    |
+| 7.3 gRPC          |              |                | Deadlines, error model, TLS                 |
+| 7.4 WebSocket     |              |                | Heartbeat, message size                     |
+| 7.5 SSE           |              |                | Content-Type, format                        |
+| 7.6 Versioning    |              |                | Strategy doc, pagination, filter validation |
+| 7.7 Cross-Cutting |              |                | Auth, rate limiting, idempotency, OpenAPI   |
 
 ---
 
@@ -262,4 +262,4 @@ Audit pagination strategy, filter injection prevention, sort allowlisting, max p
 
 ---
 
-*End of Volume 7*
+_End of Volume 7_

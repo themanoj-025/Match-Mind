@@ -202,17 +202,17 @@ This volume covers nine discovery domains:
 
 ## Volume Scorecard Template
 
-| Subsection | Score (0–10) | Top 3 Findings | Evidence Required |
-|---|---|---|---|
-| 2.1 Repository Analysis | | | Git log, branch config, .gitignore |
-| 2.2 Folder Analysis | | | Directory listing, depcheck output |
-| 2.3 Dependency Analysis | | | npm audit, license-checker output |
-| 2.4 Tech Stack | | | Lockfiles, config files |
-| 2.5 Build Analysis | | | Build time, CI logs |
-| 2.6 Runtime Analysis | | | Startup time, memory usage |
-| 2.7 Configuration | | | .env.example, grep for secrets |
-| 2.8 Environment | | | Docker/Compose configs |
-| 2.9 Documentation | | | README, docs/ contents |
+| Subsection              | Score (0–10) | Top 3 Findings | Evidence Required                  |
+| ----------------------- | ------------ | -------------- | ---------------------------------- |
+| 2.1 Repository Analysis |              |                | Git log, branch config, .gitignore |
+| 2.2 Folder Analysis     |              |                | Directory listing, depcheck output |
+| 2.3 Dependency Analysis |              |                | npm audit, license-checker output  |
+| 2.4 Tech Stack          |              |                | Lockfiles, config files            |
+| 2.5 Build Analysis      |              |                | Build time, CI logs                |
+| 2.6 Runtime Analysis    |              |                | Startup time, memory usage         |
+| 2.7 Configuration       |              |                | .env.example, grep for secrets     |
+| 2.8 Environment         |              |                | Docker/Compose configs             |
+| 2.9 Documentation       |              |                | README, docs/ contents             |
 
 ---
 
@@ -230,4 +230,4 @@ This volume covers nine discovery domains:
 
 ---
 
-*End of Volume 2*
+_End of Volume 2_

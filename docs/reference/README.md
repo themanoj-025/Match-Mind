@@ -13,16 +13,16 @@ The audit framework is a **generic methodology**, not specific to MatchMind. It 
 
 ## Volumes
 
-| Volume | Title | Focus |
-|--------|-------|-------|
-| 01 | Foundations | Engineering mindset, audit philosophy, severity/scoring systems, reviewer personas |
-| 02 | Project Discovery | Repository analysis, folder structure, dependencies, tech stack detection, build/runtime analysis |
-| 03 | Architecture | 12 architecture patterns (Clean, Hexagonal, MVC, CQRS, Event-Driven, DDD, etc.) |
-| 04 | Backend Engineering | Controllers, services, repositories, middleware, workers/queues, caching, error handling |
-| 06 | Database Engineering | Schema design, query optimization, indexing, migrations, data integrity |
-| 07 | API Engineering | REST/GraphQL design, versioning, pagination, rate limiting, documentation |
-| 08 | Security Engineering | Authentication, authorization, input validation, secret management, dependency scanning |
-| 99 | Comprehensive Audit | Full project audit combining all volumes into a single report |
+| Volume | Title                | Focus                                                                                             |
+| ------ | -------------------- | ------------------------------------------------------------------------------------------------- |
+| 01     | Foundations          | Engineering mindset, audit philosophy, severity/scoring systems, reviewer personas                |
+| 02     | Project Discovery    | Repository analysis, folder structure, dependencies, tech stack detection, build/runtime analysis |
+| 03     | Architecture         | 12 architecture patterns (Clean, Hexagonal, MVC, CQRS, Event-Driven, DDD, etc.)                   |
+| 04     | Backend Engineering  | Controllers, services, repositories, middleware, workers/queues, caching, error handling          |
+| 06     | Database Engineering | Schema design, query optimization, indexing, migrations, data integrity                           |
+| 07     | API Engineering      | REST/GraphQL design, versioning, pagination, rate limiting, documentation                         |
+| 08     | Security Engineering | Authentication, authorization, input validation, secret management, dependency scanning           |
+| 99     | Comprehensive Audit  | Full project audit combining all volumes into a single report                                     |
 
 ## Usage
 

@@ -14,6 +14,7 @@
 Backend engineering is where architecture meets implementation. The patterns defined in Volume 3 are realized here — or violated. A controller that directly queries the database, a service that sends HTTP responses, a repository that performs business validation — each is a boundary violation that makes the codebase harder to test, harder to change, and more dangerous to refactor.
 
 This volume covers 12 domains:
+
 1. **Controllers** (§4.1) — request parsing, response formatting, thin controller enforcement.
 2. **Services** (§4.2) — business logic organization, service granularity, orchestration.
 3. **Repositories** (§4.3) — data access abstraction, query isolation, testability.
@@ -44,18 +45,21 @@ This volume covers 12 domains:
 ```javascript
 // BAD
 router.post('/predictions', async (req, res) => {
-  const match = await db.query('SELECT * FROM matches WHERE id = $1', [req.body.matchId]);
-  if (!match) return res.status(404).json({ error: 'Not found' });
-  if (match.status !== 'PENDING') return res.status(400).json({ error: 'Match started' });
-  await db.query('INSERT INTO predictions ...');
-  res.status(201).json({ success: true });
-});
+  const match = await db.query('SELECT * FROM matches WHERE id = $1', [req.body.matchId])
+  if (!match) return res.status(404).json({ error: 'Not found' })
+  if (match.status !== 'PENDING') return res.status(400).json({ error: 'Match started' })
+  await db.query('INSERT INTO predictions ...')
+  res.status(201).json({ success: true })
+})
 
 // GOOD
-router.post('/predictions', asyncHandler(async (req, res) => {
-  const result = await predictionService.createPrediction(req.user.id, req.body);
-  res.status(201).json(result);
-}));
+router.post(
+  '/predictions',
+  asyncHandler(async (req, res) => {
+    const result = await predictionService.createPrediction(req.user.id, req.body)
+    res.status(201).json(result)
+  }),
+)
 ```
 
 **CHECKPOINT [04.01.002]**
@@ -242,17 +246,20 @@ router.post('/predictions', asyncHandler(async (req, res) => {
 ### A. Layered-Architecture Violation Detector Checklist
 
 **Controller violations:**
+
 - [ ] Controller calls `db.query()` or ORM methods directly?
 - [ ] Controller contains if/else on business rules?
 - [ ] Controller has > 5 lines beyond validation + service call + response?
 
 **Service violations:**
+
 - [ ] Service imports req, res, request, or response?
 - [ ] Service directly accesses database (not through repository)?
 - [ ] Service constructor has > 4 dependencies?
 - [ ] Service returns raw DB row instead of domain object?
 
 **Repository violations:**
+
 - [ ] Repository contains business validation?
 - [ ] Repository manages its own transactions?
 - [ ] Repository throws domain exceptions (NotFoundError)?
@@ -260,31 +267,31 @@ router.post('/predictions', asyncHandler(async (req, res) => {
 
 ### B. Transaction-Boundary Decision Guide
 
-| Use Case | Isolation Level | Rationale |
-|---|---|---|
-| Read-only reports | READ COMMITTED | Max concurrency |
-| Financial reconciliation | SERIALIZABLE | Prevent write skew |
-| Create record (INSERT only) | READ COMMITTED | No conflicting reads |
-| Read-then-write update | REPEATABLE READ | Prevent lost update |
+| Use Case                    | Isolation Level | Rationale            |
+| --------------------------- | --------------- | -------------------- |
+| Read-only reports           | READ COMMITTED  | Max concurrency      |
+| Financial reconciliation    | SERIALIZABLE    | Prevent write skew   |
+| Create record (INSERT only) | READ COMMITTED  | No conflicting reads |
+| Read-then-write update      | REPEATABLE READ | Prevent lost update  |
 
 ---
 
 ## Volume Scorecard Template
 
-| Subsection | Score (0-10) | Top 3 Findings | Evidence |
-|---|---|---|---|
-| 4.1 Controllers | | | Controller files, error middleware |
-| 4.2 Services | | | Service files, DI config |
-| 4.3 Repositories | | | Repository files, query patterns |
-| 4.4 Middlewares | | | Middleware order, cross-cutting |
-| 4.5 Workers/Queues | | | Idempotency, retry, DLQ |
-| 4.6 Caching | | | Cache strategy, invalidation |
-| 4.7 Auth Integration | | | Auth middleware, user extraction |
-| 4.8 Authorization | | | RBAC/ABAC, permission checks |
-| 4.9 Error Handling | | | Error middleware, classification |
-| 4.10 Validation | | | Validation schemas, multi-layer |
-| 4.11 Transactions | | | Boundaries, isolation levels |
-| 4.12 Concurrency | | | Locking, unbounded ops |
+| Subsection           | Score (0-10) | Top 3 Findings | Evidence                           |
+| -------------------- | ------------ | -------------- | ---------------------------------- |
+| 4.1 Controllers      |              |                | Controller files, error middleware |
+| 4.2 Services         |              |                | Service files, DI config           |
+| 4.3 Repositories     |              |                | Repository files, query patterns   |
+| 4.4 Middlewares      |              |                | Middleware order, cross-cutting    |
+| 4.5 Workers/Queues   |              |                | Idempotency, retry, DLQ            |
+| 4.6 Caching          |              |                | Cache strategy, invalidation       |
+| 4.7 Auth Integration |              |                | Auth middleware, user extraction   |
+| 4.8 Authorization    |              |                | RBAC/ABAC, permission checks       |
+| 4.9 Error Handling   |              |                | Error middleware, classification   |
+| 4.10 Validation      |              |                | Validation schemas, multi-layer    |
+| 4.11 Transactions    |              |                | Boundaries, isolation levels       |
+| 4.12 Concurrency     |              |                | Locking, unbounded ops             |
 
 ---
 
@@ -323,4 +330,4 @@ Audit error handling across all layers for boundaries, error envelope consistenc
 
 ---
 
-*End of Volume 4*
+_End of Volume 4_

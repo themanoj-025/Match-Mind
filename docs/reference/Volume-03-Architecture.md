@@ -203,33 +203,33 @@ For each pattern: definition, when it's the right choice, when it's over-enginee
 
 ## Non-Checkpoint Deliverable: Pattern-Mismatch Red-Flag Table
 
-| Claimed Pattern | Red Flag | Likely Actual Pattern |
-|---|---|---|
-| Clean Architecture | Domain entities import framework | MVC under the hood |
-| Microservices | Shared database | Distributed monolith |
-| CQRS | Same model for read/write | Single-path CRUD |
-| Hexagonal | Port defined in infrastructure | Adapter leak |
-| Event-Driven | Handlers are not idempotent | At-most-once delivery |
-| DDD | No bounded context mapping | Undifferentiated Big Ball of Mud |
+| Claimed Pattern    | Red Flag                         | Likely Actual Pattern            |
+| ------------------ | -------------------------------- | -------------------------------- |
+| Clean Architecture | Domain entities import framework | MVC under the hood               |
+| Microservices      | Shared database                  | Distributed monolith             |
+| CQRS               | Same model for read/write        | Single-path CRUD                 |
+| Hexagonal          | Port defined in infrastructure   | Adapter leak                     |
+| Event-Driven       | Handlers are not idempotent      | At-most-once delivery            |
+| DDD                | No bounded context mapping       | Undifferentiated Big Ball of Mud |
 
 ---
 
 ## Volume Scorecard Template
 
-| Subsection | Score (0–10) | Top 3 Findings | Evidence |
-|---|---|---|---|
-| 3.1 Clean | | | Dependency direction check |
-| 3.2 Hexagonal | | | Port/adapter separation |
-| 3.3 Onion | | | Domain independence |
-| 3.4 MVC | | | Controller thinness |
-| 3.5 MVVM | | | View/ViewModel decoupling |
-| 3.6 CQRS | | | Command/query separation |
-| 3.7 Event-Driven | | | Idempotency, DLQ |
-| 3.8 DDD | | | Aggregate boundaries |
-| 3.9 Modular Monolith | | | Module isolation |
-| 3.10 Microservices | | | Database isolation |
-| 3.11 Serverless | | | Cold start, state |
-| 3.12 Plugin | | | Plugin interface |
+| Subsection           | Score (0–10) | Top 3 Findings | Evidence                   |
+| -------------------- | ------------ | -------------- | -------------------------- |
+| 3.1 Clean            |              |                | Dependency direction check |
+| 3.2 Hexagonal        |              |                | Port/adapter separation    |
+| 3.3 Onion            |              |                | Domain independence        |
+| 3.4 MVC              |              |                | Controller thinness        |
+| 3.5 MVVM             |              |                | View/ViewModel decoupling  |
+| 3.6 CQRS             |              |                | Command/query separation   |
+| 3.7 Event-Driven     |              |                | Idempotency, DLQ           |
+| 3.8 DDD              |              |                | Aggregate boundaries       |
+| 3.9 Modular Monolith |              |                | Module isolation           |
+| 3.10 Microservices   |              |                | Database isolation         |
+| 3.11 Serverless      |              |                | Cold start, state          |
+| 3.12 Plugin          |              |                | Plugin interface           |
 
 ---
 
@@ -257,4 +257,4 @@ Detect boundary violations in a modular monolith.
 
 ---
 
-*End of Volume 3*
+_End of Volume 3_

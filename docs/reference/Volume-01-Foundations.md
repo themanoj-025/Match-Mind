@@ -105,13 +105,13 @@ This volume defines ten foundations:
 
 **Severity matrix**:
 
-| Level | Code | Definition | SLA |
-|---|---|---|---|
-| 🔴 Critical | C | Actively exploitable, data-loss, or complete-outage risk | Fix before any further deploy |
-| 🟠 High | H | Significant risk under realistic conditions | Fix this sprint |
-| 🟡 Medium | M | Real but bounded risk, maintainability/velocity tax | Fix this quarter |
-| 🟢 Low | L | Polish, best-practice deviation, minor inefficiency | Backlog |
-| ⚪ Info | I | Observation, not a defect | No action required |
+| Level       | Code | Definition                                               | SLA                           |
+| ----------- | ---- | -------------------------------------------------------- | ----------------------------- |
+| 🔴 Critical | C    | Actively exploitable, data-loss, or complete-outage risk | Fix before any further deploy |
+| 🟠 High     | H    | Significant risk under realistic conditions              | Fix this sprint               |
+| 🟡 Medium   | M    | Real but bounded risk, maintainability/velocity tax      | Fix this quarter              |
+| 🟢 Low      | L    | Polish, best-practice deviation, minor inefficiency      | Backlog                       |
+| ⚪ Info     | I    | Observation, not a defect                                | No action required            |
 
 ---
 
@@ -123,6 +123,7 @@ This volume defines ten foundations:
 **Applies to**: Universal
 
 **Category scoring rubric (0–10)**:
+
 - **0–2**: Absent or actively broken; would fail any professional review.
 - **3–4**: Present but fundamentally inadequate; prototype-grade.
 - **5–6**: Functional with known, material gaps; MVP-grade.
@@ -130,6 +131,7 @@ This volume defines ten foundations:
 - **9–10**: Best-in-class; would pass FAANG-level internal review with no notes.
 
 **Aggregate score formula**:
+
 ```
 Overall Score = Σ (Volume Score × Volume Weight) / Σ (Volume Weight)
 ```
@@ -158,6 +160,7 @@ The 24-persona panel whose combined judgment informs every checkpoint. See Secti
 ## 1.9 Decision Trees
 
 **Should this be a microservice?**
+
 ```
 Team size < 8? → No. Monolith.
 Domain complexity low? → No. Monolith.
@@ -166,6 +169,7 @@ Different scaling requirements per component? → Yes. Microservices.
 ```
 
 **REST or GraphQL?**
+
 ```
 Multiple data sources aggregated per view? → GraphQL.
 Simple CRUD, well-defined resources? → REST.
@@ -189,18 +193,18 @@ The five-phase process:
 
 ## Volume Scorecard Template
 
-| Subsection | Score (0–10) | Top 3 Findings | Evidence Required |
-|---|---|---|---|
-| 1.1 Engineering Mindset | | | Auditor self-assessment |
-| 1.2 Audit Philosophy | | | Report sample |
-| 1.3 Review Methodology | | | Workflow documentation |
-| 1.4 Review Rules | | | Finding prioritization |
-| 1.5 Severity System | | | Severity assignments |
-| 1.6 Scoring Framework | | | Score justifications |
-| 1.7 Engineering Standards | | | Code sample |
-| 1.8 Reviewer Personas | | | Persona usage evidence |
-| 1.9 Decision Trees | | | Decision documentation |
-| 1.10 Audit Workflow | | | Process adherence |
+| Subsection                | Score (0–10) | Top 3 Findings | Evidence Required       |
+| ------------------------- | ------------ | -------------- | ----------------------- |
+| 1.1 Engineering Mindset   |              |                | Auditor self-assessment |
+| 1.2 Audit Philosophy      |              |                | Report sample           |
+| 1.3 Review Methodology    |              |                | Workflow documentation  |
+| 1.4 Review Rules          |              |                | Finding prioritization  |
+| 1.5 Severity System       |              |                | Severity assignments    |
+| 1.6 Scoring Framework     |              |                | Score justifications    |
+| 1.7 Engineering Standards |              |                | Code sample             |
+| 1.8 Reviewer Personas     |              |                | Persona usage evidence  |
+| 1.9 Decision Trees        |              |                | Decision documentation  |
+| 1.10 Audit Workflow       |              |                | Process adherence       |
 
 ---
 
@@ -229,4 +233,4 @@ Use the decision trees to evaluate whether the project's architecture choices ar
 
 ---
 
-*End of Volume 1*
+_End of Volume 1_

@@ -69,10 +69,11 @@ This volume covers 15 security domains: OWASP Top 10 (2021), JWT, OAuth 2.0, OID
 
 **Bad pattern**: `jwt.sign(payload, 'secret123')` or `jwt.sign(payload, process.env.JWT_SECRET)` with no startup validation.
 **Good pattern**:
+
 ```javascript
-const jwtSecret = process.env.JWT_SECRET;
+const jwtSecret = process.env.JWT_SECRET
 if (!jwtSecret || jwtSecret.length < 32) {
-  throw new Error('JWT_SECRET must be set and at least 32 characters');
+  throw new Error('JWT_SECRET must be set and at least 32 characters')
 }
 ```
 
@@ -201,7 +202,7 @@ if (!jwtSecret || jwtSecret.length < 32) {
 **Severity if failed**: 🔴 Critical
 **Applies to**: LLM-integrated applications
 
-**Bad pattern**: ```const prompt = `System: Be helpful. User: ${userInput}`;```
+**Bad pattern**: ``const prompt = `System: Be helpful. User: ${userInput}`;``
 **Good pattern**: Use structured prompt templates with input delimiters, or API-level user/assistant role separation.
 
 **CHECKPOINT [08.09.002]**
@@ -292,12 +293,12 @@ if (!jwtSecret || jwtSecret.length < 32) {
 ### Severity/CVSS Alignment Table
 
 | Our Severity | CVSS Range | OWASP Risk Rating |
-|---|---|---|
-| Critical (C) | 9.0–10.0 | Critical |
-| High (H) | 7.0–8.9 | High |
-| Medium (M) | 4.0–6.9 | Medium |
-| Low (L) | 0.1–3.9 | Low |
-| Info (I) | N/A | Note |
+| ------------ | ---------- | ----------------- |
+| Critical (C) | 9.0–10.0   | Critical          |
+| High (H)     | 7.0–8.9    | High              |
+| Medium (M)   | 4.0–6.9    | Medium            |
+| Low (L)      | 0.1–3.9    | Low               |
+| Info (I)     | N/A        | Note              |
 
 ### Secrets Sweep Command Reference
 
@@ -320,19 +321,19 @@ grep -rn "xox[baprs]-" .  # Slack tokens
 
 ## Volume Scorecard Template
 
-| Subsection | Score (0–10) | Top 3 Findings | Evidence Required |
-|---|---|---|---|
-| 8.1 OWASP Top 10 | | | Per-category evidence list |
-| 8.2 JWT | | | Token config, validation code |
-| 8.3 OAuth 2.0 | | | Redirect URI, state, PKCE |
-| 8.5 CSRF | | | Token/samesite config |
-| 8.6 XSS | | | CSP header, escaping |
-| 8.7 SSRF | | | URL validation, IP blocking |
-| 8.8 SQL Injection | | | Parameterized queries audit |
-| 8.9 Prompt Injection | | | Prompt isolation, guardrails |
-| 8.10 Secrets Management | | | Gitleaks output |
-| 8.12 Docker | | | Dockerfile review |
-| 8.13 Kubernetes | | | Pod Security, PSP config |
+| Subsection              | Score (0–10) | Top 3 Findings | Evidence Required             |
+| ----------------------- | ------------ | -------------- | ----------------------------- |
+| 8.1 OWASP Top 10        |              |                | Per-category evidence list    |
+| 8.2 JWT                 |              |                | Token config, validation code |
+| 8.3 OAuth 2.0           |              |                | Redirect URI, state, PKCE     |
+| 8.5 CSRF                |              |                | Token/samesite config         |
+| 8.6 XSS                 |              |                | CSP header, escaping          |
+| 8.7 SSRF                |              |                | URL validation, IP blocking   |
+| 8.8 SQL Injection       |              |                | Parameterized queries audit   |
+| 8.9 Prompt Injection    |              |                | Prompt isolation, guardrails  |
+| 8.10 Secrets Management |              |                | Gitleaks output               |
+| 8.12 Docker             |              |                | Dockerfile review             |
+| 8.13 Kubernetes         |              |                | Pod Security, PSP config      |
 
 ---
 
@@ -357,14 +358,14 @@ Audit prompt structure, input isolation, output guardrails, cost controls.
 
 ## Incident Response Quick Reference
 
-| Vulnerability | Immediate Action | Root Cause Fix |
-|---|---|---|
-| SQL Injection | WAF block, rotate DB creds | Parameterized queries |
-| XSS | CSP enforce, sanitize input | Output encoding |
-| JWT algorithm confusion | Revoke all tokens | Explicit algorithm in verify() |
-| Secrets exposure | Rotate leaked secret, git purge | Secret vault |
-| SSRF | Block outbound to internal IPs | URL allowlist |
-| Prompt injection | Disable affected prompt | Input/output isolation |
+| Vulnerability           | Immediate Action                | Root Cause Fix                 |
+| ----------------------- | ------------------------------- | ------------------------------ |
+| SQL Injection           | WAF block, rotate DB creds      | Parameterized queries          |
+| XSS                     | CSP enforce, sanitize input     | Output encoding                |
+| JWT algorithm confusion | Revoke all tokens               | Explicit algorithm in verify() |
+| Secrets exposure        | Rotate leaked secret, git purge | Secret vault                   |
+| SSRF                    | Block outbound to internal IPs  | URL allowlist                  |
+| Prompt injection        | Disable affected prompt         | Input/output isolation         |
 
 ---
 
@@ -386,4 +387,4 @@ Audit prompt structure, input isolation, output guardrails, cost controls.
 
 ---
 
-*End of Volume 8*
+_End of Volume 8_

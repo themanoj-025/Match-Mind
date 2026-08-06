@@ -27,6 +27,7 @@ This volume covers 12 domains: PostgreSQL, MySQL, MongoDB, Redis, Elasticsearch,
 **Why this matters**: PostgreSQL does not auto-index FK columns. Unindexed FKs cause sequential scans on parent tables on every DELETE/UPDATE.
 
 **How to detect**:
+
 ```sql
 SELECT conrelid::regclass AS child_table, conname AS fk_name
 FROM pg_constraint
@@ -251,6 +252,7 @@ WHERE contype = 'f'
 **Applies to**: Universal
 
 **Expand/Contract pattern**:
+
 1. Expand: Add new column (nullable), dual-write
 2. Migrate: Backfill, switch reads
 3. Contract: Drop old column
@@ -279,38 +281,38 @@ WHERE contype = 'f'
 ### Index-Decision Flowchart
 
 ┌─ Slow query identified? ─────────────────┐
-│ Yes                                       │
+│ Yes │
 ├─ Run EXPLAIN ANALYZE ─────────────────────┤
-│ Sequential scan? → Add index on filter    │
-│ Index used but slow? → Is it covering?   │
-│   No → Add INCLUDE columns                │
-│   Yes → Check composite ordering          │
-│ Still slow? → Consider partial index      │
+│ Sequential scan? → Add index on filter │
+│ Index used but slow? → Is it covering? │
+│ No → Add INCLUDE columns │
+│ Yes → Check composite ordering │
+│ Still slow? → Consider partial index │
 └───────────────────────────────────────────┘
 
 ### EXPLAIN ANALYZE Reading Guide
 
-| Signal | Meaning | Action |
-|---|---|---|
-| actual rows >> estimated rows | Stale statistics | ANALYZE table |
-| Sort Method: external merge disk | Sort spilled to disk | Increase work_mem |
-| Heap Fetches > 0 with Index Scan | Index not covering | Add INCLUDE columns |
-| Planning Time > 100ms | Too many schemas | Simplify search_path |
+| Signal                           | Meaning              | Action               |
+| -------------------------------- | -------------------- | -------------------- |
+| actual rows >> estimated rows    | Stale statistics     | ANALYZE table        |
+| Sort Method: external merge disk | Sort spilled to disk | Increase work_mem    |
+| Heap Fetches > 0 with Index Scan | Index not covering   | Add INCLUDE columns  |
+| Planning Time > 100ms            | Too many schemas     | Simplify search_path |
 
 ---
 
 ## Volume Scorecard Template
 
-| Subsection | Score (0–10) | Top 3 Findings | Evidence Required |
-|---|---|---|---|
-| 6.1 PostgreSQL | | | FK indexes, autovacuum, pool config |
-| 6.2 MySQL | | | utf8mb4, InnoDB, sql_mode |
-| 6.3 MongoDB | | | Indexes, array growth, pipeline order |
-| 6.4 Redis | | | Eviction, TTL, persistence |
-| 6.5 Elasticsearch | | | Mappings, shard sizing |
-| 6.9 Indexes | | | Redundant indexes, composite ordering |
-| 6.10 Normalization | | | 3NF, documented denormalization |
-| 6.12 Migration/Backup | | | Expand/Contract, restore test |
+| Subsection            | Score (0–10) | Top 3 Findings | Evidence Required                     |
+| --------------------- | ------------ | -------------- | ------------------------------------- |
+| 6.1 PostgreSQL        |              |                | FK indexes, autovacuum, pool config   |
+| 6.2 MySQL             |              |                | utf8mb4, InnoDB, sql_mode             |
+| 6.3 MongoDB           |              |                | Indexes, array growth, pipeline order |
+| 6.4 Redis             |              |                | Eviction, TTL, persistence            |
+| 6.5 Elasticsearch     |              |                | Mappings, shard sizing                |
+| 6.9 Indexes           |              |                | Redundant indexes, composite ordering |
+| 6.10 Normalization    |              |                | 3NF, documented denormalization       |
+| 6.12 Migration/Backup |              |                | Expand/Contract, restore test         |
 
 ---
 
@@ -327,4 +329,4 @@ WHERE contype = 'f'
 
 ---
 
-*End of Volume 6*
+_End of Volume 6_

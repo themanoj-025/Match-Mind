@@ -521,7 +521,7 @@ The refresh token is a JWT with 30-day expiry. There's **no mechanism to revoke 
 const passwordHash = await bcrypt.hash(password, 12)
 ```
 
-12 rounds is reasonable for 2026. However, the `SECURITY.md` says "3 rounds" which contradicts the code. The documentation is out of date.
+12 rounds is reasonable for 2026. However, the `../community/SECURITY.md` says "3 rounds" which contradicts the code. The documentation is out of date.
 
 ### 🔵 Low: CORS Too Permissive
 
@@ -1285,11 +1285,11 @@ Coverage thresholds still at 40% — should be adjusted as coverage improves.
 ### What Works
 
 - Comprehensive README with architecture, tech stack, features, and setup
-- SECURITY.md with vulnerability disclosure process
-- CODE_OF_CONDUCT.md (standard Contributor Covenant)
-- CONTRIBUTING.md with setup instructions
-- SUPPORT.md with contact information
-- CHANGELOG.md with semantic versioning
+- ../community/SECURITY.md with vulnerability disclosure process
+- ../community/CODE_OF_CONDUCT.md (standard Contributor Covenant)
+- ../community/CONTRIBUTING.md with setup instructions
+- ../community/SUPPORT.md with contact information
+- ../community/CHANGELOG.md with semantic versioning
 - .github/ISSUE_TEMPLATE with bug report and feature request templates
 - .github/PULL_REQUEST_TEMPLATE.md
 
@@ -1397,14 +1397,14 @@ async function updateUserStreaks(prisma, userId, wasCorrect) {
 - `.gitignore` is comprehensive (secrets, node_modules, build artifacts, IDE files)
 - `.gitattributes` has proper line ending handling
 - `.editorconfig` for consistent formatting
-- Good commit message format documented in CONTRIBUTING.md
+- Good commit message format documented in ../community/CONTRIBUTING.md
 - `start.bat` is properly gitignored (not accidentally committed)
 
 ### Issues
 
 #### 🟠 No Branch Strategy Documented
 
-No mention of Git Flow, GitHub Flow, or trunk-based development. CONTRIBUTING.md says "Create a feature branch" but doesn't specify naming conventions or branch lifecycle.
+No mention of Git Flow, GitHub Flow, or trunk-based development. ../community/CONTRIBUTING.md says "Create a feature branch" but doesn't specify naming conventions or branch lifecycle.
 
 #### 🟠 No Release Strategy
 
@@ -1417,7 +1417,7 @@ Despite having a CHANGELOG with versions, there's no:
 
 #### 🟡 No Conventional Commits Enforcement
 
-The CONTRIBUTING.md recommends commit format:
+The ../community/CONTRIBUTING.md recommends commit format:
 
 ```
 type(scope): description
@@ -1965,19 +1965,19 @@ Express.js v5 is single-threaded. 100K concurrent users would require:
 ### What's Good
 
 - MIT License ✓
-- CODE_OF_CONDUCT.md ✓
-- CONTRIBUTING.md ✓
-- SECURITY.md ✓
-- SUPPORT.md ✓
+- ../community/CODE_OF_CONDUCT.md ✓
+- ../community/CONTRIBUTING.md ✓
+- ../community/SECURITY.md ✓
+- ../community/SUPPORT.md ✓
 - Issue Templates (bug report + feature request) ✓
 - PR Template ✓
-- CHANGELOG.md ✓
+- ../community/CHANGELOG.md ✓
 
 ### What's Missing
 
 #### 🟠 No Code of Conduct Enforcement Contact
 
-The CODE_OF_CONDUCT.md lists `manojjana.0025@gmail.com` but doesn't describe how enforcement decisions are made or reported anonymously.
+The ../community/CODE_OF_CONDUCT.md lists `manojjana.0025@gmail.com` but doesn't describe how enforcement decisions are made or reported anonymously.
 
 #### 🟠 No Community Health Files
 

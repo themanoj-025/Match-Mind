@@ -8,10 +8,10 @@
 
 MatchMind supports **two database backends** with identical APIs:
 
-| Backend | Use Case | Location |
-|---------|----------|----------|
-| **JSON DB** (production) | Default for all environments, production database | `backend/src/lib/jsonDb.ts` → `backend/src/data/*.json` |
-| **PostgreSQL** | Suitable for production at scale; required for Kubernetes / multi-instance deployments | `docker-compose.yml` (optional) + Prisma schema (reference only) |
+| Backend                  | Use Case                                                                               | Location                                                         |
+| ------------------------ | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| **JSON DB** (production) | Default for all environments, production database                                      | `backend/src/lib/jsonDb.ts` → `backend/src/data/*.json`          |
+| **PostgreSQL**           | Suitable for production at scale; required for Kubernetes / multi-instance deployments | `docker-compose.yml` (optional) + Prisma schema (reference only) |
 
 **Key insight:** Both backends implement the same Prisma-compatible query API. The repository layer (`backend/src/repositories/index.ts`) abstracts over whichever backend is active. Routes and services never import a database driver directly — they go through repositories.
 
@@ -213,27 +213,27 @@ The JSON DB stores data as arrays of objects in JSON files. PostgreSQL would sto
 
 ### 5.1 Field Type Translation
 
-| JSON DB Type | PostgreSQL Type | Notes |
-|---|---|---|
-| `string` (ISO 8601) | `TIMESTAMP WITH TIME ZONE` | Dates stored as strings in JSON, parsed on read |
-| `string` | `TEXT` / `VARCHAR(n)` | Direct mapping |
-| `number` | `INTEGER` / `BIGINT` / `DECIMAL` | JSON has no integer vs float distinction |
-| `boolean` | `BOOLEAN` | Direct mapping |
-| `null` | `NULL` | Both backends support nullable fields |
-| `object` | `JSONB` | Nested objects (e.g., `rosterRules`, `bidIncrementRule`) |
-| `array` | `JSONB` | Nested arrays (e.g., `poolQueue`, `unsoldPlayerIds`) |
+| JSON DB Type        | PostgreSQL Type                  | Notes                                                    |
+| ------------------- | -------------------------------- | -------------------------------------------------------- |
+| `string` (ISO 8601) | `TIMESTAMP WITH TIME ZONE`       | Dates stored as strings in JSON, parsed on read          |
+| `string`            | `TEXT` / `VARCHAR(n)`            | Direct mapping                                           |
+| `number`            | `INTEGER` / `BIGINT` / `DECIMAL` | JSON has no integer vs float distinction                 |
+| `boolean`           | `BOOLEAN`                        | Direct mapping                                           |
+| `null`              | `NULL`                           | Both backends support nullable fields                    |
+| `object`            | `JSONB`                          | Nested objects (e.g., `rosterRules`, `bidIncrementRule`) |
+| `array`             | `JSONB`                          | Nested arrays (e.g., `poolQueue`, `unsoldPlayerIds`)     |
 
 ### 5.2 Key Differences
 
-| Aspect | JSON DB | PostgreSQL |
-|--------|---------|------------|
-| **Primary keys** | Auto-generated `cuid()` (24-char hex) | UUID / auto-increment |
-| **Relations** | Resolved in-memory via `include` | Foreign keys + JOINs |
-| **Compound keys** | Simulated via underscore keys (`roomId_userId`) | Native composite unique constraints |
-| **Atomicity** | Per-collection mutex + temp-file rename | ACID transactions |
-| **Concurrent writes** | In-process mutex (single process only) | Row-level locking (multi-process safe) |
-| **Indexing** | None — O(n) scan per query | B-tree, GIN, BRIN indexes |
-| **Full-text search** | Manual `contains` (O(n) scan) | GIN indexes with `tsvector` |
+| Aspect                | JSON DB                                         | PostgreSQL                             |
+| --------------------- | ----------------------------------------------- | -------------------------------------- |
+| **Primary keys**      | Auto-generated `cuid()` (24-char hex)           | UUID / auto-increment                  |
+| **Relations**         | Resolved in-memory via `include`                | Foreign keys + JOINs                   |
+| **Compound keys**     | Simulated via underscore keys (`roomId_userId`) | Native composite unique constraints    |
+| **Atomicity**         | Per-collection mutex + temp-file rename         | ACID transactions                      |
+| **Concurrent writes** | In-process mutex (single process only)          | Row-level locking (multi-process safe) |
+| **Indexing**          | None — O(n) scan per query                      | B-tree, GIN, BRIN indexes              |
+| **Full-text search**  | Manual `contains` (O(n) scan)                   | GIN indexes with `tsvector`            |
 
 ### 5.3 Important Conversion Rules
 
@@ -286,7 +286,7 @@ async function migrateUserWrite(userData: UserData): Promise<void> {
   // Write to both backends
   await jsonDb.user.update({ where: { id: userData.id }, data: userData })
   await pgUserRepo.update(userData.id, userData)
-  
+
   // Verify consistency
   const jsonUser = await jsonDb.user.findUnique({ where: { id: userData.id } })
   const pgUser = await pgUserRepo.findById(userData.id)
@@ -300,9 +300,7 @@ During dual-write, serve reads from the source of truth:
 
 ```typescript
 function getUser(id: string, readFrom: 'json' | 'pg' = 'json') {
-  return readFrom === 'pg' 
-    ? pgUserRepo.findById(id)
-    : jsonDb.user.findUnique({ where: { id } })
+  return readFrom === 'pg' ? pgUserRepo.findById(id) : jsonDb.user.findUnique({ where: { id } })
 }
 ```
 
@@ -319,6 +317,7 @@ Switch reads to PostgreSQL only after validation confirms parity.
 **Usage:** `node scripts/migrate-json-to-postgres.js [options]`
 
 **Options:**
+
 - `--source <path>` — Path to JSON data directory (default: `backend/src/data`)
 - `--target <url>` — PostgreSQL connection string (default: reads `DATABASE_URL` env var)
 - `--dry-run` — Validate without inserting
@@ -326,6 +325,7 @@ Switch reads to PostgreSQL only after validation confirms parity.
 - `--table <name>` — Migrate a single table only (e.g., `--table user`)
 
 **Exit codes:**
+
 - `0` — Success, all records migrated
 - `1` — Validation errors (missing foreign keys, type mismatches)
 - `2` — Connection failure
@@ -337,6 +337,7 @@ Switch reads to PostgreSQL only after validation confirms parity.
 **Usage:** `node scripts/migrate-postgres-to-json.js [options]`
 
 **Options:**
+
 - `--source <url>` — PostgreSQL connection string (default: `DATABASE_URL` env var)
 - `--target <path>` — Output JSON directory (default: `backend/src/data`)
 - `--table <name>` — Export a single table
@@ -349,6 +350,7 @@ Switch reads to PostgreSQL only after validation confirms parity.
 **Usage:** `node scripts/generate-seed-from-json.js [options]`
 
 **Options:**
+
 - `--input <path>` — Source JSON data directory
 - `--output <path>` — Output seed.json path
 - `--strip-passwords` — Remove `passwordHash` fields
@@ -361,22 +363,22 @@ Switch reads to PostgreSQL only after validation confirms parity.
 
 ### 8.1 When to Migrate JSON DB → PostgreSQL
 
-| Trigger | Reason |
-|---------|--------|
+| Trigger                   | Reason                                                                                                                        |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | Multiple server instances | JSON DB is in-memory + file-based. Each instance has its own copy → data drift. PostgreSQL provides a single source of truth. |
-| >10k concurrent users | JSON DB mutex-based writes become a bottleneck under high concurrency. |
-| Need for complex queries | PostgreSQL's query planner and indexing outperform JSON DB's O(n) scan on large datasets. |
-| Compliance requirements | PostgreSQL offers audit logging, row-level security, and encryption at rest. |
-| Kubernetes deployment | Stateless containers need an external database. JSON DB's file persistence doesn't work across pods. |
+| >10k concurrent users     | JSON DB mutex-based writes become a bottleneck under high concurrency.                                                        |
+| Need for complex queries  | PostgreSQL's query planner and indexing outperform JSON DB's O(n) scan on large datasets.                                     |
+| Compliance requirements   | PostgreSQL offers audit logging, row-level security, and encryption at rest.                                                  |
+| Kubernetes deployment     | Stateless containers need an external database. JSON DB's file persistence doesn't work across pods.                          |
 
 ### 8.2 When to Migrate PostgreSQL → JSON DB
 
-| Trigger | Reason |
-|---------|--------|
+| Trigger                  | Reason                                                                 |
+| ------------------------ | ---------------------------------------------------------------------- |
 | Development environments | Zero setup — no need to install/run PostgreSQL. Just start the server. |
-| CI/CD pipelines | Faster test execution — no Docker containers needed. |
-| Single-server deployment | Lower operational complexity. No database server to maintain. |
-| Prototyping | Rapid schema iteration — just edit a JSON file. No migrations to run. |
+| CI/CD pipelines          | Faster test execution — no Docker containers needed.                   |
+| Single-server deployment | Lower operational complexity. No database server to maintain.          |
+| Prototyping              | Rapid schema iteration — just edit a JSON file. No migrations to run.  |
 
 ### 8.3 Data Integrity Safeguards
 
@@ -398,17 +400,18 @@ When migrating to PostgreSQL, these safeguards are replaced by:
 
 **For a typical migration (JSON DB → PostgreSQL):**
 
-| Step | Duration | Downtime |
-|------|----------|----------|
-| Export from JSON DB | 1–30s (depends on data size) | None (read-only) |
-| Import to PostgreSQL | 5–120s | None (write to empty DB) |
-| Validation | 1–5s | None |
-| Switch backend + restart | 5–15s | Required |
-| Verify | 1–5s | During restart window |
+| Step                     | Duration                     | Downtime                 |
+| ------------------------ | ---------------------------- | ------------------------ |
+| Export from JSON DB      | 1–30s (depends on data size) | None (read-only)         |
+| Import to PostgreSQL     | 5–120s                       | None (write to empty DB) |
+| Validation               | 1–5s                         | None                     |
+| Switch backend + restart | 5–15s                        | Required                 |
+| Verify                   | 1–5s                         | During restart window    |
 
 **Total downtime:** ~10–20 seconds for most deployments.
 
 **Approach for zero-downtime:**
+
 1. Run export during off-peak hours
 2. Set up dual-write (JSON + PG) for 24h to verify consistency
 3. Use a load balancer to drain connections from the old server
@@ -469,13 +472,13 @@ node scripts/migrate-json-to-postgres.js --dry-run --verbose
 
 As of the latest codebase state:
 
-| Item | Status |
-|------|--------|
-| **JSON DB** | ✅ **Production database** — 25 model files, fully operational |
-| **PostgreSQL** | ❌ Not running — no Prisma schema maintained |
-| **Migration scripts** | ⚠️ Referenced but **not present** in the codebase |
-| **Repository layer** | ✅ Present (`backend/src/repositories/index.ts`) — abstracts JSON DB |
-| **docker-compose.yml** | ❌ Runs app container only (no PostgreSQL service defined) |
+| Item                   | Status                                                               |
+| ---------------------- | -------------------------------------------------------------------- |
+| **JSON DB**            | ✅ **Production database** — 25 model files, fully operational       |
+| **PostgreSQL**         | ❌ Not running — no Prisma schema maintained                         |
+| **Migration scripts**  | ⚠️ Referenced but **not present** in the codebase                    |
+| **Repository layer**   | ✅ Present (`backend/src/repositories/index.ts`) — abstracts JSON DB |
+| **docker-compose.yml** | ❌ Runs app container only (no PostgreSQL service defined)           |
 
 ### What would be needed for PostgreSQL migration
 
@@ -491,14 +494,14 @@ As of the latest codebase state:
 
 ### Common Migration Issues
 
-| Symptom | Likely Cause | Fix |
-|---------|-------------|-----|
-| `Record not found` during export | Missing foreign key relationship | Run with `--verbose` to identify orphaned records |
-| `ECONNREFUSED` on PostgreSQL | PostgreSQL not running | `docker compose up -d postgres` |
-| UUID format errors | JSON DB cuid format expected as TEXT | Ensure column type is `TEXT` not `UUID` |
-| Date parsing errors | Non-standard date format in JSON | Check `createdAt`/`updatedAt` fields are ISO 8601 |
-| Data loss on restart (JSON DB) | Backup directory missing | Ensure `.backups` subdirectory exists in data dir |
-| Slow migration on large datasets | No batch processing | Use `--table` flag to migrate one collection at a time |
+| Symptom                          | Likely Cause                         | Fix                                                    |
+| -------------------------------- | ------------------------------------ | ------------------------------------------------------ |
+| `Record not found` during export | Missing foreign key relationship     | Run with `--verbose` to identify orphaned records      |
+| `ECONNREFUSED` on PostgreSQL     | PostgreSQL not running               | `docker compose up -d postgres`                        |
+| UUID format errors               | JSON DB cuid format expected as TEXT | Ensure column type is `TEXT` not `UUID`                |
+| Date parsing errors              | Non-standard date format in JSON     | Check `createdAt`/`updatedAt` fields are ISO 8601      |
+| Data loss on restart (JSON DB)   | Backup directory missing             | Ensure `.backups` subdirectory exists in data dir      |
+| Slow migration on large datasets | No batch processing                  | Use `--table` flag to migrate one collection at a time |
 
 ### Rollback Plan
 

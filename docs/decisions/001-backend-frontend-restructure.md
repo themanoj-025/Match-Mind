@@ -4,7 +4,9 @@
 **Status:** Accepted
 
 ## Context
+
 The initial architecture of Match-Mind had several structural and performance issues:
+
 - **Backend Routing:** Routes were flat and not versioned. Logic was tightly coupled to Express requests, making it hard to test or reuse.
 - **Error Handling:** Used repetitive `asyncHandler` wrappers, which are unnecessary in Express 5.
 - **Type Safety:** The backend contained numerous `any` types, particularly around complex Prisma payloads and Redis interactions.
@@ -35,5 +37,6 @@ The initial architecture of Match-Mind had several structural and performance is
    - Introduced Playwright for End-to-End (E2E) testing of critical user flows (Authentication, Lobby access).
 
 ## Consequences
+
 - **Positive:** Increased modularity, testability, and resilience. Frontend performance and UX improved significantly with automatic caching and retry logic. Future API iterations can safely bump to `v2` without breaking existing clients.
 - **Negative:** Increased dependency surface (React Query, Playwright). Some Prisma types still require manual verification due to TS compiler limitations.

@@ -1,6 +1,7 @@
 # Deployment Topology — Match-Mind
 
 ## High-Level Architecture
+
 Match-Mind is designed to be deployed as a decoupled system in a containerized environment.
 
 ```text
